@@ -1,0 +1,55 @@
+H1 {
+   text-align: center;
+}
+
+BODY {
+     margin-left: 1em;
+     background: #BBEEDF ;
+     color: black ;
+}
+
+IMG.left {
+         float: left ;
+         padding: 2% ;
+         border: none ;
+}
+
+
+DIV.centre {
+           text-align: center ;
+}
+
+DIV.full {
+         width: 100% ;
+         clear: both ;
+         float: none ;
+/*         padding-bottom: 1em ;*/
+}
+
+DIV.left {
+         border: none ;
+         float: left ;
+         width: 50% ;
+
+}
+DIV.right {
+          border: none ;
+          float: right ;
+          width: 50% ;
+}
+
+DIV.news {
+         margin-left: 5% ;
+         border: 1em ;
+         background: white ;
+         width: 90% ;
+}
+PRE {
+    margin-left: 5% ;
+    background: white ;
+    color: black ;
+    width: 90% ;
+}
+P {
+   text-indent: 2em ;
+}

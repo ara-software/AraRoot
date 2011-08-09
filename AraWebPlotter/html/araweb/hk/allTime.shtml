@@ -1,0 +1,28 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-frameset.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<!--#include virtual="/monitor/styles.shtml" -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"  />
+<meta http-equiv="Refresh" content="60" />
+<title>Houskeeping Page</title>
+</head>
+
+<body>
+<!--#include file="top.shtml" -->
+<div class="middle">
+<div class="content">
+<!--#include file="content/${DOCUMENT_NAME}" -->
+<!--#config timefmt="%d %b %Y" -->
+<p class="copyright">
+Copyright &copy; 2010 Ryan Nichol,&nbsp;&nbsp;
+(last modified <!--#flastmod file="content/${DOCUMENT_NAME}" -->)
+</p>
+
+</div>
+<!--#include file="left.shtml" -->
+</div>
+<!--#include virtual="/monitor/bottom.shtml" -->

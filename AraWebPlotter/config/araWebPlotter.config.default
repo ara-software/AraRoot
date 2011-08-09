@@ -1,0 +1,8 @@
+<input>
+eventLinkDir#S=/Users/rjn/ara/webPlotter/eventLinks;
+hkLinkDir#S=/Users/rjn/ara/webPlotter/hkLinks;
+</input>
+
+<output>
+rootFileDir#S=/Users/rjn/ara/webPlotter/rootFiles;
+</output>

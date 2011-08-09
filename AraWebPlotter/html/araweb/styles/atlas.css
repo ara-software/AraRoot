@@ -1,0 +1,78 @@
+BODY {
+     margin-left: 1em;
+     background: #FFFFC0 ;
+     color: black ;
+}
+
+IMG.left {
+        vertical-align: middle;
+         float: left ;
+         padding: 2% ;
+}
+IMG.right {
+        vertical-align: middle;
+         float: right ;
+         padding: 2% ;
+}
+
+H2.A:link {color:green}
+H2:A:visited {color:olive}
+
+H1 {
+/*
+        float: both;
+        margin-left: 0;
+        vertical-align: middle;
+*/
+        clear: both ;
+        float: none ;
+           font-size: xx-large ;
+           font-weight: 800 ;
+           text-align: center ;
+           color: teal ;
+}
+
+
+H2 {
+           margin-top: 0.5em ;
+           font-size: x-large ;
+           font-weight: 800 ;
+           text-align: center ;
+           color: teal  ;
+}
+H3 {
+           font-size: large ;
+           font-weight: 600 ;
+           color: teal ;
+}
+
+HR.sep {
+       width: 50% ;
+/*     text-align: center ;*/
+       margin-top: 0.25em ;
+       margin-left: 25% ;
+}
+
+
+DIV.centre {
+           text-align: center ;
+}
+
+DIV.full {
+         width: 100% ;
+         clear: both ;
+         float: none ;
+         padding-bottom: 1em ;
+}
+
+DIV.left {
+         border: none ;
+         float: left ;
+         width: 50% ;
+
+}
+DIV.right {
+          border: none ;
+          float: right ;
+          width: 50% ;
+}

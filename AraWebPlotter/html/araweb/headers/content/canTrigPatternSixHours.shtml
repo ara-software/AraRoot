@@ -1,0 +1,5 @@
+<h3>Current Time -- <!--#echo var="DATE_LOCAL"--></h3>
+<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
+<h3>Last Event Packet -- <!--#flastmod virtual="/monitor/lastEvent"--></h3>
+<a name="canTrigPattern"><h3>Trigger Pattern</h3></a>
+<img style="border:outset" src="canTrigPatternSixHours.png" alt="canTrigPattern" />

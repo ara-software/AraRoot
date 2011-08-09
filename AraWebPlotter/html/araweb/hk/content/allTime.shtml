@@ -1,0 +1,54 @@
+<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
+<h3></h3>
+<ul>
+<li>Last Hk Packet -- <!--#flastmod virtual="/monitor/lastHk"--></li>
+</ul>
+
+<table border="1" align="center" width="50%">
+<tr>
+<td><a name="canTempAll" align="center"><h3>Temperatures</h3></a>
+<a href="canTempAll.shtml" target="_top">
+<img src="canTempAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpDisconeAll" align="center"><h3>RF Power Discone</h3></a>
+<a href="canRfpDisconeAll.shtml" target="_top"> 
+<img src="canRfpDisconeAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpBatwingAll" align="center"><h3>RF Power Batwing</h3></a>
+<a href="canRfpBatwingAll.shtml" target="_top">
+<img src="canRfpBatwingAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclDisconeAll" align="center"><h3>Scaler - Discone</h3></a>
+<a href="canSclDisconeAll.shtml" target="_top"> 
+<img src="canSclDisconeAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatMinusAll" align="center"><h3>Scaler - Batwing-</h3></a>
+<a href="canSclBatMinusAll.shtml" target="_top">
+<img src="canSclBatMinusAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatPlusAll" align="center"><h3>Scaler - Batwing+</h3></a>
+<a href="canSclBatPlusAll.shtml" target="_top">
+<img src="canSclBatPlusAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclGlobalAll" align="center"><h3>Scaler - Global</h3></a>
+<a href="canSclGlobalAll.shtml" target="_top"> 
+<img src="canSclGlobalAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclTrigL1All" align="center"><h3>Scaler - L1 Trigger</h3></a>
+<a href="canSclTrigL1All.shtml" target="_top">
+<img src="canSclTrigL1All.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canDacAll" align="center"><h3>DAC</h3></a>
+<a href="canDacAll.shtml" target="_top">
+<img src="canDacAll.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+</table>
+
+
+
+

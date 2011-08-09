@@ -1,0 +1,54 @@
+<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
+<h3></h3>
+<ul>
+<li>Last Hk Packet -- <!--#flastmod virtual="/monitor/lastHk"--></li>
+</ul>
+
+<table border="1" align="center" width="50%">
+<tr>
+<td><a name="canTempTwelveHours" align="center"><h3>Temperatures</h3></a>
+<a href="canTempTwelveHours.shtml" target="_top">
+<img src="canTempTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpDisconeTwelveHours" align="center"><h3>RF Power Discone</h3></a>
+<a href="canRfpDisconeTwelveHours.shtml" target="_top"> 
+<img src="canRfpDisconeTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpBatwingTwelveHours" align="center"><h3>RF Power Batwing</h3></a>
+<a href="canRfpBatwingTwelveHours.shtml" target="_top">
+<img src="canRfpBatwingTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclDisconeTwelveHours" align="center"><h3>Scaler - Discone</h3></a>
+<a href="canSclDisconeTwelveHours.shtml" target="_top"> 
+<img src="canSclDisconeTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatMinusTwelveHours" align="center"><h3>Scaler - Batwing-</h3></a>
+<a href="canSclBatMinusTwelveHours.shtml" target="_top">
+<img src="canSclBatMinusTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatPlusTwelveHours" align="center"><h3>Scaler - Batwing+</h3></a>
+<a href="canSclBatPlusTwelveHours.shtml" target="_top">
+<img src="canSclBatPlusTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclGlobalTwelveHours" align="center"><h3>Scaler - Global</h3></a>
+<a href="canSclGlobalTwelveHours.shtml" target="_top"> 
+<img src="canSclGlobalTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclTrigL1TwelveHours" align="center"><h3>Scaler - L1 Trigger</h3></a>
+<a href="canSclTrigL1TwelveHours.shtml" target="_top">
+<img src="canSclTrigL1TwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canDacTwelveHours" align="center"><h3>DAC</h3></a>
+<a href="canDacTwelveHours.shtml" target="_top">
+<img src="canDacTwelveHours.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+</table>
+
+
+
+

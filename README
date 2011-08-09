@@ -1,0 +1,67 @@
+##############################################################################
+###### ARA ROOT-based Test Bed Software                                 ######
+######                                                                  ######
+###### Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                          ######
+##############################################################################
+
+Website
+========
+http://www.hep.ucl.ac.uk/uhen/ara/araroot
+
+Introduction
+============
+This is the first version of the ARA ROOT-based TestBed software. The software comprises several libraries and executables.
+
+Libraries:
+----------
+libAraEvent.so  -- Contains all of the class definitions for storing and manipulating Ara Event and Housekeeping data
+libAraDisplay.so -- The library for AraDisplay (the MagicDisplay spin off)
+libAraWebPlotter.so -- The library for the AraWebPlotter
+
+Executables:
+------------
+makeAraEventTree -- Program to convert the raw ARA TestBed data into a ROOT format
+AraWebRootFileMaker -- Program to make ROOT files for the webplotter
+AraWebPlotter -- Program that reads these files and plots stuff
+
+Scripts:
+---------
+runAraEventFileMaker.sh -- Script for calling makeAraEventTree
+runAraEventFileMaker.sh -- Script for calling makeAraEventTree
+
+ROOT Macros:
+------------
+runAraDisplay.C -- Script for starting AraDisplay
+
+
+Prerequisites
+=============
+ROOT
+
+Optional Extras
+================
+(Necessary for FFT related fun, which is quite useful)
+FFTW3 -- Fastest Fourier Transform in the West
+libRootFftwWrapper -- a ROOT wrapper for FFTW 3 downloadable from
+http://www.hep.ucl.ac.uk/uhen/libRootFftwWrapper/
+
+
+Installation
+============
+Checkout the code from the ARA SVN repository, eg.: 
+svn co svn+ssh://ara@hepts2.phys.hawaii.edu/data2/svnroot/ara/AraRoot AraRoot
+or download the latest tarball from the website at the top of the file
+
+Define the ARA_UTIL_INSTALL_DIR to point to the location you want the library installed (the library files will end up in (ARA_UTIL_INSTALL_DIR)/lib and the header files in (ARA_UTIL_INSTALL_DIR)/include and the executables in (ARA_UTIL_INSTALL_DIR)/bin). If this is not defined the installation directory will default to /usr/local
+Do
+make
+make install
+
+
+Troubleshooting
+================
+There are a myriad of ways that one can run into problems with the software
+Path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the ARA_UTIL_INSTALL_DIR and have it point to the location you want to install all the packages. If things are set up correctly you will end up with a ARA_UTIL_INSTALL_DIR/include and ARA_UTIL_INSTALL_DIR/lib and ARA_UTIL_INSTALL_DIR/share/anitaCalib all populated with essential headers, libraries and calibration constants. A quick round of
+make clean all install
+in libRootFftwWrapper and AraRoot can solve most such difficulties.
+

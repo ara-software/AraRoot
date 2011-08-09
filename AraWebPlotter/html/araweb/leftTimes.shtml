@@ -1,0 +1,28 @@
+<!-- <h2 class="navigation">Change Timespan</h2>
+<p class="navigation">
+<a class="leftBar" title=
+"All Time" href="allTime.shtml" accesskey=
+"C">All Time</a>
+<span class="spacer">&nbsp;&nbsp;</span>
+<a class=
+"leftBar" title="One Day" href="oneDay.shtml"
+accesskey="C">One Day</a>
+<span class=
+"spacer">&nbsp;&nbsp;</span>
+<a class=
+"leftBar" title="Twelve Hours" href="twelveHours.shtml"
+accesskey="C">Twelve Hours</a>
+<span class=
+"spacer">&nbsp;&nbsp;</span>
+<a class=
+"leftBar" title="Six Hours" href="sixHours.shtml"
+accesskey="C">Six Hours</a>
+<span class=
+"spacer">&nbsp;&nbsp;</span>
+<a class=
+"leftBar" title="One Hour" href="oneHour.shtml"
+accesskey="C">One Hour</a>
+<span class=
+"spacer">&nbsp;&nbsp;</span>
+</p>
+-->

@@ -1,0 +1,54 @@
+<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
+<h3></h3>
+<ul>
+<li>Last Hk Packet -- <!--#flastmod virtual="/monitor/lastHk"--></li>
+</ul>
+
+<table border="1" align="center" width="50%">
+<tr>
+<td><a name="canTempOneDay" align="center"><h3>Temperatures</h3></a>
+<a href="canTempOneDay.shtml" target="_top">
+<img src="canTempOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpDisconeOneDay" align="center"><h3>RF Power Discone</h3></a>
+<a href="canRfpDisconeOneDay.shtml" target="_top"> 
+<img src="canRfpDisconeOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canRfpBatwingOneDay" align="center"><h3>RF Power Batwing</h3></a>
+<a href="canRfpBatwingOneDay.shtml" target="_top">
+<img src="canRfpBatwingOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclDisconeOneDay" align="center"><h3>Scaler - Discone</h3></a>
+<a href="canSclDisconeOneDay.shtml" target="_top"> 
+<img src="canSclDisconeOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatMinusOneDay" align="center"><h3>Scaler - Batwing-</h3></a>
+<a href="canSclBatMinusOneDay.shtml" target="_top">
+<img src="canSclBatMinusOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclBatPlusOneDay" align="center"><h3>Scaler - Batwing+</h3></a>
+<a href="canSclBatPlusOneDay.shtml" target="_top">
+<img src="canSclBatPlusOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+<tr>
+<td><a name="canSclGlobalOneDay" align="center"><h3>Scaler - Global</h3></a>
+<a href="canSclGlobalOneDay.shtml" target="_top"> 
+<img src="canSclGlobalOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canSclTrigL1OneDay" align="center"><h3>Scaler - L1 Trigger</h3></a>
+<a href="canSclTrigL1OneDay.shtml" target="_top">
+<img src="canSclTrigL1OneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="canDacOneDay" align="center"><h3>DAC</h3></a>
+<a href="canDacOneDay.shtml" target="_top">
+<img src="canDacOneDay.png" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+</table>
+
+
+
+

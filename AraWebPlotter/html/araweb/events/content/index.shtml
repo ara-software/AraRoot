@@ -1,0 +1,22 @@
+<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
+<h3></h3>
+<ul>
+<li>Last Event -- <!--#flastmod virtual="/monitor/lastEvent"--></li>
+</ul>
+
+<table border="1" align="center" width="50%">
+<tr>
+<td><a name="lastEvent" align="center"><h3>Last Event</h3></a>
+<a href="lastEvent.shtml" target="_top"> 
+<img src="lastEvent.gif" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+<td><a name="browseEvents" align="center"><h3>Browse Events</h3></a>
+<a href="browseEvents.php" target="_top">
+<img src="lastEvent.gif" alt="Resized PNG graphic" title="Click to view" border="1" width="158" height="150" hspace="10" /></a>
+</td>
+</tr>
+</table>
+
+
+
+
