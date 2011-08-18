@@ -5,7 +5,8 @@
 #pragma link off all functions;
 
 
-
+#pragma link C++ class AraOneEventHkData+;
+#pragma link C++ class AraOneSensorHkData+;
 #pragma link C++ class RawAraStationEvent+;
 #pragma link C++ class RawAraTestBedStationHeader+;
 #pragma link C++ class RawAraTestBedStationEvent+;

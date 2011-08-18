@@ -44,6 +44,9 @@ extern void G__set_cpp_environmenteventDict();
 #include "AraGeomTool.h"
 #include "UsefulAraStationEvent.h"
 #include "araStructures.h"
+#include "AraOneEventHkData.h"
+#include "AraOneSensorHkData.h"
+#include "araOneStructures.h"
 #include "araDefines.h"
 #include <algorithm>
 namespace std { }
@@ -95,5 +98,9 @@ extern G__linked_taginfo G__eventDictLN_AraSurfaceOrientation;
 extern G__linked_taginfo G__eventDictLN_AraSurfaceOrientationcLcLEAraSurfaceOrientation;
 extern G__linked_taginfo G__eventDictLN_AraAntennaInfo;
 extern G__linked_taginfo G__eventDictLN_AraGeomTool;
+extern G__linked_taginfo G__eventDictLN_AraEventHk_t;
+extern G__linked_taginfo G__eventDictLN_AraSensorHk_t;
+extern G__linked_taginfo G__eventDictLN_AraOneEventHkData;
+extern G__linked_taginfo G__eventDictLN_AraOneSensorHkData;
 
 /* STUB derived class for protected member access */
