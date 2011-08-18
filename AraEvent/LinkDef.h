@@ -4,16 +4,20 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class RawAraEvent+;
-#pragma link C++ class RawAraHeader+;
-#pragma link C++ class AraRawRFChannel+;
-#pragma link C++ class AraHkData+;
-#pragma link C++ class FullAraHkEvent+;
-#pragma link C++ class AraTriggerMonitor+;
-#pragma link C++ class UsefulAraEvent+;
+
+
+#pragma link C++ class RawAraStationEvent+;
+#pragma link C++ class RawAraTestBedStationHeader+;
+#pragma link C++ class RawAraTestBedStationEvent+;
+#pragma link C++ class AraRawTestBedRFChannel+;
+#pragma link C++ class AraTestBedHkData+;
+#pragma link C++ class FullAraTestBedHkEvent+;
+#pragma link C++ class AraTestBedTriggerMonitor+;
+#pragma link C++ class UsefulAraStationEvent+;
 #pragma link C++ class AraAntennaInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
+
 
 #pragma link C++ namespace     AraCalType;
 #pragma link C++ enum          AraCalType::EAraCalType;

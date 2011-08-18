@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraEvent.cxx        ARA header reading class                  /////
+/////  RawAraTestBedStationEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,31 +7,32 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraEvent.h"
+#include "RawAraTestBedStationEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraEvent);
+ClassImp(RawAraTestBedStationEvent);
 
-RawAraEvent::RawAraEvent() 
+RawAraTestBedStationEvent::RawAraTestBedStationEvent()   
 {
-   //Default Constructor
+  
+  //Default Constructor
 }
 
-RawAraEvent::~RawAraEvent() {
+RawAraTestBedStationEvent::~RawAraTestBedStationEvent() {
    //Default Destructor
 }
 
 
-RawAraEvent::RawAraEvent(AraEventBody_t *bdPtr)
+RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPtr)
   :head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
-  for(int i=0;i<NUM_DIGITIZED_CHANNELS;i++) {
+  for(int i=0;i<NUM_DIGITIZED_TESTBED_CHANNELS;i++) {
     chan[i].fillChannel(&(bdPtr->channel[i]));
   }
 }
 
-Int_t RawAraEvent::getEarliestSample(Int_t chanIndex)
+Int_t RawAraTestBedStationEvent::getEarliestSample(Int_t chanIndex)
 {
  Int_t lastHitBus=this->getLastHitBus(chanIndex);
  Int_t firstHitbus=this->getFirstHitBus(chanIndex);
@@ -48,7 +49,7 @@ Int_t RawAraEvent::getEarliestSample(Int_t chanIndex)
  return 1;
 }
 
-Int_t RawAraEvent::getLatestSample(Int_t chanIndex)
+Int_t RawAraTestBedStationEvent::getLatestSample(Int_t chanIndex)
 {
  Int_t lastHitBus=this->getLastHitBus(chanIndex);
  Int_t firstHitbus=this->getFirstHitBus(chanIndex);

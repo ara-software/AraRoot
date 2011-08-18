@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "AraEventCalibrator.h"
-#include "UsefulAraEvent.h"
+#include "UsefulAraStationEvent.h"
 #include "AraGeomTool.h"
 #include "TMath.h"
 #include "TGraph.h"
@@ -131,10 +131,10 @@ void AraEventCalibrator::loadPedestals()
   }
 
   int chip,chan,samp;
-  for(chip=0;chip<ACTIVE_CHIPS;++chip) {
-    for(chan=0;chan<CHANNELS_PER_CHIP;++chan) {
-      int chanIndex = chip*CHANNELS_PER_CHIP+chan;
-      for(samp=0;samp<MAX_NUMBER_SAMPLES;++samp) {
+  for(chip=0;chip<LAB3_PER_TESTBED;++chip) {
+    for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
+      int chanIndex = chip*CHANNELS_PER_LAB3+chan;
+      for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	pedestalData[chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
       }
     }
@@ -142,10 +142,10 @@ void AraEventCalibrator::loadPedestals()
   gzclose(inPed);
 }
 
-int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex,int overrideRCO)
+int AraEventCalibrator::doBinCalibration(UsefulAraStationEvent *theEvent, int chanIndex,int overrideRCO)
 {
-  int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_CHIP;
-  int nChan=theEvent->chan[chanIndex].chanId%CHANNELS_PER_CHIP;
+  int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
+  int nChan=theEvent->chan[chanIndex].chanId%CHANNELS_PER_LAB3;
   int rco=overrideRCO;
   if(overrideRCO!=0 && overrideRCO!=1) 
     rco=theEvent->getRCO(chanIndex);
@@ -157,7 +157,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex
 
 
   double calTime=0;
-  for(int samp=0;samp<MAX_NUMBER_SAMPLES;++samp){
+  for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
     rawadc[samp]=theEvent->chan[chanIndex].data[samp];
     if(theEvent->chan[chanIndex].data[samp]==0){
       calwv[samp]=0;
@@ -182,7 +182,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex
       }
     }
     else{
-      for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES;++samp) {
+      for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	tempTimeNums[ir++]=calTime;
 	calTime+=binWidths[nChip][1-rco][samp];
       }
@@ -193,11 +193,11 @@ int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex
 	calTime+=binWidths[nChip][rco][samp];
       }
     }
-    for(int samp=ir;samp<MAX_NUMBER_SAMPLES;++samp) {
+    for(int samp=ir;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
       tempTimeNums[samp]=calTime;
       calTime+=1;
     }    
-    TMath::Sort(MAX_NUMBER_SAMPLES,tempTimeNums,indexNums,kFALSE);
+    TMath::Sort(MAX_NUMBER_SAMPLES_LAB3,tempTimeNums,indexNums,kFALSE);
   }
   // ... and rotate
   int ir=0;
@@ -206,18 +206,18 @@ int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex
     for(int samp=hbstart+1;samp<hbend;++samp)
       v[ir++]=calwv[samp];
   }else{
-    for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES;++samp) 
+    for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) 
       v[ir++]=calwv[samp];	
     for(int samp=0;samp<hbstart;++samp)
       v[ir++]=calwv[samp];
   }
   numValid=ir;
   // Fill in remaining bins with zeros
-  for(int samp=ir;samp<MAX_NUMBER_SAMPLES;++samp)
+  for(int samp=ir;samp<MAX_NUMBER_SAMPLES_LAB3;++samp)
     v[samp]=0;
   
   //Now we just have to make sure the times are monotonically increasing
-  for(int i=0;i<MAX_NUMBER_SAMPLES;i++) {
+  for(int i=0;i<MAX_NUMBER_SAMPLES_LAB3;i++) {
     calTimeNums[i]=tempTimeNums[indexNums[i]];
     calVoltNums[i]=v[indexNums[i]];
     //      std::cout << i << "\t" << indexNums[i] << "\t" << calTimeNums[i] << "\t" << calVoltNums[i] << "\n";
@@ -226,7 +226,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraEvent *theEvent, int chanIndex
 }
 
 
-void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::AraCalType_t calType) 
+void AraEventCalibrator::calibrateEvent(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
   
   static int gotPeds=0;
@@ -238,28 +238,28 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
 
 
   // Calibrate waveforms
-  for(int samp=0;samp<MAX_NUMBER_SAMPLES;++samp){
+  for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
     sampNums[samp]=samp;
     timeNums[samp]=samp*NSPERSAMP;
   }
   
-  for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_CHANNELS; ++chanIndex ){
+  for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_TESTBED_CHANNELS; ++chanIndex ){
     int numValid=doBinCalibration(theEvent,chanIndex);
 
 
 
-    //Now we stuff it back into the UsefulAraEvent object
+    //Now we stuff it back into the UsefulAraStationEvent object
          
     if(calType==AraCalType::kNoCalib) {
-      theEvent->fNumPoints[chanIndex]=MAX_NUMBER_SAMPLES;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+      theEvent->fNumPoints[chanIndex]=MAX_NUMBER_SAMPLES_LAB3;
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fVolts[chanIndex][samp]=rawadc[samp];
 	theEvent->fTimes[chanIndex][samp]=sampNums[samp];
       }
     }
     if(calType==AraCalType::kJustUnwrap || calType==AraCalType::kADC) {
       theEvent->fNumPoints[chanIndex]=numValid;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fTimes[chanIndex][samp]=sampNums[samp];
 	if(samp<numValid) {
 	  theEvent->fVolts[chanIndex][samp]=v[samp];
@@ -271,7 +271,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
     }
     if(calType==AraCalType::kVoltageTime) {
       theEvent->fNumPoints[chanIndex]=numValid;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fTimes[chanIndex][samp]=timeNums[samp];
 	if(samp<numValid) {
 	  theEvent->fVolts[chanIndex][samp]=v[samp];
@@ -282,8 +282,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
       }
     }    
     if(calType==AraCalType::kJustPed) {
-      theEvent->fNumPoints[chanIndex]=MAX_NUMBER_SAMPLES;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+      theEvent->fNumPoints[chanIndex]=MAX_NUMBER_SAMPLES_LAB3;
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fVolts[chanIndex][samp]=pedsubadc[samp];
 	theEvent->fTimes[chanIndex][samp]=sampNums[samp];
       }
@@ -291,7 +291,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
     if(AraCalType::hasBinWidthCalib(calType)) {
       //Almost always want this
       theEvent->fNumPoints[chanIndex]=numValid;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fTimes[chanIndex][samp]=calTimeNums[samp];
 	if(samp<numValid) {
 	  theEvent->fVolts[chanIndex][samp]=calVoltNums[samp];
@@ -308,9 +308,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
   if(AraCalType::hasClockAlignment(calType)) {
     //All of the higher calibrations do some form of clock alignment
     calcClockAlignVals(theEvent,calType);    
-    for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_CHANNELS; ++chanIndex ){
-      int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_CHIP;
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+    for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_TESTBED_CHANNELS; ++chanIndex ){
+      int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
+      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
 	theEvent->fTimes[chanIndex][samp]+=clockAlignVals[nChip];
       }
     }
@@ -321,9 +321,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAraEvent *theEvent, AraCalType::Ar
 
   //For now we just have the one calibration type for interleaving
   AraGeomTool *tempGeom = AraGeomTool::Instance();
-  for(int  rfchan = 0; rfchan < RFCHANS_PER_STATION; ++rfchan ){
-    memset(theEvent->fVoltsRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES);
-    memset(theEvent->fTimesRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES);
+  for(int  rfchan = 0; rfchan < RFCHANS_PER_TESTBED; ++rfchan ){
+    memset(theEvent->fVoltsRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES_LAB3);
+    memset(theEvent->fTimesRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES_LAB3);
     if(tempGeom->getNumLabChansForChan(rfchan)==2) {
       //      std::cout << chan << "\t"
       //		<< tempGeom->getFirstLabChanIndexForChan(rfchan) << "\t"
@@ -455,7 +455,7 @@ void AraEventCalibrator::loadCalib()
   std::ifstream BinFile(calibFile);
   double width;
   while(BinFile >> chip >> rco) {
-    for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+    for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
       BinFile >> width;
       binWidths[chip][rco][samp]=width;
     }
@@ -478,14 +478,14 @@ void AraEventCalibrator::loadCalib()
 
 
 
-void AraEventCalibrator::calcClockAlignVals(UsefulAraEvent *theEvent, AraCalType::AraCalType_t calType)
+void AraEventCalibrator::calcClockAlignVals(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType)
 {
   if(!AraCalType::hasClockAlignment(calType)) return;
-  TGraph *grClock[ACTIVE_CHIPS]={0};
-  Double_t lag[ACTIVE_CHIPS]={0};
-  for(int chip=0;chip<ACTIVE_CHIPS;chip++) {
+  TGraph *grClock[LAB3_PER_TESTBED]={0};
+  Double_t lag[LAB3_PER_TESTBED]={0};
+  for(int chip=0;chip<LAB3_PER_TESTBED;chip++) {
     clockAlignVals[chip]=0;    
-    int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_CHIP*chip; 
+    int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip; 
     grClock[chip]=theEvent->getGraphFromElecChan(chanIndex);
     lag[chip]=estimateClockLag(grClock[chip]);
     delete grClock[chip];
@@ -558,11 +558,11 @@ Double_t AraEventCalibrator::estimateClockLag(TGraph *grClock)
 
 }
 
-void AraEventCalibrator::fillRCOGuessArray(UsefulAraEvent *theEvent, int rcoGuess[ACTIVE_CHIPS])
+void AraEventCalibrator::fillRCOGuessArray(UsefulAraStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED])
 {
 
-  for(int chip=0;chip<ACTIVE_CHIPS;chip++) {
-    int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_CHIP*chip;
+  for(int chip=0;chip<LAB3_PER_TESTBED;chip++) {
+    int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip;
     rcoGuess[chip]=theEvent->getRawRCO(chanIndex);
     
     Double_t period[2]={0};
@@ -601,7 +601,7 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
   // This funciton estimates the period by just using all the negative-positive zero crossing
   if(numPoints<3) return 0;
   Double_t mean=0;
-  Double_t vVals[MAX_NUMBER_SAMPLES]={0};
+  Double_t vVals[MAX_NUMBER_SAMPLES_LAB3]={0};
   for(int i=0;i<numPoints;i++) {
     mean+=calVoltNums[i];
   }

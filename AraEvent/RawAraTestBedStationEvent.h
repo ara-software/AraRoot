@@ -1,43 +1,44 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraEvent.h        Raw ARA event class                      /////
+/////  RawAraTestBedStationEvent.h        Raw ARA event class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARAEVENT_H
-#define RAWARAEVENT_H
+#ifndef RAWARATESTBEDSTATIONEVENT_H
+#define RAWARATESTBEDSTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
 #include "araStructures.h"
 #include "araDefines.h"
-#include "RawAraHeader.h"
-#include "AraRawRFChannel.h"
-#include "AraTriggerMonitor.h"
-#include "AraHkData.h"
+#include "RawAraStationEvent.h"
+#include "RawAraTestBedStationHeader.h"
+#include "AraRawTestBedRFChannel.h"
+#include "AraTestBedTriggerMonitor.h"
+#include "AraTestBedHkData.h"
 
-//!  RawAraEvent -- The Raw ARA Event Data
+//!  RawAraTestBedStationEvent -- The Raw ARA Event Data
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses
 */
-class RawAraEvent: public TObject
+class RawAraTestBedStationEvent: public TObject
 {
  public:
-   RawAraEvent(); ///< Default constructor
-   RawAraEvent(AraEventBody_t *theBody); ///< Assignment constructor
-   ~RawAraEvent(); ///< Destructor
+   RawAraTestBedStationEvent(); ///< Default constructor
+   RawAraTestBedStationEvent(AraTestBedEventBody_t *theBody); ///< Assignment constructor
+   ~RawAraTestBedStationEvent(); ///< Destructor
 
    //Important Stuff
    UInt_t whichPeds; ///< Timestamp of pedestals used in subtraction
 
    //The data
-   RawAraHeader head; ///< The header
-   AraRawRFChannel chan[NUM_DIGITIZED_CHANNELS]; ///< RawRF data
-   AraTriggerMonitor trig; ///< The trigger
-   AraHkData hk; ///< The hk
+   RawAraTestBedStationHeader head; ///< The header
+   AraRawTestBedRFChannel chan[NUM_DIGITIZED_TESTBED_CHANNELS]; ///< RawRF data
+   AraTestBedTriggerMonitor trig; ///< The trigger
+   AraTestBedHkData hk; ///< The hk
    
    Int_t getLabChip(Int_t chanIndex) {
      return chan[chanIndex].getLabChip();
@@ -62,8 +63,10 @@ class RawAraEvent: public TObject
    Double_t getRubidiumTriggerTimeInSec() {return trig.getRubidiumTriggerTimeInSec();} ///< Returns the rubidium time divided by 280M
 
 
-  ClassDef(RawAraEvent,1);
+  ClassDef(RawAraTestBedStationEvent,1);
 };
+
+
 
 
 #endif //RAWARAEVENT_H

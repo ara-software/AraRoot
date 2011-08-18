@@ -1,30 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraTriggerMonitor.h        Trigger Monitor class                  /////
+/////  AraTestBedTriggerMonitor.h        Trigger Monitor class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing trigger monitor                     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARATRIGGERMONITOR_H
-#define ARATRIGGERMONITOR_H
+#ifndef ARATESTBEDTRIGGERMONITOR_H
+#define ARATESTBEDTRIGGERMONITOR_H
 
 //Includes
 #include <TObject.h>
 #include "araStructures.h"
 #include "araDefines.h"
 
-//!  AraTriggerMonitor -- The Trigger Monitor
+//!  AraTestBedTriggerMonitor -- The Trigger Monitor
 /*!
   The ROOT implementation of the Trigger Monitor
   \ingroup rootclasses
 */
-class AraTriggerMonitor: public TObject
+class AraTestBedTriggerMonitor: public TObject
 {
  public:
-   AraTriggerMonitor(); ///< Default constructor
-   AraTriggerMonitor(AraTriggerMonitorStruct_t *theTrig); ///< Assignment constructor
-   ~AraTriggerMonitor(); ///< Destructor
+   AraTestBedTriggerMonitor(); ///< Default constructor
+   AraTestBedTriggerMonitor(AraTestBedTriggerMonitorStruct_t *theTrig); ///< Assignment constructor
+   ~AraTestBedTriggerMonitor(); ///< Destructor
    
    //!  The trigger type
    /*!
@@ -75,8 +75,8 @@ class AraTriggerMonitor: public TObject
    UInt_t getRubidiumTriggerTime(); ///<Returns the 32-bit (well maybe 29-bit) trigger time
    Double_t getRubidiumTriggerTimeInSec();///< Returns the rubidium time divided by 280M
 
-   ClassDef(AraTriggerMonitor,1);
+   ClassDef(AraTestBedTriggerMonitor,1);
 };
 
 
-#endif //ARATRIGGERMONITOR_H
+#endif //ARATESTBEDTRIGGERMONITOR_H

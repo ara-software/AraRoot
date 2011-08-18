@@ -1,41 +1,41 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraHkData.cxx        Definition of the AraHkData            /////
+/////  AraTestBedHkData.cxx        Definition of the AraTestBedHkData            /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that holds AraHkData                         /////
+/////     A simple class that holds AraTestBedHkData                         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraHkData.h"
+#include "AraTestBedHkData.h"
 #include "TMath.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(AraHkData);
+ClassImp(AraTestBedHkData);
 
-AraHkData::AraHkData() 
+AraTestBedHkData::AraTestBedHkData() 
 {
    //Default Constructor
 }
 
-AraHkData::~AraHkData() {
+AraTestBedHkData::~AraTestBedHkData() {
    //Default Destructor
 }
 
 
-AraHkData::AraHkData(AraHkDataStruct_t *theHk)
+AraTestBedHkData::AraTestBedHkData(AraTestBedHkDataStruct_t *theHk)
 {
-  //From TemperatureDataStruct_t
+  //From AraTestBedAraTestBedTemperatureDataStruct_t
   memcpy(temp,theHk->temp.temp,8*sizeof(unsigned short)); ///< Temperatures
   
-  //From RFPowerDataStruct_t   
+  //From AraTestBedAraTestBedRFPowerDataStruct_t   
   memcpy(rfpDiscone,theHk->rfPow.discone,8*sizeof(unsigned short)); ///< RF Power
   memcpy(rfpBatwing,theHk->rfPow.batwing,8*sizeof(unsigned short)); ///< RF Power
   
-  //From DACDataStruct_t
+  //From AraTestBedAraTestBedDACDataStruct_t
   memcpy(dac,theHk->dac.dac,6*4*sizeof(unsigned short)); ///< DAC for what?
 
-  //From SimpleScalerStruct_t
+  //From AraTestBedAraTestBedSimpleScalerStruct_t
   memcpy(sclDiscone,theHk->scaler.discone,8*sizeof(unsigned short));
   memcpy(sclBatPlus,theHk->scaler.batPlus,8*sizeof(unsigned short));
   memcpy(sclBatMinus,theHk->scaler.batMinus,8*sizeof(unsigned short));
@@ -45,7 +45,7 @@ AraHkData::AraHkData(AraHkDataStruct_t *theHk)
 
 }
 
-char AraHkData::getDacLetter(int index)
+char AraTestBedHkData::getDacLetter(int index)
 {
   if(index<0 || index>5) return '?';
   char alphabet[6]={'A','B','C','D','E','F'};
@@ -55,7 +55,7 @@ char AraHkData::getDacLetter(int index)
 
 
 
-double AraHkData::getRFPowerDiscone(int discId)
+double AraTestBedHkData::getRFPowerDiscone(int discId)
 {
    if(discId<0 || discId>7) return 0;
    Double_t ped=813; //Average ANITA-II value
@@ -68,7 +68,7 @@ double AraHkData::getRFPowerDiscone(int discId)
 
 }
 
-double AraHkData::getRFPowerBatwing(int batId)
+double AraTestBedHkData::getRFPowerBatwing(int batId)
 {
    if(batId<0 || batId>7) return 0;
    Double_t ped=813; //Average ANITA-II value
@@ -81,7 +81,7 @@ double AraHkData::getRFPowerBatwing(int batId)
 
 }
 
-Double_t AraHkData::getTemperature(int tempId)
+Double_t AraTestBedHkData::getTemperature(int tempId)
 {
   if (tempId<0 || tempId>7)
     return -99.9;

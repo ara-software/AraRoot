@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAraEvent.h        Useful ARA event class                      /////
+/////  UsefulAraStationEvent.h        Useful ARA event class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing useful ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef USEFULARAEVENT_H
-#define USEFULARAEVENT_H
+#ifndef USEFULARASTATIONEVENT_H
+#define USEFULARASTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
@@ -15,30 +15,30 @@
 #include <TH1.h>
 #include "araStructures.h"
 #include "araDefines.h"
-#include "RawAraEvent.h"
+#include "RawAraTestBedStationEvent.h"
 #include "AraEventCalibrator.h"
 
-//!  UsefulAraEvent -- The Useful ARA Event Data
+//!  UsefulAraStationEvent -- The Useful ARA Event Data
 /*!
   The ROOT implementation of the useful ARA event data
 
-  This is the most useful class for analysing the ARA data. The raw ADC values from a RawAraEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
+  This is the most useful class for analysing the ARA data. The raw ADC values from a RawAraTestBedStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
 
   \ingroup rootclasses
 */
-class UsefulAraEvent: public RawAraEvent
+class UsefulAraStationEvent: public RawAraTestBedStationEvent
 {
  public:
-   UsefulAraEvent(); ///< Default constructor
-   UsefulAraEvent(RawAraEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Assignment constructor
-   ~UsefulAraEvent(); ///< Destructor
+   UsefulAraStationEvent(); ///< Default constructor
+   UsefulAraStationEvent(RawAraTestBedStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Assignment constructor
+   ~UsefulAraStationEvent(); ///< Destructor
 
-   Double_t fVolts[NUM_DIGITIZED_CHANNELS][MAX_NUMBER_SAMPLES]; ///< Array of the calibrated voltages
-   Double_t fTimes[NUM_DIGITIZED_CHANNELS][MAX_NUMBER_SAMPLES]; ///<Array of the times
-   Int_t fNumPoints[NUM_DIGITIZED_CHANNELS]; ///< Array of the number of valid samples
-   Double_t fVoltsRF[RFCHANS_PER_STATION][2*MAX_NUMBER_SAMPLES]; ///< Array of the calibrated, interleaved voltages for the RF input channels
-   Double_t fTimesRF[RFCHANS_PER_STATION][2*MAX_NUMBER_SAMPLES]; ///< Array of the calibrated, interleaved times for the RF input channels
-   Int_t fNumPointsRF[RFCHANS_PER_STATION]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
+   Double_t fVolts[NUM_DIGITIZED_TESTBED_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated voltages
+   Double_t fTimes[NUM_DIGITIZED_TESTBED_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///<Array of the times
+   Int_t fNumPoints[NUM_DIGITIZED_TESTBED_CHANNELS]; ///< Array of the number of valid samples
+   Double_t fVoltsRF[RFCHANS_PER_TESTBED][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved voltages for the RF input channels
+   Double_t fTimesRF[RFCHANS_PER_TESTBED][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
+   Int_t fNumPointsRF[RFCHANS_PER_TESTBED]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
 
    TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel
@@ -59,8 +59,8 @@ class UsefulAraEvent: public RawAraEvent
 
    AraEventCalibrator *fCalibrator; ///< Pointer to the AraEventCalibrator
 
-  ClassDef(UsefulAraEvent,1);
+  ClassDef(UsefulAraStationEvent,1);
 };
 
 
-#endif //USEFULARAEVENT_H
+#endif //USEFULARASTATIONEVENT_H

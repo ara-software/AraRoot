@@ -1,45 +1,45 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  FullAraHkEvent.h        Raw ARA hk class                      /////
+/////  FullAraTestBedHkEvent.h        Raw ARA hk class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FULLARAHKEVENT_H
-#define FULLARAHKEVENT_H
+#ifndef FULLARATESTBEDHKEVENT_H
+#define FULLARATESTBEDHKEVENT_H
 
 //Includes
 #include <TObject.h>
 #include "araStructures.h"
 #include "araDefines.h"
-#include "AraTriggerMonitor.h"
-#include "AraHkData.h"
+#include "AraTestBedTriggerMonitor.h"
+#include "AraTestBedHkData.h"
 
-//!  FullAraHkEvent -- The ARA Hk Data
+//!  FullAraTestBedHkEvent -- The ARA Hk Data
 /*!
   The ROOT implementation of the raw ARA housekeeping data
   \ingroup rootclasses
 */
-class FullAraHkEvent: public TObject
+class FullAraTestBedHkEvent: public TObject
 {
  public:
-   FullAraHkEvent(); ///< Default constructor
-   FullAraHkEvent(AraHkBody_t *theHk); ///< Assignment constructor
-   ~FullAraHkEvent(); ///< Destructor
+   FullAraTestBedHkEvent(); ///< Default constructor
+   FullAraTestBedHkEvent(AraTestBedHkBody_t *theHk); ///< Assignment constructor
+   ~FullAraTestBedHkEvent(); ///< Destructor
 
    unsigned int unixTime;
    unsigned int unixTimeUs;
    unsigned int eventNumber;
    unsigned int errorFlag;
    
-   AraTriggerMonitor trig; ///< The trigger
-   AraHkData hk; ///< The hk
+   AraTestBedTriggerMonitor trig; ///< The trigger
+   AraTestBedHkData hk; ///< The hk
    
    
 
-  ClassDef(FullAraHkEvent,1);
+  ClassDef(FullAraTestBedHkEvent,1);
 };
 
 
-#endif //FULLARAHKEVENT_H
+#endif //FULLARATESTBEDHKEVENT_H

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAraEvent.cxx        ARA header reading class                  /////
+/////  UsefulAraStationEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in useful ARA headers and produces     ///// 
@@ -7,47 +7,47 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "UsefulAraEvent.h"
+#include "UsefulAraStationEvent.h"
 #include "FFTtools.h"
 #include "AraGeomTool.h"
 #include "TH1.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(UsefulAraEvent);
+ClassImp(UsefulAraStationEvent);
 
-UsefulAraEvent::UsefulAraEvent() 
+UsefulAraStationEvent::UsefulAraStationEvent() 
 {
    //Default Constructor
   fCalibrator=0;
 }
 
-UsefulAraEvent::~UsefulAraEvent() {
+UsefulAraStationEvent::~UsefulAraStationEvent() {
    //Default Destructor
 }
 
-UsefulAraEvent::UsefulAraEvent(RawAraEvent *rawEvent, AraCalType::AraCalType_t calType)
-  :RawAraEvent(*rawEvent)
+UsefulAraStationEvent::UsefulAraStationEvent(RawAraTestBedStationEvent *rawEvent, AraCalType::AraCalType_t calType)
+  :RawAraTestBedStationEvent(*rawEvent)
 {
   fCalibrator=AraEventCalibrator::Instance();
   fCalibrator->calibrateEvent(this,calType);  
 }
 
-TGraph *UsefulAraEvent::getGraphFromElecChan(int chan)
+TGraph *UsefulAraStationEvent::getGraphFromElecChan(int chan)
 {
-  if(chan<0 || chan>=NUM_DIGITIZED_CHANNELS)
+  if(chan<0 || chan>=NUM_DIGITIZED_TESTBED_CHANNELS)
     return NULL;
   return new TGraph(fNumPoints[chan],fTimes[chan],fVolts[chan]);
 }
 
-TGraph *UsefulAraEvent::getGraphFromRFChan(int chan)
+TGraph *UsefulAraStationEvent::getGraphFromRFChan(int chan)
 {
-  if(chan<0 || chan>=RFCHANS_PER_STATION)
+  if(chan<0 || chan>=RFCHANS_PER_TESTBED)
     return NULL;
   return new TGraph(fNumPointsRF[chan],fTimesRF[chan],fVoltsRF[chan]);
 }
 
-TGraph *UsefulAraEvent::getFFTForRFChan(int chan)
+TGraph *UsefulAraStationEvent::getFFTForRFChan(int chan)
 {
 
    //   static AraGeomTool *fGeomTool = AraGeomTool::Instance();
@@ -86,7 +86,7 @@ TGraph *UsefulAraEvent::getFFTForRFChan(int chan)
    return grFFT;
 }
 
-TH1D *UsefulAraEvent::getFFTHistForRFChan(int chan)
+TH1D *UsefulAraStationEvent::getFFTHistForRFChan(int chan)
 {
 
    Int_t numBins=256;
@@ -104,7 +104,7 @@ TH1D *UsefulAraEvent::getFFTHistForRFChan(int chan)
 
 }
       
-int UsefulAraEvent::fillFFTHistoForRFChan(int chan, TH1D *histFFT) 
+int UsefulAraStationEvent::fillFFTHistoForRFChan(int chan, TH1D *histFFT) 
 {
 
    TGraph *grFFT =getFFTForRFChan(chan);
@@ -120,15 +120,15 @@ int UsefulAraEvent::fillFFTHistoForRFChan(int chan, TH1D *histFFT)
 
 }
 
-int UsefulAraEvent::guessRCO(int chanIndex)
+int UsefulAraStationEvent::guessRCO(int chanIndex)
 {
   ///< Looks at clock channel to try and guess which RCO phase we are in.
-  int chip=chanIndex/CHANNELS_PER_CHIP;
-  if(chip<0 || chip>=ACTIVE_CHIPS) return -1;
+  int chip=chanIndex/CHANNELS_PER_LAB3;
+  if(chip<0 || chip>=LAB3_PER_TESTBED) return -1;
   static int firstTime=1;
   static unsigned int lastEventNumber=0; //random number
   static unsigned int lastUnixTimeUs=0; //random number
-  static int fRcoGuess[ACTIVE_CHIPS]={0};
+  static int fRcoGuess[LAB3_PER_TESTBED]={0};
   fCalibrator=AraEventCalibrator::Instance();
   if(lastEventNumber!=this->head.eventNumber || firstTime || lastUnixTimeUs!=this->head.unixTimeUs) {
     fCalibrator->fillRCOGuessArray(this,fRcoGuess);
@@ -139,7 +139,7 @@ int UsefulAraEvent::guessRCO(int chanIndex)
   return fRcoGuess[chip];    
 }
 
-TGraph *UsefulAraEvent::getFFTForClock(int clock_number)
+TGraph *UsefulAraStationEvent::getFFTForClock(int clock_number)
 {
 
    if ( (clock_number<0) || ( clock_number>2) ) {
@@ -161,12 +161,12 @@ TGraph *UsefulAraEvent::getFFTForClock(int clock_number)
    Int_t numSamps  = grInt->GetN();
    Double_t *xVals = grInt->GetX();
    Double_t *yVals = grInt->GetY();
-// printf("UsefulAraEvent::getFFTForClock() - intSample = %f - maxSamps = %d - numSamps = %d [%d]\n",intSample,maxSamps,numSamps,grInt->GetN());
+// printf("UsefulAraStationEvent::getFFTForClock() - intSample = %f - maxSamps = %d - numSamps = %d [%d]\n",intSample,maxSamps,numSamps,grInt->GetN());
    for(int i=0;i<maxSamps;i++) {
 //    if ( i<numSamps ) {
-//       printf("UsefulAraEvent::getFFTForClock() - i = %d - (x,y) = %.2f,%.2f",i,xVals[i],yVals[i]);
+//       printf("UsefulAraStationEvent::getFFTForClock() - i = %d - (x,y) = %.2f,%.2f",i,xVals[i],yVals[i]);
 //    } else {
-//       printf("UsefulAraEvent::getFFTForClock() - i = %d - i>numSamps ",i);
+//       printf("UsefulAraStationEvent::getFFTForClock() - i = %d - i>numSamps ",i);
 //    }
       if( i<numSamps ) {
 //       printf(" - use point\n");
@@ -186,9 +186,9 @@ TGraph *UsefulAraEvent::getFFTForClock(int clock_number)
    delete grInt;
    return grFFT;
 
-} // end of function UsefulAraEvent::getFFTForClock()
+} // end of function UsefulAraStationEvent::getFFTForClock()
 
-TH1D *UsefulAraEvent::getFFTHistForClock(int clock_number)
+TH1D *UsefulAraStationEvent::getFFTHistForClock(int clock_number)
 {
 
    Int_t numBins=256;
@@ -206,7 +206,7 @@ TH1D *UsefulAraEvent::getFFTHistForClock(int clock_number)
   
 }
       
-int UsefulAraEvent::fillFFTHistoForClock(int clock_number, TH1D *histFFT) 
+int UsefulAraStationEvent::fillFFTHistoForClock(int clock_number, TH1D *histFFT) 
 {
    TGraph *grFFT = getFFTForClock(clock_number);
    if(!grFFT) return -1;
@@ -220,16 +220,16 @@ int UsefulAraEvent::fillFFTHistoForClock(int clock_number, TH1D *histFFT)
    return 0;
 }
 
-bool UsefulAraEvent::isCalPulserEvent( )
+bool UsefulAraStationEvent::isCalPulserEvent( )
 {
 
    bool retcode = false;
 
-   AraTriggerMonitor *trig = &(this->trig);
+   AraTestBedTriggerMonitor *trig = &(this->trig);
    unsigned short msw_clock_counter = trig->rovdd[0];
    unsigned short lsw_clock_counter = trig->rovdd[1];
 
-// printf("UsefulAraEvent::isCalPulserEvent() - DEBUG - %d %d",msw_clock_counter,lsw_clock_counter);
+// printf("UsefulAraStationEvent::isCalPulserEvent() - DEBUG - %d %d",msw_clock_counter,lsw_clock_counter);
    if ( ( msw_clock_counter == 0 ) &&                                                                /* Rb peak is at msw=0 && lsw=5801+/-5 */
         ( TMath::Abs(lsw_clock_counter-5801) < 5 ) ) {
 //    printf(" <- is cal pulser\n");
@@ -241,5 +241,5 @@ bool UsefulAraEvent::isCalPulserEvent( )
 
    return retcode;
 
-} // end of UsefulAraEvent::isCalPulserEvent() member function
+} // end of UsefulAraStationEvent::isCalPulserEvent() member function
 

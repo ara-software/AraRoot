@@ -22,7 +22,7 @@
 
 //!  AraCalType -- The Calibration Type
 /*!
-  There are a number of calibration options available to create a UsefulAraEvent.
+  There are a number of calibration options available to create a UsefulAraStationEvent.
   \ingroup rootclasses
 */
 namespace AraCalType {
@@ -46,7 +46,7 @@ namespace AraCalType {
 
 } 
 
-class UsefulAraEvent;
+class UsefulAraStationEvent;
 class TGraph; 
 
 //!  AraEventCalibrator -- The Ara Event Calibrator
@@ -65,13 +65,13 @@ class AraEventCalibrator : public TObject
    
 
    void setPedFile(char fileName[]); ///< Manually sets the pedestal file
-   void calibrateEvent(UsefulAraEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraEvent, called from UsefulAraEvent constructor
-   int doBinCalibration(UsefulAraEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
+   void calibrateEvent(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraStationEvent, called from UsefulAraStationEvent constructor
+   int doBinCalibration(UsefulAraStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
    
-   void fillRCOGuessArray(UsefulAraEvent *theEvent, int rcoGuess[ACTIVE_CHIPS]); ///< Utility function called by UsefulAraEvent
+   void fillRCOGuessArray(UsefulAraStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED]); ///< Utility function called by UsefulAraStationEvent
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
 
-   void calcClockAlignVals(UsefulAraEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
+   void calcClockAlignVals(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
    
 
@@ -80,25 +80,25 @@ class AraEventCalibrator : public TObject
    void loadCalib(); ///< Loads the various calibration constants
    int gotPedFile; ///<Flag to indicate whether a specific pedesal file has been selected
    char pedFile[FILENAME_MAX]; ///< Filename of the pedesal file
-   float pedestalData[ACTIVE_CHIPS][CHANNELS_PER_CHIP][MAX_NUMBER_SAMPLES]; ///<Array to hold the pedestal data
-   double binWidths[ACTIVE_CHIPS][2][MAX_NUMBER_SAMPLES]; ///< Array to hold the bin width calibration constants
-   double epsilonVals[ACTIVE_CHIPS][2]; ///<Array to hold the wrap-around calibration constants
+   float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
+   double binWidths[LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
+   double epsilonVals[LAB3_PER_TESTBED][2]; ///<Array to hold the wrap-around calibration constants
    double interleaveVals[8]; ///< There are only 8 interleaved channels
-   double clockAlignVals[ACTIVE_CHIPS]; //Well by default clock align 0 is 0
+   double clockAlignVals[LAB3_PER_TESTBED]; //Well by default clock align 0 is 0
 
 
 
    ///These are just utility arrays that are used in the calibration
-   double v[MAX_NUMBER_SAMPLES]; //Calibrated wrapped
-   double calwv[MAX_NUMBER_SAMPLES]; //Calibrated unwrapped
-   double rawadc[MAX_NUMBER_SAMPLES]; //Uncalibrated unwrapped
-   double pedsubadc[MAX_NUMBER_SAMPLES]; //Pedestal subtracted unwrapped
-   double sampNums[MAX_NUMBER_SAMPLES]; //Sample numbers as doubles
-   double timeNums[MAX_NUMBER_SAMPLES]; /// time numbers
-   double tempTimeNums[MAX_NUMBER_SAMPLES]; ///temporary array
-   double calTimeNums[MAX_NUMBER_SAMPLES]; /// calibrated time numbers
-   double calVoltNums[MAX_NUMBER_SAMPLES]; /// calibrated volt numbers
-   int indexNums[MAX_NUMBER_SAMPLES]; /// for time sorting
+   double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped
+   double calwv[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated unwrapped
+   double rawadc[MAX_NUMBER_SAMPLES_LAB3]; //Uncalibrated unwrapped
+   double pedsubadc[MAX_NUMBER_SAMPLES_LAB3]; //Pedestal subtracted unwrapped
+   double sampNums[MAX_NUMBER_SAMPLES_LAB3]; //Sample numbers as doubles
+   double timeNums[MAX_NUMBER_SAMPLES_LAB3]; /// time numbers
+   double tempTimeNums[MAX_NUMBER_SAMPLES_LAB3]; ///temporary array
+   double calTimeNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated time numbers
+   double calVoltNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated volt numbers
+   int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
 
 
  protected:

@@ -18,24 +18,6 @@
 
 //Enumerations
 
-//!  The PriorityCode
-/*!
-  Unused, or largely unused.
-*/
-typedef enum {
-    PRI_FORCED = 0,
-    PRI_CALIB = 1,
-    PRI_1 = 1,
-    PRI_2,
-    PRI_3,
-    PRI_4,
-    PRI_TIMEOUT,
-    PRI_6, 
-    PRI_7,
-    PRI_8,
-    PRI_PAYLOAD
-} PriorityCode;
-
 ///////////////////////////////////////////////////////////////////////////
 //Structures
 ///////////////////////////////////////////////////////////////////////////
@@ -73,7 +55,7 @@ typedef struct {
   unsigned short trigPattern; // trigger pattern: bits 0-8 - facet triggers | bit 9 - deep L1 | bit 10 - shallow L1 | bit 11 - unused | bit 12 - global trigger
   unsigned short rovdd[3];    // [0] - LSW of Rb clock counter | [1] - MSW of Rb clock counter | [2] - DAC voltage for LAB C
   unsigned short rcoCount[3]; // RCO counter for LAB chips
-} AraTriggerMonitorStruct_t;
+} AraTestBedTriggerMonitorStruct_t;
 
 //!  The channel header
 /*!
@@ -107,29 +89,29 @@ typedef struct {
   */
     unsigned char lastHitbus; //to firstHitbus-1 inclusive
 
-} AraRawRFChannelHeader_t;
+} AraRawTestBedRFChannelHeader_t;
 
 //!  A complete RF channel
 /*!
   A complete RF channel  (header + waveform)
 */
 typedef struct {
-    AraRawRFChannelHeader_t header;
-    unsigned short data[MAX_NUMBER_SAMPLES];
-} RFChannelFull_t;
+    AraRawTestBedRFChannelHeader_t header;
+    unsigned short data[MAX_NUMBER_SAMPLES_LAB3];
+} AraTestBedAraTestBedRFChannelFull_t;
 
 //!  A complete pedestal subtracted RF channel
 /*!
   A complete pedestal subtracted RF channel. UNUSED at the moment
 */
 typedef struct {
-    AraRawRFChannelHeader_t header;
+    AraRawTestBedRFChannelHeader_t header;
     short xMax;
     short xMin;
     float mean; ///<Filled by pedestalLib
     float rms; ///<Filled by pedestalLib
-    short data[MAX_NUMBER_SAMPLES]; ///<Pedestal subtracted and 11bit data
-} RFChannelPedSubbed_t;
+    short data[MAX_NUMBER_SAMPLES_LAB3]; ///<Pedestal subtracted and 11bit data
+} AraTestBedAraTestBedRFChannelPedSubbed_t;
 
 //!  The temperatures
 /*!
@@ -137,7 +119,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short temp[8]; ///< 
-} TemperatureDataStruct_t;
+} AraTestBedAraTestBedTemperatureDataStruct_t;
 
 //!  The RF power
 /*!
@@ -146,7 +128,7 @@ typedef struct {
 typedef struct {
   unsigned short discone[8]; ///< 
   unsigned short batwing[8]; ///< 
-} RFPowerDataStruct_t;
+} AraTestBedAraTestBedRFPowerDataStruct_t;
 
 //!  The DAC settings
 /*!
@@ -154,7 +136,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short dac[6][4]; ///< 
-} DACDataStruct_t;
+} AraTestBedAraTestBedDACDataStruct_t;
 
 //!  Scaler data
 /*!
@@ -166,7 +148,7 @@ typedef struct {
   unsigned short batMinus[8];
   unsigned short trigL1[12];
   unsigned short global;
-} SimpleScalerStruct_t;
+} AraTestBedAraTestBedSimpleScalerStruct_t;
 
 
 
@@ -178,14 +160,11 @@ typedef struct {
 typedef struct {
     unsigned char chanId;   ///< chan+9*nChip
     unsigned short chipEntries;
-    float pedMean[MAX_NUMBER_SAMPLES];
-    float pedRMS[MAX_NUMBER_SAMPLES]; 
+    float pedMean[MAX_NUMBER_SAMPLES_LAB3];
+    float pedRMS[MAX_NUMBER_SAMPLES_LAB3]; 
 } LabChipChannelPedStruct_t;
 
 
-////////////////////////////////////////////////////////////////////////////
-//Telemetry Structs (may be used for onboard storage)
-////////////////////////////////////////////////////////////////////////////
 
 //!  ARA Event Header 
 /*!
@@ -220,89 +199,28 @@ typedef struct {
   unsigned char errorFlag; 
   //unsigned char surfSlipFlag; ///< Sync Slip between SURF 2-9 and SURF 1
   
-} AraEventHeader_t;
+} AraTestBedEventHeader_t;
 
 
-//!  Raw waveform packet
-/*!
-  Raw waveform packet, we nromally send down encoded packets, but have the option to send them down raw
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-    RFChannelFull_t waveform;
-} RawWaveformPacket_t;
 
-//! Pedsubbed Waveform packet
-/*!
-  Pedestal subtracted waveform packet, we nromally send down encoded packets, but have the option to send them down raw
-
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-    unsigned int whichPeds;
-    RFChannelPedSubbed_t waveform;
-} PedSubbedWaveformPacket_t;
-
-//!  Raw RF wavefom packet
-/*!
-  Raw RF waveform packet, we normally send down encoded packets, but have the option to send them down raw
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-    RFChannelFull_t waveform[CHANNELS_PER_CHIP];
-} RawRFPacket_t;
-
-//!  Pedestal subtracted RF wavefom packet
-/*!
-  Pedestal subtracted RF waveform packet, we normally send down encoded packets, but have the option to send them down raw
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-    unsigned int whichPeds;
-    RFChannelPedSubbed_t waveform[CHANNELS_PER_CHIP];
-} PedSubbedRFPacket_t;
-
-
-//!  Encoded RF Packet header -- Telemetered
-/*!
-  Encoded RF Packet header, precedes the encoded data
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-} EncodedRFPacketHeader_t;
-
-//! Encoded PedSubbed Packet Header
-/*!
-  Encoded PedSubbed Packet Header, precedes the encoded waveform data.
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int eventNumber;
-    unsigned int whichPeds;
-} BaseWavePacketHeader_t;
 
 //! Hk Data Struct
 /*!
   The main housekeeping data structure
 */
 typedef struct {    
-  TemperatureDataStruct_t temp;
-  RFPowerDataStruct_t rfPow;
-  DACDataStruct_t dac;
-  SimpleScalerStruct_t scaler;
-} AraHkDataStruct_t;
+  AraTestBedAraTestBedTemperatureDataStruct_t temp;
+  AraTestBedAraTestBedRFPowerDataStruct_t rfPow;
+  AraTestBedAraTestBedDACDataStruct_t dac;
+  AraTestBedAraTestBedSimpleScalerStruct_t scaler;
+} AraTestBedHkDataStruct_t;
 
 typedef struct {
   unsigned int unixTime;
   unsigned int unixTimeUs;
   unsigned int eventNumber;
   unsigned int errorFlag;
-} AraHkDataHeader_t;
+} AraTestBedHkDataHeader_t;
 
 //! Pedestal Block
 /*!
@@ -312,7 +230,7 @@ typedef struct {
     GenericHeader_t gHdr;
     unsigned int unixTimeStart;
     unsigned int unixTimeEnd;
-    LabChipChannelPedStruct_t chan[NUM_DIGITIZED_CHANNELS];
+    LabChipChannelPedStruct_t chan[NUM_DIGITIZED_TESTBED_CHANNELS];
 } FullLabChipPedStruct_t;
 
 
@@ -326,12 +244,12 @@ typedef struct {
 */
 typedef struct {
   GenericHeader_t gHdr;
-  AraEventHeader_t hd;
+  AraTestBedEventHeader_t hd;
   //  unsigned int eventNumber;    /* Global event number */
-  RFChannelFull_t channel[NUM_DIGITIZED_CHANNELS];
-  AraTriggerMonitorStruct_t trig;
-  AraHkDataStruct_t hk;
-} AraEventBody_t;
+  AraTestBedAraTestBedRFChannelFull_t channel[NUM_DIGITIZED_TESTBED_CHANNELS];
+  AraTestBedTriggerMonitorStruct_t trig;
+  AraTestBedHkDataStruct_t hk;
+} AraTestBedEventBody_t;
 
 //! Raw housekeeping event format 
 /*!
@@ -340,10 +258,10 @@ typedef struct {
 
 typedef struct {
   GenericHeader_t gHdr;
-  AraHkDataHeader_t hd;
-  AraTriggerMonitorStruct_t trig;
-  AraHkDataStruct_t hk;
-} AraHkBody_t;
+  AraTestBedHkDataHeader_t hd;
+  AraTestBedTriggerMonitorStruct_t trig;
+  AraTestBedHkDataStruct_t hk;
+} AraTestBedHkBody_t;
 
 
 //! Pedestal subtracted event format  
@@ -354,166 +272,23 @@ typedef struct {
   GenericHeader_t gHdr;
   unsigned int eventNumber;    /* Global event number */
   unsigned int whichPeds; ///<whichPedestals did we subtract
-  RFChannelPedSubbed_t channel[NUM_DIGITIZED_CHANNELS];
-  AraHkDataStruct_t hk;
-} PedSubbedEventBody_t;
-
-//! GPS Event Timestamp  
-/*!
-  GPS Event Timestamp
-*/
-typedef struct {
-    unsigned int unixTime;
-    unsigned int subTime;
-} GpsSubTime_t;
-
-////////////////////////////////////////////////////////////////////////////
-//Prioritizer Utility Structs
-///////////////////////////////////////////////////////////////////////////
-/// @cond 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  AraTestBedAraTestBedRFChannelPedSubbed_t channel[NUM_DIGITIZED_TESTBED_CHANNELS];
+  AraTestBedHkDataStruct_t hk;
+} AraTestBedAraTestBedPedSubbedEventBody_t;
 
 
-//!  Queue Stuff
-/*!
-  Number of links in the event and housekeeping telemetry queues
-*/
-typedef struct {
-  unsigned short eventLinks[NUM_PRIORITIES]; ///<10 Priorities
-  unsigned short hkLinks[21]; ///<Needs to be finalised once everything is settled
-} QueueStruct_t;
-
-//!  Process Information
-/*!
-  Process Information the time used and memory used by ARA processess
-*/
-typedef struct {
-  unsigned int utime[NUM_PROCESSES];
-  unsigned int stime[NUM_PROCESSES];
-  unsigned int vsize[NUM_PROCESSES];
-} ProcessInfo_t;
+//This stuff is just for legacy will be deprecated
+typedef struct AraTestBedRFChannelFull_t  RFChannelFull_t;
+typedef struct AraTestBedRFChannelPedSubbed_t RFChannelPedSubbed_t;
+typedef struct AraTestBedTemperatureDataStruct_t TemperatureDataStruct_t;
+typedef struct AraTestBedRFPowerDataStruct_t RFPowerDataStruct_t;
+typedef struct AraTestBedDACDataStruct_t DACDataStruct_t;
+typedef struct AraTestBedSimpleScalerStruct_t  SimpleScalerStruct_t;
+typedef AraTestBedEventHeader_t AraEventHeader_t;
+typedef AraTestBedEventBody_t AraEventBody_t;
+typedef AraTestBedHkBody_t AraHkBody_t;
+typedef struct AraTestBedPedSubbedEventBody_t PedSubbedEventBody_t;
 
 
-//! Run Start Block
-/*!
-  Run start block
-*/
-typedef struct {
-    GenericHeader_t gHdr;
-    unsigned int unixTime; ///<Start time
-    unsigned int eventNumber; ///<Start eventNumber
-    unsigned int runNumber; ///<Run number
-} RunStart_t;
-
-
-// these are syntactic sugar to help us keep track of bit shifts 
-typedef int Fixed3_t; ///<rescaled integer left shifted 3 bits 
-typedef int Fixed6_t; ///<rescaled integer left shifted 6 bits 
-typedef int Fixed8_t; ///<rescaled integer left shifted 8 bits 
-
-
-/*    FOR THREE STRUCTS THAT FOLLOW
-      valid samples==-1 prior to unwinding 
-*/
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     int data[MAX_NUMBER_SAMPLES];
-     int valid_samples; 
-} LogicChannel_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     Fixed3_t data[MAX_NUMBER_SAMPLES];
-     Fixed3_t baseline;
-     short valid_samples;
-} TransientChannel3_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     Fixed6_t data[MAX_NUMBER_SAMPLES];
-     short valid_samples;
-} TransientChannel6_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     Fixed8_t data[MAX_NUMBER_SAMPLES];
-     Fixed8_t baseline;
-     short valid_samples;
-} TransientChannel8_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     float data[MAX_NUMBER_SAMPLES];
-     short valid_samples;
-} TransientChannelF_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     float data[MAX_NUMBER_SAMPLES];
-     short valid_samples;
-     float RMSall;
-     float RMSpre;
-} TransientChannelFRMS_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     TransientChannel3_t ch[NUM_DIGITIZED_CHANNELS]; 
-} AnitaTransientBody3_t; /* final corrected transient type 
-			    used to calculate power */
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     TransientChannel6_t ch[NUM_DIGITIZED_CHANNELS]; 
-} AnitaPowerBody6_t; /* power from squaring an AnitaTransientBody3 */
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     TransientChannel8_t ch[NUM_DIGITIZED_CHANNELS]; 
-} AnitaTransientBody8_t; /* used for pedestal subtraction, unwrapping, 
-			    averaging, and gain correction */
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     TransientChannelF_t ch[NUM_DIGITIZED_CHANNELS]; 
-} AnitaTransientBodyF_t;
-
-//! Prioritizer utility  
-/*!
-  Prioritizer utility
-*/
-typedef struct {
-     TransientChannel6_t S0,S1,S2,S3;
-} AnitaStokes6_t;
-/// @endcond 
-#endif //DOXYGEN_SHOULD_SKIP_THIS
 
 #endif /* ARA_STRUCTURES_H */

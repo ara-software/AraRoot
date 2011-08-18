@@ -71,7 +71,7 @@ void AraGeomTool::readChannelMap()
   //  std::cout << line.Data() << "\n";
   line.ReadLine(TestBedMap); ///<Ths is the second header line
   //  std::cout << line.Data() << "\n";
-  for(int ant=0;ant<ANTS_PER_STATION;ant++) {
+  for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
     //Loop over the antenna lines;
     line.ReadLine(TestBedMap);
     //    std::cout << line.Data();
@@ -338,9 +338,9 @@ Double_t AraGeomTool::calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Doub
 
 Double_t AraGeomTool::calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave)
 {
-  if(chan1<0 || chan1>=TOTAL_ANTS)
+  if(chan1<0 || chan1>=TOTAL_ANTS_PER_TESTBED)
     return 0;
-  if(chan2<0 || chan2>=TOTAL_ANTS)
+  if(chan2<0 || chan2>=TOTAL_ANTS_PER_TESTBED)
     return 0;
   return calcDeltaTInfinity(fAntInfo[chan1].antLocation,fAntInfo[chan2].antLocation,phiWave,thetaWave);            
 }
@@ -364,9 +364,9 @@ Double_t AraGeomTool::calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t p
 
 Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R)
 {
-  if(chan1<0 || chan1>=TOTAL_ANTS)
+  if(chan1<0 || chan1>=TOTAL_ANTS_PER_TESTBED)
     return 0;
-  if(chan2<0 || chan2>=TOTAL_ANTS)
+  if(chan2<0 || chan2>=TOTAL_ANTS_PER_TESTBED)
     return 0;
   return calcDeltaTR(fAntInfo[chan1].antLocation,fAntInfo[chan2].antLocation,phiWave,thetaWave,R);   
 

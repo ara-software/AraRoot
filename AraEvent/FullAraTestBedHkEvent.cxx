@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraHeader.cxx        ARA header reading class                  /////
+/////  FullAraTestBedHkEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,30 +7,31 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraHeader.h"
+#include "FullAraTestBedHkEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraHeader);
 
-RawAraHeader::RawAraHeader() 
+ClassImp(FullAraTestBedHkEvent);
+
+FullAraTestBedHkEvent::FullAraTestBedHkEvent() 
 {
    //Default Constructor
 }
 
-RawAraHeader::~RawAraHeader() {
+FullAraTestBedHkEvent::~FullAraTestBedHkEvent() {
    //Default Destructor
 }
 
 
-RawAraHeader::RawAraHeader(AraEventHeader_t *hdPtr)
+FullAraTestBedHkEvent::FullAraTestBedHkEvent(AraTestBedHkBody_t *hkBody)
+  :trig(&(hkBody->trig)),hk(&(hkBody->hk))
 {
-   unixTime=hdPtr->unixTime;
-   unixTimeUs=hdPtr->unixTimeUs;
-   gpsSubTime=hdPtr->gpsSubTime;
-   eventNumber=hdPtr->eventNumber;
-   calibStatus=hdPtr->calibStatus;
-   priority=hdPtr->priority;
-   errorFlag=hdPtr->errorFlag;
+  unixTime=hkBody->hd.unixTime;
+  unixTimeUs=hkBody->hd.unixTime;
+  eventNumber=hkBody->hd.eventNumber;
+  errorFlag=hkBody->hd.errorFlag;
+
+
 }
 

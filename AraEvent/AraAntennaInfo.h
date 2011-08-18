@@ -13,7 +13,7 @@
 #include <TObject.h>
 #include "araStructures.h"
 #include "araDefines.h"
-#include "RawAraEvent.h"
+#include "RawAraTestBedStationEvent.h"
 #include "AraEventCalibrator.h"
 
 //!  AraAntennaInfo -- ARA Antenna Information
