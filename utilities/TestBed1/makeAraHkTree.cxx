@@ -13,16 +13,16 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
-#include "araStructures.h"
-#include "FullAraHkEvent.h"  
+#include "araTestbedStructures.h"
+#include "FullAraTestBedHkEvent.h"  
 
 void processHk();
 void makeHkTree(char *inputName, char *outDir);
 
-AraHkBody_t theHkBody;
+AraTestBedHkBody_t theHkBody;
 TFile *theFile;
 TTree *hkTree;
-FullAraHkEvent *theHk=0;
+FullAraTestBedHkEvent *theHk=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
 void makeHkTree(char *inputName, char *outFile) {
   cout << inputName << "\t" << outFile << endl;
   strncpy(outName,outFile,FILENAME_MAX);
-  theHk = new FullAraHkEvent();
-  //    cout << sizeof(AraHkBody_t) << endl;
+  theHk = new FullAraTestBedHkEvent();
+  //    cout << sizeof(AraTestBedHkBody_t) << endl;
   ifstream SillyFile(inputName);
 
   int numBytes=0;
@@ -69,10 +69,10 @@ void makeHkTree(char *inputName, char *outFile) {
     gzFile infile = gzopen (fileName, "rb");    
     for(int i=0;i<1000;i++) {	
       //      cout << i << endl;
-      numBytes=gzread(infile,&theHkBody,sizeof(AraHkBody_t));
-      if(numBytes!=sizeof(AraHkBody_t)) {
+      numBytes=gzread(infile,&theHkBody,sizeof(AraTestBedHkBody_t));
+      if(numBytes!=sizeof(AraTestBedHkBody_t)) {
 	if(numBytes)
-	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraHkBody_t) << endl;
+	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraTestBedHkBody_t) << endl;
 	error=1;
 	break;
       }
@@ -101,13 +101,13 @@ void processHk() {
     theFile = new TFile(outName,"RECREATE");
     hkTree = new TTree("hkTree","Tree of ARA Hks");
     hkTree->Branch("run",&runNumber,"run/I");
-    hkTree->Branch("event","FullAraHkEvent",&theHk);
+    hkTree->Branch("event","FullAraTestBedHkEvent",&theHk);
     
     doneInit=1;
   }  
   //  cout << "Here: "  << theHk.eventNumber << endl;
   if(theHk) delete theHk;
-  theHk = new FullAraHkEvent(&theHkBody);
+  theHk = new FullAraTestBedHkEvent(&theHkBody);
   hkTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theHk;

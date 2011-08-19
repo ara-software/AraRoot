@@ -12,16 +12,18 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
-#include "araStructures.h"
-#include "RawAraEvent.h"  
+#include "araTestbedStructures.h"
+#include "RawAraTestBedStationEvent.h"  
+#include "UsefulAraStationEvent.h"
 
 void processEvent();
 void makeEventTree(char *inputName, char *outDir);
 
-AraEventBody_t theEventBody;
+AraTestBedEventBody_t theEventBody;
 TFile *theFile;
 TTree *eventTree;
-RawAraEvent *theEvent=0;
+RawAraTestBedStationEvent *theEvent=0;
+UsefulAraStationEvent *theUsefulEvent=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -47,8 +49,10 @@ void makeEventTree(char *inputName, char *outFile) {
   if ( debug ) {
      cout << "                   - full outFile = " << outFile << endl;
   }
-  theEvent = new RawAraEvent();
-  //    cout << sizeof(AraEventBody_t) << endl;
+  theEvent = new RawAraTestBedStationEvent();
+  theUsefulEvent = new UsefulAraStationEvent();
+
+  //    cout << sizeof(AraTestBedEventBody_t) << endl;
   ifstream SillyFile(inputName);
 
   int numBytes=0;
@@ -71,17 +75,17 @@ void makeEventTree(char *inputName, char *outFile) {
     //    cout << justRun << "\t" << runNumber <<endl;
     
     gzFile infile = gzopen(fileName, "rb");    
-    numBytes=gzread(infile,&theEventBody,sizeof(AraEventBody_t));
+    numBytes=gzread(infile,&theEventBody,sizeof(AraTestBedEventBody_t));
     int evt_count = 1;
     total_evt_count++;
-    while ( numBytes == sizeof(AraEventBody_t) ) {
+    while ( numBytes == sizeof(AraTestBedEventBody_t) ) {
       if ( debug                      ||
 	   ( (evt_count % 100) == 1 ) ) {
          cout << "Event count: " << "for_file = " << evt_count << " - all_toll = " << total_evt_count << endl;
       }
-      if(numBytes!=sizeof(AraEventBody_t)) {
+      if(numBytes!=sizeof(AraTestBedEventBody_t)) {
 	if(numBytes)
-	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraEventBody_t) << endl;
+	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraTestBedEventBody_t) << endl;
 	error=1;
 	break;
       }
@@ -93,7 +97,7 @@ void makeEventTree(char *inputName, char *outFile) {
 	processEvent();
 	lastEventNumber=theEventBody.hd.eventNumber;
       }
-      numBytes=gzread(infile,&theEventBody,sizeof(AraEventBody_t));
+      numBytes=gzread(infile,&theEventBody,sizeof(AraTestBedEventBody_t));
       evt_count++;
       total_evt_count++;
     } // end of while loop over events in the input file
@@ -119,20 +123,17 @@ void processEvent() {
     theFile = new TFile(outName,"RECREATE");
     eventTree = new TTree("eventTree","Tree of ARA Events");
     eventTree->Branch("run",&runNumber,"run/I");
-    eventTree->Branch("event","RawAraEvent",&theEvent);
+    eventTree->Branch("event","RawAraTestBedStationEvent",&theEvent);
+    eventTree->Branch("calevent","UsefulAraStationEvent",&theUsefulEvent);
     
     doneInit=1;
-  }  
+  }
   //  cout << "Here: "  << theEvent.eventNumber << endl;
   if(theEvent) delete theEvent;
-  theEvent = new RawAraEvent(&theEventBody);
-  
-  if(theEvent->getFirstHitBus(18)!=theEvent->getFirstHitBus(19)) {
-     std::cerr << "Bad event?\n"; 
-  }
-  else {
-     eventTree->Fill();  
-  }
+  if(theUsefulEvent) delete theUsefulEvent;
+  theEvent = new RawAraTestBedStationEvent(&theEventBody);
+  theUsefulEvent = new UsefulAraStationEvent( theEvent , AraCalType::kFirstCalib );
+  eventTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theEvent;
 }
