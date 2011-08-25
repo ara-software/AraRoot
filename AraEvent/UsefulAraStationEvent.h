@@ -13,7 +13,7 @@
 #include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
-#include "araStructures.h"
+#include "araTestbedStructures.h"
 #include "araDefines.h"
 #include "RawAraTestBedStationEvent.h"
 #include "AraEventCalibrator.h"

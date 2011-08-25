@@ -12,7 +12,7 @@
 
 //Includes
 #include <TObject.h>
-#include "araStructures.h"
+#include "araTestbedStructures.h"
 #include "araDefines.h"
 
 //!  RawAraStationEvent -- Base Class for Station Event Data

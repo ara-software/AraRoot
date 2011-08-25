@@ -21,7 +21,7 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 #Now the bits we're actually compiling
 ROOT_LIBRARY = libAraEvent.${DLLSUF}
 LIB_OBJS = RawAraTestBedStationHeader.o RawAraTestBedStationEvent.o RawAraStationEvent.o  FullAraTestBedHkEvent.o UsefulAraStationEvent.o AraEventCalibrator.o AraTestBedTriggerMonitor.o AraTestBedHkData.o AraRawTestBedRFChannel.o AraAntennaInfo.o AraGeomTool.o  UsefulAraStationEvent.o  AraOneEventHkData.o AraOneSensorHkData.o eventDict.o
-CLASS_HEADERS =RawAraTestBedStationHeader.h RawAraTestBedStationEvent.h  RawAraStationEvent.h  FullAraTestBedHkEvent.h UsefulAraStationEvent.h AraEventCalibrator.h AraTestBedTriggerMonitor.h AraTestBedHkData.h AraRawTestBedRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h araStructures.h AraOneEventHkData.h AraOneSensorHkData.h araOneStructures.h araDefines.h
+CLASS_HEADERS =RawAraTestBedStationHeader.h RawAraTestBedStationEvent.h  RawAraStationEvent.h  FullAraTestBedHkEvent.h UsefulAraStationEvent.h AraEventCalibrator.h AraTestBedTriggerMonitor.h AraTestBedHkData.h AraRawTestBedRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h araTestbedStructures.h AraOneEventHkData.h AraOneSensorHkData.h araOneStructures.h araDefines.h
 
 
 all : $(ROOT_LIBRARY)

@@ -4,7 +4,11 @@
 ## Ryan Nichol <rjn@hep.ucl.ac.uk>
 ##############################################################################
 #Site Specific  Flags
-include ../Makefile.arch  #Silly thing to do but there we are
+ifdef ARA_ROOT_DIR
+include ${ARA_ROOT_DIR}/Makefile.arch  #Silly thing to do but there we are
+else
+include ../Makefile.arch
+endif
 #If you have things in non standard paths (eg. libRootFftwWrapper) append the appropriate -I or -L lines below
 SYSINCLUDES	=
 SYSLIBS         = 

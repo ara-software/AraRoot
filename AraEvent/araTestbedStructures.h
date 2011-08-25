@@ -1,4 +1,4 @@
-/*! \file araStructures.h
+/*! \file araTestbedStructures.h
   \brief Contains the definitions of all the structures used to store 
   and move ARA data and stuff.
     

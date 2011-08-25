@@ -43,7 +43,7 @@ extern void G__set_cpp_environmenteventDict();
 #include "AraAntennaInfo.h"
 #include "AraGeomTool.h"
 #include "UsefulAraStationEvent.h"
-#include "araStructures.h"
+#include "araTestbedStructures.h"
 #include "AraOneEventHkData.h"
 #include "AraOneSensorHkData.h"
 #include "araOneStructures.h"

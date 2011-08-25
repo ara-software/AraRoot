@@ -12,7 +12,7 @@
 //Includes
 #include <TObject.h>
 #include "araDefines.h"
-#include "araStructures.h"
+#include "araTestbedStructures.h"
 
 //!  RawAraTestBedStationHeader -- The Raw ARA Event Header
 /*!
