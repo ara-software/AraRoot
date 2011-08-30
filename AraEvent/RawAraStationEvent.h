@@ -12,8 +12,6 @@
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araDefines.h"
 
 //!  RawAraStationEvent -- Base Class for Station Event Data
 /*!
@@ -24,11 +22,11 @@ class RawAraStationEvent: public TObject {
 
  public:
   RawAraStationEvent(UInt_t stationId) ;
-  RawAraStationEvent() {}///< Default constructor
-  ~RawAraStationEvent() {} ///< Destructor
+  RawAraStationEvent();///< Default constructor
+  ~RawAraStationEvent(); ///< Destructor
   
   UInt_t getStationId() {return fStationId;}
-  virtual Int_t getNumChannels();
+  Int_t getNumChannels() {return 0;}
   
 
   UInt_t fStationId; //TestBed1 = 0x0, ARA1 =0x1, ...

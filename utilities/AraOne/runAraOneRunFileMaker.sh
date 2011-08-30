@@ -7,8 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=/tmp/data
-ROOT_BASE_DIR=/tmp/araRoot
+RAW_BASE_DIR=/Users/rjn/ara/data/ohio2011/
+ROOT_BASE_DIR=/Users/rjn/ara/data/ohio2011/root
 
 
 RUN_NUM=$1
@@ -29,25 +29,25 @@ else
     mkdir ${ROOT_DIR}
 fi
 
-#echo "Starting Event File"
-#EVENT_FILE_LIST=`mktemp`
-#for file in ${RAW_DIR}/ev_*/*; 
-#  do
-#  if [[ -f $file ]]; then
-#      echo $file >> ${EVENT_FILE_LIST}
-##      echo `dirname $file`;
-#  fi
-#done
+echo "Starting Event File"
+EVENT_FILE_LIST=`mktemp event.XXXX`
+for file in ${RAW_DIR}/event/ev_*/*; 
+do
+  if [[ -f $file ]]; then
+      echo $file >> ${EVENT_FILE_LIST}
+      echo `dirname $file`;
+  fi
+done
 
-#if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-#    ./makeAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE}
-#    cat ${EVENT_FILE_LIST}
-#    rm ${EVENT_FILE_LIST}
-#    echo "Done Event File"
-#else
-#    rm ${EVENT_FILE_LIST}
-#    echo "No event files"
-#fi
+if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
+    ./makeSimpleAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE}
+    cat ${EVENT_FILE_LIST}
+    rm ${EVENT_FILE_LIST}
+    echo "Done Event File"
+else
+    rm ${EVENT_FILE_LIST}
+    echo "No event files"
+fi
 
 
 echo "Starting Sensor Hk File"

@@ -33,7 +33,7 @@ AraOneSensorHkData::AraOneSensorHkData(AraSensorHk_t *theHk)
 
   atriVoltage=theHk->atriVoltage; ///< ATRI Voltage (conversion?)
   atriCurrent=theHk->atriCurrent; ///< ATRI Current (conversion?)
-  memcpy(ddaTemmp,theHk->ddaTemmp,sizeof(UShort_t)*DDA_PER_ATRI); ///< DDA Temperature conversion??
+  memcpy(ddaTemp,theHk->ddaTemp,sizeof(UShort_t)*DDA_PER_ATRI); ///< DDA Temperature conversion??
   memcpy(tdaTemp,theHk->tdaTemp,sizeof(UShort_t)*TDA_PER_ATRI); ///< TDA Temperature conversion??
   memcpy(ddaVoltageCurrent,theHk->ddaVoltageCurrent,sizeof(UInt_t)*DDA_PER_ATRI); ///< 3 bytes only will work out better packing when I know what the numbers mean
   memcpy(tdaVoltageCurrent,theHk->tdaVoltageCurrent,sizeof(UInt_t)*DDA_PER_ATRI); ///< 3 bytes only will work out better packing when I know what the numbers mean

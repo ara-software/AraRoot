@@ -19,3 +19,13 @@ RawAraStationEvent::RawAraStationEvent(UInt_t stationId)
 {
   fStationId=stationId;
 }
+
+RawAraStationEvent::RawAraStationEvent() 
+{
+  fStationId=0x0;
+}
+
+RawAraStationEvent::~RawAraStationEvent()
+{
+
+}
