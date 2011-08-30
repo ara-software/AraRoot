@@ -28,6 +28,7 @@ class RawAraStationEvent: public TObject {
   ~RawAraStationEvent() {} ///< Destructor
   
   UInt_t getStationId() {return fStationId;}
+  virtual Int_t getNumChannels();
   
 
   UInt_t fStationId; //TestBed1 = 0x0, ARA1 =0x1, ...

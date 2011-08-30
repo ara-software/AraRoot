@@ -14,6 +14,7 @@
 ClassImp(RawAraTestBedStationEvent);
 
 RawAraTestBedStationEvent::RawAraTestBedStationEvent()   
+ :RawAraStationEvent(0)
 {
   
   //Default Constructor
@@ -25,7 +26,7 @@ RawAraTestBedStationEvent::~RawAraTestBedStationEvent() {
 
 
 RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPtr)
-  :head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
+  :RawAraStationEvent(0),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
   for(int i=0;i<NUM_DIGITIZED_TESTBED_CHANNELS;i++) {
     chan[i].fillChannel(&(bdPtr->channel[i]));

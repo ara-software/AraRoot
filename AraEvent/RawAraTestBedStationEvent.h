@@ -24,7 +24,7 @@
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses
 */
-class RawAraTestBedStationEvent: public TObject
+class RawAraTestBedStationEvent: public RawAraStationEvent
 {
  public:
    RawAraTestBedStationEvent(); ///< Default constructor
@@ -40,6 +40,8 @@ class RawAraTestBedStationEvent: public TObject
    AraTestBedTriggerMonitor trig; ///< The trigger
    AraTestBedHkData hk; ///< The hk
    
+   Int_t getNumChannels() {return NUM_DIGITIZED_TESTBED_CHANNELS;}
+
    Int_t getLabChip(Int_t chanIndex) {
      return chan[chanIndex].getLabChip();
    } ///< Returns the LABRADOR number

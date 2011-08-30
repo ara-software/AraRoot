@@ -10,6 +10,7 @@
 #pragma link C++ class RawAraStationEvent+;
 #pragma link C++ class RawAraTestBedStationHeader+;
 #pragma link C++ class RawAraTestBedStationEvent+;
+#pragma link C++ class RawAraOneSimpleStationEvent+;
 #pragma link C++ class AraRawTestBedRFChannel+;
 #pragma link C++ class AraTestBedHkData+;
 #pragma link C++ class FullAraTestBedHkEvent+;

@@ -19,7 +19,10 @@
 #ifndef __MAKECINT__
 #include <stdio.h>
 #include <syslog.h>
+
+
 #define ARA_LOG LOG_LOCAL4
+
 #define ARA_LOG_MESSAGE(LOG_LEVEL,...) if(printToScreen>LOG_LEVEL) fprintf(stderr, __VA_ARGS__); syslog(LOG_LEVEL,__VA_ARGS__);
 
 ///The one global variable for logging to screen
@@ -33,6 +36,8 @@ int printToScreen;
 #define DDA_PER_ATRI 4
 #define RFCHAN_PER_DDA 4
 #define TDA_PER_ATRI 4
+#define ANTS_PER_TDA 4
+#define THRESHOLDS_PER_ATRI TDA_PER_ATRI*ANTS_PER_TDA
 
 
 //PID Files  //will change to /var/run

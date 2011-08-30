@@ -48,6 +48,7 @@ extern void G__set_cpp_environmenteventDict();
 #include "AraOneSensorHkData.h"
 #include "araOneStructures.h"
 #include "araDefines.h"
+#include "RawAraOneSimpleStationEvent.h"
 #include <algorithm>
 namespace std { }
 using namespace std;
@@ -100,7 +101,9 @@ extern G__linked_taginfo G__eventDictLN_AraAntennaInfo;
 extern G__linked_taginfo G__eventDictLN_AraGeomTool;
 extern G__linked_taginfo G__eventDictLN_AraEventHk_t;
 extern G__linked_taginfo G__eventDictLN_AraSensorHk_t;
+extern G__linked_taginfo G__eventDictLN_AraSimpleStationEvent_t;
 extern G__linked_taginfo G__eventDictLN_AraOneEventHkData;
 extern G__linked_taginfo G__eventDictLN_AraOneSensorHkData;
+extern G__linked_taginfo G__eventDictLN_RawAraOneSimpleStationEvent;
 
 /* STUB derived class for protected member access */

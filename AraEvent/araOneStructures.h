@@ -96,15 +96,27 @@ typedef struct {
   uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
   uint8_t atriVoltage; ///< ATRI Voltage (conversion??)
   uint8_t atriCurrent; ///< ATRI Current (conversion??)
-  uint16_t ddaTemmp[DDA_PER_ATRI]; ///< DDA Temperature conversion??
+  uint16_t ddaTemp[DDA_PER_ATRI]; ///< DDA Temperature conversion??
   uint16_t tdaTemp[TDA_PER_ATRI]; ///< TDA Temperature conversion??
   uint32_t ddaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
   uint32_t tdaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
 } AraSensorHk_t;
 
 
-
-
+//!  The ARA Station Event Structure
+/*!
+  This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working
+*/
+typedef struct {
+  AraGenericHeader_t gHdr; ///< The generic header 
+  uint64_t unixTime; ///< Time in seconds (64-bits for future proofing)
+  uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
+  uint32_t eventNumber; ///< Event number
+  uint32_t eventId[DDA_PER_ATRI]; ///< Event Id
+  uint16_t blockId[DDA_PER_ATRI]; ///< Block Id
+  uint16_t samples[DDA_PER_ATRI][512]; ///< Samples
+} AraSimpleStationEvent_t;
+  
 
 
 #endif //ARAONE_STRUCTURES_H
