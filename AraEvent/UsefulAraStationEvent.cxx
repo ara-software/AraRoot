@@ -26,21 +26,28 @@ UsefulAraStationEvent::~UsefulAraStationEvent() {
 }
 
 
-TGraph *UsefulAraStationEvent::getGraphFromElecChan(int chan)
+TGraph *UsefulAraStationEvent::getGraphFromElecChan(int /*chan*/)
 {
   std::cerr << "Error calling UsefulAraStationEvent::getGraphFromElecChan()\n";
   return NULL;
 }
 
-TGraph *UsefulAraStationEvent::getGraphFromRFChan(int chan)
+TGraph *UsefulAraStationEvent::getGraphFromRFChan(int /*chan*/)
 {
   std::cerr << "Error calling UsefulAraStationEvent::getGraphFromRFChan()\n";
   return NULL;
 }
 
-Int_t UsefulAraStationEvent::getNumChannels()
+Int_t UsefulAraStationEvent::getNumElecChannels()
 {
-  std::cerr << "Error calling UsefulAraStationEvent::getNumChannels()\n";
+  std::cerr << "Error calling UsefulAraStationEvent::getNumElecChannels()\n";
+  return -1;
+  
+}
+
+Int_t UsefulAraStationEvent::getNumRFChannels()
+{
+  std::cerr << "Error calling UsefulAraStationEvent::getNumRFChannels()\n";
   return -1;
   
 }
