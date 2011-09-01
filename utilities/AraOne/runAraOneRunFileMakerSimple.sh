@@ -7,10 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-#RAW_BASE_DIR=/Users/rjn/ara/data/ohio2011/
-#ROOT_BASE_DIR=/Users/rjn/ara/data/ohio2011/root
-RAW_BASE_DIR=/tmp/fakeData
-ROOT_BASE_DIR=/tmp/fakeRoot
+RAW_BASE_DIR=/Users/rjn/ara/data/ohio2011/
+ROOT_BASE_DIR=/Users/rjn/ara/data/ohio2011/root
 
 
 RUN_NUM=$1
@@ -37,13 +35,13 @@ for file in ${RAW_DIR}/event/ev_*/*;
 do
   if [[ -f $file ]]; then
       echo $file >> ${EVENT_FILE_LIST}
-#      echo `dirname $file`;
+      echo `dirname $file`;
   fi
 done
 
 if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE}
-    #cat ${EVENT_FILE_LIST}
+    ./makeSimpleAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE}
+    cat ${EVENT_FILE_LIST}
     rm ${EVENT_FILE_LIST}
     echo "Done Event File"
 else

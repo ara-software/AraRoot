@@ -19,7 +19,7 @@ LIBS          = $(ROOTLIBS)  -lMinuit $(SYSLIBS) $(LD_ARA_UTIL) $(FFTLIBS)
 GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 
-TREE_MAKER = makeAraSensorHkTree makeAraEventHkTree makeSimpleAraEventTree
+TREE_MAKER = makeAraSensorHkTree makeAraEventHkTree makeSimpleAraEventTree makeAraEventTree
 SCRIPTS = runAraOneRunFileMaker.sh
 
 all : $(TREE_MAKER)
