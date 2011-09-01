@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "AraEventCalibrator.h"
-#include "UsefulAraStationEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
 #include "AraGeomTool.h"
 #include "TMath.h"
 #include "TGraph.h"
@@ -142,7 +142,7 @@ void AraEventCalibrator::loadPedestals()
   gzclose(inPed);
 }
 
-int AraEventCalibrator::doBinCalibration(UsefulAraStationEvent *theEvent, int chanIndex,int overrideRCO)
+int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO)
 {
   int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
   int nChan=theEvent->chan[chanIndex].chanId%CHANNELS_PER_LAB3;
@@ -226,7 +226,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraStationEvent *theEvent, int ch
 }
 
 
-void AraEventCalibrator::calibrateEvent(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType) 
+void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
   
   static int gotPeds=0;
@@ -248,7 +248,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraStationEvent *theEvent, AraCalT
 
 
 
-    //Now we stuff it back into the UsefulAraStationEvent object
+    //Now we stuff it back into the UsefulAraTestBedStationEvent object
          
     if(calType==AraCalType::kNoCalib) {
       theEvent->fNumPoints[chanIndex]=MAX_NUMBER_SAMPLES_LAB3;
@@ -478,7 +478,7 @@ void AraEventCalibrator::loadCalib()
 
 
 
-void AraEventCalibrator::calcClockAlignVals(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType)
+void AraEventCalibrator::calcClockAlignVals(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType)
 {
   if(!AraCalType::hasClockAlignment(calType)) return;
   TGraph *grClock[LAB3_PER_TESTBED]={0};
@@ -558,7 +558,7 @@ Double_t AraEventCalibrator::estimateClockLag(TGraph *grClock)
 
 }
 
-void AraEventCalibrator::fillRCOGuessArray(UsefulAraStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED])
+void AraEventCalibrator::fillRCOGuessArray(UsefulAraTestBedStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED])
 {
 
   for(int chip=0;chip<LAB3_PER_TESTBED;chip++) {

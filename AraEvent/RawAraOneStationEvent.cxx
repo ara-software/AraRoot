@@ -38,6 +38,7 @@ RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, cha
    numReadoutBlocks=hdPtr->numReadoutBlocks; ///< Number of readout blocks which follow header
 
    int uptoByte=0;
+   //   std::cerr << "numReadoutBlocks " << numReadoutBlocks << "\n";
    for(int block=0;block<numReadoutBlocks;block++) {
      AraStationEventBlockHeader_t *blkPtr = (AraStationEventBlockHeader_t*)&dataBuffer[uptoByte];
      uptoByte+=sizeof(AraStationEventBlockHeader_t);
@@ -45,7 +46,10 @@ RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, cha
      RawAraOneStationBlock blocky(blkPtr,chanPtr);
      blockVec.push_back(blocky);
      int numChan=blocky.getNumChannels();
-     uptoByte+=sizeof(AraStationEventBlockChannel_t*)*numChan;
+     //     std::cout << "numChan " << numChan << "\n";
+     uptoByte+=sizeof(AraStationEventBlockChannel_t)*numChan;
    }
-   std::cerr << "Assigned " << uptoByte <<  " bytes out of " << numStationBytes << "\n";
+   //   std::cerr << sizeof(AraStationEventHeader_t) << "\n";
+   if(uptoByte!=int(numStationBytes-(sizeof(AraStationEventHeader_t)-EXTRA_SOFTWARE_HEADER_BYTES))) 
+     std::cerr << "Error assigned " << uptoByte <<  " bytes out of " << numStationBytes-(sizeof(AraStationEventHeader_t)-EXTRA_SOFTWARE_HEADER_BYTES) << "\n";
 }

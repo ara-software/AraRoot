@@ -22,7 +22,7 @@
 
 //!  AraCalType -- The Calibration Type
 /*!
-  There are a number of calibration options available to create a UsefulAraStationEvent.
+  There are a number of calibration options available to create a UsefulAraTestBedStationEvent.
   \ingroup rootclasses
 */
 namespace AraCalType {
@@ -46,7 +46,7 @@ namespace AraCalType {
 
 } 
 
-class UsefulAraStationEvent;
+class UsefulAraTestBedStationEvent;
 class TGraph; 
 
 //!  AraEventCalibrator -- The Ara Event Calibrator
@@ -65,13 +65,13 @@ class AraEventCalibrator : public TObject
    
 
    void setPedFile(char fileName[]); ///< Manually sets the pedestal file
-   void calibrateEvent(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraStationEvent, called from UsefulAraStationEvent constructor
-   int doBinCalibration(UsefulAraStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
+   void calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraTestBedStationEvent, called from UsefulAraTestBedStationEvent constructor
+   int doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
    
-   void fillRCOGuessArray(UsefulAraStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED]); ///< Utility function called by UsefulAraStationEvent
+   void fillRCOGuessArray(UsefulAraTestBedStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED]); ///< Utility function called by UsefulAraTestBedStationEvent
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
 
-   void calcClockAlignVals(UsefulAraStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
+   void calcClockAlignVals(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
    
 

@@ -29,10 +29,9 @@ class RawAraOneStationBlock: public TObject
 {
  public:
    RawAraOneStationBlock(); ///< Default constructor
-   RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t channels[]); ///< Assignment constructor
+   RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels); ///< Assignment constructor
    ~RawAraOneStationBlock(); ///< Destructor
 
-   int getNumChannels() {return (int) numChannels;}
 
    //Extra stuff
    UChar_t numChannels;
@@ -44,6 +43,8 @@ class RawAraOneStationBlock: public TObject
 
    //The samples
    std::vector< std::vector<UShort_t> > data;
+
+   int getNumChannels() {return (int) numChannels;}
 
 
   ClassDef(RawAraOneStationBlock,1);

@@ -23,7 +23,7 @@ RawAraOneStationBlock::~RawAraOneStationBlock() {
 }
 
 
-RawAraOneStationBlock::RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t channels[]) ///< Assignment constructor
+RawAraOneStationBlock::RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels) ///< Assignment constructor
 {
   irsBlockNumber=hdPtr->irsBlockNumber;
   channelMask=hdPtr->channelMask;
@@ -39,9 +39,12 @@ RawAraOneStationBlock::RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr
 
   //Now loop over and fill in the data
   for(int chan=0;chan<numChannels;chan++) {
+    std::vector <UShort_t> tempVec;
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      data[chan][samp]=channels[chan].samples[samp];
+      tempVec.push_back(channels[chan].samples[samp]);
+      //      data[chan][samp]=channels[chan].samples[samp];
     }
+    data.push_back(tempVec);
   }
 
 }

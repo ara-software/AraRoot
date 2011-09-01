@@ -118,6 +118,9 @@ typedef struct {
 } AraSimpleStationEvent_t;
 
 
+
+#define EXTRA_SOFTWARE_HEADER_BYTES 28
+
 //!  The ARA Station Event Header Format
 /*!
   This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working

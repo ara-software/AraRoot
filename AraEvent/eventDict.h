@@ -43,6 +43,7 @@ extern void G__set_cpp_environmenteventDict();
 #include "AraAntennaInfo.h"
 #include "AraGeomTool.h"
 #include "UsefulAraStationEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
 #include "araTestbedStructures.h"
 #include "AraOneEventHkData.h"
 #include "AraOneSensorHkData.h"
@@ -87,8 +88,9 @@ extern G__linked_taginfo G__eventDictLN_TGraph;
 extern G__linked_taginfo G__eventDictLN_TH1D;
 extern G__linked_taginfo G__eventDictLN_AraCalType;
 extern G__linked_taginfo G__eventDictLN_AraCalTypecLcLEAraCalType;
-extern G__linked_taginfo G__eventDictLN_UsefulAraStationEvent;
+extern G__linked_taginfo G__eventDictLN_UsefulAraTestBedStationEvent;
 extern G__linked_taginfo G__eventDictLN_AraEventCalibrator;
+extern G__linked_taginfo G__eventDictLN_UsefulAraStationEvent;
 extern G__linked_taginfo G__eventDictLN_AraAntType;
 extern G__linked_taginfo G__eventDictLN_AraAntTypecLcLEAraAntType;
 extern G__linked_taginfo G__eventDictLN_AraAntPol;
