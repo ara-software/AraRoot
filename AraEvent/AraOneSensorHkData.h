@@ -20,7 +20,7 @@
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneSensorHkData: public RawAraOneGenericHeader
+class AraOneSensorHkData: public RawAraOneGenericHeader, public TObject
 {
  public:
    AraOneSensorHkData(); ///< Default constructor

@@ -20,7 +20,7 @@
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneEventHkData: public RawAraOneGenericHeader
+class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
 {
  public:
    AraOneEventHkData(); ///< Default constructor

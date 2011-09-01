@@ -32,6 +32,7 @@ class RawAraOneStationBlock: public TObject
    RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t channels[]); ///< Assignment constructor
    ~RawAraOneStationBlock(); ///< Destructor
 
+   int getNumChannels() {return (int) numChannels;}
 
    //Extra stuff
    UChar_t numChannels;

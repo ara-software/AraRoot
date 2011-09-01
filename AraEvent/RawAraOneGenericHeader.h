@@ -22,7 +22,7 @@
   The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
   \ingroup rootclasses
 */
-class RawAraOneGenericHeader: public TObject
+class RawAraOneGenericHeader
 {
  public:
    RawAraOneGenericHeader(); ///< Default constructor

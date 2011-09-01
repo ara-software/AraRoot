@@ -51,6 +51,7 @@ extern void G__set_cpp_environmenteventDict();
 #include "RawAraOneSimpleStationEvent.h"
 #include "RawAraOneStationBlock.h"
 #include "RawAraOneGenericHeader.h"
+#include "RawAraOneStationEvent.h"
 #include <algorithm>
 namespace std { }
 using namespace std;
@@ -106,6 +107,7 @@ extern G__linked_taginfo G__eventDictLN_AraGenericHeader_t;
 extern G__linked_taginfo G__eventDictLN_AraEventHk_t;
 extern G__linked_taginfo G__eventDictLN_AraSensorHk_t;
 extern G__linked_taginfo G__eventDictLN_AraSimpleStationEvent_t;
+extern G__linked_taginfo G__eventDictLN_AraStationEventHeader_t;
 extern G__linked_taginfo G__eventDictLN_AraStationEventBlockHeader_t;
 extern G__linked_taginfo G__eventDictLN_AraStationEventBlockChannel_t;
 extern G__linked_taginfo G__eventDictLN_RawAraOneGenericHeader;
@@ -115,5 +117,8 @@ extern G__linked_taginfo G__eventDictLN_RawAraOneSimpleStationEvent;
 extern G__linked_taginfo G__eventDictLN_RawAraOneStationBlock;
 extern G__linked_taginfo G__eventDictLN_vectorlEvectorlEunsignedsPshortcOallocatorlEunsignedsPshortgRsPgRcOallocatorlEvectorlEunsignedsPshortcOallocatorlEunsignedsPshortgRsPgRsPgRsPgR;
 extern G__linked_taginfo G__eventDictLN_reverse_iteratorlEvectorlEvectorlEunsignedsPshortcOallocatorlEunsignedsPshortgRsPgRcOallocatorlEvectorlEunsignedsPshortcOallocatorlEunsignedsPshortgRsPgRsPgRsPgRcLcLiteratorgR;
+extern G__linked_taginfo G__eventDictLN_RawAraOneStationEvent;
+extern G__linked_taginfo G__eventDictLN_vectorlERawAraOneStationBlockcOallocatorlERawAraOneStationBlockgRsPgR;
+extern G__linked_taginfo G__eventDictLN_reverse_iteratorlEvectorlERawAraOneStationBlockcOallocatorlERawAraOneStationBlockgRsPgRcLcLiteratorgR;
 
 /* STUB derived class for protected member access */
