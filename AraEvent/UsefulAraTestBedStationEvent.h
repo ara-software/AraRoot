@@ -41,6 +41,9 @@ class UsefulAraTestBedStationEvent: public RawAraTestBedStationEvent, public Use
    Double_t fTimesRF[RFCHANS_PER_TESTBED][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
    Int_t fNumPointsRF[RFCHANS_PER_TESTBED]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
 
+
+   Int_t getNumElecChannels() {return NUM_DIGITIZED_TESTBED_CHANNELS;}
+   Int_t getNumRFChannels() {return RFCHANS_PER_TESTBED;}
    TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel
    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns
