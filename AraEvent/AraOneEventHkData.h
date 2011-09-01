@@ -11,6 +11,7 @@
 
 //Includes
 #include <TObject.h>
+#include "RawAraOneGenericHeader.h"
 #include "araOneStructures.h"
 #include "araDefines.h"
 
@@ -19,16 +20,13 @@
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneEventHkData: public TObject
+class AraOneEventHkData: public RawAraOneGenericHeader
 {
  public:
    AraOneEventHkData(); ///< Default constructor
    AraOneEventHkData(AraEventHk_t *theHk); ///< Assignment constructor
    ~AraOneEventHkData(); ///< Destructor
 
-
-   UChar_t verId; ///< Software version
-   UChar_t stationId; ///< Station Id
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
    UInt_t firmwareVersion; ///< Firmware version
@@ -42,7 +40,7 @@ class AraOneEventHkData: public TObject
    UShort_t triggerScaler; ///< Trigger scaler (what is this?)
    
 
-   ClassDef(AraOneEventHkData,1);
+   ClassDef(AraOneEventHkData,2);
 };
 
 

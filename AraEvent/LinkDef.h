@@ -19,6 +19,10 @@
 #pragma link C++ class AraAntennaInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
+#pragma link C++ class RawAraOneStationBlock+;
+#pragma link C++ class RawAraOneGenericHeader+;
+
+#pragma link C++ typedef AraDataStructureType_t;
 
 
 #pragma link C++ namespace     AraCalType;

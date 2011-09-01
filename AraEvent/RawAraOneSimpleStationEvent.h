@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneSimpleStationEvent.h        Raw ARA event class                      /////
+/////  RawAraOneSimpleStationEvent.h        Raw ARA event class          /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////

@@ -103,7 +103,7 @@ typedef struct {
 } AraSensorHk_t;
 
 
-//!  The ARA Station Event Structure
+//!  The ARA Station Simple Event Structure
 /*!
   This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working
 */
@@ -116,6 +116,45 @@ typedef struct {
   uint16_t blockId[DDA_PER_ATRI]; ///< Block Id
   uint16_t samples[DDA_PER_ATRI][512]; ///< Samples
 } AraSimpleStationEvent_t;
+
+
+//!  The ARA Station Event Header Format
+/*!
+  This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working
+*/
+typedef struct {
+  AraGenericHeader_t gHdr; ///< The generic header 
+  uint64_t unixTime; ///< Software event time in seconds (64-bits for future proofing)
+  uint32_t unixTimeUs; ///< Software event time in microseconds (32-bits)
+  uint32_t eventNumber; ///< Software event number
+  uint32_t ppsNumber; ///< For matching up with thresholds etc.
+  uint32_t numBytes; ///<Bytes in station readout
+  uint32_t recordId; ///< Record Id
+  uint64_t timeStamp; ///< Timestamp
+  uint32_t eventId; ///< Event Id
+  uint16_t numReadoutBlocks; ///< Number of readout blocks which follow header
+} AraStationEventHeader_t;
+  
+
+
+//!  The ARA Station Event Block Header Format
+/*!
+  This is the 4-byte structure that contains the Ara Station Event Block Header
+*/
+typedef struct {
+  uint16_t irsBlockNumber; ///< The IRS block number
+  uint8_t channelMask; ///<Bit mask for the 8 available channels 0x8f by default
+  uint8_t atriDdaNumber; 
+} AraStationEventBlockHeader_t;
+
+
+//!  The ARA Station Event Block Channel
+/*!
+  This is the 128-byte structure which contains the 64 samples in a single channel
+*/
+typedef struct {
+  uint16_t samples[SAMPLES_PER_BLOCK]; ///< The IRS block readout
+} AraStationEventBlockChannel_t;
   
 
 

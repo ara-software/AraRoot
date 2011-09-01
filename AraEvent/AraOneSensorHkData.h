@@ -11,6 +11,7 @@
 
 //Includes
 #include <TObject.h>
+#include "RawAraOneGenericHeader.h"
 #include "araOneStructures.h"
 #include "araDefines.h"
 
@@ -19,16 +20,13 @@
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneSensorHkData: public TObject
+class AraOneSensorHkData: public RawAraOneGenericHeader
 {
  public:
    AraOneSensorHkData(); ///< Default constructor
    AraOneSensorHkData(AraSensorHk_t *theHk); ///< Assignment constructor
    ~AraOneSensorHkData(); ///< Destructor
 
-
-   UChar_t verId; ///< Software version
-   UChar_t stationId; ///< Station Id
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
 

@@ -24,10 +24,9 @@ AraOneSensorHkData::~AraOneSensorHkData() {
 
 
 AraOneSensorHkData::AraOneSensorHkData(AraSensorHk_t *theHk)
+  :RawAraOneGenericHeader(&(theHk->gHdr))
 {
 
-  verId=theHk->gHdr.verId; ///< Software version
-  stationId=theHk->gHdr.stationId; ///< Station Id
   unixTime=theHk->unixTime; ///< Time in seconds (64-bits for future proofing)
   unixTimeUs=theHk->unixTimeUs; ///< Time in microseconds (32-bits)
 

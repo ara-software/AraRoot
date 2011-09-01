@@ -38,6 +38,7 @@ int printToScreen;
 #define TDA_PER_ATRI 4
 #define ANTS_PER_TDA 4
 #define THRESHOLDS_PER_ATRI TDA_PER_ATRI*ANTS_PER_TDA
+#define SAMPLES_PER_BLOCK 64
 
 
 //PID Files  //will change to /var/run
@@ -46,7 +47,7 @@ int printToScreen;
 
 //CONFIG Files //will change to absoulte path maybe
 #define ARAD_CONFIG_FILE "arad.config"
-#define ARA_ACQD_CONFIG_FILE "araAcqd.config"
+#define ARA_ACQD_CONFIG_FILE "ARAAcqd.config"
 
 //SOCKETS
 #define ATRI_CONTROL_SOCKET "/tmp/atri_control"
@@ -54,7 +55,7 @@ int printToScreen;
 #define ACQD_RC_SOCKET "/tmp/acqd_rc"
 
 
-#define ARA_RUN_NUMBER_FILE "/tmp/araRunNumber"
+#define ARA_RUN_NUMBER_FILE "/home/ara/araRunNumber"
 #define DAQ_EVENT_DIR "event/"
 #define DAQ_SENSOR_HK_DIR    "sensorHk/"
 #define DAQ_EVENT_HK_DIR "eventHk/"
