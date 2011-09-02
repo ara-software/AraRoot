@@ -12,7 +12,7 @@
 //Includes
 #include <TObject.h>
 #include "araTestbedStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 #include "RawAraTestBedStationEvent.h"
 #include "AraEventCalibrator.h"
 

@@ -13,7 +13,7 @@
 #include <TObject.h>
 #include "RawAraOneGenericHeader.h"
 #include "araOneStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 
 //!  AraOneEventHkData -- The HK data
 /*!

@@ -13,7 +13,7 @@
 #include <TObject.h>
 #include <TMath.h>
 #include "araTestbedStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 #include "AraAntennaInfo.h"
 
 

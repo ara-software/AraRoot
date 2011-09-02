@@ -1,4 +1,4 @@
-/*! \file araDefines.h
+/*! \file araTestBedDefines.h
     \brief The standard ARA include file.
     
     It will end up including all those definitions that are needed 

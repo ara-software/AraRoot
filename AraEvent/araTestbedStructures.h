@@ -12,7 +12,7 @@
 
 #ifndef ARA_STRUCTURES_H
 #define ARA_STRUCTURES_H
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 
 #define ARA_STRUCTURES_VERSION 1
 

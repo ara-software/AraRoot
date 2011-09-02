@@ -12,7 +12,7 @@
 //Includes
 #include <TObject.h>
 #include "araTestbedStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 
 
 #define ADCMV 0.939   /* mV/adc, per Gary's email of 05/04/2006 */

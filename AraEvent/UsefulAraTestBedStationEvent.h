@@ -14,7 +14,7 @@
 #include <TGraph.h>
 #include <TH1.h>
 #include "araTestbedStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 #include "RawAraTestBedStationEvent.h"
 #include "AraEventCalibrator.h"
 #include "UsefulAraStationEvent.h"

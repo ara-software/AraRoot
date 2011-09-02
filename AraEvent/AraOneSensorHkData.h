@@ -13,7 +13,7 @@
 #include <TObject.h>
 #include "RawAraOneGenericHeader.h"
 #include "araOneStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 
 //!  AraOneSensorHkData -- The HK data
 /*!

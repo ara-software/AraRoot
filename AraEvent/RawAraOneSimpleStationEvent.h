@@ -12,12 +12,8 @@
 //Includes
 #include <TObject.h>
 #include "araOneStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 #include "RawAraStationEvent.h"
-#include "RawAraTestBedStationHeader.h"
-#include "AraRawTestBedRFChannel.h"
-#include "AraTestBedTriggerMonitor.h"
-#include "AraTestBedHkData.h"
 
 //!  RawAraOneSimpleStationEvent -- The Raw ARA Event Data
 /*!

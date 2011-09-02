@@ -48,7 +48,7 @@ extern void G__set_cpp_environmenteventDict();
 #include "AraOneEventHkData.h"
 #include "AraOneSensorHkData.h"
 #include "araOneStructures.h"
-#include "araDefines.h"
+#include "araTestBedDefines.h"
 #include "RawAraOneSimpleStationEvent.h"
 #include "RawAraOneStationBlock.h"
 #include "RawAraOneGenericHeader.h"
