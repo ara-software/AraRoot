@@ -30,6 +30,9 @@ class RawAraOneGenericHeader
    ~RawAraOneGenericHeader(); ///< Destructor
  
 
+   UChar_t softVerMajor;
+   UChar_t softVerMinor;
+
    AraDataStructureType_t typeId;
    UChar_t verId;
    AraStationId_t stationId;

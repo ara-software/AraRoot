@@ -11,6 +11,8 @@
 
 //Includes
 #include <TObject.h>
+#include "araSoft.h"
+#include "araOneStructures.h"
 #include "araTestbedStructures.h"
 #include "araTestBedDefines.h"
 
@@ -46,6 +48,7 @@ namespace AraCalType {
 
 } 
 
+class UsefulAraOneStationEvent;
 class UsefulAraTestBedStationEvent;
 class TGraph; 
 
@@ -64,6 +67,7 @@ class AraEventCalibrator : public TObject
    static AraEventCalibrator*  Instance(); ///< Generates an instance of AraEventCalibrator to use
    
 
+   //TestBed calibrations
    void setPedFile(char fileName[]); ///< Manually sets the pedestal file
    void calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraTestBedStationEvent, called from UsefulAraTestBedStationEvent constructor
    int doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
@@ -75,9 +79,8 @@ class AraEventCalibrator : public TObject
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
    
 
-
-   void loadPedestals(); ///< Loads the pedestals from a file
-   void loadCalib(); ///< Loads the various calibration constants
+   void loadTestBedPedestals(); ///< Loads the pedestals from a file
+   void loadTestBedCalib(); ///< Loads the various calibration constants
    int gotPedFile; ///<Flag to indicate whether a specific pedesal file has been selected
    char pedFile[FILENAME_MAX]; ///< Filename of the pedesal file
    float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
@@ -85,7 +88,6 @@ class AraEventCalibrator : public TObject
    double epsilonVals[LAB3_PER_TESTBED][2]; ///<Array to hold the wrap-around calibration constants
    double interleaveVals[8]; ///< There are only 8 interleaved channels
    double clockAlignVals[LAB3_PER_TESTBED]; //Well by default clock align 0 is 0
-
 
 
    ///These are just utility arrays that are used in the calibration
@@ -99,6 +101,12 @@ class AraEventCalibrator : public TObject
    double calTimeNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated time numbers
    double calVoltNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated volt numbers
    int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
+
+
+   //AraOne Calibrations
+
+   void calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAraOneStationEvent, called from UsefulAraOneStationEvent constructor
+
 
 
  protected:

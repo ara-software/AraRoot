@@ -8,6 +8,7 @@
 
 #include "AraEventCalibrator.h"
 #include "UsefulAraTestBedStationEvent.h"
+#include "UsefulAraOneStationEvent.h"
 #include "AraGeomTool.h"
 #include "TMath.h"
 #include "TGraph.h"
@@ -58,7 +59,7 @@ AraEventCalibrator * AraEventCalibrator::fgInstance=0;
 AraEventCalibrator::AraEventCalibrator() 
 {
   gotPedFile=0;
-  loadCalib();
+  loadTestBedCalib();
   //Default Constructor
 }
 
@@ -82,10 +83,10 @@ void AraEventCalibrator::setPedFile(char fileName[])
 {
   strncpy(pedFile,fileName,FILENAME_MAX);
   gotPedFile=1;
-  loadPedestals();
+  loadTestBedPedestals();
 }
 
-void AraEventCalibrator::loadPedestals()
+void AraEventCalibrator::loadTestBedPedestals()
 {
   if(!gotPedFile) {
     char *pedFileEnv = getenv( "ARA_PEDESTAL_FILE" );
@@ -96,22 +97,22 @@ void AraEventCalibrator::loadPedestals()
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  fprintf(stdout,"AraEventCalibrator::loadPedestals(): INFO - Pedestal file [from ./calib]");
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  fprintf(stdout,"AraEventCalibrator::loadPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	fprintf(stdout,"AraEventCalibrator::loadPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
+	fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(pedFile,"%s/peds_1294924296.869787.run001202.dat",calibDir);
       fprintf(stdout," = %s\n",pedFile);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(pedFile,pedFileEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadPedestals(): INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile);
+      fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile);
     } // end of IF-block for pedestal file specified by environment variable
   }
 
@@ -231,7 +232,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
   
   static int gotPeds=0;
   if(!gotPeds)  
-    loadPedestals();
+    loadTestBedPedestals();
   gotPeds=1;
   if(AraCalType::hasBinWidthCalib(calType))
     theEvent->guessRCO(0); //Forces the calculation of the RCO phase from the clock
@@ -434,7 +435,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
 }
 
 
-void AraEventCalibrator::loadCalib()
+void AraEventCalibrator::loadTestBedCalib()
 {
   char calibFile[FILENAME_MAX];
   char calibDir[FILENAME_MAX];
@@ -650,4 +651,74 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
   rms=TMath::Sqrt(meanPeriodSq-meanPeriod*meanPeriod);
   
   return meanPeriod;
+}
+
+void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType) 
+{
+  //Really what we will do here is just kNoCalib
+
+  //Step one is loop over the blocks
+
+  std::vector<RawAraOneStationBlock>::iterator blockIt;
+  std::vector< std::vector<UShort_t> >::iterator vecVecIt;
+  std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
+  std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
+  std::vector< UShort_t >::iterator shortIt;
+  for(blockIt = theEvent->blockVec.begin(); 
+      blockIt!=theEvent->blockVec.end();
+      blockIt++) {
+    //Step two is determine the channel Ids
+    Int_t irsChan[8];
+    Int_t numChans=0;
+    for(Int_t bit=0;bit<8;bit++) {
+      Int_t mask=(1<<bit);
+      if((blockIt->channelMask)&mask) {
+	irsChan[numChans]=bit;
+	numChans++;
+      }
+    }
+    std::cout << "Got numChans " << numChans << "\n";
+
+    //Step three is loop over the channels within a block
+    Int_t uptoChan=0;
+    for(vecVecIt=blockIt->data.begin();
+	vecVecIt!=blockIt->data.end();
+	vecVecIt++) {
+      Int_t chanId=irsChan[uptoChan] | ((blockIt->atriDdaNumber&0x3)<<8);
+      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
+		<< (int)blockIt->atriDdaNumber << "\n";
+
+
+      //Step four is to check if we have already got this chanId
+
+      timeMapIt=theEvent->fTimes.find(chanId);
+      Double_t time=0;
+      if(timeMapIt==theEvent->fTimes.end()) {
+	//First time round for this channel
+	std::vector <Double_t> tempTimes;
+	std::vector <Double_t> tempVolts;	
+	//Now need to insert empty vector into map
+	theEvent->fTimes.insert( std::pair< Int_t, std::vector <Double_t> >(chanId,tempTimes));
+	theEvent->fVolts.insert( std::pair< Int_t, std::vector <Double_t> >(chanId,tempVolts));
+	theEvent->fNumChannels++;
+      }
+      else {
+	//Just get the last time
+	time=timeMapIt->second.back();
+      }
+      
+      //Set the iterators to point to the correct channel in the map
+      timeMapIt=theEvent->fTimes.find(chanId);
+      voltMapIt=theEvent->fVolts.find(chanId);
+           
+      //Now loop over the 64 samples
+      for(shortIt=vecVecIt->begin();
+	  shortIt!=vecVecIt->end();
+	  shortIt++) {
+	time+=1;	
+	timeMapIt->second.push_back(time); ///<Filling with time
+	voltMapIt->second.push_back(*shortIt); ///<Filling with voltage
+      }		    
+    }
+  }              
 }

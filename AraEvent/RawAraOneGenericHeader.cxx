@@ -8,12 +8,14 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "RawAraOneGenericHeader.h"
+#include "AraRootVersion.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 ClassImp(RawAraOneGenericHeader);
 
 RawAraOneGenericHeader::RawAraOneGenericHeader()   
+  :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
 {  
   //Default Constructor
 }
@@ -24,6 +26,7 @@ RawAraOneGenericHeader::~RawAraOneGenericHeader() {
 
 
 RawAraOneGenericHeader::RawAraOneGenericHeader(AraGenericHeader_t *gHdr) ///< Assignment constructor
+  :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
 {
   typeId=gHdr->typeId;
   verId=gHdr->verId;

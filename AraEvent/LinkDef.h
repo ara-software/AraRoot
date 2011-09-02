@@ -17,6 +17,7 @@
 #pragma link C++ class AraTestBedTriggerMonitor+;
 #pragma link C++ class UsefulAraStationEvent+;
 #pragma link C++ class UsefulAraTestBedStationEvent+;
+#pragma link C++ class UsefulAraOneStationEvent+;
 #pragma link C++ class AraAntennaInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
