@@ -11,9 +11,9 @@
 
 //Includes
 #include <TObject.h>
-#include "RawAraOneGenericHeader.h"
+#include "araSoft.h"
 #include "araOneStructures.h"
-#include "araTestBedDefines.h"
+#include "RawAraOneGenericHeader.h"
 
 //!  AraOneSensorHkData -- The HK data
 /*!
@@ -43,4 +43,4 @@ class AraOneSensorHkData: public RawAraOneGenericHeader, public TObject
 };
 
 
-#endif //ARAHKDATA_H
+#endif //ARAONESENSORHKDATA

@@ -18,7 +18,8 @@
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include <stdint.h>
 #endif
-#include <araSoft.h>
+
+#include "araSoft.h"
 
 #define ARA_SOFT_VERISON 0x1
 
