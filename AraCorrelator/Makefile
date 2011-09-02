@@ -76,7 +76,7 @@ endif
 
 
 clean:
-	@rm makeCorrelationMaps
+	@rm -f makeCorrelationMaps
 	@rm -f *Dict*
 	@rm -f *.${OBJSUF}
 	@rm -f $(LIBRARY)

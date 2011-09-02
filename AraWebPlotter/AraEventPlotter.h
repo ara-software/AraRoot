@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-////// Simple Class to handle making plots from UsefulAraEvent     /////////
+////// Simple Class to handle making plots from UsefulAraTestBedStationEvent     /////////
 //////                                                             /////////
 ////// rjn@hep.ucl.ac.uk --- December 2010                         /////////
 ////////////////////////////////////////////////////////////////////////////
@@ -14,20 +14,20 @@
 #include "TH1.h"
 #include "AraTimeHistoHandler.h"
 #include "AraHistoHandler.h"
-#include "RawAraEvent.h"
-#include "UsefulAraEvent.h"
-#include "araDefines.h"
+#include "RawAraTestBedStationEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "araTestbedDefines.h"
 
 class AraEventPlotter
 {
  public:
   AraEventPlotter(char *plotDir, char *dataDir);
   ~AraEventPlotter();
-  void addEvent(int runNumber,RawAraEvent *rawEvent);
+  void addEvent(int runNumber,RawAraTestBedStationEvent *rawEvent);
   void makePlots();
   void makeLatestRunPlots();
   void saveFiles();
-  void plotEvent(Int_t runNumber,UsefulAraEvent *usefulEvent);
+  void plotEvent(Int_t runNumber,UsefulAraTestBedStationEvent *usefulEvent);
   void setEventPlotFlag(int flag) { fEventPlotFlag=flag;}
 
   void loadAllTimeHists();
@@ -50,13 +50,13 @@ class AraEventPlotter
   AraTimeHistoHandler *fRcoCountHisto[3];
   
   //Now the event FFT averages
-  AraHistoHandler *fAverageFFTHisto[ANTS_PER_STATION];
+  AraHistoHandler *fAverageFFTHisto[ANTS_PER_TESTBED];
   AraHistoHandler *fAverageTriggerPattern;
   AraHistoHandler *fAverageUnixTimeUs;
 
   //Now some simple event analysis stuff
-  AraTimeHistoHandler *fWaveformRMSHisto[ANTS_PER_STATION];
-  AraTimeHistoHandler *fWaveformSNRHisto[ANTS_PER_STATION];
+  AraTimeHistoHandler *fWaveformRMSHisto[ANTS_PER_TESTBED];
+  AraTimeHistoHandler *fWaveformSNRHisto[ANTS_PER_TESTBED];
   
   //The histogram pointers
   TH1D *histTrigPat;

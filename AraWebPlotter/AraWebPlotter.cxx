@@ -15,9 +15,9 @@
 #define HACK_FOR_ROOT
 
 //ARA includes
-#include "araStructures.h"
-#include "RawAraEvent.h"  
-#include "FullAraHkEvent.h"  
+#include "araTestbedStructures.h"
+#include "RawAraTestBedStationEvent.h"  
+#include "FullAraTestBedHkEvent.h"  
 #include "AraWebPlotterConfig.h"
 #include "AraHkPlotter.h"
 #include "AraEventPlotter.h"
@@ -27,12 +27,12 @@ int openRootFiles(char *eventFileName, char *hkFileName);
 Int_t runNumber;
 TFile *theEventFile;
 TChain *eventTree;
-RawAraEvent *theEvent=0;
+RawAraTestBedStationEvent *theEvent=0;
 
 
 TFile *theHkFile;
 TChain *hkTree;
-FullAraHkEvent *theHk=0;
+FullAraTestBedHkEvent *theHk=0;
 
 
 
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
   if(argc>2) 
     hkFileName=argv[3];
 
-  //  theEvent = new RawAraEvent();
+  //  theEvent = new RawAraTestBedStationEvent();
   //Step one is to read the config file.
    gROOT->SetBatch();
   AraWebPlotterConfig *araConfig = new AraWebPlotterConfig();

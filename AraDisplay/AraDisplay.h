@@ -17,13 +17,13 @@
 #include "AraEventCalibrator.h"
 #include "AraEventCorrelator.h"
 #include "AraControlPanel.h"
-#include "araDefines.h"
+#include "araTestbedDefines.h"
 #include "AraCanvasMaker.h"
 
 class TCanvas;
 class TPad;
-class UsefulAraEvent;
-class RawAraEvent;
+class UsefulAraTestBedStationEvent;
+class RawAraTestBedStationEvent;
 
 
 class TButton;
@@ -135,8 +135,8 @@ class AraDisplay
    TPad *fAraMainPad; ///< The main event display pad.
    TPad *fAraEventInfoPad; ///< The event display info pad.
 
-   UsefulAraEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulAraEvent *fRawEventPtr; ///< Pointer to the raw event.
+   UsefulAraTestBedStationEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
+   UsefulAraTestBedStationEvent *fRawEventPtr; ///< Pointer to the raw event.
    Int_t fCurrentRun; ///<Run number
       
    TButton *fElecViewButton; ///< The vertical polarisation button.

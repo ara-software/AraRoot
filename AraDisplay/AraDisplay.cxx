@@ -49,8 +49,8 @@
 #include "AraControlPanel.h"
 
 //Event Reader Includes
-#include "UsefulAraEvent.h"
-#include "RawAraEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "RawAraTestBedStationEvent.h"
 
 //ROOT Includes
 #include "TROOT.h"
@@ -180,7 +180,7 @@ int AraDisplay::getEventEntry()
 
   if(fUsefulEventPtr)
     delete fUsefulEventPtr;
-  fUsefulEventPtr = new UsefulAraEvent(fRawEventPtr,fCalType);
+  fUsefulEventPtr = new UsefulAraTestBedStationEvent(fRawEventPtr,fCalType);
   
   //Need to make configurable at some point
   //This will also need to be modifed to make realEvent accessible outside here

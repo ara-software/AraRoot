@@ -35,7 +35,8 @@ all :
 	@cd AraEvent; make all
 	@cd AraDisplay; make all
 	@cd AraCorrelator; make all
-	@cd utilities; make all
+	@cd utilities/AraOne; make all
+	@cd utilities/TestBed1; make all
 	@cd AraWebPlotter; make all
 
 
@@ -55,13 +56,15 @@ AraWebPlotter/AraWebRootFileMaker:
 	$(LD)  $(CXXFLAGS) $(LDFLAGS) $<  $(LIBS) -o $@
 
 progs:
-	cd utilities; make
+	cd utilities/AraOne; make
+	cd utilities/TestBed1; make
 
 install:
 	@cd AraEvent; make install
 	@cd AraDisplay; make install
 	@cd AraCorrelator; make install
-	@cd utilities; make install
+	@cd utilities/AraOne; make install
+	@cd utilities/TestBed1; make install
 	@cd AraWebPlotter; make install
 
 
@@ -69,7 +72,8 @@ clean:
 	cd AraEvent; make clean
 	cd AraDisplay; make clean
 	cd AraCorrelator; make clean
-	cd utilities; make clean
+	cd utilities/AraOne; make clean
+	cd utilities/TestBed1; make clean
 	cd AraWebPlotter; make clean
 	@rm -f *Dict*
 	@rm -f *.${OBJSUF}
