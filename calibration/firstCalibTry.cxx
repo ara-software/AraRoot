@@ -2,9 +2,9 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraEvent.h"
-#include "RawAraEvent.h"
-#include "araDefines.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "RawAraTestBedStationEvent.h"
+#include "araTestbedDefines.h"
 
 //ROOT Includes
 #include "TROOT.h"
@@ -26,7 +26,7 @@
 void loadPedestals();   
 int gotPedFile=0;
 char pedFile[FILENAME_MAX];
-float pedestalData[ACTIVE_CHIPS][CHANNELS_PER_CHIP][MAX_NUMBER_SAMPLES];
+float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3];
 
 
 int main(int argc, char *argv)
@@ -42,7 +42,7 @@ int main(int argc, char *argv)
     std::cerr << "Can't find eventTree\n";
     return -1;
   }
-  RawAraEvent *evPtr=0;
+  RawAraTestBedStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   //  strcpy(pedFile,"/Users/rjn/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
   strcpy(pedFile,"/unix/anita1/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291303459/peds_1291303459.323022.dat");
@@ -55,13 +55,13 @@ int main(int argc, char *argv)
   char histName[180];
   sprintf(histName,"histFile_%3.0fMHz_%3.0fmV.root",1000*frequency,ampmv);
   TFile *histFile = new TFile(histName,"RECREATE");
-  TH1F *histFirstSamp[NUM_DIGITIZED_CHANNELS][2];
-  TH1F *histLastSamp[NUM_DIGITIZED_CHANNELS][2];
-  TH1F *histZC[NUM_DIGITIZED_CHANNELS][2];
-  TH1F *histNorm[NUM_DIGITIZED_CHANNELS][2];
-  TH1F *histBinWidth[NUM_DIGITIZED_CHANNELS][2];
-  TH1F *histBinWidthErr[NUM_DIGITIZED_CHANNELS][2];
-  for(int chan=0;chan<NUM_DIGITIZED_CHANNELS;chan++) {
+  TH1F *histFirstSamp[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  TH1F *histLastSamp[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  TH1F *histZC[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  TH1F *histNorm[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  TH1F *histBinWidth[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  TH1F *histBinWidthErr[NUM_DIGITIZED_TESTBED_CHANNELS][2];
+  for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
     for(int rco=0;rco<2;rco++) {
       sprintf(histName,"histFirstSamp_%d_%d",chan,rco);
       histFirstSamp[chan][rco] = new TH1F(histName,histName,260,-0.5,259.5);
@@ -85,7 +85,7 @@ int main(int argc, char *argv)
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
     
-    for(int chan=0;chan<NUM_DIGITIZED_CHANNELS;chan++) {
+    for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
       int chip=chan/9;
       int realChan=chan%9;
       if(realChan==8) continue;
@@ -96,7 +96,7 @@ int main(int argc, char *argv)
       if(firstSamp<20 || firstSamp>250) continue;
       histFirstSamp[chan][rco]->Fill(firstSamp);
       histLastSamp[chan][rco]->Fill(lastSamp);
-      double data[MAX_NUMBER_SAMPLES];
+      double data[MAX_NUMBER_SAMPLES_LAB3];
 
       for(int samp=0;samp<260;samp++) {
 	data[samp]=evPtr->chan[chan].data[samp]-pedestalData[chip][realChan][samp];
@@ -183,7 +183,7 @@ int main(int argc, char *argv)
   for(int chip=0;chip<3;chip++) {
     for(int rco=0;rco<2;rco++) {
       for(int chan=0;chan<8;chan++) {
-	int chanIndex = chip*CHANNELS_PER_CHIP+chan;
+	int chanIndex = chip*CHANNELS_PER_LAB3+chan;
 	if(chip==2 && chan==7) continue;
 	for(int bin=1;bin<260;bin++) {
 	  numNorm++;
@@ -327,10 +327,10 @@ void loadPedestals()
   }
 
   int chip,chan,samp;
-  for(chip=0;chip<ACTIVE_CHIPS;++chip) {
-    for(chan=0;chan<CHANNELS_PER_CHIP;++chan) {
-      int chanIndex = chip*CHANNELS_PER_CHIP+chan;
-      for(samp=0;samp<MAX_NUMBER_SAMPLES;++samp) {
+  for(chip=0;chip<LAB3_PER_TESTBED;++chip) {
+    for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
+      int chanIndex = chip*CHANNELS_PER_LAB3+chan;
+      for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	pedestalData[chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
       }
     }

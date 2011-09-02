@@ -2,11 +2,11 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraEvent.h"
-#include "RawAraEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "RawAraTestBedStationEvent.h"
 #include "AraGeomTool.h"
 #include "AraEventCalibrator.h"
-#include "araDefines.h"
+#include "araTestbedDefines.h"
 #include "FFTtools.h"
 
 //ROOT Includes
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
    }
    //  AraEventCalibrator::Instance()->setPedFile("/Users/rjn/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
    //   AraEventCalibrator::Instance()->setPedFile("/unix/anita1/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
-   RawAraEvent *evPtr=0;
+   RawAraTestBedStationEvent *evPtr=0;
    eventTree->SetBranchAddress("event",&evPtr);
    
    
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
      firstSamp[1]=evPtr->getEarliestSample(17);
      firstSamp[2]=evPtr->getEarliestSample(26);
 
-     UsefulAraEvent realEvent(evPtr,AraCalType::kFirstCalib);
+     UsefulAraTestBedStationEvent realEvent(evPtr,AraCalType::kFirstCalib);
 
 
      TGraph *grClock[3];

@@ -2,9 +2,9 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraEvent.h"
-#include "RawAraEvent.h"
-#include "araDefines.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "RawAraTestBedStationEvent.h"
+#include "araTestbedDefines.h"
 
 //ROOT Includes
 #include "TROOT.h"
@@ -33,8 +33,8 @@ void loadPedestals();
 Double_t mySineWave(Double_t *t, Double_t *par) ;
 int gotPedFile=0;
 char pedFile[FILENAME_MAX];
-float pedestalData[ACTIVE_CHIPS][CHANNELS_PER_CHIP][MAX_NUMBER_SAMPLES];
-Double_t binWidths[ACTIVE_CHIPS][2][MAX_NUMBER_SAMPLES];
+float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3];
+Double_t binWidths[LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3];
 
 //int main(int argc, char *argv)
 int plotEpsilonCal()
@@ -50,7 +50,7 @@ int plotEpsilonCal()
     std::cerr << "Can't find eventTree\n";
     return -1;
   }
-  RawAraEvent *evPtr=0;
+  RawAraTestBedStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   strcpy(pedFile,"/unix/anita1/ara/data/fromWisconsin/root/peds_1294924296.869787.run001202.dat");
   //  strcpy(pedFile,"/Users/rjn/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
@@ -82,8 +82,8 @@ int plotEpsilonCal()
   for(Long64_t i=9;i<10;i++) {
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
-    UsefulAraEvent realEvent(evPtr,AraCalType::kFirstCalib);
-    //    for(int chanIndex=0;chanIndex<NUM_DIGITIZED_CHANNELS;chanIndex++) {
+    UsefulAraTestBedStationEvent realEvent(evPtr,AraCalType::kFirstCalib);
+    //    for(int chanIndex=0;chanIndex<NUM_DIGITIZED_TESTBED_CHANNELS;chanIndex++) {
     for(int chanIndex=0;chanIndex<1;chanIndex++) {
       int chip=chanIndex/9;
       int chan=chanIndex%9;
@@ -235,10 +235,10 @@ void loadPedestals()
   }
 
   int chip,chan,samp;
-  for(chip=0;chip<ACTIVE_CHIPS;++chip) {
-    for(chan=0;chan<CHANNELS_PER_CHIP;++chan) {
-      int chanIndex = chip*CHANNELS_PER_CHIP+chan;
-      for(samp=0;samp<MAX_NUMBER_SAMPLES;++samp) {
+  for(chip=0;chip<LAB3_PER_TESTBED;++chip) {
+    for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
+      int chanIndex = chip*CHANNELS_PER_LAB3+chan;
+      for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	pedestalData[chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
       }
     }
@@ -265,7 +265,7 @@ void loadCalib()
   int chip,rco;
   double width;
   while(BinFile >> chip >> rco) {
-    for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+    for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
       BinFile >> width;
       binWidths[chip][rco][samp]=width;
     }

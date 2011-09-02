@@ -2,11 +2,11 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraEvent.h"
-#include "RawAraEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
+#include "RawAraTestBedStationEvent.h"
 #include "AraGeomTool.h"
 #include "AraEventCalibrator.h"
-#include "araDefines.h"
+#include "araTestbedDefines.h"
 
 //ROOT Includes
 #include "TROOT.h"
@@ -34,8 +34,8 @@ Double_t estimateLagLast(TGraph *grIn, Double_t freq);
 Double_t mySineWave(Double_t *t, Double_t *par) ;
 int gotPedFile=0;
 char pedFile[FILENAME_MAX];
-float pedestalData[ACTIVE_CHIPS][CHANNELS_PER_CHIP][MAX_NUMBER_SAMPLES];
-Double_t binWidths[ACTIVE_CHIPS][2][MAX_NUMBER_SAMPLES];
+float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3];
+Double_t binWidths[LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3];
 
 int main(int argc, char **argv)
 {
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
   }
   //  AraEventCalibrator::Instance()->setPedFile("/Users/rjn/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
   AraEventCalibrator::Instance()->setPedFile("/unix/anita1/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
-  RawAraEvent *evPtr=0;
+  RawAraTestBedStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   
   Double_t period=1./freqVal;
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
      }
     eventTree->GetEntry(i);
     //    std::cerr << i << "\t" << evPtr->head.unixTime << "\n";
-    //    for(int chan=0;chan<NUM_DIGITIZED_CHANNELS;chan++) {
+    //    for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
     if(evPtr->getFirstHitBus(18)!=evPtr->getFirstHitBus(19)) {
        std::cerr << "Bad channel?\n"; 
        continue;
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     if(evPtr->head.unixTime>2e9) continue;
 
 
-    UsefulAraEvent realEvent(evPtr,AraCalType::kFirstCalib);
+    UsefulAraTestBedStationEvent realEvent(evPtr,AraCalType::kFirstCalib);
     
     for(int rfChan=0;rfChan<8;rfChan++) {
       int ci1=tempGeom->getFirstLabChanIndexForChan(rfChan);
@@ -202,10 +202,10 @@ void loadPedestals()
   }
 
   int chip,chan,samp;
-  for(chip=0;chip<ACTIVE_CHIPS;++chip) {
-    for(chan=0;chan<CHANNELS_PER_CHIP;++chan) {
-      int chanIndex = chip*CHANNELS_PER_CHIP+chan;
-      for(samp=0;samp<MAX_NUMBER_SAMPLES;++samp) {
+  for(chip=0;chip<LAB3_PER_TESTBED;++chip) {
+    for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
+      int chanIndex = chip*CHANNELS_PER_LAB3+chan;
+      for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	pedestalData[chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
       }
     }
@@ -232,7 +232,7 @@ void loadCalib()
   int chip,rco;
   double width;
   while(BinFile >> chip >> rco) {
-    for(int samp=0;samp<MAX_NUMBER_SAMPLES;samp++) {
+    for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
       BinFile >> width;
       binWidths[chip][rco][samp]=width;
     }
