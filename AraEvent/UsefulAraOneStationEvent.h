@@ -39,8 +39,8 @@ class UsefulAraOneStationEvent: public RawAraOneStationEvent, public UsefulAraSt
 
    Int_t getNumElecChannels() {return fNumChannels;} ///< Or may not be the same
    Int_t getNumRFChannels() {return fNumChannels;} ///< Is the same
-   TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
-   TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel
+   TGraph *getGraphFromElecChan(int chanId); ///< Returns the voltages-time graph for the appropriate electronics channel
+   TGraph *getGraphFromRFChan(int chanId); ///< Returns the voltage-time graph for the appropriate rf channel
 
    //Calibrated data
    Int_t fNumChannels; ///< The number of channels

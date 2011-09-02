@@ -684,10 +684,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
     for(vecVecIt=blockIt->data.begin();
 	vecVecIt!=blockIt->data.end();
 	vecVecIt++) {
-      Int_t chanId=irsChan[uptoChan] | ((blockIt->atriDdaNumber&0x3)<<8);
+      Int_t chanId=irsChan[uptoChan] | ((blockIt->atriDdaNumber&0x3)<<3);
       std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
 		<< (int)blockIt->atriDdaNumber << "\n";
-
+      uptoChan++;
 
       //Step four is to check if we have already got this chanId
 
