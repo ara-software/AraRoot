@@ -14,7 +14,7 @@ using namespace std;
 
 #include "araTestbedStructures.h"
 #include "RawAraTestBedStationEvent.h"  
-#include "UsefulAraStationEvent.h"
+#include "UsefulAraTestBedStationEvent.h"
 
 void processEvent();
 void makeEventTree(char *inputName, char *outDir);
@@ -23,7 +23,7 @@ AraTestBedEventBody_t theEventBody;
 TFile *theFile;
 TTree *eventTree;
 RawAraTestBedStationEvent *theEvent=0;
-UsefulAraStationEvent *theUsefulEvent=0;
+UsefulAraTestBedStationEvent *theUsefulEvent=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -50,7 +50,7 @@ void makeEventTree(char *inputName, char *outFile) {
      cout << "                   - full outFile = " << outFile << endl;
   }
   theEvent = new RawAraTestBedStationEvent();
-  theUsefulEvent = new UsefulAraStationEvent();
+  theUsefulEvent = new UsefulAraTestBedStationEvent();
 
   //    cout << sizeof(AraTestBedEventBody_t) << endl;
   ifstream SillyFile(inputName);
@@ -124,7 +124,7 @@ void processEvent() {
     eventTree = new TTree("eventTree","Tree of ARA Events");
     eventTree->Branch("run",&runNumber,"run/I");
     eventTree->Branch("event","RawAraTestBedStationEvent",&theEvent);
-    eventTree->Branch("calevent","UsefulAraStationEvent",&theUsefulEvent);
+    eventTree->Branch("calevent","UsefulAraTestBedStationEvent",&theUsefulEvent);
     
     doneInit=1;
   }
@@ -132,7 +132,7 @@ void processEvent() {
   if(theEvent) delete theEvent;
   if(theUsefulEvent) delete theUsefulEvent;
   theEvent = new RawAraTestBedStationEvent(&theEventBody);
-  theUsefulEvent = new UsefulAraStationEvent( theEvent , AraCalType::kFirstCalib );
+  theUsefulEvent = new UsefulAraTestBedStationEvent( theEvent , AraCalType::kFirstCalib );
   eventTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theEvent;
