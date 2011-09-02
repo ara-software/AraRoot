@@ -19,13 +19,13 @@
 
 
 
-class UsefulAraEvent;
+class UsefulAraTestBedStationEvent;
 class TH2D;
 class TGraph;
 
 //!  AraCorrelatorType -- The Calibration Type
 /*!
-  There are a number of calibration options available to create a UsefulAraEvent.
+  There are a number of calibration options available to create a UsefulAraTestBedStationEvent.
   \ingroup rootclasses
 */
 
@@ -49,7 +49,7 @@ class AraEventCorrelator : public TObject
   AraEventCorrelator(Int_t numAnts=4); ///< Default constructor
    ~AraEventCorrelator(); ///< Destructor
    
-   TH2D *getInterferometricMap(UsefulAraEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
+   TH2D *getInterferometricMap(UsefulAraTestBedStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
    void fillAntennaPositions();
    void fillDeltaTArrays(AraCorrelatorType::AraCorrelatorType_t corType);
    void setupDeltaTInfinity();
