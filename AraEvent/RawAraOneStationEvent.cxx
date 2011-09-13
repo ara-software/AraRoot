@@ -32,24 +32,35 @@ RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, cha
    eventNumber=hdPtr->eventNumber; ///< Software event number
    ppsNumber=hdPtr->ppsNumber; ///< For matching up with thresholds etc.
    numStationBytes=hdPtr->numBytes; ///<Bytes in station readout
-   recordId=hdPtr->recordId; ///< Record Id
+   std::cerr << eventNumber << "\t" << ppsNumber << "\t" << numStationBytes;
    timeStamp=hdPtr->timeStamp; ///< Timestamp
    eventId=hdPtr->eventId; ///< Event Id
    numReadoutBlocks=hdPtr->numReadoutBlocks; ///< Number of readout blocks which follow header
+   
+   for(int trig=0;trig<MAX_TRIG_BLOCKS;trig++) {
+     triggerPattern[trig]=hdPtr->triggerPattern[trig];
+     triggerInfo[trig]=hdPtr->triggerInfo[trig];
+     triggerBlock[trig]=hdPtr->triggerBlock[trig];
+   }
 
    int uptoByte=0;
-   //   std::cerr << "numReadoutBlocks " << numReadoutBlocks << "\n";
+   std::cerr << "numReadoutBlocks " << numReadoutBlocks << "\n";
    for(int block=0;block<numReadoutBlocks;block++) {
-     AraStationEventBlockHeader_t *blkPtr = (AraStationEventBlockHeader_t*)&dataBuffer[uptoByte];
+     AraStationEventBlockHeader_t *blkPtr = (AraStationEventBlockHeader_t*)&dataBuffer[uptoByte];     
      uptoByte+=sizeof(AraStationEventBlockHeader_t);
      AraStationEventBlockChannel_t *chanPtr = (AraStationEventBlockChannel_t*)&dataBuffer[uptoByte];
      RawAraOneStationBlock blocky(blkPtr,chanPtr);
      blockVec.push_back(blocky);
      int numChan=blocky.getNumChannels();
-     //     std::cout << "numChan " << numChan << "\n";
+
+     std::cout << "block " << block << " numChan " << numChan 
+	       <<  " irsBlockNumber " << blkPtr->irsBlockNumber 
+	       << " channelMask " << blkPtr->channelMask << "\t"
+	       << " uptoByte " << uptoByte << "\n";
+     numChan=8; //HArd wire for testing
      uptoByte+=sizeof(AraStationEventBlockChannel_t)*numChan;
    }
    //   std::cerr << sizeof(AraStationEventHeader_t) << "\n";
-   if(uptoByte!=int(numStationBytes-(sizeof(AraStationEventHeader_t)-EXTRA_SOFTWARE_HEADER_BYTES))) 
-     std::cerr << "Error assigned " << uptoByte <<  " bytes out of " << numStationBytes-(sizeof(AraStationEventHeader_t)-EXTRA_SOFTWARE_HEADER_BYTES) << "\n";
+   if(uptoByte!=int(numStationBytes))    
+     std::cerr << "Error assigned " << uptoByte <<  " bytes out of " << numStationBytes << "\n";
 }

@@ -20,8 +20,8 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS) -lGui
 
 #Now the bits we're actually compiling
 ROOT_LIBRARY = libAraDisplay.${DLLSUF}
-LIB_OBJS = AraCanvasMaker.o AraControlPanel.o AraDisplay.o AraFFTGraph.o AraWaveformGraph.o AraCorrelationFactory.o araDisplayDict.o
-CLASS_HEADERS = AraCanvasMaker.h AraControlPanel.h AraDisplay.h AraFFTGraph.h AraWaveformGraph.h AraCorrelationFactory.h AraDisplayConventions.h
+LIB_OBJS = AraCanvasMaker.o AraTBCanvasMaker.o AraControlPanel.o AraDisplay.o AraFFTGraph.o AraWaveformGraph.o AraCorrelationFactory.o araDisplayDict.o
+CLASS_HEADERS = AraCanvasMaker.h AraTBCanvasMaker.h AraControlPanel.h AraDisplay.h AraFFTGraph.h AraWaveformGraph.h AraCorrelationFactory.h AraDisplayConventions.h
 
 
 all : $(ROOT_LIBRARY)

@@ -38,13 +38,16 @@ class RawAraOneStationBlock: public TObject
 
    //The header data
    UShort_t irsBlockNumber;
-   UChar_t channelMask;
-   UChar_t atriDdaNumber;
+   UShort_t channelMask;
 
    //The samples
    std::vector< std::vector<UShort_t> > data;
 
    int getNumChannels() {return (int) numChannels;}
+
+   int getDda() {return (channelMask&0x300)>>8;}
+   int getBlock() {return irsBlockNumber&0x1ff;}
+   int getCapArray() { return (irsBlockNumber&0x4)>>2;}
 
 
   ClassDef(RawAraOneStationBlock,1);

@@ -16,7 +16,7 @@
 #include <TH1.h>
 #include <TVector3.h>
 #include "AraDisplayConventions.h"
-#include "UsefulAraTestBedStationEvent.h"
+#include "UsefulAraOneStationEvent.h"
 #include "AraEventCalibrator.h"
 #include "AraEventCorrelator.h"
 
@@ -65,20 +65,20 @@ class AraCanvasMaker
    //!  The main event view canvas getter.
    /*!
      Actually draws all the little squiggly lines.
-     /param evPtr Pointer to the UsefulAraTestBedStationEvent we want to draw.
+     /param evPtr Pointer to the UsefulAraOneStationEvent we want to draw.
      /param hdPtr Pointer to the header of the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getEventViewerCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getEventViewerCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
    
    //!  The main event view canvas getter used by QnDWBOM.
    /*!
      Actually draws all the little squiggly lines.
-     /param evPtr Pointer to the UsefulAraTestBedStationEvent we want to draw.
+     /param evPtr Pointer to the UsefulAraOneStationEvent we want to draw.
      /param hdPtr Pointer to the header of the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *quickGetEventViewerCanvasForWebPlottter(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
    
   
   
@@ -89,7 +89,7 @@ class AraCanvasMaker
      /param hdPtr Pointer to the header of the event we want to draw
      /param useCan Optional pointer to a canvas to draw all the TPaveText's (if zero a canvas will be created).
    */
-   TPad *getEventInfoCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0, Int_t runNumber=0);
+   TPad *getEventInfoCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0, Int_t runNumber=0);
   
    
    void setupElecPadWithFrames(TPad *plotPad); ///< Worker function to setup the electronics view canvas.
@@ -138,32 +138,32 @@ class AraCanvasMaker
      /param evPtr Pointer to the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getElectronicsCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getElectronicsCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
    //!  A worker function to draw the Antenna canvas -- shouldn't be called directly.
    /*!
      /param evPtr Pointer to the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getAntennaCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getAntennaCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
    //!  A worker function to draw the Interferometric Map canvas -- shouldn't be called directly.
    /*!
      /param evPtr Pointer to the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getIntMapCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getIntMapCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
    //!  A worker function to draw the RF Channel canvas -- shouldn't be called directly.
    /*!
      /param evPtr Pointer to the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getRFChannelCanvas(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getRFChannelCanvas(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
 
    //!  A worker function to draw the canvas for QnDWBOM -- shouldn't be called directly.
    /*!
      /param evPtr Pointer to the event we want to draw
      /param useCan Optional pointer to a canvas to draw the squiggly ines in (if zero a canvas will be created).
    */
-   TPad *getCanvasForWebPlotter(UsefulAraTestBedStationEvent *evPtr, TPad *useCan=0);
+   TPad *getCanvasForWebPlotter(UsefulAraOneStationEvent *evPtr, TPad *useCan=0);
 
 };
 

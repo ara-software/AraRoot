@@ -27,7 +27,6 @@ RawAraOneStationBlock::RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr
 {
   irsBlockNumber=hdPtr->irsBlockNumber;
   channelMask=hdPtr->channelMask;
-  atriDdaNumber=hdPtr->atriDdaNumber;
   
   numChannels=0;
   UChar_t mask;

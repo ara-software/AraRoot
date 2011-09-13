@@ -21,7 +21,8 @@
 
 #include "araSoft.h"
 
-#define ARA_SOFT_VERISON 0x1
+#define ARA_SOFT_VERISON 0x2
+#define ARA_SOFT_SUB_VERISON 0x1
 
 
 
@@ -59,11 +60,13 @@ typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
 */
 typedef struct {
   AraDataStructureType_t typeId;
-  uint8_t verId;
   AraStationId_t stationId;
-  uint8_t reserved;
-  uint16_t numBytes;
+  uint8_t verId;
+  uint8_t subVerId;
+  uint32_t numBytes;
   uint16_t checksum;
+  uint16_t reserved;
+  uint32_t alsoReserved;
 } AraGenericHeader_t;
 
 
@@ -120,7 +123,7 @@ typedef struct {
 
 
 
-#define EXTRA_SOFTWARE_HEADER_BYTES 28
+#define EXTRA_SOFTWARE_HEADER_BYTES 32 ///I think
 
 //!  The ARA Station Event Header Format
 /*!
@@ -131,12 +134,15 @@ typedef struct {
   uint64_t unixTime; ///< Software event time in seconds (64-bits for future proofing)
   uint32_t unixTimeUs; ///< Software event time in microseconds (32-bits)
   uint32_t eventNumber; ///< Software event number
-  uint32_t ppsNumber; ///< For matching up with thresholds etc.
   uint32_t numBytes; ///<Bytes in station readout
-  uint32_t recordId; ///< Record Id
-  uint64_t timeStamp; ///< Timestamp
+  uint32_t timeStamp; ///< Timestamp
+  uint32_t ppsNumber; ///< For matching up with thresholds etc.
   uint32_t eventId; ///< Event Id
+  uint16_t versionNumber; ///<Event version number
   uint16_t numReadoutBlocks; ///< Number of readout blocks which follow header
+  uint16_t triggerPattern[MAX_TRIG_BLOCKS]; ///< The trigger type block, might do something more clever with this
+  uint16_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger type block, might do something more clever with this
+  uint8_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block (starting from 0) di trigger occur in?
 } AraStationEventHeader_t;
   
 
@@ -147,8 +153,9 @@ typedef struct {
 */
 typedef struct {
   uint16_t irsBlockNumber; ///< The IRS block number
-  uint8_t channelMask; ///<Bit mask for the 8 available channels 0x8f by default
-  uint8_t atriDdaNumber; 
+  uint16_t channelMask; ///< Channel mask
+  //  uint8_t channelMask; ///<Bit mask for the 8 available channels 0x8f by default
+  //  uint8_t atriDdaNumber; 
 } AraStationEventBlockHeader_t;
 
 

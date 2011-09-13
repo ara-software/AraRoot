@@ -23,22 +23,35 @@
 
 #define ARA_LOG LOG_LOCAL4
 
-#define ARA_LOG_MESSAGE(LOG_LEVEL,...) if(printToScreen>LOG_LEVEL) fprintf(stderr, __VA_ARGS__); syslog(LOG_LEVEL,__VA_ARGS__);
+//#define ARA_LOG_MESSAGE(LOG_LEVEL,...) if(printToScreen>LOG_LEVEL) fprintf(stderr, __VA_ARGS__); syslog(LOG_LEVEL,__VA_ARGS__);
 
 ///The one global variable for logging to screen
 #ifndef ARA_ROOT
-int printToScreen;
+//int printToScreen;
 #endif
 #endif
 
 
 ///Hardware descriptors
 #define DDA_PER_ATRI 4
-#define RFCHAN_PER_DDA 4
+#define BLOCKS_PER_DDA 512
+#define RFCHAN_PER_DDA 8
 #define TDA_PER_ATRI 4
 #define ANTS_PER_TDA 4
 #define THRESHOLDS_PER_ATRI TDA_PER_ATRI*ANTS_PER_TDA
 #define SAMPLES_PER_BLOCK 64
+#define MAX_TRIG_BLOCKS 4
+#define CHANNELS_PER_ATRI DDA_PER_ATRI*RFCHAN_PER_DDA
+
+#define FIRST_BLOCK_FRAME_START 0x65  //'e'
+#define FIRST_BLOCK_FRAME_OTHER 0x45  //'E'
+#define MIDDLE_BLOCK_FRAME_START 0x62 // 'b'
+#define MIDDLE_BLOCK_FRAME_OTHER 0x42 // 'B'
+#define LAST_BLOCK_FRAME_START 0x66 // 'f'
+#define LAST_BLOCK_FRAME_OTHER 0x46 // 'F'
+#define ONLY_BLOCK_FRAME_START 0x6f  //'o'
+#define ONLY_BLOCK_FRAME_OTHER 0x4f  //'O'
+
 
 
 //PID Files  //will change to /var/run

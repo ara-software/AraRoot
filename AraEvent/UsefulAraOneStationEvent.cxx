@@ -51,8 +51,9 @@ TGraph *UsefulAraOneStationEvent::getGraphFromElecChan(int chanId)
   return gr;
 }
 
-TGraph *UsefulAraOneStationEvent::getGraphFromRFChan(int /*chan*/)
+TGraph *UsefulAraOneStationEvent::getGraphFromRFChan(int chan)
 {
+  return getGraphFromElecChan(chan);
   std::cerr << "Error calling UsefulAraOneStationEvent::getGraphFromRFChan()\n";
   return NULL;
 }

@@ -20,7 +20,7 @@ void process();
 void makeTree(char *inputName, char *outDir);
 
 AraStationEventHeader_t theEventHeader;
-char dataBuffer[10000];
+char *dataBuffer;
 TFile *theFile;
 TTree *eventTree;
 RawAraOneStationEvent *theEvent=0;
@@ -31,6 +31,7 @@ Int_t lastRunNumber;
 
 
 int main(int argc, char **argv) {
+  dataBuffer = new char[100000];
   theEvent=0;
   if(argc<3) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
@@ -39,6 +40,7 @@ int main(int argc, char **argv) {
   if(argc==4) 
     runNumber=atoi(argv[3]);
   makeTree(argv[1],argv[2]);
+  delete [] dataBuffer;
   return 0;
 }
   
@@ -73,7 +75,7 @@ void makeTree(char *inputName, char *outFile) {
     for(int i=0;i<1000;i++) {	
       //      cout << i << endl;
       numBytes=gzread(infile,&theEventHeader,sizeof(AraStationEventHeader_t));
-      //      std::cout << numBytes << "\n";
+      std::cout << numBytes << "\n";
       if(numBytes==0) break;
       if(numBytes!=sizeof(AraStationEventHeader_t)) {
 	if(numBytes)
@@ -82,10 +84,13 @@ void makeTree(char *inputName, char *outFile) {
 	break;
       }
       if(theEventHeader.gHdr.numBytes>0) {
-	//	std::cout << "Num bytes: " << theEventHeader.gHdr.numBytes << "\t" << theEventHeader.numBytes << "\n";
+	std::cout << "Num bytes: " << theEventHeader.gHdr.numBytes << "\t" << theEventHeader.numBytes << "\n";
+	std::cout << "Event number: " << theEventHeader.eventNumber << "\t" << theEventHeader.unixTime << "\t" << theEventHeader.unixTimeUs << "\n";
+	
+	
 	Int_t numDataBytes=theEventHeader.gHdr.numBytes-sizeof(AraStationEventHeader_t);
 	numBytes=gzread(infile,dataBuffer,numDataBytes);
-      //      std::cout << numBytes << "\n";
+	std::cout << numBytes << "\n";
 	if(numBytes==0) break;
 	if(numBytes!=numDataBytes) {
 	  if(numBytes)

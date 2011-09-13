@@ -18,13 +18,18 @@
 #include "AraEventCorrelator.h"
 #include "AraControlPanel.h"
 #include "araTestbedDefines.h"
+#include "AraTBCanvasMaker.h"
 #include "AraCanvasMaker.h"
+
+#include "araSoft.h"
 
 class TCanvas;
 class TPad;
 class UsefulAraTestBedStationEvent;
 class RawAraTestBedStationEvent;
 
+class UsefulAraOneStationEvent;
+class RawAraOneStationEvent;
 
 class TButton;
 class TTreeIndex;
@@ -126,6 +131,7 @@ class AraDisplay
   AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fCanvasLayout;
   AraDisplayFormatOption::AraDisplayFormatOption_t fWaveformFormat; ///< The format for displaying waveforms.
 
+  AraTBCanvasMaker *fTBEventCanMaker;
   AraCanvasMaker *fEventCanMaker;
 
 
@@ -135,8 +141,10 @@ class AraDisplay
    TPad *fAraMainPad; ///< The main event display pad.
    TPad *fAraEventInfoPad; ///< The event display info pad.
 
-   UsefulAraTestBedStationEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulAraTestBedStationEvent *fRawEventPtr; ///< Pointer to the raw event.
+   UsefulAraTestBedStationEvent *fTBUsefulEventPtr; ///< Pointer to the calibrated event.
+   UsefulAraTestBedStationEvent *fTBRawEventPtr; ///< Pointer to the raw event.
+   UsefulAraOneStationEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
+   UsefulAraOneStationEvent *fRawEventPtr; ///< Pointer to the raw event.
    Int_t fCurrentRun; ///<Run number
       
    TButton *fElecViewButton; ///< The vertical polarisation button.
@@ -154,6 +162,7 @@ class AraDisplay
 
    Int_t fInEventPlayMode; ///< Flag that indicates playback mode
    Int_t fEventPlaySleepMs; ///< Length of sleep between events in playback mode.
+   Int_t fTBData;
    Int_t fApplyEventCut; ///< Apply an event cut
    TEventList *fCutEventList; ///<The cut eventlist
    

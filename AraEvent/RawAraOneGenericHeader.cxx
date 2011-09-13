@@ -30,6 +30,7 @@ RawAraOneGenericHeader::RawAraOneGenericHeader(AraGenericHeader_t *gHdr) ///< As
 {
   typeId=gHdr->typeId;
   verId=gHdr->verId;
+  subVerId=gHdr->subVerId;
   stationId=gHdr->stationId;
   reserved=gHdr->reserved;
   numBytes=gHdr->numBytes;

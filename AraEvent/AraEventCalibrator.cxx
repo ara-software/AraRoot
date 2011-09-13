@@ -51,6 +51,16 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
   return kFALSE;
 }
 
+
+
+Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
+{ 
+  if(calType==kNoCalib) return kFALSE;
+  return kTRUE;
+}
+
+
+
 ClassImp(AraEventCalibrator);
 
 AraEventCalibrator * AraEventCalibrator::fgInstance=0;
@@ -59,6 +69,7 @@ AraEventCalibrator * AraEventCalibrator::fgInstance=0;
 AraEventCalibrator::AraEventCalibrator() 
 {
   gotPedFile=0;
+  fGotAraOnePedFile=0;
   loadTestBedCalib();
   //Default Constructor
 }
@@ -656,6 +667,11 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
 void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
   //Really what we will do here is just kNoCalib
+  static int gotPeds=0;
+  if(!gotPeds)  {
+    loadAraOnePedestals();
+    gotPeds=1;
+  }
 
   //Step one is loop over the blocks
 
@@ -677,16 +693,19 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 	numChans++;
       }
     }
-    std::cout << "Got numChans " << numChans << "\n";
+    //    std::cout << "Got numChans " << numChans << "\n";
 
     //Step three is loop over the channels within a block
     Int_t uptoChan=0;
     for(vecVecIt=blockIt->data.begin();
 	vecVecIt!=blockIt->data.end();
 	vecVecIt++) {
-      Int_t chanId=irsChan[uptoChan] | ((blockIt->atriDdaNumber&0x3)<<3);
-      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
-		<< (int)blockIt->atriDdaNumber << "\n";
+      Int_t chanId=irsChan[uptoChan] | ((blockIt->channelMask&0x300)>>5);
+      Int_t chan=irsChan[uptoChan];
+      Int_t dda=blockIt->getDda();
+      Int_t block=blockIt->getBlock();
+      //      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
+      //		<< (int)((blockIt->channelMask&0x300)>>5) << "\n";
       uptoChan++;
 
       //Step four is to check if we have already got this chanId
@@ -710,15 +729,83 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
       //Set the iterators to point to the correct channel in the map
       timeMapIt=theEvent->fTimes.find(chanId);
       voltMapIt=theEvent->fVolts.find(chanId);
-           
+
+      int samp=0;
       //Now loop over the 64 samples
       for(shortIt=vecVecIt->begin();
 	  shortIt!=vecVecIt->end();
 	  shortIt++) {
 	time+=1;	
 	timeMapIt->second.push_back(time); ///<Filling with time
-	voltMapIt->second.push_back(*shortIt); ///<Filling with voltage
+	if(!AraCalType::hasPedestalSubtraction(calType))
+	  voltMapIt->second.push_back(*shortIt); ///<Filling with ADC
+	else
+	  voltMapIt->second.push_back((*shortIt)-(Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)]); ///<Filling with ADC-Pedestal
+	samp++;
       }		    
     }
   }              
+}
+
+
+
+void AraEventCalibrator::setAraOnePedFile(char *filename)
+{
+  strncpy(fAraOnePedFile,filename,FILENAME_MAX);
+  fGotAraOnePedFile=1;
+  loadAraOnePedestals();
+}
+
+void AraEventCalibrator::loadAraOnePedestals()
+{  
+  
+  if(!fGotAraOnePedFile) {
+    char *pedFileEnv = getenv( "ARA_ONE_PEDESTAL_FILE" );
+    if ( pedFileEnv == NULL ) {
+      char calibDir[FILENAME_MAX];
+      char *calibEnv=getenv("ARA_CALIB_DIR");
+      if(!calibEnv) {
+	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+	if(!utilEnv) {
+	  sprintf(calibDir,"calib");
+	  fprintf(stdout,"AraEventCalibrator::loadAraOnePedestals(): INFO - Pedestal file [from ./calib]");
+	} else {
+	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
+	  fprintf(stdout,"AraEventCalibrator::loadAraOnePedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	}
+      }
+      else {
+	strncpy(calibDir,calibEnv,FILENAME_MAX);
+	fprintf(stdout,"AraEventCalibrator::loadAraOnePedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
+      }
+      sprintf(fAraOnePedFile,"%s/araOnePedestals.txt",calibDir);
+      fprintf(stdout," = %s\n",fAraOnePedFile);
+    } // end of IF-block for pedestal file not specified by environment variable
+    else {
+      strncpy(fAraOnePedFile,pedFileEnv,FILENAME_MAX);
+      fprintf(stdout,"AraEventCalibrator::loadAraOnePedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAraOnePedFile);
+    } // end of IF-block for pedestal file specified by environment variable
+  }
+
+
+  //Pedestal file
+  std::ifstream PedFile(fAraOnePedFile);
+  Int_t dda,block,chan;
+  UShort_t pedVal;
+  
+  fAraOnePeds = new UShort_t [DDA_PER_ATRI*BLOCKS_PER_DDA*RFCHAN_PER_DDA*SAMPLES_PER_BLOCK];
+  if(!fAraOnePeds) {
+    std::cerr << "Can not allocate memory for pedestal file\n";
+    exit(0);
+  }
+      
+  
+
+  while(PedFile >> dda >> block >> chan) {
+    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      PedFile >> pedVal;
+      fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)]=pedVal;
+    }
+  }  
+
 }

@@ -40,12 +40,23 @@ class RawAraOneStationEvent: public RawAraOneGenericHeader, public RawAraStation
    UInt_t eventNumber; ///< Software event number
    UInt_t ppsNumber; ///< For matching up with thresholds etc.
    UInt_t numStationBytes; ///<Bytes in station readout
-   UInt_t recordId; ///< Record Id
-   ULong64_t timeStamp; ///< Timestamp
+   UInt_t timeStamp; ///< Timestamp
    UInt_t eventId; ///< Event Id
+   UShort_t versionId; ///< Version Id for event header
    UShort_t numReadoutBlocks; ///< Number of readout blocks which follow header
 
+   UShort_t triggerPattern[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
+   UShort_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
+   UChar_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block the triggers occured in
+
    std::vector<RawAraOneStationBlock> blockVec;
+   
+   inline static int getPedIndex(int dda, int block, int chan, int sample)
+   {
+     return sample+(chan*SAMPLES_PER_BLOCK)+(block*RFCHAN_PER_DDA*SAMPLES_PER_BLOCK)+(dda*BLOCKS_PER_DDA*RFCHAN_PER_DDA*SAMPLES_PER_BLOCK);
+   }
+
+
 
   ClassDef(RawAraOneStationEvent,1);
 };

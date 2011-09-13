@@ -35,9 +35,10 @@ class RawAraOneGenericHeader
 
    AraDataStructureType_t typeId;
    UChar_t verId;
+   UChar_t subVerId;
    AraStationId_t stationId;
-   UChar_t reserved;
-   UShort_t numBytes;
+   UShort_t reserved;
+   UInt_t numBytes;
    UShort_t checksum;
 
   ClassDef(RawAraOneGenericHeader,1);

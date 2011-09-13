@@ -45,6 +45,7 @@ namespace AraCalType {
   Bool_t hasBinWidthCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform the bin-by-bin calibration
   Bool_t hasInterleaveCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform an interleave calibration
   Bool_t hasClockAlignment(AraCalType::AraCalType_t calType); ///< Does the calibration type perform a clock alignment calibration
+  Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
 
 } 
 
@@ -104,8 +105,14 @@ class AraEventCalibrator : public TObject
 
 
    //AraOne Calibrations
+   UShort_t *fAraOnePeds;
+   Int_t fGotAraOnePedFile;
+   char fAraOnePedFile[FILENAME_MAX];
 
    void calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAraOneStationEvent, called from UsefulAraOneStationEvent constructor
+   void setAraOnePedFile(char *filename);
+   void loadAraOnePedestals();
+   
 
 
 
