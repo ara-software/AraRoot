@@ -61,7 +61,8 @@ Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 {
-  return kTRUE;
+  //  return kTRUE;
+  return kFALSE;
 }
 
 
