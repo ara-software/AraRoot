@@ -46,6 +46,7 @@ namespace AraCalType {
   Bool_t hasInterleaveCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform an interleave calibration
   Bool_t hasClockAlignment(AraCalType::AraCalType_t calType); ///< Does the calibration type perform a clock alignment calibration
   Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
+  Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
 
 } 
 

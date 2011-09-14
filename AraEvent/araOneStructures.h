@@ -22,7 +22,7 @@
 #include "araSoft.h"
 
 #define ARA_SOFT_VERISON 0x2
-#define ARA_SOFT_SUB_VERISON 0x1
+#define ARA_SOFT_SUB_VERISON 0x2
 
 
 
@@ -87,6 +87,9 @@ typedef struct {
   uint16_t l2Scaler[DDA_PER_ATRI]; ///< L2 scaler
   uint16_t l3Scaler; ///< L3 scaler
   uint16_t triggerScaler; ///< Trigger scaler (what is this?)
+  uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
+  uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
+  uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
 } AraEventHk_t;
 
 

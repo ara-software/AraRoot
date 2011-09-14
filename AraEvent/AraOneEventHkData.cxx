@@ -37,5 +37,8 @@ AraOneEventHkData::AraOneEventHkData(AraEventHk_t *theHk)
   memcpy(l2Scaler,theHk->l2Scaler,DDA_PER_ATRI*sizeof(UShort_t)); ///< L2 scaler
   l3Scaler=theHk->l3Scaler; ///< L3 scaler
   triggerScaler=theHk->triggerScaler; ///< Trigger scaler (what is this?)
+  memcpy(deadTime,theHk->deadTime,DDA_PER_ATRI*sizeof(UChar_t));
+  memcpy(avgOccupancy,theHk->avgOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
+  memcpy(maxOccupancy,theHk->maxOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
 
 }

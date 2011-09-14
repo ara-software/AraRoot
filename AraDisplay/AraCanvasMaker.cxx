@@ -89,7 +89,9 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=50;
+  fMaxTimeLimit=1300;
+  fThisMinTime=0;
+  fThisMaxTime=100;
   if(AraCalType::hasCableDelays(calType)) {
     fMinTimeLimit=-200;
     fMaxTimeLimit=150;
@@ -297,8 +299,13 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
     //    if(grElecAveragedFFT[chan]) delete grElecAveragedFFT[chan];
     
     TGraph *grTemp = evPtr->getGraphFromElecChan(chan);
-    if(grTemp->GetX()[0]<fMinTimeLimit) fMinTimeLimit=grTemp->GetX()[0];
-    if(grTemp->GetX()[grTemp->GetN()-1]>fMaxTimeLimit) fMaxTimeLimit=grTemp->GetX()[grTemp->GetN()-1];
+    if(chan==0) {
+      fThisMinTime=grTemp->GetX()[0];
+      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    }
+
+    if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
+    if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
     grElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grElec[chan]->setElecChan(chan);
       //      std::cout << evPtr->eventNumber << "\n";
@@ -349,6 +356,11 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
     //    if(grRFChanAveragedFFT[chan]) delete grRFChanAveragedFFT[chan];
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
+    if(rfchan==0) {
+      fThisMinTime=grTemp->GetX()[0];
+      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    }
+
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grRFChan[rfchan]->setRFChan(rfchan);
       //      std::cout << evPtr->eventNumber << "\n";
@@ -469,7 +481,7 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
       Int_t numPoints=grTemp->GetN();
       Double_t *yVals=grTemp->GetY();
       	
-      if(chan%9==8) {
+      if(chan%8==7) {
 	//Clock channel
 	for(int i=0;i<numPoints;i++) {	
 	  if(yVals[i]<fMinClockVoltLimit)
@@ -502,9 +514,13 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
     grRFChanHilbert[rfchan]=0;
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
+    if(rfchan==0) {
+      fThisMinTime=grTemp->GetX()[0];
+      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    }
 
-    if(grTemp->GetX()[0]<fMinTimeLimit) fMinTimeLimit=grTemp->GetX()[0];
-    if(grTemp->GetX()[grTemp->GetN()-1]>fMaxTimeLimit) fMaxTimeLimit=grTemp->GetX()[grTemp->GetN()-1];
+    if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
+    if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
 
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grRFChan[rfchan]->setRFChan(rfchan);
@@ -680,13 +696,15 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAraOneStationEvent *evPtr,TPad 
 	grElec[chanIndex]->Draw("l");
 	
 	
-	if(fAutoScale) {
-	  TList *listy = gPad->GetListOfPrimitives();
-	  for(int i=0;i<listy->GetSize();i++) {
-	    TObject *fred = listy->At(i);
-	    TH1F *tempHist = (TH1F*) fred;
-	    if(tempHist->InheritsFrom("TH1")) {
-	      if(channel<8) {
+	TList *listy = gPad->GetListOfPrimitives();
+	for(int i=0;i<listy->GetSize();i++) {
+	  TObject *fred = listy->At(i);
+	  TH1F *tempHist = (TH1F*) fred;
+	  if(tempHist->InheritsFrom("TH1")) {
+	    tempHist->GetXaxis()->SetRangeUser(fThisMinTime,fThisMaxTime);
+	    //	    std::cout << fThisMinTime << "\t" << fThisMaxTime << "\n";
+	    if(fAutoScale) {
+	      if(channel<7) {
 		tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit,fMaxVoltLimit);
 	      }
 	      else {

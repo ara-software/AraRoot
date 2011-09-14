@@ -101,7 +101,7 @@ void AraDisplay::zeroPointers()
   fEventTree=0;
   fEventPlaySleepMs=0;
   
-  fCanvasLayout=AraDisplayCanvasLayoutOption::kAntennaView;
+  fCanvasLayout=AraDisplayCanvasLayoutOption::kElectronicsView;
   fWaveformFormat=AraDisplayFormatOption::kWaveform;
 
 }

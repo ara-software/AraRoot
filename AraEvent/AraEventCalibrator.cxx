@@ -59,6 +59,11 @@ Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
   return kTRUE;
 }
 
+Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
+{
+  return kTRUE;
+}
+
 
 
 ClassImp(AraEventCalibrator);
@@ -679,6 +684,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
   std::vector< std::vector<UShort_t> >::iterator vecVecIt;
   std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
   std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
+  std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt2;
   std::vector< UShort_t >::iterator shortIt;
   for(blockIt = theEvent->blockVec.begin(); 
       blockIt!=theEvent->blockVec.end();
@@ -744,7 +750,31 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 	samp++;
       }		    
     }
-  }              
+  }
+  
+  if(hasCommonMode(calType)) {
+    //Then we need to do a common mode correction
+    //loop over dda
+    //loop over chan 
+    //loop over times and subtract one
+    
+    for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+      for(Int_t chan=0;chan<6;chan++) {
+	Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+	voltMapIt=theEvent->fVolts.find(chanId);
+	voltMapIt2=theEvent->fVolts.find(6);
+	
+	Int_t numPoints=(voltMapIt->second).size();
+	for(int samp=0;samp<numPoints;samp++) {
+	  voltMapIt->second[samp]-=voltMapIt2->second[samp];
+	}
+      }
+    }
+
+  }
+
+
+            
 }
 
 

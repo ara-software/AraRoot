@@ -38,7 +38,9 @@ class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
    UShort_t l2Scaler[DDA_PER_ATRI]; ///< L2 scaler
    UShort_t l3Scaler; ///< L3 scaler
    UShort_t triggerScaler; ///< Trigger scaler (what is this?)
-   
+   UChar_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
+   UChar_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
+   UChar_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
 
    ClassDef(AraOneEventHkData,2);
 };
