@@ -61,8 +61,9 @@ Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 {
-  //  return kTRUE;
   return kFALSE;
+  if(calType==kNoCalib) return kFALSE;
+  return kTRUE;
 }
 
 
@@ -712,7 +713,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
       Int_t dda=blockIt->getDda();
       Int_t block=blockIt->getBlock();
       //      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
-      //		<< (int)((blockIt->channelMask&0x300)>>5) << "\n";
+      //      		<< dda << "\t" << block << "\t" << RawAraOneStationEvent::getPedIndex(dda,block,chan,0) << "\n";
       uptoChan++;
 
       //Step four is to check if we have already got this chanId
@@ -746,8 +747,12 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 	timeMapIt->second.push_back(time); ///<Filling with time
 	if(!AraCalType::hasPedestalSubtraction(calType))
 	  voltMapIt->second.push_back(*shortIt); ///<Filling with ADC
-	else
+	else {
 	  voltMapIt->second.push_back((*shortIt)-(Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)]); ///<Filling with ADC-Pedestal
+	  //	  if(dda==3 && samp<2) {
+	  //	    std::cout << (*shortIt)  << "\t" << (Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
+	  //	  }
+	}
 	samp++;
       }		    
     }
@@ -760,15 +765,16 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
     //loop over times and subtract one
     
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
-      for(Int_t chan=0;chan<6;chan++) {
-	Int_t chanId=chan+RFCHAN_PER_DDA*dda;
-	voltMapIt=theEvent->fVolts.find(chanId);
-	voltMapIt2=theEvent->fVolts.find(6);
+      for(Int_t chan=0;chan<5;chan++) {
+  	Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+  	voltMapIt=theEvent->fVolts.find(chanId);
+	Int_t chanId2=5+RFCHAN_PER_DDA*dda;
+  	voltMapIt2=theEvent->fVolts.find(chanId2);
 	
-	Int_t numPoints=(voltMapIt->second).size();
-	for(int samp=0;samp<numPoints;samp++) {
-	  voltMapIt->second[samp]-=voltMapIt2->second[samp];
-	}
+  	Int_t numPoints=(voltMapIt->second).size();
+  	for(int samp=0;samp<numPoints;samp++) {
+  	  voltMapIt->second[samp]-=voltMapIt2->second[samp];
+  	}
       }
     }
 
