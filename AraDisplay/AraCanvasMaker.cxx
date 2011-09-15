@@ -89,7 +89,7 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=1300;
+  fMaxTimeLimit=2000;
   fThisMinTime=0;
   fThisMaxTime=100;
   if(AraCalType::hasCableDelays(calType)) {
@@ -123,6 +123,7 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
   case AraCalType::kNoCalib:
     fMaxVoltLimit=3000;
     fMinVoltLimit=1000;
+    break;
   case AraCalType::kJustUnwrap:
     fMinTimeLimit=0;
     fMaxTimeLimit=50;
