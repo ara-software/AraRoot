@@ -41,8 +41,11 @@ class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
    UChar_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
    UChar_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
    UChar_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
+   UShort_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
+   UShort_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
+   UShort_t thresholdDac[TDA_PER_ATRI][ANTS_PER_TDA]; ///< Value the thresholds are set to
 
-   ClassDef(AraOneEventHkData,2);
+   ClassDef(AraOneEventHkData,3);
 };
 
 
