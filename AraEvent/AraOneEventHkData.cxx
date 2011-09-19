@@ -34,9 +34,8 @@ AraOneEventHkData::AraOneEventHkData(AraEventHk_t *theHk)
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
   clockCounter=theHk->clockCounter; ///< Clock counter (which clock?)
   memcpy(l1Scaler,theHk->l1Scaler,TDA_PER_ATRI*ANTS_PER_TDA*sizeof(UShort_t)); ///< L1 scaler, am I correct in decoding this need to check mapping
-  memcpy(l2Scaler,theHk->l2Scaler,TDA_PER_ATRI*sizeof(UShort_t)); ///< L2 scaler
+  memcpy(l2Scaler,theHk->l2Scaler,TDA_PER_ATRI*L2_PER_TDA*sizeof(UShort_t)); ///< L2 scaler
   l3Scaler=theHk->l3Scaler; ///< L3 scaler
-  triggerScaler=theHk->triggerScaler; ///< Trigger scaler (what is this?)
   memcpy(deadTime,theHk->deadTime,DDA_PER_ATRI*sizeof(UChar_t));
   memcpy(avgOccupancy,theHk->avgOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
   memcpy(maxOccupancy,theHk->maxOccupancy,DDA_PER_ATRI*sizeof(UChar_t));

@@ -34,10 +34,9 @@ class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
    UShort_t wilkinsonDelay[DDA_PER_ATRI]; ///< Wilkinson delay?? one per DDA
    UInt_t ppsCounter; ///< Pulse per second counter
    UInt_t clockCounter; ///< Clock counter (which clock?)
-   UShort_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping
-   UShort_t l2Scaler[DDA_PER_ATRI]; ///< L2 scaler
+   UShort_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping -- prescaled by 32
+   UShort_t l2Scaler[TDA_PER_ATRI][L2_PER_TDA]; ///< L2 scaler -- not prescaled
    UShort_t l3Scaler; ///< L3 scaler
-   UShort_t triggerScaler; ///< Trigger scaler (what is this?)
    UChar_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
    UChar_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
    UChar_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second

@@ -22,7 +22,7 @@
 #include "araSoft.h"
 
 #define ARA_SOFT_VERISON 2
-#define ARA_SOFT_SUB_VERISON 3
+#define ARA_SOFT_SUB_VERISON 4
 
 
 
@@ -83,10 +83,9 @@ typedef struct {
   uint16_t wilkinsonDelay[DDA_PER_ATRI]; ///< Wilkinson delay?? one per DDA
   uint32_t ppsCounter; ///< Pulse per second counter
   uint32_t clockCounter; ///< Clock counter (which clock?)
-  uint16_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping
-  uint16_t l2Scaler[TDA_PER_ATRI]; ///< L2 scaler
-  uint16_t l3Scaler; ///< L3 scaler
-  uint16_t triggerScaler; ///< Trigger scaler (what is this?)
+  uint16_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping prescaled by 32
+  uint16_t l2Scaler[TDA_PER_ATRI][L2_PER_TDA]; ///< L2 scaler not prescaled
+  uint16_t l3Scaler; ///< L3 scaler not prescaled
   uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
   uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
   uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
