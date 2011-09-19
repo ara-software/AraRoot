@@ -84,7 +84,7 @@ typedef struct {
   uint32_t ppsCounter; ///< Pulse per second counter
   uint32_t clockCounter; ///< Clock counter (which clock?)
   uint16_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping
-  uint16_t l2Scaler[DDA_PER_ATRI]; ///< L2 scaler
+  uint16_t l2Scaler[TDA_PER_ATRI]; ///< L2 scaler
   uint16_t l3Scaler; ///< L3 scaler
   uint16_t triggerScaler; ///< Trigger scaler (what is this?)
   uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).

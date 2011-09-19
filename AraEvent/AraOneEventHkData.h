@@ -34,7 +34,7 @@ class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
    UShort_t wilkinsonDelay[DDA_PER_ATRI]; ///< Wilkinson delay?? one per DDA
    UInt_t ppsCounter; ///< Pulse per second counter
    UInt_t clockCounter; ///< Clock counter (which clock?)
-   UShort_t l1Scaler[DDA_PER_ATRI][RFCHAN_PER_DDA]; ///< L1 scaler, am I correct in decoding this need to check mapping
+   UShort_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping
    UShort_t l2Scaler[DDA_PER_ATRI]; ///< L2 scaler
    UShort_t l3Scaler; ///< L3 scaler
    UShort_t triggerScaler; ///< Trigger scaler (what is this?)

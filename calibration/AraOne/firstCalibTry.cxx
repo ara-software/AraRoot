@@ -24,19 +24,21 @@
 
 
 Double_t estimateLag(TGraph *grIn, Double_t freq);
-int firstCalibTry(int run,Double_t freq);
+int firstCalibTry(int run,Double_t freq, Int_t dda, Int_t chan);
 
 int main(int argc, char **argv)
 {
-  if(argc<3) {
-    std::cerr << "Need to give a run number and a frequency (in GHz)\n";
+  if(argc<5) {
+    std::cerr << "Usage: " << argv[0] << " <run> <freq in GHz> <dda> <chan>\n";
     return 1;
   }
-  return firstCalibTry(atoi(argv[1]),atof(argv[2]));
+  return firstCalibTry(atoi(argv[1]),atof(argv[2]),atoi(argv[3]),atoi(argv[4]));
 }
 
-int firstCalibTry(int run,Double_t frequency)
+int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 {
+  Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
+
   char inName[180];
   sprintf(inName,"/Users/rjn/ara/data/ohio2011/root/run%d/event%d.root",run,run);
 
@@ -56,7 +58,7 @@ int firstCalibTry(int run,Double_t frequency)
   Double_t ampmv=5;
 
   char histName[180];
-  sprintf(histName,"sineOut_%3.0fMHz_run%d.root",1000*frequency,run);
+  sprintf(histName,"sineOut_%3.0fMHz_run%d_dda%d_chan%d.root",1000*frequency,run,dda,chan);
   TFile *histFile = new TFile(histName,"RECREATE");
 
   Long64_t numEntries=eventTree->GetEntries();
@@ -85,89 +87,96 @@ int firstCalibTry(int run,Double_t frequency)
 
   std::vector <Long64_t> entryVec;
 
-  for(Long64_t i=10;i<numEntries;i++) {
+  for(Long64_t i=40;i<numEntries;i++) {
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
-    if(evPtr->blockVec[0].getBlock()==0) continue;
     UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
 
 
     //For now will assume all the ddas have the same block
-    Int_t capArray=evPtr->blockVec[0].getCapArray();
+    Int_t capArray=evPtr->blockVec[dda].getCapArray();
 
-    TGraph *gr = realEvent.getGraphFromElecChan(16);
+    TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawT=gr->GetX();
     Double_t *rawV=gr->GetY();
     Double_t mean=gr->GetMean(2);
+    Int_t numSamples=gr->GetN();
+    Int_t numBlocks=numSamples/64;
+
 
     //    histMean->Fill(mean);
 
-    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      tVals[samp%2][samp/2]=rawT[samp];
-      vVals[samp%2][samp/2]=rawV[samp]-mean;
-    }
+    for(int block=0;block<numBlocks;block++) {
+      Int_t thisCapArray=capArray;
+      if(block%2) thisCapArray=1-capArray;
 
-    TGraph *grHalf[2]={0};
-    for(int half=0;half<2;half++) {
-      grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
-    }
-
-    // TCanvas *can = new TCanvas("can","can",600,600);
-    // can->Divide(1,3);
-    // can->cd(1);
-    // gr->Draw("alp");
-    // can->cd(2);
-    // grHalf[0]->Draw("alp");
-    // can->cd(3);
-    // grHalf[1]->Draw("alp");
-    // return 1;
-
-    Double_t countZc[2]={0};
-    for(int half=0;half<2;half++) {
-      for(int samp=0;samp<(SAMPLES_PER_BLOCK/2)-1;samp++) {
-	Double_t val1=vVals[half][samp];
-	Double_t val2=vVals[half][samp+1];
-	if(val1<0 && val2>0) {
-	  countZc[half]++;
-	}
-	else if(val1>0 && val2<0) {
-	  countZc[half]++;
-	}
-	else if(val1==0 || val2==0) {
-	  countZc[half]+=0.5;
-	}	
+      for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+	tVals[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*block];
+	vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*block]-mean;
       }
-    }
-    if(TMath::Abs(countZc[0]-countZc[1])<2) {
-      entryVec.push_back(i);
-      //      std::cerr << i << "\t" <<countZc[0] << "\t" << countZc[1] << "\t" << mean << "\n";
       
-      numEvents[capArray]++;
+      TGraph *grHalf[2]={0};
+      for(int half=0;half<2;half++) {
+	grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
+      }
+      
+      // TCanvas *can = new TCanvas("can","can",600,600);
+      // can->Divide(1,3);
+      // can->cd(1);
+      // gr->Draw("alp");
+      // can->cd(2);
+      // grHalf[0]->Draw("alp");
+      // can->cd(3);
+      // grHalf[1]->Draw("alp");
+      // return 1;
+      
+      Double_t countZc[2]={0};
       for(int half=0;half<2;half++) {
 	for(int samp=0;samp<(SAMPLES_PER_BLOCK/2)-1;samp++) {
 	  Double_t val1=vVals[half][samp];
 	  Double_t val2=vVals[half][samp+1];
 	  if(val1<0 && val2>0) {
-	    histZC[capArray][half]->Fill(samp);
-	    histBinWidth[capArray][half]->Fill(samp);
+	    countZc[half]++;
 	  }
 	  else if(val1>0 && val2<0) {
-	    histZC[capArray][half]->Fill(samp);
-	    histBinWidth[capArray][half]->Fill(samp);
+	    countZc[half]++;
 	  }
 	  else if(val1==0 || val2==0) {
-	    histZC[capArray][half]->Fill(samp,0.5);
-	    histBinWidth[capArray][half]->Fill(samp,0.5);
+	    countZc[half]+=0.5;
 	  }	
 	}
-      }     
-    }
+      }
+      if(TMath::Abs(countZc[0]-countZc[1])<2) {
+	entryVec.push_back(i);
+	//      std::cerr << i << "\t" <<countZc[0] << "\t" << countZc[1] << "\t" << mean << "\n";
+	
+	numEvents[thisCapArray]++;
+	for(int half=0;half<2;half++) {
+	  for(int samp=0;samp<(SAMPLES_PER_BLOCK/2)-1;samp++) {
+	    Double_t val1=vVals[half][samp];
+	    Double_t val2=vVals[half][samp+1];
+	    if(val1<0 && val2>0) {
+	      histZC[thisCapArray][half]->Fill(samp);
+	      histBinWidth[thisCapArray][half]->Fill(samp);
+	    }
+	    else if(val1>0 && val2<0) {
+	      histZC[thisCapArray][half]->Fill(samp);
+	      histBinWidth[thisCapArray][half]->Fill(samp);
+	    }
+	    else if(val1==0 || val2==0) {
+	      histZC[thisCapArray][half]->Fill(samp,0.5);
+	      histBinWidth[thisCapArray][half]->Fill(samp,0.5);
+	    }	
+	  }
+	}     
+      }
 
     
-    delete gr;
-    delete grHalf[0];
-    delete grHalf[1];
+      delete grHalf[0];
+      delete grHalf[1];
+    }
 
+    delete gr;
   }
   
   for(int capArray=0;capArray<2;capArray++) {
@@ -216,6 +225,16 @@ int firstCalibTry(int run,Double_t frequency)
   }
 
 
+  
+  
+  TTree *lagTree = new TTree("lagTree","lagTree");
+  Int_t block,thisCapArray;
+  Double_t lag1,lag0,deltaLagg;
+  lagTree->Branch("block",&block,"block/I");
+  lagTree->Branch("capArray",&thisCapArray,"capArray/I");
+  lagTree->Branch("lag1",&lag1,"lag1/D");
+  lagTree->Branch("lag0",&lag0,"lag0/D");
+  lagTree->Branch("deltaLag",&deltaLagg,"deltaLag/D");
 
   TH1F *histLag[2];
   for(int capArray=0;capArray<2;capArray++) {
@@ -237,49 +256,67 @@ int firstCalibTry(int run,Double_t frequency)
     Int_t capArray=evPtr->blockVec[0].getCapArray();
     
 
-    TGraph *gr = realEvent.getGraphFromElecChan(16);
+    TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     //    Double_t *rawT=gr->GetX();
     Double_t *rawV=gr->GetY();
+    Double_t mean=gr->GetMean(2);
+    Int_t numSamples=gr->GetN();
+    Int_t numBlocks=numSamples/64;
+
+
+    //    histMean->Fill(mean);
     
-    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      tVals[samp%2][samp/2]=newTimeVals[capArray][samp%2][samp/2];
-      vVals[samp%2][samp/2]=rawV[samp];
+    for(block=0;block<numBlocks;block++) {
+      thisCapArray=capArray;
+      if(block%2) thisCapArray=1-capArray;
+      
+    
+      for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+	tVals[samp%2][samp/2]=newTimeVals[thisCapArray][samp%2][samp/2];
+	vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*block]-mean;
+      }
+      
+      TGraph *grHalf[2]={0};
+      for(int half=0;half<2;half++) {
+	grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
+      }
+      
+      // TCanvas *can = new TCanvas();//"can","can",600,600);
+      // can->Divide(1,2);
+      // can->cd(1);
+      // gr->Draw("alp");
+      // can->cd(2);
+      // grHalf[0]->Draw("alp");
+      // //    can->cd(3);
+      // grHalf[1]->SetLineColor(kGreen+2);
+      // grHalf[1]->SetMarkerColor(kGreen+2);
+      // grHalf[1]->Draw("lp");
+      lag0=estimateLag(grHalf[0],frequency);
+      lag1=estimateLag(grHalf[1],frequency);
+           
+      deltaLagg=lag0-lag1;
+      while(TMath::Abs(deltaLagg-1.0/frequency)<TMath::Abs(deltaLagg))
+	deltaLagg-=1./frequency;
+      while(TMath::Abs(deltaLagg+1.0/frequency)<TMath::Abs(deltaLagg))
+	deltaLagg+=1./frequency;
+      
+
+      //Arbitrary to make sample 1 after sample zero
+      if(deltaLagg<0) 
+	deltaLagg+=1./frequency;
+
+      lagTree->Fill();
+
+      histLag[thisCapArray]->Fill(deltaLagg);
+      
+      delete grHalf[0];
+      delete grHalf[1];
     }
-
-    TGraph *grHalf[2]={0};
-    for(int half=0;half<2;half++) {
-      grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
-    }
-
-    // TCanvas *can = new TCanvas();//"can","can",600,600);
-    // can->Divide(1,2);
-    // can->cd(1);
-    // gr->Draw("alp");
-    // can->cd(2);
-    // grHalf[0]->Draw("alp");
-    // //    can->cd(3);
-    // grHalf[1]->SetLineColor(kGreen+2);
-    // grHalf[1]->SetMarkerColor(kGreen+2);
-    // grHalf[1]->Draw("lp");
-    Double_t lag0=estimateLag(grHalf[0],frequency);
-    Double_t lag1=estimateLag(grHalf[1],frequency);
-
-    Double_t deltaLag=lag0-lag1;
-    while(TMath::Abs(deltaLag-1.0/frequency)<TMath::Abs(deltaLag))
-      deltaLag-=1./frequency;
-
-    histLag[capArray]->Fill(deltaLag);
-   
     delete gr;
-    delete grHalf[0];
-    delete grHalf[1];
-
 
   }
   std::cerr << "\n";
-
-  Int_t dda=0;
-  Int_t chan=3;
+  lagTree->AutoSave();
 
   Double_t deltaLag[2]={histLag[0]->GetMean(),histLag[1]->GetMean()};
 
@@ -298,9 +335,10 @@ int firstCalibTry(int run,Double_t frequency)
   }
   
   
-  
+  char outName[180];
+  sprintf(outName,"sampleTiming_run%d_dda%d_chan%d.txt",run,dda,chan);
 
-  std::ofstream OutFile("sampleTiming.txt");
+  std::ofstream OutFile(outName);
   for(int capArray=0;capArray<2;capArray++) {
     OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {

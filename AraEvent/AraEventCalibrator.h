@@ -30,10 +30,10 @@
 namespace AraCalType {
   typedef enum EAraCalType {
     kNoCalib                        = 0x00, ///<The 260 samples straight from raw data
-    kJustUnwrap                     = 0x01, ///<The X good samples from raw data (260-hitbus)
-    kADC                            = 0x02, ///<Same as kNoCalib -- i.e. useless
-    kVoltageTime                    = 0x03, ///<Using 1 and 2.6    
-    kJustPed                        = 0x04, ///<Just subtract peds
+    kJustUnwrap                     = 0x01, ///<The X good samples from raw data (260-hitbus)   
+    kJustPed                        = 0x02, ///<Just subtract peds
+    kADC                            = 0x03, ///<Same as kNoCalib -- i.e. useless
+    kVoltageTime                    = 0x04, ///<Using 1 and 2.6 
     kFirstCalib                     = 0x05, ///<First attempt at a calibration by RJN
     kFirstCalibPlusCables           = 0x06, ///< Same as First Calib but also doing the cable delays
     kSecondCalib                    = 0x07, ///< Same as first calib but also doing the clock alignment
@@ -109,11 +109,15 @@ class AraEventCalibrator : public TObject
    UShort_t *fAraOnePeds;
    Int_t fGotAraOnePedFile;
    char fAraOnePedFile[FILENAME_MAX];
+   Int_t fAraOneSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
+   Double_t fAraOneSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
+   Double_t fAraOneEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
 
    void calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAraOneStationEvent, called from UsefulAraOneStationEvent constructor
    void setAraOnePedFile(char *filename);
    void loadAraOnePedestals();
-   
+   void loadAraOneCalib();
+
 
 
 

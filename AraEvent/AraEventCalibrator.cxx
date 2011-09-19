@@ -36,8 +36,7 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
 { 
-  if(calType==kFirstCalibPlusCables || calType==kSecondCalibPlusCables ||
-     calType==kFirstCalib || calType==kSecondCalib)
+  if(calType>=kFirstCalib)
     return kTRUE;
   return kFALSE;
 }
@@ -78,6 +77,7 @@ AraEventCalibrator::AraEventCalibrator()
   gotPedFile=0;
   fGotAraOnePedFile=0;
   loadTestBedCalib();
+  loadAraOneCalib();
   //Default Constructor
 }
 
@@ -712,6 +712,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
       Int_t chan=irsChan[uptoChan];
       Int_t dda=blockIt->getDda();
       Int_t block=blockIt->getBlock();
+      Int_t capArray=blockIt->getCapArray();
       //      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
       //      		<< dda << "\t" << block << "\t" << RawAraOneStationEvent::getPedIndex(dda,block,chan,0) << "\n";
       uptoChan++;
@@ -720,6 +721,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 
       timeMapIt=theEvent->fTimes.find(chanId);
       Double_t time=0;
+      Int_t firstTime=1;
       if(timeMapIt==theEvent->fTimes.end()) {
 	//First time round for this channel
 	std::vector <Double_t> tempTimes;
@@ -732,6 +734,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
       else {
 	//Just get the last time
 	time=timeMapIt->second.back();
+	//	if(dda==1 &&chan==1)
+	  //	  std::cout << "Last time " << time << "\t" << timeMapIt->second.size() << "\n";
+	firstTime=0;
       }
       
       //Set the iterators to point to the correct channel in the map
@@ -739,22 +744,66 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
       voltMapIt=theEvent->fVolts.find(chanId);
 
       int samp=0;
+      int index=0;
       //Now loop over the 64 samples
+      Double_t tempTimes[SAMPLES_PER_BLOCK];
+      Double_t tempVolts[SAMPLES_PER_BLOCK];
+      Int_t voltIndex[SAMPLES_PER_BLOCK];
+
+      //Here is the Epsilon calibration
+      if(AraCalType::hasBinWidthCalib(calType)) {
+	if(!firstTime) {
+	  //Add on the time between blocks
+	  time+=fAraOneEpsilonTimes[dda][chan][capArray];
+	  if(dda==1 && chan==1)
+	    std::cout << "Block " << time << "\t" << fAraOneEpsilonTimes[dda][chan][capArray] << "\n";
+
+	}
+      }
+
       for(shortIt=vecVecIt->begin();
 	  shortIt!=vecVecIt->end();
 	  shortIt++) {
-	time+=1;	
-	timeMapIt->second.push_back(time); ///<Filling with time
-	if(!AraCalType::hasPedestalSubtraction(calType))
-	  voltMapIt->second.push_back(*shortIt); ///<Filling with ADC
+	
+	if(AraCalType::hasBinWidthCalib(calType)) {
+
+	  //Now need to work out where to place the sample
+	  voltIndex[samp]=fAraOneSampleIndex[dda][chan][capArray][samp];
+
+	  //Now get the time
+	  tempTimes[samp]=time+fAraOneSampleTimes[dda][chan][capArray][samp];
+
+	  if(dda==1 && chan==1) {
+	    std::cout << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAraOneSampleTimes[dda][chan][capArray][samp] << "\n";
+	    std::cout << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
+	  }
+	  
+	}
 	else {
-	  voltMapIt->second.push_back((*shortIt)-(Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)]); ///<Filling with ADC-Pedestal
+	  time+=1;	
+	  tempTimes[samp]=time;
+	  voltIndex[samp]=samp;
+	}
+	
+	//Now the voltage part
+	if(!AraCalType::hasPedestalSubtraction(calType))
+	  tempVolts[samp]=(*shortIt); ///<Filling with ADC
+	else {
+	  tempVolts[samp]=(*shortIt)-(Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)]; ///<Filling with ADC-Pedestal
 	  //	  if(dda==3 && samp<2) {
 	  //	    std::cout << (*shortIt)  << "\t" << (Int_t)fAraOnePeds[RawAraOneStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
 	  //	  }
 	}
 	samp++;
-      }		    
+      }
+
+      for(samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+	timeMapIt->second.push_back(tempTimes[samp]); ///<Filling with time
+	voltMapIt->second.push_back(tempVolts[voltIndex[samp]]); //Filling with volts
+	
+      }
+      
+	    
     }
   }
   
@@ -845,4 +894,56 @@ void AraEventCalibrator::loadAraOnePedestals()
     }
   }  
 
+}
+
+
+void AraEventCalibrator::loadAraOneCalib()
+{
+  char calibFile[FILENAME_MAX];
+  char calibDir[FILENAME_MAX];
+  char *calibEnv=getenv("ARA_CALIB_DIR");
+  if(!calibEnv) {
+    char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+    if(!utilEnv)
+      sprintf(calibDir,"calib");
+    else
+      sprintf(calibDir,"%s/share/araCalib",utilEnv);
+  }
+  else {
+    strncpy(calibDir,calibEnv,FILENAME_MAX);
+  }  
+
+  int dda,chan,sample,capArray;
+  sprintf(calibFile,"%s/araOneSampleTiming.txt",calibDir);
+  std::ifstream SampleFile(calibFile);
+  for(dda=0;dda<DDA_PER_ATRI;dda++) {
+    for(chan=0;chan<RFCHAN_PER_DDA;chan++) {
+      for(capArray=0;capArray<2;capArray++) {
+	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+	  fAraOneSampleTimes[dda][chan][capArray][sample]=sample/3.2;
+	  fAraOneSampleIndex[dda][chan][capArray][sample]=sample;
+	}
+	fAraOneEpsilonTimes[dda][chan][capArray]=1/3.2;
+      }
+    }
+  }
+
+  Double_t value;
+  Int_t index;
+  while(SampleFile >> dda >> chan >> capArray) {
+    //    std::cout <<  dda << "\t" << chan << "\t" << capArray << "\t";
+    for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+      SampleFile >> index;
+      fAraOneSampleIndex[dda][chan][capArray][sample]=index;
+      //      std::cout << fAraOneSampleIndex[dda][chan][ << " ";    
+    }
+
+    SampleFile >> dda >> chan >> capArray;
+    for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+      SampleFile >> value;
+      fAraOneSampleTimes[dda][chan][capArray][sample]=value;
+      //      std::cout << fAraOneSampleTimes[dda][chan][capArray][sample] << " ";    
+    }
+    //    std::cout << "\n";
+  }
 }

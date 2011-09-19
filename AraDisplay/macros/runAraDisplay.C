@@ -34,6 +34,7 @@ void runAraDisplay(char *eventFile) {
   //  AraEventCalibrator::Instance()->setPedFile("/unix/anita1/ara/data/pole11/peds/peds_1293938343/peds_1293938343.353103.dat");
   //  AraEventCalibrator::Instance()->setPedFile("/unix/anita1/ara/data/frozen_daqbox_calibration/Minus54C/pedestal_files/peds_1291239657/peds_1291239657/peds_1291239657.193855.dat");
   //  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
-  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kVoltageTime);  
+  //  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kVoltageTime);  
+  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kFirstCalib);  
   magicPtr->startEventDisplay();  
 }

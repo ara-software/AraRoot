@@ -33,8 +33,8 @@ AraOneEventHkData::AraOneEventHkData(AraEventHk_t *theHk)
   memcpy(wilkinsonDelay,theHk->wilkinsonDelay,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson delay?? one per DDA
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
   clockCounter=theHk->clockCounter; ///< Clock counter (which clock?)
-  memcpy(l1Scaler,theHk->l1Scaler,DDA_PER_ATRI*RFCHAN_PER_DDA*sizeof(UShort_t)); ///< L1 scaler, am I correct in decoding this need to check mapping
-  memcpy(l2Scaler,theHk->l2Scaler,DDA_PER_ATRI*sizeof(UShort_t)); ///< L2 scaler
+  memcpy(l1Scaler,theHk->l1Scaler,TDA_PER_ATRI*ANTS_PER_TDA*sizeof(UShort_t)); ///< L1 scaler, am I correct in decoding this need to check mapping
+  memcpy(l2Scaler,theHk->l2Scaler,TDA_PER_ATRI*sizeof(UShort_t)); ///< L2 scaler
   l3Scaler=theHk->l3Scaler; ///< L3 scaler
   triggerScaler=theHk->triggerScaler; ///< Trigger scaler (what is this?)
   memcpy(deadTime,theHk->deadTime,DDA_PER_ATRI*sizeof(UChar_t));
