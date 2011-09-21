@@ -22,7 +22,7 @@
 #include "araSoft.h"
 
 #define ARA_SOFT_VERISON 2
-#define ARA_SOFT_SUB_VERISON 4
+#define ARA_SOFT_SUB_VERISON 5
 
 
 
@@ -84,14 +84,17 @@ typedef struct {
   uint32_t ppsCounter; ///< Pulse per second counter
   uint32_t clockCounter; ///< Clock counter (which clock?)
   uint16_t l1Scaler[TDA_PER_ATRI][ANTS_PER_TDA]; ///< L1 scaler, am I correct in decoding this need to check mapping prescaled by 32
+  uint16_t l1ScalerSurface[ANTS_PER_TDA]; ///< The Surface L1 scaler
   uint16_t l2Scaler[TDA_PER_ATRI][L2_PER_TDA]; ///< L2 scaler not prescaled
   uint16_t l3Scaler; ///< L3 scaler not prescaled
+  uint16_t l3ScalerSurface; ///< L3 surface scaler not prescaled
   uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
   uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
   uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
   uint16_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t thresholdDac[TDA_PER_ATRI][ANTS_PER_TDA]; ///< Value the thresholds are set to
+  uint16_t surfaceThresholdDac[ANTS_PER_TDA]; ///< The surface thresholds
 } AraEventHk_t;
 
 

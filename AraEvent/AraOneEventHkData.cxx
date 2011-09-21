@@ -42,5 +42,6 @@ AraOneEventHkData::AraOneEventHkData(AraEventHk_t *theHk)
   memcpy(vdlyDac,theHk->vdlyDac,DDA_PER_ATRI*sizeof(UShort_t));
   memcpy(vadjDac,theHk->vadjDac,DDA_PER_ATRI*sizeof(UShort_t));
   memcpy(thresholdDac,theHk->thresholdDac,TDA_PER_ATRI*ANTS_PER_TDA*sizeof(UShort_t));
-
+  memcpy(l1ScalerSurface,theHk->l1ScalerSurface,ANTS_PER_TDA*sizeof(UShort_t));
+  memcpy(surfaceThresholdDac,theHk->surfaceThresholdDac,ANTS_PER_TDA*sizeof(UShort_t));
 }
