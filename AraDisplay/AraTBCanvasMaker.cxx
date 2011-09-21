@@ -13,7 +13,7 @@
 #include "AraWaveformGraph.h"
 #include "AraEventCorrelator.h"
 #include "AraFFTGraph.h"
-#include "araTestbedDefines.h"
+#include "araTestBedDefines.h"
 
 
 #include "TString.h"

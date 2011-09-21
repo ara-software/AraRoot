@@ -17,7 +17,7 @@
 #include "AraEventCalibrator.h"
 #include "AraEventCorrelator.h"
 #include "AraControlPanel.h"
-#include "araTestbedDefines.h"
+#include "araTestBedDefines.h"
 #include "AraTBCanvasMaker.h"
 #include "AraCanvasMaker.h"
 
