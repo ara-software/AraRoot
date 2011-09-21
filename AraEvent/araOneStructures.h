@@ -22,7 +22,7 @@
 #include "araSoft.h"
 
 #define ARA_SOFT_VERISON 2
-#define ARA_SOFT_SUB_VERISON 5
+#define ARA_SOFT_SUB_VERISON 7
 
 
 
@@ -88,13 +88,16 @@ typedef struct {
   uint16_t l2Scaler[TDA_PER_ATRI][L2_PER_TDA]; ///< L2 scaler not prescaled
   uint16_t l3Scaler; ///< L3 scaler not prescaled
   uint16_t l3ScalerSurface; ///< L3 surface scaler not prescaled
-  uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
-  uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
-  uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
+  uint16_t l2ScalerAllTda12; ///< L2 for 3of8 in DTA 1&2
+  uint16_t l2ScalerAllTda34; ///< L2 for 3of8 in DTA 3&4
   uint16_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t thresholdDac[TDA_PER_ATRI][ANTS_PER_TDA]; ///< Value the thresholds are set to
   uint16_t surfaceThresholdDac[ANTS_PER_TDA]; ///< The surface thresholds
+  uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
+  uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
+  uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
+  uint8_t reserved[DDA_PER_ATRI];
 } AraEventHk_t;
 
 
