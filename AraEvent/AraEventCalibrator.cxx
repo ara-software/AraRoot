@@ -755,8 +755,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 	if(!firstTime) {
 	  //Add on the time between blocks
 	  time+=fAraOneEpsilonTimes[dda][chan][capArray];
-	  if(dda==1 && chan==1)
-	    std::cout << "Block " << time << "\t" << fAraOneEpsilonTimes[dda][chan][capArray] << "\n";
+	  //	  if(dda==1 && chan==1)
+	  //	    std::cout << "Block " << time << "\t" << fAraOneEpsilonTimes[dda][chan][capArray] << "\n";
 
 	}
       }
@@ -773,10 +773,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAraOneStationEvent *theEvent, AraC
 	  //Now get the time
 	  tempTimes[samp]=time+fAraOneSampleTimes[dda][chan][capArray][samp];
 
-	  if(dda==1 && chan==1) {
-	    std::cout << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAraOneSampleTimes[dda][chan][capArray][samp] << "\n";
-	    std::cout << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
-	  }
+	  //	  if(dda==1 && chan==1) {
+	  //	  //	    std::cout << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAraOneSampleTimes[dda][chan][capArray][samp] << "\n";
+	  //	    std::cout << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
+	  //	  }
 	  
 	}
 	else {
