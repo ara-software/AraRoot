@@ -27,12 +27,12 @@
 Double_t estimateLag(TGraph *grIn, Double_t freq);
 Double_t estimateLastZC(TGraph *grIn, Double_t freq);
 int firstCalibTry(int run,Double_t freq, Int_t dda, Int_t chan);
-void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan);  
+void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block);  
 void nextEvent();
 void previousEvent();
 
 Double_t newTimeVals[2][2][SAMPLES_PER_BLOCK/2];
-Int_t lastRun=0, lastEvent=0, lastDda=0, lastChan=0;
+Int_t lastRun=0, lastEvent=0, lastDda=0, lastChan=0, lastBlock=0;
 
 
 int main(int argc, char **argv)
@@ -229,7 +229,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
   //jpd print em all to screen
   for(int capArray=0;capArray<2;capArray++) {
     for(int samp=0;samp<SAMPLES_PER_BLOCK/2;samp++) {
-      printf("%i\t%i\t%0.3f\t%0.3f\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp], newTimeVals[capArray][0][samp]-newTimeVals[capArray][0][samp-1] , newTimeVals[capArray][1][samp]-newTimeVals[capArray][1][samp-1]);
+      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
     }
   }
 
@@ -345,22 +345,26 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
       if(samp%2==0)
 	timeVals[capArray][samp]=newTimeVals[capArray][samp%2][samp/2];
       else 
-	timeVals[capArray][samp]=newTimeVals[capArray][samp%2][samp/2]+deltaLag[capArray];
+	{
+	  timeVals[capArray][samp]=newTimeVals[capArray][samp%2][samp/2]+deltaLag[capArray];
+	  newTimeVals[capArray][samp%2][samp/2]+=deltaLag[capArray];
+	}
     }
     TMath::Sort(SAMPLES_PER_BLOCK,timeVals[capArray],indexVals[capArray],kFALSE);
   }
 
-  cout << endl << "estimated interleave " << deltaLag[0] << "\t" << deltaLag[1] << endl;
+  cout << endl;
+
+  //jpd print em all to screen
+  for(int capArray=0;capArray<2;capArray++) {
+    for(int samp=0;samp<SAMPLES_PER_BLOCK/2;samp++) {
+      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
+    }
+  }
   
-  //jpd now the interleave effect is included between the odd and even samples in timeVals[capArray][samp]
-
-  //jpd now try to work out epsilon
-
-  //jpd loop through events - load waveforms split into cap arrays, use timeVals to calibrate them
-
-  //jpd look for last zc in the first block and first in the second block
-
-  //difference in time should be a period phase-Period = epsilon
+  cout << endl << "estimated interleave capArray 0 " << deltaLag[0] << " \t capArray 1 " << deltaLag[1] << endl;
+  
+  //3. Do epsilon calibration
 
   Double_t epsilon[2] = {0};
   TH1F *histEpsilon[2];
@@ -395,7 +399,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     //    histMean->Fill(mean);
           
     Double_t mean[2][2]={{0}};
-    for(int block=0; block <2; block++){
+    for(block=0; block <2; block++){
       for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
 	mean[block][samp%2]+=rawV[samp+SAMPLES_PER_BLOCK*block];
       }
@@ -451,10 +455,23 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 
   }  
 
+  cout << "Estimate epsilon 0 to 1 is " << histEpsilon[0]->GetMean(1) << " 1 to 0 is " << histEpsilon[1]->GetMean(1) << endl;
+
+  for(int half=0;half<2;half++){
+    for(int samp=0; samp<SAMPLES_PER_BLOCK/2;samp++){
+      newTimeVals[1][half][samp]+=(newTimeVals[0][1][31]+histEpsilon[0]->GetMean(1));
+    }
+  }
+      
 
 
 
-
+  //jpd print em all to screen
+  for(int capArray=0;capArray<2;capArray++) {
+    for(int samp=0;samp<SAMPLES_PER_BLOCK/2;samp++) {
+      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
+    }
+  }
 
 
   
@@ -597,13 +614,13 @@ Double_t estimateLastZC(TGraph *grIn, Double_t freq)
 }
 
 
-void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
+void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block){
   Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
   lastRun=run;
   lastEvent=event;
   lastDda=dda;
   lastChan=chan;
-  
+  lastBlock=block;
 
   char inName[180];
   sprintf(inName,"/Users/jdavies/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
@@ -628,10 +645,10 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
   Double_t mean[2]={0};
   Int_t numSamples=gr->GetN();
   
-  if(numSamples>6*SAMPLES_PER_BLOCK){
-    cout << "Too many samples to plot!" << endl;
-    return;
-  }
+  // if(numSamples>6*SAMPLES_PER_BLOCK){
+  //   cout << "Too many samples to plot!" << endl;
+  //   return;
+  // }
   Int_t numBlocks=numSamples/64;
   Double_t tVals[2][32];
   Double_t tValsRaw[2][32];
@@ -645,16 +662,16 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
   can->cd(1);
   gr->Draw("alp");
   
-  for(int block=0;block<numBlocks;block++) {
+  for(int thisBlock=0;thisBlock<block+2;thisBlock++) {
     mean[0]=0;
     mean[1]=0;
     thisCapArray=capArray;
-    if(block%2) thisCapArray=1-capArray;
+    if(thisBlock%2) thisCapArray=1-capArray;
 
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      tVals[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*block];
-      tValsRaw[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*block];
-      mean[samp%2]+=rawV[samp+SAMPLES_PER_BLOCK*block];
+      tVals[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*thisBlock];
+      tValsRaw[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*thisBlock];
+      mean[samp%2]+=rawV[samp+SAMPLES_PER_BLOCK*thisBlock];
     }
     mean[0]/=SAMPLES_PER_BLOCK/2;
     mean[1]/=SAMPLES_PER_BLOCK/2;
@@ -662,7 +679,7 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
     
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
       tVals[samp%2][samp/2]=newTimeVals[thisCapArray][samp%2][samp/2];
-      vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*block];//-mean[samp%2];
+      vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*thisBlock]-mean[samp%2];
     }
     
     TGraph *grHalf[2]={0};
@@ -672,10 +689,10 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
       grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
       grHalfRaw[half] = new TGraph(SAMPLES_PER_BLOCK/2,tValsRaw[half],vVals[half]);      
       
-      sprintf(graphName, "block %i half %i", block+1, half+1);
+      sprintf(graphName, "block %i half %i", thisBlock+1, half+1);
       cout << graphName << endl;
       grHalf[half]->SetNameTitle(graphName, graphName);
-      sprintf(graphName, "block %i half %i - Raw",block+1, half+1);
+      sprintf(graphName, "block %i half %i - Raw",thisBlock+1, half+1);
       cout << graphName << endl;
       grHalfRaw[half]->SetNameTitle(graphName, graphName);
       
@@ -688,7 +705,7 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
     // grHalf[1]->Draw("lp"); //odd samples
     
     
-    can->cd(block+2);
+    can->cd(thisBlock-block+2);
     grHalfRaw[1]->SetLineColor(1);
     grHalfRaw[1]->SetMarkerColor(1);
     grHalfRaw[0]->Draw("alp");
@@ -706,11 +723,11 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
 void nextEvent(){
   
 
-  plotEvent(lastRun, lastEvent+1, lastDda, lastChan);
+  plotEvent(lastRun, lastEvent+1, lastDda, lastChan, lastBlock);
 
 }
 void previousEvent(){
 
-  plotEvent(lastRun, lastEvent-1, lastDda, lastChan);
+  plotEvent(lastRun, lastEvent-1, lastDda, lastChan, lastBlock);
 
 }
