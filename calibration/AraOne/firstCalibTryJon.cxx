@@ -31,7 +31,10 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block);
 void nextEvent();
 void previousEvent();
 
+Double_t newTimeValsUnsorted[2][2][SAMPLES_PER_BLOCK/2];
 Double_t newTimeVals[2][2][SAMPLES_PER_BLOCK/2];
+Double_t newTimeValsEpsilon[2][2][SAMPLES_PER_BLOCK/2];
+Double_t newEpsilon[2];
 Int_t lastRun=0, lastEvent=0, lastDda=0, lastChan=0, lastBlock=0;
 
 
@@ -92,7 +95,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     }
   }
 
-  TH1F *histMean = new TH1F("histMean","histMean",1000,-500,500);
+  TH1F *histMean = new TH1F("histMean","histMean",1000,-0.1,0.1);
 
   std::vector <Long64_t> entryVec;
 
@@ -103,7 +106,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 
 
     //For now will assume all the ddas have the same block
-    Int_t capArray=evPtr->blockVec[dda].getCapArray();
+    Int_t capArray=evPtr->blockVec[0].getCapArray();
 
     TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawT=gr->GetX();
@@ -111,9 +114,6 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 
     Int_t numSamples=gr->GetN();
     Int_t numBlocks=numSamples/64;
-
-
-    //    histMean->Fill(mean);
 
     for(int block=0;block<numBlocks;block++) {
       Int_t thisCapArray=capArray;
@@ -140,8 +140,9 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
       TGraph *grHalf[2]={0};
       for(int half=0;half<2;half++) {
 	grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
+	histMean->Fill(grHalf[half]->GetMean(2));
       }
-      
+
       // TCanvas *can = new TCanvas("can","can",600,600);
       // can->Divide(1,3);
       // can->cd(1);
@@ -222,9 +223,12 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 	newTimeVals[capArray][half][samp]=time;
 	time+=histBinWidth[capArray][half]->GetBinContent(samp+1);
       }
-      std::cout << "Mean : " << capArray << "\t" << half << "\t" << time/32. << "\n";
+      std::cout << "Mean : " << capArray << " " << half << " " << time/32. << "\n";
     }
   }
+
+  cout << "-----------------Done bin widths-----------------" << endl;
+  cout << "cap     samp Time even Time odd" << endl;
 
   //jpd print em all to screen
   for(int capArray=0;capArray<2;capArray++) {
@@ -232,6 +236,8 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
       printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
     }
   }
+
+  cout << "Doing Interleave timing" << endl;
 
   //2. now calculate the interleave times
 
@@ -353,7 +359,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     TMath::Sort(SAMPLES_PER_BLOCK,timeVals[capArray],indexVals[capArray],kFALSE);
   }
 
-  cout << endl;
+  cout << endl << "-------------Done Interleaving-------------" << endl  << "cap       samp Time even Time odd" << endl;
 
   //jpd print em all to screen
   for(int capArray=0;capArray<2;capArray++) {
@@ -363,6 +369,33 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
   }
   
   cout << endl << "estimated interleave capArray 0 " << deltaLag[0] << " \t capArray 1 " << deltaLag[1] << endl;
+
+
+  char outName[180];
+  sprintf(outName,"sampleTiming_run%d_dda%d_chan%d.txt",run,dda,chan);
+
+  std::ofstream OutFile(outName);
+  for(int capArray=0;capArray<2;capArray++) {
+    OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
+    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      if(samp%2==0)
+	OutFile << indexVals[capArray][samp] << " ";
+      else
+	OutFile << indexVals[capArray][samp]  << " ";
+    }
+    OutFile << "\n";
+    OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
+    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      if(samp%2==0)
+	OutFile << timeVals[capArray][indexVals[capArray][samp]] << " ";
+      else
+	OutFile << timeVals[capArray][indexVals[capArray][samp]]  << " ";
+    }
+    OutFile << "\n";
+  }
+  OutFile.close();
+  
+  cout << "Doing epsilon Calibration" << endl;
   
   //3. Do epsilon calibration
 
@@ -394,10 +427,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     //    Double_t mean=gr->GetMean(2);
     Int_t numSamples=gr->GetN();
     Int_t numBlocks=numSamples/64;
-
-
-    //    histMean->Fill(mean);
-          
+    
     Double_t mean[2][2]={{0}};
     for(block=0; block <2; block++){
       for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
@@ -422,89 +452,86 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     for(int half=0;half<2;half++) {
       grHalf[half] = new TGraph(SAMPLES_PER_BLOCK,tValsHalf[half],vValsHalf[half]);
     }
-
-    // TCanvas *can = new TCanvas();
-    // can->Divide(1,2);
-    // can->cd(1);
-    // grHalf[0]->Draw("alp");
-    // can->cd(2);
-    // grHalf[1]->Draw("alp");
-
     //now estimate the epsilon value
 
     Double_t lastZC = estimateLastZC(grHalf[0], frequency);
     Double_t firstZC = estimateLag(grHalf[1], frequency);
  
-    
     while(firstZC<lastZC)
       firstZC+=1./frequency;
     epsilon[capArray]=1./frequency-(firstZC-lastZC);
 
     histEpsilon[capArray]->Fill(epsilon[capArray]);
-    
-
     // cout << "last zc at time " << lastZC << " first ZC at " << firstZC << endl;
-
     // cout << "epsilon for cap array " << capArray << " to " << 1-capArray << " transition is " << epsilon << endl;
-
-
     delete grHalf[0];
     delete grHalf[1];
-    
     delete gr;
-
   }  
 
-  cout << "Estimate epsilon 0 to 1 is " << histEpsilon[0]->GetMean(1) << " 1 to 0 is " << histEpsilon[1]->GetMean(1) << endl;
+  //3.A printing epsilon values to file
+
+  sprintf(outName,"epsilon_run%d_dda%d_chan%d.txt",run,dda,chan);
+
+  std::ofstream OutFile2(outName);
+  for(int capArray=0; capArray<2; capArray++){
+    OutFile2 << dda << "\t" << chan << "\t" << capArray << "\t";   
+    OutFile2 << histEpsilon[capArray]->GetMean(1) << "\n";
+  }
+
+  OutFile2 << "\n";
+    
+  OutFile2.close();
+
+  //3.B Filling the newEpsilon[capArray] array
+
+  for(int capArray=0;capArray<2;capArray++){
+    newEpsilon[capArray]=histEpsilon[capArray]->GetMean(1);
+  }
+  
+
+  cout << "--------------Done epsilon values-------------" << endl << "cap    samp Time even Time odd" << endl;
 
   for(int half=0;half<2;half++){
     for(int samp=0; samp<SAMPLES_PER_BLOCK/2;samp++){
-      newTimeVals[1][half][samp]+=(newTimeVals[0][1][31]+histEpsilon[0]->GetMean(1));
+      newTimeValsEpsilon[1][half][samp]+=newTimeVals[1][half][samp]+(newTimeVals[0][1][31]+histEpsilon[0]->GetMean(1));
+      newTimeValsEpsilon[0][half][samp]=newTimeVals[0][half][samp];
     }
   }
-      
-
-
-
   //jpd print em all to screen
   for(int capArray=0;capArray<2;capArray++) {
     for(int samp=0;samp<SAMPLES_PER_BLOCK/2;samp++) {
-      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
+      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeValsEpsilon[capArray][0][samp], newTimeValsEpsilon[capArray][1][samp]);
     }
   }
 
-
+  cout << "Estimate epsilon 0 to 1 is " << histEpsilon[0]->GetMean(1) << " 1 to 0 is " << histEpsilon[1]->GetMean(1) << endl;
   
   //jpd end of epsilon calculation
 
 
-  char outName[180];
-  sprintf(outName,"sampleTiming_run%d_dda%d_chan%d.txt",run,dda,chan);
-
-  std::ofstream OutFile(outName);
-  for(int capArray=0;capArray<2;capArray++) {
-    OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
-    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      if(samp%2==0)
-	OutFile << indexVals[capArray][samp] << " ";
-      else
-	OutFile << indexVals[capArray][samp]  << " ";
-    }
-    OutFile << "\n";
-    OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
-    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-      if(samp%2==0)
-	OutFile << timeVals[capArray][indexVals[capArray][samp]] << " ";
-      else
-	OutFile << timeVals[capArray][indexVals[capArray][samp]]  << " ";
-    }
-    OutFile << "\n";
-  }
-  OutFile.close();
-
 
   histFile->Write();
-  
+  for(int capArray=0; capArray<2;capArray++){
+    if(histLag[capArray])
+      delete histLag[capArray];
+    if(histEpsilon[capArray])
+      delete histEpsilon[capArray];
+    for(int half=0; half<2; half++){
+      if(histZC[capArray][half])
+	delete histZC[capArray][half];
+      if(histBinWidth[capArray][half])
+	delete histBinWidth[capArray][half];
+    }
+  }
+  if(histMean)
+    delete histMean;
+  if(lagTree)
+    delete lagTree;
+  if(fp)
+    delete fp;
+  if(histFile)
+    delete histFile;
       
   return 0;
 }
@@ -642,6 +669,11 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block){
   TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
   Double_t *rawT=gr->GetX();
   Double_t *rawV=gr->GetY();
+  Double_t rawSubArrayT[128];
+  Double_t rawSubArrayV[128];
+  Double_t calibratedSubArrayT[128];
+  Double_t calibratedSubArrayV[128];
+
   Double_t mean[2]={0};
   Int_t numSamples=gr->GetN();
   
@@ -658,15 +690,85 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block){
   printf("%i samples %i blocks\n", numSamples, numBlocks);
   
   TCanvas *can = new TCanvas();//"can","can",600,600);
-  can->Divide(1,numBlocks+1);
+  can->Divide(1,3);
   can->cd(1);
-  gr->Draw("alp");
+
+  //jpd cut out the relevant part of the graph
   
-  for(int thisBlock=0;thisBlock<block+2;thisBlock++) {
+  for(int samp=0; samp<SAMPLES_PER_BLOCK*2;samp++){
+    rawSubArrayT[samp]=rawT[samp+SAMPLES_PER_BLOCK*block];
+    rawSubArrayV[samp]=rawV[samp+SAMPLES_PER_BLOCK*block];
+  }
+
+  //now want to calibrate the graph properly
+  //firstly populate timeVals with the newTimeVals
+  //then re-order timeVals
+
+  Int_t indexVals[2][SAMPLES_PER_BLOCK];
+  Double_t timeVals[2][SAMPLES_PER_BLOCK];
+  Int_t lastSampleFirstBlock;
+
+  for(int cap=0; cap<2;cap++){
+    for(int samp=0; samp<SAMPLES_PER_BLOCK;samp++){
+      timeVals[cap][samp]=newTimeVals[cap][samp%2][samp/2];
+    }
+    TMath::Sort(SAMPLES_PER_BLOCK, timeVals[cap], indexVals[cap],kFALSE);    
+  }
+  //find last sample in the first block and the capArray of this block
+
+  if(block%2) thisCapArray=1-capArray;
+  lastSampleFirstBlock=indexVals[thisCapArray][SAMPLES_PER_BLOCK-1];
+
+  cout << "first capArray is " << thisCapArray << " last sample is " << lastSampleFirstBlock << " " << timeVals[thisCapArray][lastSampleFirstBlock] << endl;
+
+  //fill the calibratedSubArray and re-order the voltages
+  for(int samp=0; samp<SAMPLES_PER_BLOCK;samp++){
+    
+    calibratedSubArrayT[samp]=timeVals[thisCapArray][samp];
+    calibratedSubArrayV[samp]=rawSubArrayV[indexVals[thisCapArray][samp]];
+
+    calibratedSubArrayT[samp+SAMPLES_PER_BLOCK]=timeVals[1-thisCapArray][samp]+timeVals[thisCapArray][lastSampleFirstBlock]+newEpsilon[thisCapArray];
+    calibratedSubArrayV[samp+SAMPLES_PER_BLOCK]=rawSubArrayV[indexVals[1-thisCapArray][samp]];
+
+  }
+
+
+  /*
+ for(int capArray=0;capArray<2;capArray++) { 
+    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      if(samp%2==0)
+	timeVals[capArray][samp]=newTimeVals[capArray][samp%2][samp/2];
+      else 
+	{
+	  timeVals[capArray][samp]=newTimeVals[capArray][samp%2][samp/2]+deltaLag[capArray];
+	  newTimeVals[capArray][samp%2][samp/2]+=deltaLag[capArray];
+	}
+    }
+    TMath::Sort(SAMPLES_PER_BLOCK,timeVals[capArray],indexVals[capArray],kFALSE);
+  }
+  */
+
+  //jpd and form grSubArray from the wanted part of the graph
+
+  TGraph *grSubArray = new TGraph(SAMPLES_PER_BLOCK*2, rawSubArrayT, rawSubArrayV);
+  TGraph *grCalSubArray = new TGraph(SAMPLES_PER_BLOCK*2, calibratedSubArrayT, calibratedSubArrayV);
+
+  // grSubArray->GetXaxis()->SetLabelSize(0.06);
+  // grSubArray->SetMarkerStyle(22);
+  // grSubArray->Draw("alp");
+
+  grCalSubArray->GetXaxis()->SetLabelSize(0.06);
+  grCalSubArray->SetMarkerStyle(22);
+  grCalSubArray->Draw("alp");
+
+  //gr->Draw("alp");
+  
+  for(int thisBlock=block;thisBlock<block+2;thisBlock++) {
     mean[0]=0;
     mean[1]=0;
     thisCapArray=capArray;
     if(thisBlock%2) thisCapArray=1-capArray;
+    else thisCapArray = capArray; // possible issue here with the wrong capArray!
 
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
       tVals[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*thisBlock];
@@ -697,21 +799,18 @@ void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan, Int_t block){
       grHalfRaw[half]->SetNameTitle(graphName, graphName);
       
     }
-    // can->cd(block+2);
-    // grHalf[0]->Draw("alp"); //even samples
-    // //can->cd(3);
-    // grHalf[1]->SetLineColor(kGreen+2);
-    // grHalf[1]->SetMarkerColor(kGreen+2);
-    // grHalf[1]->Draw("lp"); //odd samples
-    
     
     can->cd(thisBlock-block+2);
-    grHalfRaw[1]->SetLineColor(1);
-    grHalfRaw[1]->SetMarkerColor(1);
+    grHalfRaw[0]->SetLineColor(1);
+    grHalfRaw[0]->SetMarkerColor(1);
+    grHalfRaw[0]->GetXaxis()->SetLabelSize(0.06);
+    grHalfRaw[0]->SetMarkerStyle(22);
     grHalfRaw[0]->Draw("alp");
     //can->cd(3);
     grHalfRaw[1]->SetLineColor(kGreen+2);
     grHalfRaw[1]->SetMarkerColor(kGreen+2);
+    grHalfRaw[1]->GetXaxis()->SetLabelSize(0.06);
+    grHalfRaw[1]->SetMarkerStyle(22);
     grHalfRaw[1]->Draw("lp");
         
 
