@@ -13,5 +13,5 @@ void runFirstCalibJon() {
   gSystem->Load("libAraDisplay.so");
 
   gSystem->CompileMacro("firstCalibTryJon.cxx");
-  firstCalibTry(764,0.34, 0, 0);
+  firstCalibTry(764,0.43, 0, 0);
 }

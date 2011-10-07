@@ -25,6 +25,10 @@
 
 Double_t estimateLag(TGraph *grIn, Double_t freq);
 int firstCalibTry(int run,Double_t freq, Int_t dda, Int_t chan);
+void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan);  
+
+Double_t newTimeVals[2][2][SAMPLES_PER_BLOCK/2];
+
 
 int main(int argc, char **argv)
 {
@@ -40,7 +44,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
   Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
 
   char inName[180];
-  sprintf(inName,"/Users/rjn/ara/data/ohio2011/root/run%d/event%d.root",run,run);
+  sprintf(inName,"/Users/jdavies/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
 
   TFile *fp = new TFile(inName);
   if(!fp) {
@@ -99,7 +103,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawT=gr->GetX();
     Double_t *rawV=gr->GetY();
-    Double_t mean=gr->GetMean(2);
+    Double_t mean=0;//gr->GetMean(2);
     Int_t numSamples=gr->GetN();
     Int_t numBlocks=numSamples/64;
 
@@ -107,14 +111,22 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
     //    histMean->Fill(mean);
 
     for(int block=0;block<numBlocks;block++) {
+      mean = 0;
       Int_t thisCapArray=capArray;
       if(block%2) thisCapArray=1-capArray;
+      for(int samp=0; samp<SAMPLES_PER_BLOCK;samp++){
+	mean+=rawV[samp+SAMPLES_PER_BLOCK*block];
+      }
+      mean/=SAMPLES_PER_BLOCK;
+      //jpd picking out the correct block and splitting into two halves
+      //128 samples = 2 caparrays
+      //64 samples (block) split into two halfs -- equivalent to splitting into the odds and evens
 
       for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
 	tVals[samp%2][samp/2]=rawT[samp+SAMPLES_PER_BLOCK*block];
 	vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*block]-mean;
       }
-      
+
       TGraph *grHalf[2]={0};
       for(int half=0;half<2;half++) {
 	grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
@@ -146,6 +158,9 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 	  }	
 	}
       }
+
+      //jpd previous section just counts total ZCs in the two halves
+      //jpd require that the number in the two halves is ~equal
       if(TMath::Abs(countZc[0]-countZc[1])<2) {
 	entryVec.push_back(i);
 	//      std::cerr << i << "\t" <<countZc[0] << "\t" << countZc[1] << "\t" << mean << "\n";
@@ -185,11 +200,13 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
       histBinWidth[capArray][half]->Scale(0.5/frequency);
     }
   }
+  //jpd at this stage we have produced a set of calibration constants contained in histBinWidth[capArray][half]
+
 
   //Step two is to work out the interleave factor
 
   std::cerr << "\n";
-  Double_t newTimeVals[2][2][SAMPLES_PER_BLOCK/2];
+
   for(int capArray=0;capArray<2;capArray++) {
     for(int half=0;half<2;half++) {
       Double_t time=0;
@@ -197,9 +214,10 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 	newTimeVals[capArray][half][samp]=time;
 	time+=histBinWidth[capArray][half]->GetBinContent(samp+1);
       }
-      std::cout << "Mean : " << capArray << "\t" << half << "\t" << time/64. << "\n";
+      std::cout << "Mean : " << capArray << "\t" << half << "\t" << time/32. << "\n";
     }
   }
+  //jpd now filled the newTimeVals[capArray][half][samp] array with the cumulative delta ts
 
   std::cout << "Desired rate is " << 25*128 << " MHz\t" << (1000./(25*128)) << "ns\n";
 
@@ -217,15 +235,12 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
   //   }
   // }
 
+  //jpd print em all to screen
   for(int capArray=0;capArray<2;capArray++) {
     for(int samp=0;samp<SAMPLES_PER_BLOCK/2;samp++) {
-      std::cout << capArray << "\t" << samp << "\t" << newTimeVals[capArray][0][samp]
-		<< "\t" << newTimeVals[capArray][1][samp] << "\n";
+      printf("%i\t%i\t%0.3f\t%0.3f\n", capArray, samp, newTimeVals[capArray][0][samp], newTimeVals[capArray][1][samp]);
     }
   }
-
-
-  
   
   TTree *lagTree = new TTree("lagTree","lagTree");
   Int_t block,thisCapArray;
@@ -291,7 +306,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
       // grHalf[1]->SetLineColor(kGreen+2);
       // grHalf[1]->SetMarkerColor(kGreen+2);
       // grHalf[1]->Draw("lp");
-      lag0=estimateLag(grHalf[0],frequency);
+      lag0=estimateLag(grHalf[0],frequency); //jpd got here!
       lag1=estimateLag(grHalf[1],frequency);
            
       deltaLagg=lag0-lag1;
@@ -320,6 +335,8 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan)
 
   Double_t deltaLag[2]={histLag[0]->GetMean(),histLag[1]->GetMean()};
 
+  cout << endl << "estimated interleave " << deltaLag[0] << "\t" << deltaLag[1] << endl;
+  
   Double_t timeVals[2][SAMPLES_PER_BLOCK];
   Int_t indexVals[2][SAMPLES_PER_BLOCK];
 
@@ -418,4 +435,61 @@ Double_t estimateLag(TGraph *grIn, Double_t freq)
 
 }
 
+void plotEvent(Int_t run, Int_t event, Int_t dda, Int_t chan){
+  Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
 
+
+  char inName[180];
+  sprintf(inName,"/Users/jdavies/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
+
+  TFile *fp = new TFile(inName);
+  
+  TTree *eventTree = (TTree*) fp->Get("eventTree");
+
+  RawAraOneStationEvent *evPtr=0;
+  eventTree->SetBranchAddress("event",&evPtr); 
+
+  eventTree->GetEntry(event);
+  UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+  
+  //For now will assume all the ddas have the same block
+  Int_t capArray=evPtr->blockVec[0].getCapArray();
+  Int_t thisCapArray=0;  
+  
+  TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
+  //    Double_t *rawT=gr->GetX();
+  Double_t *rawV=gr->GetY();
+  Double_t mean=gr->GetMean(2);
+  Int_t numSamples=gr->GetN();
+  Int_t numBlocks=numSamples/64;
+  Double_t tVals[2][32];
+  Double_t vVals[2][32];
+  
+
+  for(int block=0;block<numBlocks;block++) {
+    thisCapArray=capArray;
+    if(block%2) thisCapArray=1-capArray;
+    
+    
+    for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      tVals[samp%2][samp/2]=newTimeVals[thisCapArray][samp%2][samp/2];
+      vVals[samp%2][samp/2]=rawV[samp+SAMPLES_PER_BLOCK*block]-mean;
+    }
+    
+    TGraph *grHalf[2]={0};
+    for(int half=0;half<2;half++) {
+      grHalf[half] = new TGraph(SAMPLES_PER_BLOCK/2,tVals[half],vVals[half]);
+    }
+    
+     TCanvas *can = new TCanvas();//"can","can",600,600);
+     can->Divide(1,2);
+     can->cd(1);
+     gr->Draw("alp");
+     can->cd(2);
+     grHalf[0]->Draw("alp");
+     //can->cd(3);
+     grHalf[1]->SetLineColor(kGreen+2);
+     grHalf[1]->SetMarkerColor(kGreen+2);
+     grHalf[1]->Draw("lp");
+  }
+}
