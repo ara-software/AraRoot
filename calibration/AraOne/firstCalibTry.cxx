@@ -58,7 +58,9 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
   Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
 
   char inName[180];
-  sprintf(inName,"/Users/jdavies/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
+  sprintf(inName,"/unix/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
+
+
 
   TFile *fp = new TFile(inName);
   if(!fp) {
@@ -109,7 +111,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
 
     //all the ddas block zero will be the same block
     //the capArray will toggle as we move through the event
-    Int_t capArray=evPtr->blockVec[0].getCapArray();
+    Int_t capArray=evPtr->blockVec[dda].getCapArray();
 
     TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawT=gr->GetX();
@@ -229,6 +231,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
   //2. now calculate the interleave times
 
   TTree *lagTree = new TTree("lagTree","lagTree");
+  Int_t cap[4], blockNo[4], ddaNo[4];
   Double_t lag1,lag0,deltaLagg;
   Int_t block, thisCapArray;
   lagTree->Branch("block",&block,"block/I");
@@ -236,6 +239,10 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
   lagTree->Branch("lag1",&lag1,"lag1/D");
   lagTree->Branch("lag0",&lag0,"lag0/D");
   lagTree->Branch("deltaLag",&deltaLagg,"deltaLag/D");
+  lagTree->Branch("cap", cap, "cap[4]/I");
+  lagTree->Branch("blockNo", blockNo, "blockNo[4]/I");
+  lagTree->Branch("ddaNo", ddaNo, "ddaNo[4]/I");
+
 
   TH1F *histLag[2];
   for(int capArray=0;capArray<2;capArray++) {
@@ -256,8 +263,22 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
     UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
 
     //For now will assume all the ddas have the same block
-    Int_t capArray=evPtr->blockVec[0].getCapArray();
-   
+    Int_t capArray=evPtr->blockVec[dda].getCapArray();
+    cap[0] =evPtr->blockVec[0].getCapArray();
+    cap[1] =evPtr->blockVec[1].getCapArray();
+    cap[2] =evPtr->blockVec[2].getCapArray();
+    cap[3] =evPtr->blockVec[3].getCapArray();
+    blockNo[0]=evPtr->blockVec[0].getBlock();
+    blockNo[1]=evPtr->blockVec[1].getBlock();
+    blockNo[2]=evPtr->blockVec[2].getBlock();
+    blockNo[3]=evPtr->blockVec[3].getBlock();
+    ddaNo[0]=evPtr->blockVec[0].getDda();
+    ddaNo[1]=evPtr->blockVec[1].getDda();
+    ddaNo[2]=evPtr->blockVec[2].getDda();
+    ddaNo[3]=evPtr->blockVec[3].getDda();
+
+
+
     TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawV=gr->GetY();
     Int_t numSamples=gr->GetN();
@@ -409,7 +430,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
     UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
     
     //For now will assume all the ddas have the same  block
-    Int_t capArray=evPtr->blockVec[0].getCapArray();
+    Int_t capArray=evPtr->blockVec[dda].getCapArray();
 
     TGraph *gr = realEvent.getGraphFromElecChan(chanIndex);
     Double_t *rawV=gr->GetY();
