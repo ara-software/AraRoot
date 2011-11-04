@@ -7,7 +7,7 @@ ifdef ARA_ROOT_DIR
 include ${ARA_ROOT_DIR}/StandardDefinitions.mk
 endif
 
-LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L ${ARA_ROOT_DIR}/AraEvent -lAraEvent -lz
+LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L${ARA_ROOT_DIR}/AraEvent -lAraEvent -lz
 INC_ARA_UTIL=-I$(ARA_UTIL_INC_DIR) -I ${ARA_ROOT_DIR}/AraEvent
 
 
