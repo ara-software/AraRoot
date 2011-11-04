@@ -45,7 +45,11 @@ TGraph *UsefulAraOneStationEvent::getGraphFromElecChan(int chanId)
 {
   std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
   timeMapIt=fTimes.find(chanId);
-  if(timeMapIt==fTimes.end()) return NULL;
+  if(timeMapIt==fTimes.end()) {
+    // This channel doesn't exist. We don't return a null pointer,
+    // we return an empty graph.
+    return new TGraph;
+  }
   
   TGraph *gr = new TGraph(fTimes[chanId].size(),&(fTimes[chanId][0]),&(fVolts[chanId][0]));
   return gr;
