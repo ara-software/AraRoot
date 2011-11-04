@@ -17,7 +17,7 @@ void runAraDisplay(int run=257) {
 void runAraDisplay(char *eventFile) {
   gSystem->AddIncludePath("-I${ARA_UTIL_INSTALL_DIR}/include");
   gSystem->AddIncludePath("-I/sw/include");
-  gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":/sw/lib:/Users/barawn/utilities/lib/").c_str());
+  gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
   gSystem->Load("libfftw3.so");
   gSystem->Load("libgsl.so");
   gSystem->Load("libMathMore.so");
