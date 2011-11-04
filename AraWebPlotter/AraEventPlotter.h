@@ -16,7 +16,7 @@
 #include "AraHistoHandler.h"
 #include "RawAraTestBedStationEvent.h"
 #include "UsefulAraTestBedStationEvent.h"
-#include "araTestbedDefines.h"
+#include "araTestBedDefines.h"
 
 class AraEventPlotter
 {
