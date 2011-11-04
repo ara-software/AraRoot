@@ -280,6 +280,7 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
   TPad *retCan=0;
   fWebPlotterMode=1;
   //  static Int_t lastEventView=0;
+  int foundTimeRange = 0;
 
   if(fAutoScale) {
     fMinVoltLimit=1e9;
@@ -300,13 +301,21 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
     //    if(grElecAveragedFFT[chan]) delete grElecAveragedFFT[chan];
     
     TGraph *grTemp = evPtr->getGraphFromElecChan(chan);
-    if(chan==0) {
+    if (!foundTimeRange && grTemp->GetN()) {
+      foundTimeRange = 1;
       fThisMinTime=grTemp->GetX()[0];
       fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
     }
 
-    if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
-    if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    // If GetN() returns 0, it's just an empty graph.
+    // Draw will throw a bunch of stupid errors ("illegal number of points")
+    // but other than that it'll be fine. Maybe we'll put a check somewhere
+    // on Draw to shut up the errors.
+    if (grTemp->GetN()) {
+      if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
+      if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    }
+
     grElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grElec[chan]->setElecChan(chan);
       //      std::cout << evPtr->eventNumber << "\n";
@@ -345,8 +354,7 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
     delete grTemp;
   }
 
-  
-
+  foundTimeRange = 0;
   for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
     if(grRFChan[rfchan]) delete grRFChan[rfchan];
     if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
@@ -357,7 +365,8 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
     //    if(grRFChanAveragedFFT[chan]) delete grRFChanAveragedFFT[chan];
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
-    if(rfchan==0) {
+    if (!foundTimeRange && grTemp->GetN()) {
+      foundTimeRange = 1;
       fThisMinTime=grTemp->GetX()[0];
       fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
     }
@@ -384,8 +393,6 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
       }
       delete grTempFFT;      
     }
-
-
 
     if(fAutoScale) {
       Int_t numPoints=grTemp->GetN();
@@ -439,6 +446,8 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
 
   static UInt_t lastEventNumber=0;
 
+  int foundTimeRange = 0;
+
   if(fAutoScale) {
     fMinVoltLimit=1e9;
     fMaxVoltLimit=-1e9;
@@ -457,10 +466,13 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
     grElecHilbert[chan]=0;
     
     TGraph *grTemp = evPtr->getGraphFromElecChan(chan);
-    grElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+    if (grTemp->GetN() && !foundTimeRange) {
+      fThisMinTime = grTemp->GetX()[0];
+      fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
+      foundTimeRange = 1;
+    }
+    grElec[chan] = new AraWaveformGraph(grTemp->GetN(), grTemp->GetX(),grTemp->GetY());
     grElec[chan]->setElecChan(chan);
-
-
     if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT) {
       TGraph *grTempFFT = grElec[chan]->getFFT();
       grElecFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
@@ -504,8 +516,8 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
     delete grTemp;
   }
   //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
-
-
+  foundTimeRange = 0;
+  
   for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
     if(grRFChan[rfchan]) delete grRFChan[rfchan];
     if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
@@ -515,14 +527,16 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
     grRFChanHilbert[rfchan]=0;
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
-    if(rfchan==0) {
-      fThisMinTime=grTemp->GetX()[0];
-      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    if (grTemp->GetN() && !foundTimeRange) {
+      fThisMinTime = grTemp->GetX()[0];
+      fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
+      foundTimeRange = 1;
     }
 
-    if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
-    if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
-
+    if (grTemp->GetN()) {
+      if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
+      if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
+    }
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grRFChan[rfchan]->setRFChan(rfchan);
       //      std::cout << evPtr->eventNumber << "\n";
