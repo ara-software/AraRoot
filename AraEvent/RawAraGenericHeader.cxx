@@ -36,11 +36,12 @@ RawAraGenericHeader::RawAraGenericHeader(AraGenericHeader_t *gHdr) ///< Assignme
   numBytes=gHdr->numBytes;
   checksum=gHdr->checksum;
 }
-RawAraGenericHeader::RawAraGenericHeader(UInt_t stationId) ///< Assignment constructor for ICRR type
+RawAraGenericHeader::RawAraGenericHeader(UInt_t station) ///< Assignment constructor for ICRR type
   :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
 {
-  if(stationId==0||stationId==1){ //ICRR stationId==0 TestBed stationId==1 for Ara1
+  if(station==0||station==1){ //ICRR station==0 Icrr station==1 for Ara1
     typeId=ARA_ICRR_EVENT_TYPE;
+    stationId=station;
     verId=0;
     subVerId=0;
     reserved=0;

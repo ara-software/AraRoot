@@ -1,4 +1,4 @@
-/*! \file araTestbedStructures.h
+/*! \file araIcrrStructures.h
   \brief Contains the definitions of all the structures used to store 
   and move ARA data and stuff.
     
@@ -12,7 +12,7 @@
 
 #ifndef ARA_STRUCTURES_H
 #define ARA_STRUCTURES_H
-#include "araTestBedDefines.h"
+#include "araIcrrDefines.h"
 
 #define ARA_STRUCTURES_VERSION 1
 
@@ -55,7 +55,7 @@ typedef struct {
   unsigned short trigPattern; // trigger pattern: bits 0-8 - facet triggers | bit 9 - deep L1 | bit 10 - shallow L1 | bit 11 - unused | bit 12 - global trigger
   unsigned short rovdd[3];    // [0] - LSW of Rb clock counter | [1] - MSW of Rb clock counter | [2] - DAC voltage for LAB C
   unsigned short rcoCount[3]; // RCO counter for LAB chips
-} AraTestBedTriggerMonitorStruct_t;
+} IcrrTriggerMonitorStruct_t;
 
 //!  The channel header
 /*!
@@ -89,29 +89,29 @@ typedef struct {
   */
     unsigned char lastHitbus; //to firstHitbus-1 inclusive
 
-} AraRawTestBedRFChannelHeader_t;
+} AraRawIcrrRFChannelHeader_t;
 
 //!  A complete RF channel
 /*!
   A complete RF channel  (header + waveform)
 */
 typedef struct {
-    AraRawTestBedRFChannelHeader_t header;
+    AraRawIcrrRFChannelHeader_t header;
     unsigned short data[MAX_NUMBER_SAMPLES_LAB3];
-} AraTestBedAraTestBedRFChannelFull_t;
+} IcrrIcrrRFChannelFull_t;
 
 //!  A complete pedestal subtracted RF channel
 /*!
   A complete pedestal subtracted RF channel. UNUSED at the moment
 */
 typedef struct {
-    AraRawTestBedRFChannelHeader_t header;
+    AraRawIcrrRFChannelHeader_t header;
     short xMax;
     short xMin;
     float mean; ///<Filled by pedestalLib
     float rms; ///<Filled by pedestalLib
     short data[MAX_NUMBER_SAMPLES_LAB3]; ///<Pedestal subtracted and 11bit data
-} AraTestBedAraTestBedRFChannelPedSubbed_t;
+} IcrrIcrrRFChannelPedSubbed_t;
 
 //!  The temperatures
 /*!
@@ -119,7 +119,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short temp[8]; ///< 
-} AraTestBedAraTestBedTemperatureDataStruct_t;
+} IcrrIcrrTemperatureDataStruct_t;
 
 //!  The RF power
 /*!
@@ -128,7 +128,7 @@ typedef struct {
 typedef struct {
   unsigned short discone[8]; ///< 
   unsigned short batwing[8]; ///< 
-} AraTestBedAraTestBedRFPowerDataStruct_t;
+} IcrrIcrrRFPowerDataStruct_t;
 
 //!  The DAC settings
 /*!
@@ -136,7 +136,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short dac[6][4]; ///< 
-} AraTestBedAraTestBedDACDataStruct_t;
+} IcrrIcrrDACDataStruct_t;
 
 //!  Scaler data
 /*!
@@ -148,7 +148,7 @@ typedef struct {
   unsigned short batMinus[8];
   unsigned short trigL1[12];
   unsigned short global;
-} AraTestBedAraTestBedSimpleScalerStruct_t;
+} IcrrIcrrSimpleScalerStruct_t;
 
 
 
@@ -199,7 +199,7 @@ typedef struct {
   unsigned char errorFlag; 
   //unsigned char surfSlipFlag; ///< Sync Slip between SURF 2-9 and SURF 1
   
-} AraTestBedEventHeader_t;
+} IcrrEventHeader_t;
 
 
 
@@ -209,18 +209,18 @@ typedef struct {
   The main housekeeping data structure
 */
 typedef struct {    
-  AraTestBedAraTestBedTemperatureDataStruct_t temp;
-  AraTestBedAraTestBedRFPowerDataStruct_t rfPow;
-  AraTestBedAraTestBedDACDataStruct_t dac;
-  AraTestBedAraTestBedSimpleScalerStruct_t scaler;
-} AraTestBedHkDataStruct_t;
+  IcrrIcrrTemperatureDataStruct_t temp;
+  IcrrIcrrRFPowerDataStruct_t rfPow;
+  IcrrIcrrDACDataStruct_t dac;
+  IcrrIcrrSimpleScalerStruct_t scaler;
+} IcrrHkDataStruct_t;
 
 typedef struct {
   unsigned int unixTime;
   unsigned int unixTimeUs;
   unsigned int eventNumber;
   unsigned int errorFlag;
-} AraTestBedHkDataHeader_t;
+} IcrrHkDataHeader_t;
 
 //! Pedestal Block
 /*!
@@ -230,7 +230,7 @@ typedef struct {
     GenericHeader_t gHdr;
     unsigned int unixTimeStart;
     unsigned int unixTimeEnd;
-    LabChipChannelPedStruct_t chan[NUM_DIGITIZED_TESTBED_CHANNELS];
+    LabChipChannelPedStruct_t chan[NUM_DIGITIZED_ICRR_CHANNELS];
 } FullLabChipPedStruct_t;
 
 
@@ -244,12 +244,12 @@ typedef struct {
 */
 typedef struct {
   GenericHeader_t gHdr;
-  AraTestBedEventHeader_t hd;
+  IcrrEventHeader_t hd;
   //  unsigned int eventNumber;    /* Global event number */
-  AraTestBedAraTestBedRFChannelFull_t channel[NUM_DIGITIZED_TESTBED_CHANNELS];
-  AraTestBedTriggerMonitorStruct_t trig;
-  AraTestBedHkDataStruct_t hk;
-} AraTestBedEventBody_t;
+  IcrrIcrrRFChannelFull_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
+  IcrrTriggerMonitorStruct_t trig;
+  IcrrHkDataStruct_t hk;
+} IcrrEventBody_t;
 
 //! Raw housekeeping event format 
 /*!
@@ -258,10 +258,10 @@ typedef struct {
 
 typedef struct {
   GenericHeader_t gHdr;
-  AraTestBedHkDataHeader_t hd;
-  AraTestBedTriggerMonitorStruct_t trig;
-  AraTestBedHkDataStruct_t hk;
-} AraTestBedHkBody_t;
+  IcrrHkDataHeader_t hd;
+  IcrrTriggerMonitorStruct_t trig;
+  IcrrHkDataStruct_t hk;
+} IcrrHkBody_t;
 
 
 //! Pedestal subtracted event format  
@@ -272,22 +272,22 @@ typedef struct {
   GenericHeader_t gHdr;
   unsigned int eventNumber;    /* Global event number */
   unsigned int whichPeds; ///<whichPedestals did we subtract
-  AraTestBedAraTestBedRFChannelPedSubbed_t channel[NUM_DIGITIZED_TESTBED_CHANNELS];
-  AraTestBedHkDataStruct_t hk;
-} AraTestBedAraTestBedPedSubbedEventBody_t;
+  IcrrIcrrRFChannelPedSubbed_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
+  IcrrHkDataStruct_t hk;
+} IcrrIcrrPedSubbedEventBody_t;
 
 
 //This stuff is just for legacy will be deprecated
-typedef struct AraTestBedRFChannelFull_t  RFChannelFull_t;
-typedef struct AraTestBedRFChannelPedSubbed_t RFChannelPedSubbed_t;
-typedef struct AraTestBedTemperatureDataStruct_t TemperatureDataStruct_t;
-typedef struct AraTestBedRFPowerDataStruct_t RFPowerDataStruct_t;
-typedef struct AraTestBedDACDataStruct_t DACDataStruct_t;
-typedef struct AraTestBedSimpleScalerStruct_t  SimpleScalerStruct_t;
-typedef AraTestBedEventHeader_t AraEventHeader_t;
-typedef AraTestBedEventBody_t AraEventBody_t;
-typedef AraTestBedHkBody_t AraHkBody_t;
-typedef struct AraTestBedPedSubbedEventBody_t PedSubbedEventBody_t;
+typedef struct IcrrRFChannelFull_t  RFChannelFull_t;
+typedef struct IcrrRFChannelPedSubbed_t RFChannelPedSubbed_t;
+typedef struct IcrrTemperatureDataStruct_t TemperatureDataStruct_t;
+typedef struct IcrrRFPowerDataStruct_t RFPowerDataStruct_t;
+typedef struct IcrrDACDataStruct_t DACDataStruct_t;
+typedef struct IcrrSimpleScalerStruct_t  SimpleScalerStruct_t;
+typedef IcrrEventHeader_t AraEventHeader_t;
+typedef IcrrEventBody_t AraEventBody_t;
+typedef IcrrHkBody_t AraHkBody_t;
+typedef struct IcrrPedSubbedEventBody_t PedSubbedEventBody_t;
 
 
 

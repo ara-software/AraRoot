@@ -9,11 +9,11 @@
 #include <iostream>
 #include "AraTBCanvasMaker.h"
 #include "AraGeomTool.h"
-#include "UsefulAraTestBedStationEvent.h"
+#include "UsefulIcrrStationEvent.h"
 #include "AraWaveformGraph.h"
 #include "AraEventCorrelator.h"
 #include "AraFFTGraph.h"
-#include "araTestBedDefines.h"
+#include "araIcrrDefines.h"
 
 
 #include "TString.h"
@@ -48,22 +48,22 @@ AraGeomTool *fTBACMGeomTool=0;
 
 
 
-AraWaveformGraph *grTBElec[NUM_DIGITIZED_TESTBED_CHANNELS]={0}; 
-AraWaveformGraph *grTBElecFiltered[NUM_DIGITIZED_TESTBED_CHANNELS]={0};
-AraWaveformGraph *grTBElecHilbert[NUM_DIGITIZED_TESTBED_CHANNELS]={0};
-AraFFTGraph *grTBElecFFT[NUM_DIGITIZED_TESTBED_CHANNELS]={0};
-AraFFTGraph *grTBElecAveragedFFT[NUM_DIGITIZED_TESTBED_CHANNELS]={0};
+AraWaveformGraph *grTBElec[NUM_DIGITIZED_ICRR_CHANNELS]={0}; 
+AraWaveformGraph *grTBElecFiltered[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraWaveformGraph *grTBElecHilbert[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraFFTGraph *grTBElecFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraFFTGraph *grTBElecAveragedFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
 
-AraWaveformGraph *grTBRFChan[RFCHANS_PER_TESTBED]={0};
-AraWaveformGraph *grTBRFChanFiltered[RFCHANS_PER_TESTBED]={0};
-AraWaveformGraph *grTBRFChanHilbert[RFCHANS_PER_TESTBED]={0};
-AraFFTGraph *grTBRFChanFFT[RFCHANS_PER_TESTBED]={0};
-AraFFTGraph *grTBRFChanAveragedFFT[RFCHANS_PER_TESTBED]={0};
+AraWaveformGraph *grTBRFChan[RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grTBRFChanFiltered[RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grTBRFChanHilbert[RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grTBRFChanFFT[RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grTBRFChanAveragedFFT[RFCHANS_PER_ICRR]={0};
 
 
 TH1D *AraTBCanvasMaker::getFFTHisto(int ant)
 {
-  if(ant<0 || ant>=RFCHANS_PER_TESTBED) return NULL;
+  if(ant<0 || ant>=RFCHANS_PER_ICRR) return NULL;
   if(grTBRFChan[ant])
     return grTBRFChan[ant]->getFFTHisto();
     return NULL;
@@ -106,17 +106,17 @@ AraTBCanvasMaker::AraTBCanvasMaker(AraCalType::AraCalType_t calType)
   fCalType=calType;
   fCorType=AraCorrelatorType::kSphericalDist40;
   fgInstance=this;
-  memset(grTBElec,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_TESTBED_CHANNELS);
-  memset(grTBElecFiltered,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_TESTBED_CHANNELS);
-  memset(grTBElecHilbert,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_TESTBED_CHANNELS);
-  memset(grTBElecFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_TESTBED_CHANNELS);
-  memset(grTBElecAveragedFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_TESTBED_CHANNELS);
+  memset(grTBElec,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grTBElecFiltered,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grTBElecHilbert,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grTBElecFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grTBElecAveragedFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
 
-  memset(grTBRFChan,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_TESTBED);
-  memset(grTBRFChanFiltered,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_TESTBED);
-  memset(grTBRFChanHilbert,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_TESTBED);
-  memset(grTBRFChanFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_TESTBED);
-  memset(grTBRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_TESTBED);  
+  memset(grTBRFChan,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
+  memset(grTBRFChanFiltered,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
+  memset(grTBRFChanHilbert,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
+  memset(grTBRFChanFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_ICRR);
+  memset(grTBRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_ICRR);  
   switch(fCalType) {
   case AraCalType::kNoCalib:
     fMaxVoltLimit=3000;
@@ -147,7 +147,7 @@ AraTBCanvasMaker*  AraTBCanvasMaker::Instance()
 }
 
 
-TPad *AraTBCanvasMaker::getEventInfoCanvas(UsefulAraTestBedStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
+TPad *AraTBCanvasMaker::getEventInfoCanvas(UsefulIcrrStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
 {
    static UInt_t lastEventNumber=0;
    static TPaveText *leftPave=0;
@@ -252,7 +252,7 @@ TPad *AraTBCanvasMaker::getEventInfoCanvas(UsefulAraTestBedStationEvent *evPtr, 
 }
 
 
-TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraTestBedStationEvent *evPtr,  TPad *useCan)
+TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulIcrrStationEvent *evPtr,  TPad *useCan)
 {
   TPad *retCan=0;
   fWebPlotterMode=1;
@@ -267,7 +267,7 @@ TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraTestBed
 
 
 
-  for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
     if(grTBElec[chan]) delete grTBElec[chan];
     if(grTBElecFFT[chan]) delete grTBElecFFT[chan];
     if(grTBElecHilbert[chan]) delete grTBElecHilbert[chan];
@@ -317,7 +317,7 @@ TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraTestBed
 
   
 
-  for(int rfchan=0;rfchan<RFCHANS_PER_TESTBED;rfchan++) {
+  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
     if(grTBRFChan[rfchan]) delete grTBRFChan[rfchan];
     if(grTBRFChanFFT[rfchan]) delete grTBRFChanFFT[rfchan];
     if(grTBRFChanHilbert[rfchan]) delete grTBRFChanHilbert[rfchan];
@@ -397,7 +397,7 @@ TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraTestBed
 
 }
 
-TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulAraTestBedStationEvent *evPtr,
+TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulIcrrStationEvent *evPtr,
 					   TPad *useCan)
 {
   TPad *retCan=0;
@@ -413,7 +413,7 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulAraTestBedStationEvent *evPtr
 
 
 
-  for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
     if(grTBElec[chan]) delete grTBElec[chan];
     if(grTBElecFFT[chan]) delete grTBElecFFT[chan];
     if(grTBElecHilbert[chan]) delete grTBElecHilbert[chan];
@@ -471,7 +471,7 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulAraTestBedStationEvent *evPtr
   //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
 
 
-  for(int rfchan=0;rfchan<RFCHANS_PER_TESTBED;rfchan++) {
+  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
     if(grTBRFChan[rfchan]) delete grTBRFChan[rfchan];
     if(grTBRFChanFFT[rfchan]) delete grTBRFChanFFT[rfchan];
     if(grTBRFChanHilbert[rfchan]) delete grTBRFChanHilbert[rfchan];
@@ -565,7 +565,7 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulAraTestBedStationEvent *evPtr
 }
 
 
-TPad *AraTBCanvasMaker::getElectronicsCanvas(UsefulAraTestBedStationEvent *evPtr,TPad *useCan)
+TPad *AraTBCanvasMaker::getElectronicsCanvas(UsefulIcrrStationEvent *evPtr,TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
@@ -684,7 +684,7 @@ TPad *AraTBCanvasMaker::getElectronicsCanvas(UsefulAraTestBedStationEvent *evPtr
 }
 
 
-TPad *AraTBCanvasMaker::getCanvasForWebPlotter(UsefulAraTestBedStationEvent *evPtr,
+TPad *AraTBCanvasMaker::getCanvasForWebPlotter(UsefulIcrrStationEvent *evPtr,
 					     TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
@@ -767,7 +767,7 @@ TPad *AraTBCanvasMaker::getCanvasForWebPlotter(UsefulAraTestBedStationEvent *evP
 
 }
 
-TPad *AraTBCanvasMaker::getRFChannelCanvas(UsefulAraTestBedStationEvent *evPtr,
+TPad *AraTBCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
 					 TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
@@ -861,7 +861,7 @@ TPad *AraTBCanvasMaker::getRFChannelCanvas(UsefulAraTestBedStationEvent *evPtr,
 }
 
 
-TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulAraTestBedStationEvent *evPtr,
+TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
@@ -964,7 +964,7 @@ TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulAraTestBedStationEvent *evPtr,
 }
 
 
-TPad *AraTBCanvasMaker::getIntMapCanvas(UsefulAraTestBedStationEvent *evPtr,
+TPad *AraTBCanvasMaker::getIntMapCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {
   static UInt_t lastEventNumber=0;
@@ -1212,7 +1212,7 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
   if(rfChanPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int rfChan=0;rfChan<RFCHANS_PER_TESTBED;rfChan++) {
+    for(int rfChan=0;rfChan<RFCHANS_PER_ICRR;rfChan++) {
 	sprintf(padName,"rfChanPad%d",rfChan);
 	TPad *paddy = (TPad*) plotPad->FindObject(padName);
 	if(!paddy)
@@ -1451,13 +1451,13 @@ void AraTBCanvasMaker::deleteTGraphsFromRFPad(TPad *paddy,int rfchan)
 
 void AraTBCanvasMaker::resetAverage() 
 {
-  for(int chan=0;chan<NUM_DIGITIZED_TESTBED_CHANNELS;chan++) {
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
     if(grTBElecAveragedFFT[chan]) {
       delete grTBElecAveragedFFT[chan];
       grTBElecAveragedFFT[chan]=0;
     }
   }
-  for(int rfchan=0;rfchan<RFCHANS_PER_TESTBED;rfchan++) {
+  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
     if(grTBRFChanAveragedFFT[rfchan]) {
       delete grTBRFChanAveragedFFT[rfchan];
       grTBRFChanAveragedFFT[rfchan]=0;

@@ -1,30 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraTestBedStationHeader        Raw ARA header class                        /////
+/////  RawIcrrStationHeader        Raw ARA header class                        /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA headers in a TTree          /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARATESTBEDSTATIONHEADER_H
-#define RAWARATESTBEDSTATIONHEADER_H
+#ifndef RAWICRRSTATIONHEADER_H
+#define RAWICRRSTATIONHEADER_H
 
 //Includes
 #include <TObject.h>
-#include "araTestBedDefines.h"
-#include "araTestbedStructures.h"
+#include "araIcrrDefines.h"
+#include "araIcrrStructures.h"
 
-//!  RawAraTestBedStationHeader -- The Raw ARA Event Header
+//!  RawIcrrStationHeader -- The Raw ARA Event Header
 /*!
   The ROOT implementation of the raw ARA event header
   \ingroup rootclasses
 */
-class RawAraTestBedStationHeader: public TObject
+class RawIcrrStationHeader: public TObject
 {
  public:
-   RawAraTestBedStationHeader(); ///< Default constructor
-   RawAraTestBedStationHeader(AraTestBedEventHeader_t *hdPtr); ///< Assignment constructor
-   ~RawAraTestBedStationHeader(); ///< Destructor
+   RawIcrrStationHeader(); ///< Default constructor
+   RawIcrrStationHeader(IcrrEventHeader_t *hdPtr); ///< Assignment constructor
+   ~RawIcrrStationHeader(); ///< Destructor
 
   unsigned int unixTime;       ///< unix UTC sec
   unsigned int unixTimeUs;     ///< unix UTC microsec 
@@ -51,8 +51,8 @@ class RawAraTestBedStationHeader: public TObject
   */
   unsigned char errorFlag; 
 
-  ClassDef(RawAraTestBedStationHeader,1);
+  ClassDef(RawIcrrStationHeader,1);
 };
 
 
-#endif //RAWARATESTBEDSTATIONHEADER_H
+#endif //RAWICRRSTATIONHEADER_H

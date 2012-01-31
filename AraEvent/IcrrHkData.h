@@ -1,30 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraTestBedHkData.h        HK data class                                     /////
+/////  IcrrHkData.h        HK data class                                     /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing housekeeping info                   /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARATESTBEDHKDATA_H
-#define ARATESTBEDHKDATA_H
+#ifndef ICRRHKDATA_H
+#define ICRRHKDATA_H
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 
-//!  AraTestBedHkData -- The HK data
+//!  IcrrHkData -- The HK data
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraTestBedHkData: public TObject
+class IcrrHkData: public TObject
 {
  public:
-   AraTestBedHkData(); ///< Default constructor
-   AraTestBedHkData(AraTestBedHkDataStruct_t *theHk); ///< Assignment constructor
-   ~AraTestBedHkData(); ///< Destructor
+   IcrrHkData(); ///< Default constructor
+   IcrrHkData(IcrrHkDataStruct_t *theHk); ///< Assignment constructor
+   ~IcrrHkData(); ///< Destructor
    
    static char getDacLetter(int index);
 
@@ -33,24 +33,24 @@ class AraTestBedHkData: public TObject
    double getTemperature(int tempId);///< Get the temperature in some units
 
 
-   //From AraTestBedAraTestBedTemperatureDataStruct_t
+   //From IcrrIcrrTemperatureDataStruct_t
    unsigned short temp[8]; ///< Temperatures
    
-   //From AraTestBedAraTestBedRFPowerDataStruct_t   
+   //From IcrrIcrrRFPowerDataStruct_t   
   unsigned short rfpDiscone[8]; ///< RF Power
   unsigned short rfpBatwing[8]; ///< RF Power
 
-  //From AraTestBedAraTestBedDACDataStruct_t
+  //From IcrrIcrrDACDataStruct_t
   unsigned short dac[6][4]; ///< DAC for what?
 
-  //From AraTestBedAraTestBedSimpleScalerStruct_t
+  //From IcrrIcrrSimpleScalerStruct_t
   unsigned short sclDiscone[8];
   unsigned short sclBatPlus[8];
   unsigned short sclBatMinus[8];
   unsigned short sclTrigL1[12];
   unsigned short sclGlobal;
 
-   ClassDef(AraTestBedHkData,1);
+   ClassDef(IcrrHkData,1);
 };
 
 

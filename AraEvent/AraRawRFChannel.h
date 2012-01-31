@@ -11,8 +11,8 @@
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 
 //!  AraRawRFChannel -- The Raw ARA Event Data
 /*!

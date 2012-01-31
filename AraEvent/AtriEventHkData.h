@@ -1,32 +1,32 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraOneEventHkData.h        Event HK data class                    /////
+/////  AtriEventHkData.h        Event HK data class                    /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing Event related housekeeping info     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARAONEEVENTHKDATA_H
-#define ARAONEEVENTHKDATA_H
+#ifndef ATRIEVENTHKDATA_H
+#define ATRIEVENTHKDATA_H
 
 //Includes
 #include <TObject.h>
-//#include "RawAraOneGenericHeader.h"
+//#include "RawAtriGenericHeader.h"
 #include "RawAraGenericHeader.h"
 #include "araOneStructures.h"
 
 
-//!  AraOneEventHkData -- The HK data
+//!  AtriEventHkData -- The HK data
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneEventHkData: public RawAraGenericHeader, public TObject
+class AtriEventHkData: public RawAraGenericHeader, public TObject
 {
  public:
-   AraOneEventHkData(); ///< Default constructor
-   AraOneEventHkData(AraEventHk_t *theHk); ///< Assignment constructor
-   ~AraOneEventHkData(); ///< Destructor
+   AtriEventHkData(); ///< Default constructor
+   AtriEventHkData(AraEventHk_t *theHk); ///< Assignment constructor
+   ~AtriEventHkData(); ///< Destructor
 
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
@@ -50,7 +50,7 @@ class AraOneEventHkData: public RawAraGenericHeader, public TObject
    UShort_t l2ScalerAllTda12; ///< L2 for 3of8 in DTA 1&2
    UShort_t l2ScalerAllTda34; ///< L2 for 3of8 in DTA 3&4
 
-   ClassDef(AraOneEventHkData,3);
+   ClassDef(AtriEventHkData,3);
 };
 
 

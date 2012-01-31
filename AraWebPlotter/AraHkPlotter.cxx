@@ -102,7 +102,7 @@ void AraHkPlotter::initialiseTimeHists(Int_t binWidth)
    for(int i=0;i<6;i++) {
       for(int j=0;j<4;j++) {
 	 sprintf(name,"dacHisto%d_%d",i,j);
-	 sprintf(title,"DAC %c %d",AraTestBedHkData::getDacLetter(i),j+1);
+	 sprintf(title,"DAC %c %d",IcrrHkData::getDacLetter(i),j+1);
 	 fDacHistos[i][j] = (AraTimeHistoHandler*) fHistoFile->Get(name);
 	 if(!fDacHistos[i][j])
 	    fDacHistos[i][j]= new AraTimeHistoHandler(name,title,binWidth);
@@ -193,7 +193,7 @@ void AraHkPlotter::loadAllTimeHists()
 		     for(int i=0;i<6;i++) {
 			for(int j=0;j<4;j++) {
 			   sprintf(name,"dacHisto%d_%d",i,j);
-			   sprintf(title,"DAC %c %d",AraTestBedHkData::getDacLetter(i),j+1);
+			   sprintf(title,"DAC %c %d",IcrrHkData::getDacLetter(i),j+1);
 			   AraTimeHistoHandler *tempDacHistos = (AraTimeHistoHandler*) fpRun->Get(name);
 			   if(fDacHistos[i][j] && tempDacHistos)
 			      fDacHistos[i][j]->addAraTimeHistoHandler(tempDacHistos);
@@ -229,7 +229,7 @@ void AraHkPlotter::loadAllTimeHists()
 
 
 
-void AraHkPlotter::addHk(Int_t runNumber,UInt_t unixTime, AraTestBedHkData *hkData)
+void AraHkPlotter::addHk(Int_t runNumber,UInt_t unixTime, IcrrHkData *hkData)
 {
    if(fCurrentRun!=runNumber) {
       fCurrentRun=runNumber;
@@ -470,7 +470,7 @@ void AraHkPlotter::makePlots()
 	 for(int j=0;j<4;j++) {
 	    grDac[i][j]= fDacHistos[i][j]->getTimeGraph(plotTime);
 	 }
-	 sprintf(plotTitle,"DAC (%c) for %s (Last: %s)",AraTestBedHkData::getDacLetter(i),AraPlotTime::getTimeTitleString(plotTime),clockTime.AsString("sl"));      
+	 sprintf(plotTitle,"DAC (%c) for %s (Last: %s)",IcrrHkData::getDacLetter(i),AraPlotTime::getTimeTitleString(plotTime),clockTime.AsString("sl"));      
 	 //This is dodgy should think about whether to go home
 	 mg[i] =AraPlotUtils::plotMultigraph((TCanvas*)gPad,grDac[i],4,plotTitle,"Time","Scaler (units)",1);
 	 if(mg[i]) doPlot=1;
@@ -683,7 +683,7 @@ void AraHkPlotter::makeLatestRunPlots()
 	 for(int j=0;j<4;j++) {
 	    grDac[i][j]= fDacHistos[i][j]->getTimeGraph(fEarliestTime,fLatestTime);
 	 }
-	 sprintf(plotTitle,"DAC (%c) for Run %d",AraTestBedHkData::getDacLetter(i),fCurrentRun);      
+	 sprintf(plotTitle,"DAC (%c) for Run %d",IcrrHkData::getDacLetter(i),fCurrentRun);      
 	 //This is dodgy should think about whether to go home
 	 mg[i] =AraPlotUtils::plotMultigraph((TCanvas*)gPad,grDac[i],4,plotTitle,"Time","Scaler (units)",1);
 	 if(mg[i]) doPlot=1;

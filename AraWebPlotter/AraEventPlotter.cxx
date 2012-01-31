@@ -329,7 +329,7 @@ void AraEventPlotter::loadAllTimeHists()
 
 
 
-void AraEventPlotter::addEvent(Int_t runNumber,RawAraTestBedStationEvent *rawEvent)
+void AraEventPlotter::addEvent(Int_t runNumber,RawIcrrStationEvent *rawEvent)
 {  
    static Int_t lastPpsNum=0;
    static Double_t tthen=0;
@@ -415,7 +415,7 @@ void AraEventPlotter::addEvent(Int_t runNumber,RawAraTestBedStationEvent *rawEve
       fpEvent->cd();
    }
    //Now we deal with the event quantities
-   UsefulAraTestBedStationEvent *usefulEventPtr = new UsefulAraTestBedStationEvent(rawEvent,AraCalType::kFirstCalib);
+   UsefulIcrrStationEvent *usefulEventPtr = new UsefulIcrrStationEvent(rawEvent,AraCalType::kFirstCalib);
    //First up plot the event
    if(fEventPlotFlag) plotEvent(runNumber,usefulEventPtr);
 
@@ -992,7 +992,7 @@ void AraEventPlotter::makePlots()
 
 
 
-void AraEventPlotter::plotEvent(Int_t runNumber,UsefulAraTestBedStationEvent *usefulEvent)
+void AraEventPlotter::plotEvent(Int_t runNumber,UsefulIcrrStationEvent *usefulEvent)
 {
 
    gEventCanvasMaker=AraTBCanvasMaker::Instance();

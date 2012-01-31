@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneStationEvent.h        Raw ARA station event class        /////
+/////  RawAtriStationEvent.h        Raw ARA station event class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that is a wraper for                            /////
@@ -8,33 +8,33 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARAONESTATIONEVENT_H
-#define RAWARAONESTATIONEVENT_H
+#ifndef RAWATRISTATIONEVENT_H
+#define RAWATRISTATIONEVENT_H
 
 //Includes
 #include <vector>
 #include <TObject.h>
-//#include "RawAraOneGenericHeader.h"
+//#include "RawAtriGenericHeader.h"
 //#include "RawAraGenericHeader.h"
 #include "RawAraStationEvent.h"
-#include "RawAraOneStationBlock.h"
+#include "RawAtriStationBlock.h"
 #include "araOneStructures.h"
 #include "araSoft.h"
 
 
 
 
-//!  RawAraOneStationEvent -- The Raw ARA Station Event Class
+//!  RawAtriStationEvent -- The Raw ARA Station Event Class
 /*!
   The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
   \ingroup rootclasses
 */
-class RawAraOneStationEvent: /*public RawAraGenericHeader ,*/public RawAraStationEvent
+class RawAtriStationEvent: /*public RawAraGenericHeader ,*/public RawAraStationEvent
 {
  public:
-   RawAraOneStationEvent(); ///< Default constructor
-   RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer); ///< Assignment constructor
-   ~RawAraOneStationEvent(); ///< Destructor
+   RawAtriStationEvent(); ///< Default constructor
+   RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer); ///< Assignment constructor
+   ~RawAtriStationEvent(); ///< Destructor
 
    ULong64_t unixTime; ///< Software event time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Software event time in microseconds (32-bits)
@@ -50,7 +50,7 @@ class RawAraOneStationEvent: /*public RawAraGenericHeader ,*/public RawAraStatio
    UShort_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
    UChar_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block the triggers occured in
 
-   std::vector<RawAraOneStationBlock> blockVec;
+   std::vector<RawAtriStationBlock> blockVec;
    
    inline static int getPedIndex(int dda, int block, int chan, int sample)
    {
@@ -59,10 +59,10 @@ class RawAraOneStationEvent: /*public RawAraGenericHeader ,*/public RawAraStatio
 
 
 
-  ClassDef(RawAraOneStationEvent,1);
+  ClassDef(RawAtriStationEvent,1);
 };
 
 
 
 
-#endif //RAWARAONESTATIONEVENT
+#endif //RAWATRISTATIONEVENT

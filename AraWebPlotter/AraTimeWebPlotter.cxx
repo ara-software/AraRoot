@@ -17,8 +17,8 @@
 
 //ARA includes
 #include "araTestbedStructures.h"
-#include "RawAraTestBedStationEvent.h"  
-#include "FullAraTestBedHkEvent.h"  
+#include "RawIcrrStationEvent.h"  
+#include "FullIcrrHkEvent.h"  
 #include "AraWebPlotterConfig.h"
 #include "AraHkPlotter.h"
 #include "AraEventPlotter.h"
@@ -28,17 +28,17 @@ int openRootFiles(char *eventFileName, char *hkFileName);
 Int_t runNumber;
 TFile *theEventFile;
 TChain *eventTree;
-RawAraTestBedStationEvent *theEvent=0;
+RawIcrrStationEvent *theEvent=0;
 
 
 TFile *theHkFile;
 TChain *hkTree;
-FullAraTestBedHkEvent *theHk=0;
+FullIcrrHkEvent *theHk=0;
 
 
 
 int main(int argc, char **argv) {
-  //  theEvent = new RawAraTestBedStationEvent();
+  //  theEvent = new RawIcrrStationEvent();
   //Step one is to read the config file.
    gROOT->SetBatch();
   AraWebPlotterConfig *araConfig = new AraWebPlotterConfig();

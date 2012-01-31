@@ -14,7 +14,7 @@ using namespace std;
 #define HACK_FOR_ROOT
 
 #include "araOneStructures.h"
-#include "AraOneSensorHkData.h"  
+#include "AtriSensorHkData.h"  
 
 void processHk();
 void makeHkTree(char *inputName, char *outDir);
@@ -22,7 +22,7 @@ void makeHkTree(char *inputName, char *outDir);
 AraSensorHk_t theSensorHkStruct;
 TFile *theFile;
 TTree *sensorHkTree;
-AraOneSensorHkData *theSensorHk=0;
+AtriSensorHkData *theSensorHk=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 void makeHkTree(char *inputName, char *outFile) {
   cout << inputName << "\t" << outFile << endl;
   strncpy(outName,outFile,FILENAME_MAX);
-  theSensorHk = new AraOneSensorHkData();
+  theSensorHk = new AtriSensorHkData();
   //    cout << sizeof(AraSensorHk_t) << endl;
   ifstream SillyFile(inputName);
 
@@ -105,13 +105,13 @@ void processHk() {
     theFile = new TFile(outName,"RECREATE");
     sensorHkTree = new TTree("sensorHkTree","Tree of ARA Hks");
     sensorHkTree->Branch("run",&runNumber,"run/I");
-    sensorHkTree->Branch("sensorHk","AraOneSensorHkData",&theSensorHk);
+    sensorHkTree->Branch("sensorHk","AtriSensorHkData",&theSensorHk);
     
     doneInit=1;
   }  
   //  cout << "Here: "  << theSensorHk.eventNumber << endl;
   if(theSensorHk) delete theSensorHk;
-  theSensorHk = new AraOneSensorHkData(&theSensorHkStruct);
+  theSensorHk = new AtriSensorHkData(&theSensorHkStruct);
   sensorHkTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theSensorHk;

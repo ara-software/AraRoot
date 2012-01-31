@@ -5,24 +5,24 @@
 #pragma link off all functions;
 
 
-#pragma link C++ class AraOneEventHkData+;
-#pragma link C++ class AraOneSensorHkData+;
+#pragma link C++ class AtriEventHkData+;
+#pragma link C++ class AtriSensorHkData+;
 #pragma link C++ class RawAraStationEvent+;
-#pragma link C++ class RawAraTestBedStationHeader+;
-#pragma link C++ class RawAraTestBedStationEvent+;
-#pragma link C++ class RawAraOneSimpleStationEvent+;
-#pragma link C++ class AraRawTestBedRFChannel+;
-#pragma link C++ class AraTestBedHkData+;
-#pragma link C++ class FullAraTestBedHkEvent+;
-#pragma link C++ class AraTestBedTriggerMonitor+;
+#pragma link C++ class RawIcrrStationHeader+;
+#pragma link C++ class RawIcrrStationEvent+;
+#pragma link C++ class RawAtriSimpleStationEvent+;
+#pragma link C++ class AraRawIcrrRFChannel+;
+#pragma link C++ class IcrrHkData+;
+#pragma link C++ class FullIcrrHkEvent+;
+#pragma link C++ class IcrrTriggerMonitor+;
 #pragma link C++ class UsefulAraStationEvent+;
-#pragma link C++ class UsefulAraTestBedStationEvent+;
-#pragma link C++ class UsefulAraOneStationEvent+;
+#pragma link C++ class UsefulIcrrStationEvent+;
+#pragma link C++ class UsefulAtriStationEvent+;
 #pragma link C++ class AraAntennaInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
-#pragma link C++ class RawAraOneStationBlock+;
-#pragma link C++ class RawAraOneStationEvent+;
+#pragma link C++ class RawAtriStationBlock+;
+#pragma link C++ class RawAtriStationEvent+;
 #pragma link C++ class RawAraGenericHeader+;
 
 #pragma link C++ typedef AraDataStructureType_t;

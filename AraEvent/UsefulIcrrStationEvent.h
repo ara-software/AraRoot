@@ -1,49 +1,49 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAraTestBedStationEvent.h        Useful ARA event class                      /////
+/////  UsefulIcrrStationEvent.h        Useful ARA event class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing useful ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef USEFULARATESTBEDSTATIONEVENT_H
-#define USEFULARATESTBEDSTATIONEVENT_H
+#ifndef USEFULICRRSTATIONEVENT_H
+#define USEFULICRRSTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
-#include "RawAraTestBedStationEvent.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
+#include "RawIcrrStationEvent.h"
 #include "AraEventCalibrator.h"
 #include "UsefulAraStationEvent.h"
 
-//!  UsefulAraTestBedStationEvent -- The Useful ARA Event Data
+//!  UsefulIcrrStationEvent -- The Useful ARA Event Data
 /*!
   The ROOT implementation of the useful ARA event data
 
-  This is the most useful class for analysing the ARA data. The raw ADC values from a RawAraTestBedStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
+  This is the most useful class for analysing the ARA data. The raw ADC values from a RawIcrrStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
 
   \ingroup rootclasses
 */
-class UsefulAraTestBedStationEvent: public RawAraTestBedStationEvent, public UsefulAraStationEvent
+class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStationEvent
 {
  public:
-   UsefulAraTestBedStationEvent(); ///< Default constructor
-   UsefulAraTestBedStationEvent(RawAraTestBedStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Assignment constructor
-   ~UsefulAraTestBedStationEvent(); ///< Destructor
+   UsefulIcrrStationEvent(); ///< Default constructor
+   UsefulIcrrStationEvent(RawIcrrStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Assignment constructor
+   ~UsefulIcrrStationEvent(); ///< Destructor
 
-   Double_t fVolts[NUM_DIGITIZED_TESTBED_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated voltages
-   Double_t fTimes[NUM_DIGITIZED_TESTBED_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///<Array of the times
-   Int_t fNumPoints[NUM_DIGITIZED_TESTBED_CHANNELS]; ///< Array of the number of valid samples
-   Double_t fVoltsRF[RFCHANS_PER_TESTBED][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved voltages for the RF input channels
-   Double_t fTimesRF[RFCHANS_PER_TESTBED][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
-   Int_t fNumPointsRF[RFCHANS_PER_TESTBED]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
+   Double_t fVolts[NUM_DIGITIZED_ICRR_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated voltages
+   Double_t fTimes[NUM_DIGITIZED_ICRR_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///<Array of the times
+   Int_t fNumPoints[NUM_DIGITIZED_ICRR_CHANNELS]; ///< Array of the number of valid samples
+   Double_t fVoltsRF[RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved voltages for the RF input channels
+   Double_t fTimesRF[RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
+   Int_t fNumPointsRF[RFCHANS_PER_ICRR]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
 
 
-   Int_t getNumElecChannels() {return NUM_DIGITIZED_TESTBED_CHANNELS;}
-   Int_t getNumRFChannels() {return RFCHANS_PER_TESTBED;}
+   Int_t getNumElecChannels() {return NUM_DIGITIZED_ICRR_CHANNELS;}
+   Int_t getNumRFChannels() {return RFCHANS_PER_ICRR;}
    TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel
    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns
@@ -63,8 +63,8 @@ class UsefulAraTestBedStationEvent: public RawAraTestBedStationEvent, public Use
 
    AraEventCalibrator *fCalibrator; ///< Pointer to the AraEventCalibrator
 
-  ClassDef(UsefulAraTestBedStationEvent,1);
+  ClassDef(UsefulIcrrStationEvent,1);
 };
 
 
-#endif //USEFULARATESTBEDSTATIONEVENT_H
+#endif //USEFULICRRSTATIONEVENT_H

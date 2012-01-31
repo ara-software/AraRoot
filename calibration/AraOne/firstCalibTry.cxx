@@ -2,8 +2,8 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraOneStationEvent.h"
-#include "RawAraOneStationEvent.h"
+#include "UsefulAtriStationEvent.h"
+#include "RawAtriStationEvent.h"
 #include "araSoft.h"
 
 //ROOT Includes
@@ -72,7 +72,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
     std::cerr << "Can't find eventTree\n";
     return -1;
   }
-  RawAraOneStationEvent *evPtr=0;
+  RawAtriStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   char histName[180];
   sprintf(histName,"output_root/sineOut_%3.0fMHz_run%d_dda%d_chan%d.root",1000*frequency,run,dda,chan);
@@ -107,7 +107,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
   for(Long64_t i=0;i<numEntries;i++) {
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
-    UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+    UsefulAtriStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
 
     //all the ddas block zero will be the same block
     //the capArray will toggle as we move through the event
@@ -260,7 +260,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
     if(evPtr->blockVec[0].getBlock()==0) continue;
-    UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+    UsefulAtriStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
 
     //For now will assume all the ddas have the same block
     Int_t capArray=evPtr->blockVec[dda].getCapArray();
@@ -427,7 +427,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
     if(i%starEvery==0) std::cerr << "*";
     eventTree->GetEntry(i);
     if(evPtr->blockVec[0].getBlock()==0) continue;
-    UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+    UsefulAtriStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
     
     //For now will assume all the ddas have the same  block
     Int_t capArray=evPtr->blockVec[dda].getCapArray();
@@ -794,11 +794,11 @@ void plotEvent(Int_t event, Int_t block){
   
   TTree *eventTree = (TTree*) fp->Get("eventTree");
 
-  RawAraOneStationEvent *evPtr=0;
+  RawAtriStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr); 
 
   eventTree->GetEntry(event);
-  UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+  UsefulAtriStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
   
   //For now will assume all the ddas have the same block
   Int_t capArray=evPtr->blockVec[0].getCapArray();

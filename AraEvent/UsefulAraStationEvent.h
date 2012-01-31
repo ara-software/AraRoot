@@ -18,7 +18,7 @@
 /*!
   The ROOT implementation of the useful ARA event data
 
-  This is the base class of the useful class for analysing the ARA data. The raw ADC values from a RawAraTestBedStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
+  This is the base class of the useful class for analysing the ARA data. The raw ADC values from a RawIcrrStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
 
   \ingroup rootclasses
 */

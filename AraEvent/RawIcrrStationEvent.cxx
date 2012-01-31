@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraTestBedStationEvent.cxx        ARA header reading class                  /////
+/////  RawIcrrStationEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,42 +7,42 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraTestBedStationEvent.h"
+#include "RawIcrrStationEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraTestBedStationEvent);
+ClassImp(RawIcrrStationEvent);
 
-RawAraTestBedStationEvent::RawAraTestBedStationEvent()   
+RawIcrrStationEvent::RawIcrrStationEvent()   
   :RawAraStationEvent(0)
 {
   //Default Constructor
 }
 
-RawAraTestBedStationEvent::~RawAraTestBedStationEvent() {
+RawIcrrStationEvent::~RawIcrrStationEvent() {
    //Default Destructor
 }
 
 
-RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPtr)
+RawIcrrStationEvent::RawIcrrStationEvent(IcrrEventBody_t *bdPtr)
   :RawAraStationEvent(0),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
-  for(int i=0;i<NUM_DIGITIZED_TESTBED_CHANNELS;i++) {
+  for(int i=0;i<NUM_DIGITIZED_ICRR_CHANNELS;i++) {
     chan[i].fillChannel(&(bdPtr->channel[i]));
   }
 }
 
-RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPtr, UInt_t stationId)
+RawIcrrStationEvent::RawIcrrStationEvent(IcrrEventBody_t *bdPtr, UInt_t stationId)
   :RawAraStationEvent(stationId),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
-  for(int i=0;i<NUM_DIGITIZED_TESTBED_CHANNELS;i++) {
+  for(int i=0;i<NUM_DIGITIZED_ICRR_CHANNELS;i++) {
     chan[i].fillChannel(&(bdPtr->channel[i]));
   }
 }
 
 
 
-Int_t RawAraTestBedStationEvent::getEarliestSample(Int_t chanIndex)
+Int_t RawIcrrStationEvent::getEarliestSample(Int_t chanIndex)
 {
  Int_t lastHitBus=this->getLastHitBus(chanIndex);
  Int_t firstHitbus=this->getFirstHitBus(chanIndex);
@@ -59,7 +59,7 @@ Int_t RawAraTestBedStationEvent::getEarliestSample(Int_t chanIndex)
  return 1;
 }
 
-Int_t RawAraTestBedStationEvent::getLatestSample(Int_t chanIndex)
+Int_t RawIcrrStationEvent::getLatestSample(Int_t chanIndex)
 {
  Int_t lastHitBus=this->getLastHitBus(chanIndex);
  Int_t firstHitbus=this->getFirstHitBus(chanIndex);

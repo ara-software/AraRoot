@@ -1,29 +1,29 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraOneSensorHkData.cxx        Definition of the AraOneSensorHkData            /////
+/////  AtriSensorHkData.cxx        Definition of the AtriSensorHkData            /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that holds AraOneSensorHkData                         /////
+/////     A simple class that holds AtriSensorHkData                         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraOneSensorHkData.h"
+#include "AtriSensorHkData.h"
 #include "TMath.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(AraOneSensorHkData);
+ClassImp(AtriSensorHkData);
 
-AraOneSensorHkData::AraOneSensorHkData() 
+AtriSensorHkData::AtriSensorHkData() 
 {
    //Default Constructor
 }
 
-AraOneSensorHkData::~AraOneSensorHkData() {
+AtriSensorHkData::~AtriSensorHkData() {
    //Default Destructor
 }
 
 
-AraOneSensorHkData::AraOneSensorHkData(AraSensorHk_t *theHk)
+AtriSensorHkData::AtriSensorHkData(AraSensorHk_t *theHk)
   :RawAraGenericHeader(&(theHk->gHdr))
 {
 

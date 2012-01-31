@@ -13,8 +13,8 @@
 #include <TObject.h>
 #include "araSoft.h"
 #include "araOneStructures.h"
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 
 
 #define ADCMV 0.939   /* mV/adc, per Gary's email of 05/04/2006 */
@@ -26,7 +26,7 @@
 
 //!  AraCalType -- The Calibration Type
 /*!
-  There are a number of calibration options available to create a UsefulAraTestBedStationEvent.
+  There are a number of calibration options available to create a UsefulIcrrStationEvent.
   \ingroup rootclasses
 */
 namespace AraCalType {
@@ -52,8 +52,8 @@ namespace AraCalType {
 
 } 
 
-class UsefulAraOneStationEvent;
-class UsefulAraTestBedStationEvent;
+class UsefulAtriStationEvent;
+class UsefulIcrrStationEvent;
 class TGraph; 
 
 //!  AraEventCalibrator -- The Ara Event Calibrator
@@ -71,44 +71,44 @@ class AraEventCalibrator : public TObject
    static AraEventCalibrator*  Instance(); ///< Generates an instance of AraEventCalibrator to use
    
 
-   //TestBed calibrations
+   //Icrr calibrations
    //jd DONE
    void setPedFile(char fileName[], UInt_t stationId); ///< Manually sets the pedestal file
 
    //jd DONE
-   void calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraTestBedStationEvent, called from UsefulAraTestBedStationEvent constructor
+   void calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulIcrrStationEvent, called from UsefulIcrrStationEvent constructor
 
    //jd DONE
-   int doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
+   int doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
    
    //jd?
-   void fillRCOGuessArray(UsefulAraTestBedStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED]); ///< Utility function called by UsefulAraTestBedStationEvent
+   void fillRCOGuessArray(UsefulIcrrStationEvent *theEvent, int rcoGuess[LAB3_PER_ICRR]); ///< Utility function called by UsefulIcrrStationEvent
    
    //jd
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
 
-   void calcClockAlignVals(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
+   void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
    
    //jd? DONE
-   void loadTestBedPedestals(); ///< Loads the pedestals from a file
+   void loadIcrrPedestals(); ///< Loads the pedestals from a file
    //jd? DONE
-   void loadTestBedCalib(); ///< Loads the various calibration constants
+   void loadIcrrCalib(); ///< Loads the various calibration constants
    //jd DONE
    int gotPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a specific pedesal file has been selected
    //jd DONE
    char pedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedesal file
  
    //jd DONE DONE
-   float pedestalData[ICRR_NO_STATIONS][LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
+   float pedestalData[ICRR_NO_STATIONS][LAB3_PER_ICRR][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
    //jd DONE DONE
-   double binWidths[ICRR_NO_STATIONS][LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
+   double binWidths[ICRR_NO_STATIONS][LAB3_PER_ICRR][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
    //jd DONE DONE
-   double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_TESTBED][2]; ///<Array to hold the wrap-around calibration constants
+   double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_ICRR][2]; ///<Array to hold the wrap-around calibration constants
    //jd DONE DONE
    double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
    //jd DONE DONE
-   double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_TESTBED]; //Well by default clock align 0 is 0
+   double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //Well by default clock align 0 is 0
 
    ///These are just utility arrays that are used in the calibration
    double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped
@@ -123,18 +123,18 @@ class AraEventCalibrator : public TObject
    int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
 
 
-   //AraOne Calibrations
-   UShort_t *fAraOnePeds;
-   Int_t fGotAraOnePedFile;
-   char fAraOnePedFile[FILENAME_MAX];
-   Int_t fAraOneSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
-   Double_t fAraOneSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
-   Double_t fAraOneEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
+   //Atri Calibrations
+   UShort_t *fAtriPeds;
+   Int_t fGotAtriPedFile;
+   char fAtriPedFile[FILENAME_MAX];
+   Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
+   Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
+   Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
 
-   void calibrateEvent(UsefulAraOneStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAraOneStationEvent, called from UsefulAraOneStationEvent constructor
-   void setAraOnePedFile(char *filename);
-   void loadAraOnePedestals();
-   void loadAraOneCalib();
+   void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
+   void setAtriPedFile(char *filename);
+   void loadAtriPedestals();
+   void loadAtriCalib();
 
 
 

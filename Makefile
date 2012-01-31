@@ -35,8 +35,8 @@ all :
 	@cd AraEvent; make all
 	@cd AraDisplay; make all
 	@cd AraCorrelator; make all
-	@cd utilities/AraOne; make all
-	@cd utilities/TestBed1; make all
+	@cd utilities/Atri; make all
+	@cd utilities/Icrr; make all
 	@cd AraWebPlotter; make all
 
 
@@ -72,8 +72,8 @@ clean:
 	cd AraEvent; make clean
 	cd AraDisplay; make clean
 	cd AraCorrelator; make clean
-	cd utilities/AraOne; make clean
-	cd utilities/TestBed1; make clean
+	cd utilities/Atri; make clean
+	cd utilities/Icrr; make clean
 	cd AraWebPlotter; make clean
 	@rm -f *Dict*
 	@rm -f *.${OBJSUF}

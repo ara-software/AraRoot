@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  FullAraTestBedHkEvent.cxx        ARA header reading class                  /////
+/////  FullIcrrHkEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,24 +7,24 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "FullAraTestBedHkEvent.h"
+#include "FullIcrrHkEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 
-ClassImp(FullAraTestBedHkEvent);
+ClassImp(FullIcrrHkEvent);
 
-FullAraTestBedHkEvent::FullAraTestBedHkEvent() 
+FullIcrrHkEvent::FullIcrrHkEvent() 
 {
    //Default Constructor
 }
 
-FullAraTestBedHkEvent::~FullAraTestBedHkEvent() {
+FullIcrrHkEvent::~FullIcrrHkEvent() {
    //Default Destructor
 }
 
 
-FullAraTestBedHkEvent::FullAraTestBedHkEvent(AraTestBedHkBody_t *hkBody)
+FullIcrrHkEvent::FullIcrrHkEvent(IcrrHkBody_t *hkBody)
   :trig(&(hkBody->trig)),hk(&(hkBody->hk))
 {
   unixTime=hkBody->hd.unixTime;

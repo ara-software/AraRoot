@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-////// Simple Class to handle making plots from UsefulAraTestBedStationEvent     /////////
+////// Simple Class to handle making plots from UsefulIcrrStationEvent     /////////
 //////                                                             /////////
 ////// rjn@hep.ucl.ac.uk --- December 2010                         /////////
 ////////////////////////////////////////////////////////////////////////////
@@ -14,8 +14,8 @@
 #include "TH1.h"
 #include "AraTimeHistoHandler.h"
 #include "AraHistoHandler.h"
-#include "RawAraTestBedStationEvent.h"
-#include "UsefulAraTestBedStationEvent.h"
+#include "RawIcrrStationEvent.h"
+#include "UsefulIcrrStationEvent.h"
 #include "araTestBedDefines.h"
 
 class AraEventPlotter
@@ -23,11 +23,11 @@ class AraEventPlotter
  public:
   AraEventPlotter(char *plotDir, char *dataDir);
   ~AraEventPlotter();
-  void addEvent(int runNumber,RawAraTestBedStationEvent *rawEvent);
+  void addEvent(int runNumber,RawIcrrStationEvent *rawEvent);
   void makePlots();
   void makeLatestRunPlots();
   void saveFiles();
-  void plotEvent(Int_t runNumber,UsefulAraTestBedStationEvent *usefulEvent);
+  void plotEvent(Int_t runNumber,UsefulIcrrStationEvent *usefulEvent);
   void setEventPlotFlag(int flag) { fEventPlotFlag=flag;}
 
   void loadAllTimeHists();

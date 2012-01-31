@@ -27,7 +27,7 @@ class RawAraGenericHeader
  public:
    RawAraGenericHeader(); ///< Default constructor
    RawAraGenericHeader(AraGenericHeader_t *gHdr); ///< Assignment constructor
-   RawAraGenericHeader(UInt_t stationId); ///< Assignment constructor for ICRR type
+   RawAraGenericHeader(UInt_t station); ///< Assignment constructor for ICRR type
    ~RawAraGenericHeader(); ///< Destructor
  
 

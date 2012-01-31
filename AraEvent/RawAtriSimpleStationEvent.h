@@ -1,33 +1,33 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneSimpleStationEvent.h        Raw ARA event class          /////
+/////  RawAtriSimpleStationEvent.h        Raw ARA event class          /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARAONESIMPLESTATIONEVENT_H
-#define RAWARAONESIMPLESTATIONEVENT_H
+#ifndef RAWATRISIMPLESTATIONEVENT_H
+#define RAWATRISIMPLESTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
 #include "araOneStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrDefines.h"
 #include "RawAraStationEvent.h"
 
-//!  RawAraOneSimpleStationEvent -- The Raw ARA Event Data
+//!  RawAtriSimpleStationEvent -- The Raw ARA Event Data
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses
 */
-class RawAraOneSimpleStationEvent: public RawAraStationEvent
+class RawAtriSimpleStationEvent: public RawAraStationEvent
 {
  public:
-   RawAraOneSimpleStationEvent(); ///< Default constructor
-   RawAraOneSimpleStationEvent(AraSimpleStationEvent_t *theBody); ///< Assignment constructor
-   ~RawAraOneSimpleStationEvent(); ///< Destructor
+   RawAtriSimpleStationEvent(); ///< Default constructor
+   RawAtriSimpleStationEvent(AraSimpleStationEvent_t *theBody); ///< Assignment constructor
+   ~RawAtriSimpleStationEvent(); ///< Destructor
 
-   Int_t getNumChannels() {return NUM_DIGITIZED_TESTBED_CHANNELS;}
+   Int_t getNumChannels() {return NUM_DIGITIZED_ICRR_CHANNELS;}
 
 
    //The data   
@@ -39,7 +39,7 @@ class RawAraOneSimpleStationEvent: public RawAraStationEvent
    UShort_t samples[DDA_PER_ATRI][512]; ///<The samples
 
 
-  ClassDef(RawAraOneSimpleStationEvent,1);
+  ClassDef(RawAtriSimpleStationEvent,1);
 };
 
 

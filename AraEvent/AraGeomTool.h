@@ -12,8 +12,8 @@
 //Includes
 #include <TObject.h>
 #include <TMath.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 #include "AraAntennaInfo.h"
 
 
@@ -51,7 +51,7 @@ class AraGeomTool
    //Instance generator
    static AraGeomTool*  Instance();
    
-   AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_TESTBED];
+   AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR];
    int fAntLookupTable[3][8]; //At som point should lose the magic numbers
    
    //Some variables to do with ice properties

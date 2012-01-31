@@ -13,16 +13,16 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
-#include "araTestbedStructures.h"
-#include "FullAraTestBedHkEvent.h"  
+#include "araOneStructures.h"
+#include "RawAtriSimpleStationEvent.h"  
 
-void processHk();
-void makeHkTree(char *inputName, char *outDir);
+void process();
+void makeTree(char *inputName, char *outDir);
 
-AraTestBedHkBody_t theHkBody;
+AraSimpleStationEvent_t theEventStruct;
 TFile *theFile;
-TTree *hkTree;
-FullAraTestBedHkEvent *theHk=0;
+TTree *eventTree;
+RawAtriSimpleStationEvent *theEvent=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -36,16 +36,16 @@ int main(int argc, char **argv) {
   }
   if(argc==4) 
     runNumber=atoi(argv[3]);
-  makeHkTree(argv[1],argv[2]);
+  makeTree(argv[1],argv[2]);
   return 0;
 }
   
 
-void makeHkTree(char *inputName, char *outFile) {
+void makeTree(char *inputName, char *outFile) {
   cout << inputName << "\t" << outFile << endl;
   strncpy(outName,outFile,FILENAME_MAX);
-  theHk = new FullAraTestBedHkEvent();
-  //    cout << sizeof(AraTestBedHkBody_t) << endl;
+  theEvent = new RawAtriSimpleStationEvent();
+  //    cout << sizeof(AraSimpleStationEvent_t) << endl;
   ifstream SillyFile(inputName);
 
   int numBytes=0;
@@ -67,28 +67,32 @@ void makeHkTree(char *inputName, char *outFile) {
     //    sscanf(justRun,"run%d",&runNumber);
     
     gzFile infile = gzopen (fileName, "rb");    
+    //    std::cout << "gzeof: " << gzeof(infile) << "\n";
     for(int i=0;i<1000;i++) {	
       //      cout << i << endl;
-      numBytes=gzread(infile,&theHkBody,sizeof(AraTestBedHkBody_t));
-      if(numBytes!=sizeof(AraTestBedHkBody_t)) {
+      numBytes=gzread(infile,&theEventStruct,sizeof(AraSimpleStationEvent_t));
+      //      std::cout << numBytes << "\n";
+      if(numBytes==0) break;
+      if(numBytes!=sizeof(AraSimpleStationEvent_t)) {
 	if(numBytes)
-	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraTestBedHkBody_t) << endl;
+	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraSimpleStationEvent_t) << endl;
 	error=1;
 	break;
       }
-      //      cout << "Hk: " << theHkBody.hd.eventNumber << endl;
-      processHk();
+      //      cout << ": " << theEventStruct.unixTime << endl;
+      process();
     }
     gzclose(infile);
     //	if(error) break;
   }
-  hkTree->AutoSave();
+  if(eventTree)
+    eventTree->AutoSave();
   //    theFile->Close();
 }
 
 
-void processHk() {
-  //  cout << "processHk:\t" << theHkBody.eventNumber << endl;
+void process() {
+  //  cout << "process:\t" << theEventStruct.eventNumber << endl;
   static int doneInit=0;
   
   if(!doneInit) {
@@ -99,16 +103,16 @@ void processHk() {
     //    sprintf(fileName,"%s/eventFile%d.root",dirName,runNumber);
     cout << "Creating File: " << outName << endl;
     theFile = new TFile(outName,"RECREATE");
-    hkTree = new TTree("hkTree","Tree of ARA Hks");
-    hkTree->Branch("run",&runNumber,"run/I");
-    hkTree->Branch("event","FullAraTestBedHkEvent",&theHk);
+    eventTree = new TTree("eventTree","Tree of ARA Event's");
+    eventTree->Branch("run",&runNumber,"run/I");
+    eventTree->Branch("event","RawAtriSimpleStationEvent",&theEvent);
     
     doneInit=1;
   }  
-  //  cout << "Here: "  << theHk.eventNumber << endl;
-  if(theHk) delete theHk;
-  theHk = new FullAraTestBedHkEvent(&theHkBody);
-  hkTree->Fill();  
+  //  cout << "Here: "  << theEvent.eventNumber << endl;
+  if(theEvent) delete theEvent;
+  theEvent = new RawAtriSimpleStationEvent(&theEventStruct);
+  eventTree->Fill();  
   lastRunNumber=runNumber;
-  //  delete theHk;
+  //  delete theEvent;
 }

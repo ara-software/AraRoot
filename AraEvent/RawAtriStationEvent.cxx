@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneStationEvent.cxx        ARA header reading class   /////
+/////  RawAtriStationEvent.cxx        ARA header reading class   /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,23 +7,23 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraOneStationEvent.h"
+#include "RawAtriStationEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraOneStationEvent);
+ClassImp(RawAtriStationEvent);
 
-RawAraOneStationEvent::RawAraOneStationEvent()   
+RawAtriStationEvent::RawAtriStationEvent()   
 {  
   //Default Constructor
 }
 
-RawAraOneStationEvent::~RawAraOneStationEvent() {
+RawAtriStationEvent::~RawAtriStationEvent() {
    //Default Destructor
 }
 
 
-RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer) ///< Assignment constructor
+RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer) ///< Assignment constructor
   :/*RawAraGenericHeader(&(hdPtr->gHdr)),*/RawAraStationEvent(hdPtr->gHdr.stationId, &(hdPtr->gHdr))
 {
   
@@ -49,7 +49,7 @@ RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, cha
      AraStationEventBlockHeader_t *blkPtr = (AraStationEventBlockHeader_t*)&dataBuffer[uptoByte];     
      uptoByte+=sizeof(AraStationEventBlockHeader_t);
      AraStationEventBlockChannel_t *chanPtr = (AraStationEventBlockChannel_t*)&dataBuffer[uptoByte];
-     RawAraOneStationBlock blocky(blkPtr,chanPtr);
+     RawAtriStationBlock blocky(blkPtr,chanPtr);
      blockVec.push_back(blocky);
      int numChan=blocky.getNumChannels();
 

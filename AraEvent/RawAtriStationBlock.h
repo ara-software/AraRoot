@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneStationBlock.h        Raw ARA station block class        /////
+/////  RawAtriStationBlock.h        Raw ARA station block class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that is a wraper for                            /////
@@ -8,8 +8,8 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARAONESTATIONBLOCK_H
-#define RAWARAONESTATIONBLOCK_H
+#ifndef RAWATRISTATIONBLOCK_H
+#define RAWATRISTATIONBLOCK_H
 
 //Includes
 #include <vector>
@@ -20,17 +20,17 @@
 
 
 
-//!  RawAraOneStationBlock -- The Raw ARA Station Block Class
+//!  RawAtriStationBlock -- The Raw ARA Station Block Class
 /*!
   The ROOT implementation of the raw ARA Station Block containing the samples from one block readout of the IRS
   \ingroup rootclasses
 */
-class RawAraOneStationBlock: public TObject
+class RawAtriStationBlock: public TObject
 {
  public:
-   RawAraOneStationBlock(); ///< Default constructor
-   RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels); ///< Assignment constructor
-   ~RawAraOneStationBlock(); ///< Destructor
+   RawAtriStationBlock(); ///< Default constructor
+   RawAtriStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels); ///< Assignment constructor
+   ~RawAtriStationBlock(); ///< Destructor
 
 
    //Extra stuff
@@ -50,10 +50,10 @@ class RawAraOneStationBlock: public TObject
    int getCapArray() { return (irsBlockNumber&0x4)>>2;}
 
 
-  ClassDef(RawAraOneStationBlock,1);
+  ClassDef(RawAtriStationBlock,1);
 };
 
 
 
 
-#endif //RAWARAONESTATIONBLOCK
+#endif //RAWATRISTATIONBLOCK

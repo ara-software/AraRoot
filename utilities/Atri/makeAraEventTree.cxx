@@ -14,15 +14,16 @@ using namespace std;
 #define HACK_FOR_ROOT
 
 #include "araOneStructures.h"
-#include "AraOneEventHkData.h"  
+#include "RawAtriStationEvent.h"  
 
-void processHk();
-void makeHkTree(char *inputName, char *outDir);
+void process();
+void makeTree(char *inputName, char *outDir);
 
-AraEventHk_t theEventHkStruct;
+AraStationEventHeader_t theEventHeader;
+char *dataBuffer;
 TFile *theFile;
-TTree *eventHkTree;
-AraOneEventHkData *theEventHk=0;
+TTree *eventTree;
+RawAtriStationEvent *theEvent=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
@@ -30,22 +31,25 @@ Int_t lastRunNumber;
 
 
 int main(int argc, char **argv) {
+  dataBuffer = new char[200000];
+  theEvent=0;
   if(argc<3) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
   if(argc==4) 
     runNumber=atoi(argv[3]);
-  makeHkTree(argv[1],argv[2]);
+  makeTree(argv[1],argv[2]);
+  delete [] dataBuffer;
   return 0;
 }
   
 
-void makeHkTree(char *inputName, char *outFile) {
+void makeTree(char *inputName, char *outFile) {
   cout << inputName << "\t" << outFile << endl;
   strncpy(outName,outFile,FILENAME_MAX);
-  theEventHk = new AraOneEventHkData();
-  //    cout << sizeof(AraEventHk_t) << endl;
+  theEvent = new RawAtriStationEvent();
+  //    cout << sizeof(AraStationEventHeader_t) << endl;
   ifstream SillyFile(inputName);
 
   int numBytes=0;
@@ -70,31 +74,53 @@ void makeHkTree(char *inputName, char *outFile) {
     //    std::cout << "gzeof: " << gzeof(infile) << "\n";
     for(int i=0;i<1000;i++) {	
       //      cout << i << endl;
-      numBytes=gzread(infile,&theEventHkStruct,sizeof(AraEventHk_t));
+      numBytes=gzread(infile,&theEventHeader,sizeof(AraStationEventHeader_t));
       //      std::cout << numBytes << "\n";
       if(numBytes==0) break;
-      if(numBytes!=sizeof(AraEventHk_t)) {
+      if(numBytes!=sizeof(AraStationEventHeader_t)) {
 	if(numBytes)
-	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraEventHk_t) << endl;
+	  cerr << "Read problem: " <<numBytes << " of " << sizeof(AraStationEventHeader_t) << endl;
 	error=1;
 	break;
       }
-      //      cout << "Hk: " << theEventHkStruct.unixTime << endl;
-      processHk();
-    }
+      if(theEventHeader.gHdr.numBytes>0) {
+	//	std::cout << "Num bytes: " << theEventHeader.gHdr.numBytes << "\t" << theEventHeader.numBytes << "\n";
+	//	std::cout << "Event number: " << theEventHeader.eventNumber << "\t" << theEventHeader.unixTime << "\t" << theEventHeader.unixTimeUs << "\n";
+	
+	
+	Int_t numDataBytes=theEventHeader.gHdr.numBytes-sizeof(AraStationEventHeader_t);
+	numBytes=gzread(infile,dataBuffer,numDataBytes);
+	//	std::cout << numBytes << "\n";
+	if(numBytes==0) break;
+	if(numBytes!=numDataBytes) {
+	  if(numBytes)
+	    cerr << "Read problem: " <<numBytes << " of " <<  numDataBytes << endl;
+	  error=1;
+	  break;
+	}
+	process();
+     	//	exit(0);
+      }
+      else {
+	std::cerr << "How can gHdr.numBytes = " << theEventHeader.gHdr.numBytes << "\n";
+	error=1;
+	break;
+      }
+
+      //      cout << ": " << theEventHeader.unixTime << endl;
+     }
     gzclose(infile);
     //	if(error) break;
   }
-  if(eventHkTree)
-    eventHkTree->AutoSave();
+  if(eventTree)
+    eventTree->AutoSave();
   //    theFile->Close();
 }
 
 
-void processHk() {
-  //  cout << "processHk:\t" << theEventHkStruct.eventNumber << endl;
+void process() {
+  //  cout << "process:\t" << theEventHeader.eventNumber << endl;
   static int doneInit=0;
-  
   if(!doneInit) {
     //    char dirName[FILENAME_MAX];
     //    char fileName[FILENAME_MAX];
@@ -103,16 +129,17 @@ void processHk() {
     //    sprintf(fileName,"%s/eventFile%d.root",dirName,runNumber);
     cout << "Creating File: " << outName << endl;
     theFile = new TFile(outName,"RECREATE");
-    eventHkTree = new TTree("eventHkTree","Tree of ARA Hks");
-    eventHkTree->Branch("run",&runNumber,"run/I");
-    eventHkTree->Branch("eventHk","AraOneEventHkData",&theEventHk);
+    eventTree = new TTree("eventTree","Tree of ARA Event's");
+    eventTree->Branch("run",&runNumber,"run/I");
+    eventTree->Branch("event","RawAtriStationEvent",&theEvent);
     
     doneInit=1;
   }  
-  //  cout << "Here: "  << theEventHk.eventNumber << endl;
-  if(theEventHk) delete theEventHk;
-  theEventHk = new AraOneEventHkData(&theEventHkStruct);
-  eventHkTree->Fill();  
+  //  cout << "Here: "  << theEvent.eventNumber << endl;
+  if(theEvent) delete theEvent;
+  
+  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer);
+  eventTree->Fill();  
   lastRunNumber=runNumber;
-  //  delete theEventHk;
+  //  delete theEvent;
 }

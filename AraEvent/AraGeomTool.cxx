@@ -58,22 +58,22 @@ void AraGeomTool::readChannelMap()
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
 
-  sprintf(fileName,"%s/Testbed.csv",calibDir);
-  std::ifstream TestBedMap(fileName);
-  if(!TestBedMap) {
+  sprintf(fileName,"%s/TestBed.csv",calibDir);
+  std::ifstream IcrrMap(fileName);
+  if(!IcrrMap) {
     std::cerr << "Couldn't open:\t" << fileName << " don't know where anything is.\n";
     return;
   }
 
   //Now we can try and read the file and parse it something useful
   TString line;
-  line.ReadLine(TestBedMap); ///<Ths is the header line
+  line.ReadLine(IcrrMap); ///<Ths is the header line
   //  std::cout << line.Data() << "\n";
-  line.ReadLine(TestBedMap); ///<Ths is the second header line
+  line.ReadLine(IcrrMap); ///<Ths is the second header line
   //  std::cout << line.Data() << "\n";
-  for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+  for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
     //Loop over the antenna lines;
-    line.ReadLine(TestBedMap);
+    line.ReadLine(IcrrMap);
     //    std::cout << line.Data();
     TObjArray *tokens = line.Tokenize(",");
     //    std::cout << tokens->GetEntries() << "\n"; 
@@ -338,9 +338,9 @@ Double_t AraGeomTool::calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Doub
 
 Double_t AraGeomTool::calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave)
 {
-  if(chan1<0 || chan1>=TOTAL_ANTS_PER_TESTBED)
+  if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)
     return 0;
-  if(chan2<0 || chan2>=TOTAL_ANTS_PER_TESTBED)
+  if(chan2<0 || chan2>=TOTAL_ANTS_PER_ICRR)
     return 0;
   return calcDeltaTInfinity(fAntInfo[chan1].antLocation,fAntInfo[chan2].antLocation,phiWave,thetaWave);            
 }
@@ -364,9 +364,9 @@ Double_t AraGeomTool::calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t p
 
 Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R)
 {
-  if(chan1<0 || chan1>=TOTAL_ANTS_PER_TESTBED)
+  if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)
     return 0;
-  if(chan2<0 || chan2>=TOTAL_ANTS_PER_TESTBED)
+  if(chan2<0 || chan2>=TOTAL_ANTS_PER_ICRR)
     return 0;
   return calcDeltaTR(fAntInfo[chan1].antLocation,fAntInfo[chan2].antLocation,phiWave,thetaWave,R);   
 

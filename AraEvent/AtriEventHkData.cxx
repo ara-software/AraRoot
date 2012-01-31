@@ -1,29 +1,29 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraOneEventHkData.cxx        Definition of the AraOneEventHkData            /////
+/////  AtriEventHkData.cxx        Definition of the AtriEventHkData            /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that holds AraOneEventHkData                         /////
+/////     A simple class that holds AtriEventHkData                         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraOneEventHkData.h"
+#include "AtriEventHkData.h"
 #include "TMath.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(AraOneEventHkData);
+ClassImp(AtriEventHkData);
 
-AraOneEventHkData::AraOneEventHkData() 
+AtriEventHkData::AtriEventHkData() 
 {
    //Default Constructor
 }
 
-AraOneEventHkData::~AraOneEventHkData() {
+AtriEventHkData::~AtriEventHkData() {
    //Default Destructor
 }
 
 
-AraOneEventHkData::AraOneEventHkData(AraEventHk_t *theHk)
+AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   :RawAraGenericHeader(&(theHk->gHdr))
 {
   unixTime=theHk->unixTime; ///< Time in seconds (64-bits for future proofing)

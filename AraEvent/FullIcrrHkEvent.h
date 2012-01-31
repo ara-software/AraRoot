@@ -1,45 +1,45 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  FullAraTestBedHkEvent.h        Raw ARA hk class                      /////
+/////  FullIcrrHkEvent.h        Raw ARA hk class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef FULLARATESTBEDHKEVENT_H
-#define FULLARATESTBEDHKEVENT_H
+#ifndef FULLICRRHKEVENT_H
+#define FULLICRRHKEVENT_H
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
-#include "AraTestBedTriggerMonitor.h"
-#include "AraTestBedHkData.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
+#include "IcrrTriggerMonitor.h"
+#include "IcrrHkData.h"
 
-//!  FullAraTestBedHkEvent -- The ARA Hk Data
+//!  FullIcrrHkEvent -- The ARA Hk Data
 /*!
   The ROOT implementation of the raw ARA housekeeping data
   \ingroup rootclasses
 */
-class FullAraTestBedHkEvent: public TObject
+class FullIcrrHkEvent: public TObject
 {
  public:
-   FullAraTestBedHkEvent(); ///< Default constructor
-   FullAraTestBedHkEvent(AraTestBedHkBody_t *theHk); ///< Assignment constructor
-   ~FullAraTestBedHkEvent(); ///< Destructor
+   FullIcrrHkEvent(); ///< Default constructor
+   FullIcrrHkEvent(IcrrHkBody_t *theHk); ///< Assignment constructor
+   ~FullIcrrHkEvent(); ///< Destructor
 
    unsigned int unixTime;
    unsigned int unixTimeUs;
    unsigned int eventNumber;
    unsigned int errorFlag;
    
-   AraTestBedTriggerMonitor trig; ///< The trigger
-   AraTestBedHkData hk; ///< The hk
+   IcrrTriggerMonitor trig; ///< The trigger
+   IcrrHkData hk; ///< The hk
    
    
 
-  ClassDef(FullAraTestBedHkEvent,1);
+  ClassDef(FullIcrrHkEvent,1);
 };
 
 
-#endif //FULLARATESTBEDHKEVENT_H
+#endif //FULLICRRHKEVENT_H

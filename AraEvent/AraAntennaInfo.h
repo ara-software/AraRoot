@@ -11,9 +11,9 @@
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
-#include "RawAraTestBedStationEvent.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
+#include "RawIcrrStationEvent.h"
 #include "AraEventCalibrator.h"
 
 //!  AraAntennaInfo -- ARA Antenna Information

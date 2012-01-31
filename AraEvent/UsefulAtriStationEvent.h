@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAraOneStationEvent.h        Useful ARA event class          /////
+/////  UsefulAtriStationEvent.h        Useful ARA event class          /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing useful ARA events in a TTree        /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef USEFULARAONESTATIONEVENT_H
-#define USEFULARAONESTATIONEVENT_H
+#ifndef USEFULATRISTATIONEVENT_H
+#define USEFULATRISTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
@@ -17,24 +17,24 @@
 #include <map>
 
 #include "UsefulAraStationEvent.h"
-#include "RawAraOneStationEvent.h"
+#include "RawAtriStationEvent.h"
 #include "AraEventCalibrator.h"
 
 
-//!  UsefulAraOneStationEvent -- The Useful ARA Event Data
+//!  UsefulAtriStationEvent -- The Useful ARA Event Data
 /*!
   The ROOT implementation of the useful ARA event data
 
-  This is the base class of the useful class for analysing the ARA data. The raw ADC values from a RawAraOneStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
+  This is the base class of the useful class for analysing the ARA data. The raw ADC values from a RawAtriStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
 
   \ingroup rootclasses
 */
-class UsefulAraOneStationEvent: public RawAraOneStationEvent, public UsefulAraStationEvent
+class UsefulAtriStationEvent: public RawAtriStationEvent, public UsefulAraStationEvent
 {
  public:
-   UsefulAraOneStationEvent(); ///< Default constructor
-   UsefulAraOneStationEvent(RawAraOneStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
-   ~UsefulAraOneStationEvent(); ///< Destructor
+   UsefulAtriStationEvent(); ///< Default constructor
+   UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
+   ~UsefulAtriStationEvent(); ///< Destructor
 
 
    Int_t getNumElecChannels() {return fNumChannels;} ///< Or may not be the same
@@ -48,8 +48,8 @@ class UsefulAraOneStationEvent: public RawAraOneStationEvent, public UsefulAraSt
    std::map< Int_t, std::vector <Double_t> > fVolts; ///< The voltages of samples
 
 
-  ClassDef(UsefulAraOneStationEvent,1);
+  ClassDef(UsefulAtriStationEvent,1);
 };
 
 
-#endif //USEFULARAONESTATIONEVENT_H
+#endif //USEFULATRISTATIONEVENT_H

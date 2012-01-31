@@ -1,33 +1,33 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraRawTestBedRFChannel.cxx        Definition of the AraRawTestBedRFChannel            /////
+/////  AraRawIcrrRFChannel.cxx        Definition of the AraRawIcrrRFChannel            /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that holds AraRawTestBedRFChannel                         /////
+/////     A simple class that holds AraRawIcrrRFChannel                         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraRawTestBedRFChannel.h"
+#include "AraRawIcrrRFChannel.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(AraRawTestBedRFChannel);
+ClassImp(AraRawIcrrRFChannel);
 
-AraRawTestBedRFChannel::AraRawTestBedRFChannel() 
+AraRawIcrrRFChannel::AraRawIcrrRFChannel() 
 {
    //Default Constructor
 }
 
-AraRawTestBedRFChannel::~AraRawTestBedRFChannel() {
+AraRawIcrrRFChannel::~AraRawIcrrRFChannel() {
    //Default Destructor
 }
 
 
-AraRawTestBedRFChannel::AraRawTestBedRFChannel(AraTestBedAraTestBedRFChannelFull_t *rfPtr)
+AraRawIcrrRFChannel::AraRawIcrrRFChannel(IcrrIcrrRFChannelFull_t *rfPtr)
 {
   fillChannel(rfPtr);
 }
 
-void AraRawTestBedRFChannel::fillChannel(AraTestBedAraTestBedRFChannelFull_t *rfPtr)
+void AraRawIcrrRFChannel::fillChannel(IcrrIcrrRFChannelFull_t *rfPtr)
 {
   chanId=rfPtr->header.chanId;
   chipIdFlag=rfPtr->header.chipIdFlag;
@@ -36,7 +36,7 @@ void AraRawTestBedRFChannel::fillChannel(AraTestBedAraTestBedRFChannelFull_t *rf
   memcpy(data,rfPtr->data,MAX_NUMBER_SAMPLES_LAB3*sizeof(UShort_t));
 }
 
-Int_t AraRawTestBedRFChannel::getEarliestSample()
+Int_t AraRawIcrrRFChannel::getEarliestSample()
 {
  Int_t lastHitBus=this->getLastHitBus();
  Int_t firstHitbus=this->getFirstHitBus();
@@ -53,7 +53,7 @@ Int_t AraRawTestBedRFChannel::getEarliestSample()
  return 1;
 }
 
-Int_t AraRawTestBedRFChannel::getLatestSample()
+Int_t AraRawIcrrRFChannel::getLatestSample()
 {
  Int_t lastHitBus=this->getLastHitBus();
  Int_t firstHitbus=this->getFirstHitBus();

@@ -1,31 +1,31 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraRawTestBedRFChannel.h        Raw RF channel class                        /////
+/////  AraRawIcrrRFChannel.h        Raw RF channel class                        /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw RF channel data                 /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARARAWTESTBEDRFCHANNEL_H
-#define ARARAWTESTBEDRFCHANNEL_H
+#ifndef ARARAWICRRRFCHANNEL_H
+#define ARARAWICRRRFCHANNEL_H
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 
-//!  AraRawTestBedRFChannel -- The Raw ARA Event Data
+//!  AraRawIcrrRFChannel -- The Raw ARA Event Data
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses
 */
-class AraRawTestBedRFChannel: public TObject
+class AraRawIcrrRFChannel: public TObject
 {
  public:
-   AraRawTestBedRFChannel(); ///< Default constructor
-   AraRawTestBedRFChannel(AraTestBedAraTestBedRFChannelFull_t *rfChan); ///< Assignment constructor
-   ~AraRawTestBedRFChannel(); ///< Destructor
-   void fillChannel(AraTestBedAraTestBedRFChannelFull_t *rfChan);
+   AraRawIcrrRFChannel(); ///< Default constructor
+   AraRawIcrrRFChannel(IcrrIcrrRFChannelFull_t *rfChan); ///< Assignment constructor
+   ~AraRawIcrrRFChannel(); ///< Destructor
+   void fillChannel(IcrrIcrrRFChannelFull_t *rfChan);
    
    //!  Channel Id
    /*!
@@ -75,8 +75,8 @@ class AraRawTestBedRFChannel: public TObject
    Int_t getLatestSample(); ///<Returns the latest sample in the waveform
    Int_t getEarliestSample(); ///< Returns the earliest sample in the waveform
    
-   ClassDef(AraRawTestBedRFChannel,1);
+   ClassDef(AraRawIcrrRFChannel,1);
 };
 
 
-#endif //ARARAWTESTBEDRFCHANNEL_H
+#endif //ARARAWICRRRFCHANNEL_H

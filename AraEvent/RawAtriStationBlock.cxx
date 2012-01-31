@@ -7,23 +7,23 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraOneStationBlock.h"
+#include "RawAtriStationBlock.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraOneStationBlock);
+ClassImp(RawAtriStationBlock);
 
-RawAraOneStationBlock::RawAraOneStationBlock()   
+RawAtriStationBlock::RawAtriStationBlock()   
 {  
   //Default Constructor
 }
 
-RawAraOneStationBlock::~RawAraOneStationBlock() {
+RawAtriStationBlock::~RawAtriStationBlock() {
    //Default Destructor
 }
 
 
-RawAraOneStationBlock::RawAraOneStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels) ///< Assignment constructor
+RawAtriStationBlock::RawAtriStationBlock(AraStationEventBlockHeader_t *hdPtr, AraStationEventBlockChannel_t *channels) ///< Assignment constructor
 {
   irsBlockNumber=hdPtr->irsBlockNumber;
   channelMask=hdPtr->channelMask;

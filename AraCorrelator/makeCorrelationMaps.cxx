@@ -6,8 +6,8 @@
 #include "TSystem.h"
 #include "TH2.h"
 
-#include "RawAraTestBedStationEvent.h"  
-#include "UsefulAraTestBedStationEvent.h"
+#include "RawIcrrStationEvent.h"  
+#include "UsefulIcrrStationEvent.h"
 #include "AraEventCorrelator.h"
 
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     std::cerr << "Can't get eventTree\n";
     return -1;
   }
-  RawAraTestBedStationEvent *rawEvPtr=0;
+  RawIcrrStationEvent *rawEvPtr=0;
   eventTree->SetBranchAddress("event",&rawEvPtr);
   
   TFile *fpOut = new TFile(argv[2],"RECREATE");
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
   for(int i=0;i<50;i++) {
     eventTree->GetEvent(i);
     fpOut->cd();
-    UsefulAraTestBedStationEvent usefulEvent(rawEvPtr,AraCalType::kFirstCalib);
+    UsefulIcrrStationEvent usefulEvent(rawEvPtr,AraCalType::kFirstCalib);
     TH2D *histMap = theCorrelator->getInterferometricMap(&usefulEvent,AraAntPol::kVertical);
     sprintf(histName,"vmap%d",i);
     histMap->SetName(histName);

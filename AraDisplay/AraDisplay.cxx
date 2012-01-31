@@ -50,10 +50,10 @@
 #include "AraControlPanel.h"
 
 //Event Reader Includes
-#include "UsefulAraTestBedStationEvent.h"
-#include "RawAraTestBedStationEvent.h"
-#include "UsefulAraOneStationEvent.h"
-#include "RawAraOneStationEvent.h"
+#include "UsefulIcrrStationEvent.h"
+#include "RawIcrrStationEvent.h"
+#include "UsefulAtriStationEvent.h"
+#include "RawAtriStationEvent.h"
 
 //ROOT Includes
 #include "TROOT.h"
@@ -192,12 +192,12 @@ int AraDisplay::getEventEntry()
   if(fTBData) {
     if(fTBUsefulEventPtr)
     delete fTBUsefulEventPtr;
-    fTBUsefulEventPtr = new UsefulAraTestBedStationEvent(fTBRawEventPtr,fCalType);
+    fTBUsefulEventPtr = new UsefulIcrrStationEvent(fTBRawEventPtr,fCalType);
   }
   else {
     if(fUsefulEventPtr)
     delete fUsefulEventPtr;
-    fUsefulEventPtr = new UsefulAraOneStationEvent(fRawEventPtr,fCalType);
+    fUsefulEventPtr = new UsefulAtriStationEvent(fRawEventPtr,fCalType);
   }
   
   //Need to make configurable at some point

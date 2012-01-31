@@ -9,7 +9,7 @@
 #include <iostream>
 #include "AraCanvasMaker.h"
 #include "AraGeomTool.h"
-#include "UsefulAraOneStationEvent.h"
+#include "UsefulAtriStationEvent.h"
 #include "AraWaveformGraph.h"
 #include "AraEventCorrelator.h"
 #include "AraFFTGraph.h"
@@ -150,7 +150,7 @@ AraCanvasMaker*  AraCanvasMaker::Instance()
 }
 
 
-TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAraOneStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
+TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
 {
    static UInt_t lastEventNumber=0;
    static TPaveText *leftPave=0;
@@ -275,7 +275,7 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAraOneStationEvent *evPtr,  TPad 
 }
 
 
-TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStationEvent *evPtr,  TPad *useCan)
+TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationEvent *evPtr,  TPad *useCan)
 {
   TPad *retCan=0;
   fWebPlotterMode=1;
@@ -439,7 +439,7 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAraOneStatio
 
 }
 
-TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
+TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
 					   TPad *useCan)
 {
   TPad *retCan=0;
@@ -622,7 +622,7 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAraOneStationEvent *evPtr,
 }
 
 
-TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAraOneStationEvent *evPtr,TPad *useCan)
+TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
@@ -745,7 +745,7 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAraOneStationEvent *evPtr,TPad 
 }
 
 
-TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAraOneStationEvent *evPtr,
+TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
 					     TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
@@ -828,7 +828,7 @@ TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAraOneStationEvent *evPtr,
 
 }
 
-TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAraOneStationEvent *evPtr,
+TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 					 TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
@@ -922,7 +922,7 @@ TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAraOneStationEvent *evPtr,
 }
 
 
-TPad *AraCanvasMaker::getAntennaCanvas(UsefulAraOneStationEvent *evPtr,
+TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 				       TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
@@ -1025,7 +1025,7 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAraOneStationEvent *evPtr,
 }
 
 
-TPad *AraCanvasMaker::getIntMapCanvas(UsefulAraOneStationEvent *evPtr,
+TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
 				       TPad *useCan)
 {
   static UInt_t lastEventNumber=0;

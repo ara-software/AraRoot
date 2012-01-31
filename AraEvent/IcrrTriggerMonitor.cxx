@@ -1,30 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraTestBedTriggerMonitor.cxx        Definition of the AraTestBedTriggerMonitor            /////
+/////  IcrrTriggerMonitor.cxx        Definition of the IcrrTriggerMonitor            /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that holds AraTestBedTriggerMonitor                         /////
+/////     A simple class that holds IcrrTriggerMonitor                         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraTestBedTriggerMonitor.h"
+#include "IcrrTriggerMonitor.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(AraTestBedTriggerMonitor);
+ClassImp(IcrrTriggerMonitor);
 
 
 
-AraTestBedTriggerMonitor::AraTestBedTriggerMonitor() 
+IcrrTriggerMonitor::IcrrTriggerMonitor() 
 {
    //Default Constructor
 }
 
-AraTestBedTriggerMonitor::~AraTestBedTriggerMonitor() {
+IcrrTriggerMonitor::~IcrrTriggerMonitor() {
    //Default Destructor
 }
 
 
-AraTestBedTriggerMonitor::AraTestBedTriggerMonitor(AraTestBedTriggerMonitorStruct_t *theTrig)
+IcrrTriggerMonitor::IcrrTriggerMonitor(IcrrTriggerMonitorStruct_t *theTrig)
 {
   trigType=theTrig->trigType;
   ppsNum=theTrig->ppsNum;
@@ -39,7 +39,7 @@ AraTestBedTriggerMonitor::AraTestBedTriggerMonitor(AraTestBedTriggerMonitorStruc
   rcoCount[2]=theTrig->rcoCount[2];
 }
 
-Int_t AraTestBedTriggerMonitor::isInTrigPattern(int bit)
+Int_t IcrrTriggerMonitor::isInTrigPattern(int bit)
 {
   if(bit<0 || bit>15) return 0;
   if(trigPattern & (1<<bit))
@@ -47,7 +47,7 @@ Int_t AraTestBedTriggerMonitor::isInTrigPattern(int bit)
   return 0;
 }
 
-Int_t AraTestBedTriggerMonitor::isInTrigType(int bit)
+Int_t IcrrTriggerMonitor::isInTrigType(int bit)
 {
   if(bit<0 || bit>2) return 0;
   if(trigType & (1<<bit))
@@ -55,12 +55,12 @@ Int_t AraTestBedTriggerMonitor::isInTrigType(int bit)
   return 0;
 }
 
-Double_t AraTestBedTriggerMonitor::getDeadtime()
+Double_t IcrrTriggerMonitor::getDeadtime()
 {
   return ((deadTime1*65536.0+deadTime2*1.0)/10000000.0);
 }
 
-UInt_t AraTestBedTriggerMonitor::getRubidiumTriggerTime()
+UInt_t IcrrTriggerMonitor::getRubidiumTriggerTime()
 {
   UInt_t lsb=rovdd[1];
   UInt_t msb=rovdd[0];
@@ -68,7 +68,7 @@ UInt_t AraTestBedTriggerMonitor::getRubidiumTriggerTime()
   return lsb;
 } ///<Returns the 32-bit (well maybe 28-bit) trigger time
 
-Double_t AraTestBedTriggerMonitor::getRubidiumTriggerTimeInSec()
+Double_t IcrrTriggerMonitor::getRubidiumTriggerTimeInSec()
 {
   UInt_t rbTime=getRubidiumTriggerTime();
   if(rbTime>=RUBIDIUM_FREQUENCY) {

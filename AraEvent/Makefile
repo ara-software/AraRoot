@@ -20,8 +20,8 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 #Now the bits we're actually compiling
 ROOT_LIBRARY = libAraEvent.${DLLSUF}
-LIB_OBJS = RawAraTestBedStationHeader.o RawAraTestBedStationEvent.o RawAraStationEvent.o  FullAraTestBedHkEvent.o AraEventCalibrator.o AraTestBedTriggerMonitor.o AraTestBedHkData.o AraRawTestBedRFChannel.o AraAntennaInfo.o AraGeomTool.o  UsefulAraStationEvent.o UsefulAraTestBedStationEvent.o AraOneEventHkData.o AraOneSensorHkData.o RawAraOneSimpleStationEvent.o RawAraOneStationBlock.o RawAraGenericHeader.o RawAraOneStationEvent.o UsefulAraOneStationEvent.o eventDict.o
-CLASS_HEADERS =RawAraTestBedStationHeader.h RawAraTestBedStationEvent.h  RawAraStationEvent.h  FullAraTestBedHkEvent.h  AraEventCalibrator.h AraTestBedTriggerMonitor.h AraTestBedHkData.h AraRawTestBedRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h UsefulAraTestBedStationEvent.h araTestbedStructures.h AraOneEventHkData.h AraOneSensorHkData.h araOneStructures.h araSoft.h araTestBedDefines.h RawAraOneSimpleStationEvent.h RawAraOneStationBlock.h RawAraGenericHeader.h RawAraOneStationEvent.h UsefulAraOneStationEvent.h
+LIB_OBJS = RawIcrrStationHeader.o RawIcrrStationEvent.o RawAraStationEvent.o  FullIcrrHkEvent.o AraEventCalibrator.o IcrrTriggerMonitor.o IcrrHkData.o AraRawIcrrRFChannel.o AraAntennaInfo.o AraGeomTool.o  UsefulAraStationEvent.o UsefulIcrrStationEvent.o AtriEventHkData.o AtriSensorHkData.o RawAtriSimpleStationEvent.o RawAtriStationBlock.o RawAraGenericHeader.o RawAtriStationEvent.o UsefulAtriStationEvent.o eventDict.o
+CLASS_HEADERS =RawIcrrStationHeader.h RawIcrrStationEvent.h  RawAraStationEvent.h  FullIcrrHkEvent.h  AraEventCalibrator.h IcrrTriggerMonitor.h IcrrHkData.h AraRawIcrrRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h UsefulIcrrStationEvent.h araIcrrStructures.h AtriEventHkData.h AtriSensorHkData.h araOneStructures.h araSoft.h araIcrrDefines.h RawAtriSimpleStationEvent.h RawAtriStationBlock.h RawAraGenericHeader.h RawAtriStationEvent.h UsefulAtriStationEvent.h
 
 
 all : $(ROOT_LIBRARY)

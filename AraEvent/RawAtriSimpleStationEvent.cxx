@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneSimpleStationEvent.cxx        ARA header reading class                  /////
+/////  RawAtriSimpleStationEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,25 +7,25 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraOneSimpleStationEvent.h"
+#include "RawAtriSimpleStationEvent.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraOneSimpleStationEvent);
+ClassImp(RawAtriSimpleStationEvent);
 
-RawAraOneSimpleStationEvent::RawAraOneSimpleStationEvent()   
+RawAtriSimpleStationEvent::RawAtriSimpleStationEvent()   
  :RawAraStationEvent(0)
 {
   
   //Default Constructor
 }
 
-RawAraOneSimpleStationEvent::~RawAraOneSimpleStationEvent() {
+RawAtriSimpleStationEvent::~RawAtriSimpleStationEvent() {
    //Default Destructor
 }
 
 
-RawAraOneSimpleStationEvent::RawAraOneSimpleStationEvent(AraSimpleStationEvent_t *bdPtr)
+RawAtriSimpleStationEvent::RawAtriSimpleStationEvent(AraSimpleStationEvent_t *bdPtr)
 {
   unixTime=bdPtr->unixTime;
   unixTimeUs=bdPtr->unixTimeUs;

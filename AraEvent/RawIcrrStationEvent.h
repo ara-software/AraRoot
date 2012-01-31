@@ -1,49 +1,49 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraTestBedStationEvent.h        Raw ARA event class                      /////
+/////  RawIcrrStationEvent.h        Raw ARA event class                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing raw ARA events in a TTree         /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARATESTBEDSTATIONEVENT_H
-#define RAWARATESTBEDSTATIONEVENT_H
+#ifndef RAWICRRSTATIONEVENT_H
+#define RAWICRRSTATIONEVENT_H
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 #include "RawAraStationEvent.h"
-#include "RawAraTestBedStationHeader.h"
-#include "AraRawTestBedRFChannel.h"
-#include "AraTestBedTriggerMonitor.h"
-#include "AraTestBedHkData.h"
+#include "RawIcrrStationHeader.h"
+#include "AraRawIcrrRFChannel.h"
+#include "IcrrTriggerMonitor.h"
+#include "IcrrHkData.h"
 
-//!  RawAraTestBedStationEvent -- The Raw ARA Event Data
+//!  RawIcrrStationEvent -- The Raw ARA Event Data
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses
 */
-class RawAraTestBedStationEvent: public RawAraStationEvent
+class RawIcrrStationEvent: public RawAraStationEvent
 {
  public:
-   RawAraTestBedStationEvent(); ///< Default constructor
-   RawAraTestBedStationEvent(AraTestBedEventBody_t *theBody); ///< Assignment constructor
-   RawAraTestBedStationEvent(AraTestBedEventBody_t *theBody, UInt_t stationId); ///< Assignment constructor to create RawAraGenericHeader
+   RawIcrrStationEvent(); ///< Default constructor
+   RawIcrrStationEvent(IcrrEventBody_t *theBody); ///< Assignment constructor
+   RawIcrrStationEvent(IcrrEventBody_t *theBody, UInt_t stationId); ///< Assignment constructor to create RawAraGenericHeader
 
 
-   ~RawAraTestBedStationEvent(); ///< Destructor
+   ~RawIcrrStationEvent(); ///< Destructor
 
    //Important Stuff
    UInt_t whichPeds; ///< Timestamp of pedestals used in subtraction
 
    //The data
-   RawAraTestBedStationHeader head; ///< The header
-   AraRawTestBedRFChannel chan[NUM_DIGITIZED_TESTBED_CHANNELS]; ///< RawRF data
-   AraTestBedTriggerMonitor trig; ///< The trigger
-   AraTestBedHkData hk; ///< The hk
+   RawIcrrStationHeader head; ///< The header
+   AraRawIcrrRFChannel chan[NUM_DIGITIZED_ICRR_CHANNELS]; ///< RawRF data
+   IcrrTriggerMonitor trig; ///< The trigger
+   IcrrHkData hk; ///< The hk
    
-   Int_t getNumChannels() {return NUM_DIGITIZED_TESTBED_CHANNELS;}
+   Int_t getNumChannels() {return NUM_DIGITIZED_ICRR_CHANNELS;}
 
    Int_t getLabChip(Int_t chanIndex) {
      return chan[chanIndex].getLabChip();
@@ -68,7 +68,7 @@ class RawAraTestBedStationEvent: public RawAraStationEvent
    Double_t getRubidiumTriggerTimeInSec() {return trig.getRubidiumTriggerTimeInSec();} ///< Returns the rubidium time divided by 280M
 
 
-  ClassDef(RawAraTestBedStationEvent,1);
+  ClassDef(RawIcrrStationEvent,1);
 };
 
 

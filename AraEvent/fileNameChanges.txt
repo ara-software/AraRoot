@@ -1,0 +1,67 @@
+------------------------------------------------------------------------------------------------------
+This is the history of the filename changes as the AraRoot structure changes
+
+
+  671  ls *One*
+  672  svn mv AraOneEventHkData.cxx AtriEventHkData.cxx
+  673  svn mv AraOneEventHkData.cxx AtriEventHkData.cxx
+  674  svn mv AraOneEventHkData.h AtriEventHkData.h
+  675  svn mv AraOneSensorHkData.cxx AtriSensorHkData.cxx
+  676  svn mv AraOneSensorHkData.h AtriSensorHkData.h
+  677  svn mv RawAraOneSimpleStationEvent.cxx RawIcrrSimpleStationEvent.cxx
+  678  svn mv RawAraOneSimpleStationEvent.h RawIcrrSimpleStationEvent.h
+  679  svn mv RawAraOneStationBlock.cxx RawIcrrStationBlock.cxx
+  680  svn mv RawAraOneStationBlock.h RawIcrrStationBlock.h
+  681  svn mv RawAraOneStationEvent.cxx RawIcrrStationEvent.cxx
+  682  svn mv RawAraOneStationEvent.h RawIcrrStationEvent.h
+  683  svn mv UsefulAraOneStationEvent.cxx UsefulIcrrStationEvent.cxx
+  684  svn mv UsefulAraOneStationEvent.h UsefulIcrrStationEvent.h
+  685  ls *One*
+  686  clear
+  687  ls
+  688  ls *one*
+  689  ls *TestBed*
+  690  clear
+  691  ls *TestBed*
+  692  ls
+  693  ls *Icrr*
+  694  svn mv RawIcrrSimpleStationEvent.cxx RawAtriSimpleStationEvent.cxx
+  695  svn mv RawIcrrSimpleStationEvent.h RawAtriSimpleStationEvent.h
+  696  ls *Icrr*
+  697  svn mv RawIcrrStationBlock.cxx RawAtriStationBlock.cxx
+  698  svn mv RawIcrrStationBlock.h RawAtriStationBlock.h
+  699  ls *Icrr*
+  700  svn mv RawIcrrStationEvent.cxx RawAtriStationEvent.cxx
+  701  svn mv RawIcrrStationEvent.h RawAtriStationEvent.h
+  702  svn mv UsefulIcrrStationEvent.cxx UsefulAtriStationEvent.cxx
+  703  svn mv UsefulIcrrStationEvent.h UsefulAtriStationEvent.h
+  704  ls *Icrr*
+  705  clear
+  706  ls *Atri*
+  707  ls
+  708  ls *TestBed*
+  709  svn mv AraRawTestBedRFChannel.cxx AraRawIcrrRFChannel.cxx
+  710  svn mv AraRawTestBedRFChannel.h AraRawIcrrRFChannel.h
+  711  ls *TestBed*
+  712  svn mv AraTestBedHkData.cxx IcrrHkData.cxx
+  713  svn mv AraTestBedHkData.h IcrrHkData.h
+  714  svn mv AraTestBedHkData.cxx IcrrHkData.cxx
+  715  ls *TestBed*
+  716  svn mv AraTestBedTriggerMonitor.cxx IcrrTriggerMonitor.cxx
+  717  svn mv AraTestBedTriggerMonitor.h IcrrTriggerMonitor.h
+  718  ls *TestBed*
+  719  svn mv FullAraTestBedHkEvent.cxx FullIcrrHkEvent.cxx
+  720  svn mv FullAraTestBedHkEvent.h FullIcrrHkEvent.h
+  721  ls *TestBed*
+  722  svn mv RawAraTestBedStationEvent.cxx RawIcrrStationEvent.cxx
+  723  svn mv RawAraTestBedStationEvent.h RawIcrrStationEvent.h
+  724  ls *TestBed*
+  725  svn mv RawAraTestBedStationHeader.cxx RawIcrrStationHeader.cxx
+  726  svn mv RawAraTestBedStationHeader.h RawIcrrStationHeader.h
+  727  ls *TestBed*
+  728  svn mv UsefulAraTestBedStationEvent.cxx UsefulIcrrStationEvent.cxx
+  729  svn mv UsefulAraTestBedStationEvent.h UsefulIcrrStationEvent.h
+  730  ls *TestBed*
+  731  clear
+  732  ls
+  733  svn commit ./* -m "Changed all names as follows: AraTestBed -> Icrr ; AraOne -> Atri"

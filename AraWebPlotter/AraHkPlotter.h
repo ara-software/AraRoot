@@ -10,14 +10,14 @@
 
 #include "TFile.h"
 #include "AraTimeHistoHandler.h"
-#include "AraTestBedHkData.h"
+#include "IcrrHkData.h"
 
 class AraHkPlotter
 {
  public:
   AraHkPlotter(char *plotDir, char *dataDir);
   ~AraHkPlotter();
-  void addHk(Int_t runNumber,UInt_t unixTime, AraTestBedHkData *hkData);
+  void addHk(Int_t runNumber,UInt_t unixTime, IcrrHkData *hkData);
   void makePlots();
   void makeLatestRunPlots();
   void saveFiles();

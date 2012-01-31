@@ -12,8 +12,8 @@
  * $Header: $
  */
 
-#ifndef ARAONE_STRUCTURES_H
-#define ARAONE_STRUCTURES_H
+#ifndef ATRI_STRUCTURES_H
+#define ATRI_STRUCTURES_H
 
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include <stdint.h>
@@ -45,7 +45,7 @@ typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
   Each data structure is going to have a one byte overhead saying where it came from
 */
 enum {
-  ARA_STATION_TESTBED=0x0, ///< TestBed1 probably won't chnage the testbed data yet
+  ARA_STATION_ICRR=0x0, ///< Icrr1 probably won't chnage the testbed data yet
   ARA_STATION_ARA1=0x1 ///< ARA1 data
 } ;
 typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
@@ -181,4 +181,4 @@ typedef struct {
   
 
 
-#endif //ARAONE_STRUCTURES_H
+#endif //ATRI_STRUCTURES_H

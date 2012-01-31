@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAraOneStationEvent.cxx        ARA header reading class                  /////
+/////  UsefulAtriStationEvent.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in useful ARA headers and produces     ///// 
@@ -7,7 +7,7 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "UsefulAraOneStationEvent.h"
+#include "UsefulAtriStationEvent.h"
 #include "AraEventCalibrator.h"
 #include "FFTtools.h"
 #include "AraGeomTool.h"
@@ -15,25 +15,25 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(UsefulAraOneStationEvent);
+ClassImp(UsefulAtriStationEvent);
 
 AraEventCalibrator *fCalibrator;
 
-UsefulAraOneStationEvent::UsefulAraOneStationEvent() 
+UsefulAtriStationEvent::UsefulAtriStationEvent() 
 {
    //Default Constructor
   fNumChannels=0;
   fCalibrator=0;
 }
 
-UsefulAraOneStationEvent::~UsefulAraOneStationEvent() {
+UsefulAtriStationEvent::~UsefulAtriStationEvent() {
    //Default Destructor
   fNumChannels=0;
   fCalibrator=0;
 }
 
-UsefulAraOneStationEvent::UsefulAraOneStationEvent(RawAraOneStationEvent *rawEvent, AraCalType::AraCalType_t calType)
- :RawAraOneStationEvent(*rawEvent)
+UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType)
+ :RawAtriStationEvent(*rawEvent)
 {
   fCalibrator=AraEventCalibrator::Instance();
   fNumChannels=0;
@@ -41,7 +41,7 @@ UsefulAraOneStationEvent::UsefulAraOneStationEvent(RawAraOneStationEvent *rawEve
 }
 
 
-TGraph *UsefulAraOneStationEvent::getGraphFromElecChan(int chanId)
+TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 {
   std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
   timeMapIt=fTimes.find(chanId);
@@ -55,9 +55,9 @@ TGraph *UsefulAraOneStationEvent::getGraphFromElecChan(int chanId)
   return gr;
 }
 
-TGraph *UsefulAraOneStationEvent::getGraphFromRFChan(int chan)
+TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 {
   return getGraphFromElecChan(chan);
-  std::cerr << "Error calling UsefulAraOneStationEvent::getGraphFromRFChan()\n";
+  std::cerr << "Error calling UsefulAtriStationEvent::getGraphFromRFChan()\n";
   return NULL;
 }

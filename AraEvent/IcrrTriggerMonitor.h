@@ -1,30 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraTestBedTriggerMonitor.h        Trigger Monitor class                  /////
+/////  IcrrTriggerMonitor.h        Trigger Monitor class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class for storing trigger monitor                     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARATESTBEDTRIGGERMONITOR_H
-#define ARATESTBEDTRIGGERMONITOR_H
+#ifndef ICRRTRIGGERMONITOR_H
+#define ICRRTRIGGERMONITOR_H
 
 //Includes
 #include <TObject.h>
-#include "araTestbedStructures.h"
-#include "araTestBedDefines.h"
+#include "araIcrrStructures.h"
+#include "araIcrrDefines.h"
 
-//!  AraTestBedTriggerMonitor -- The Trigger Monitor
+//!  IcrrTriggerMonitor -- The Trigger Monitor
 /*!
   The ROOT implementation of the Trigger Monitor
   \ingroup rootclasses
 */
-class AraTestBedTriggerMonitor: public TObject
+class IcrrTriggerMonitor: public TObject
 {
  public:
-   AraTestBedTriggerMonitor(); ///< Default constructor
-   AraTestBedTriggerMonitor(AraTestBedTriggerMonitorStruct_t *theTrig); ///< Assignment constructor
-   ~AraTestBedTriggerMonitor(); ///< Destructor
+   IcrrTriggerMonitor(); ///< Default constructor
+   IcrrTriggerMonitor(IcrrTriggerMonitorStruct_t *theTrig); ///< Assignment constructor
+   ~IcrrTriggerMonitor(); ///< Destructor
    
    //!  The trigger type
    /*!
@@ -75,8 +75,8 @@ class AraTestBedTriggerMonitor: public TObject
    UInt_t getRubidiumTriggerTime(); ///<Returns the 32-bit (well maybe 29-bit) trigger time
    Double_t getRubidiumTriggerTimeInSec();///< Returns the rubidium time divided by 280M
 
-   ClassDef(AraTestBedTriggerMonitor,1);
+   ClassDef(IcrrTriggerMonitor,1);
 };
 
 
-#endif //ARATESTBEDTRIGGERMONITOR_H
+#endif //ICRRTRIGGERMONITOR_H

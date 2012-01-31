@@ -2,7 +2,7 @@
 #include "AraEventCorrelator.h"
 #include "AraGeomTool.h"
 #include "AraAntennaInfo.h"
-#include "UsefulAraTestBedStationEvent.h"
+#include "UsefulIcrrStationEvent.h"
 #include "FFTtools.h"
 #include "TH2D.h"
 #include "TMath.h"
@@ -232,7 +232,7 @@ void AraEventCorrelator::getPairIndices(int pair, int &ant1, int &ant2)
   }    
 }
 
-TH2D *AraEventCorrelator::getInterferometricMap(UsefulAraTestBedStationEvent *evPtr, AraAntPol::AraAntPol_t polType,AraCorrelatorType::AraCorrelatorType_t corType)
+TH2D *AraEventCorrelator::getInterferometricMap(UsefulIcrrStationEvent *evPtr, AraAntPol::AraAntPol_t polType,AraCorrelatorType::AraCorrelatorType_t corType)
 {
   static int counter=0;
   fillDeltaTArrays(corType);

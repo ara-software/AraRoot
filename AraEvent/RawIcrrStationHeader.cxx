@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraTestBedStationHeader.cxx        ARA header reading class                  /////
+/////  RawIcrrStationHeader.cxx        ARA header reading class                  /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that reads in raw ARA headers and produces     ///// 
@@ -7,23 +7,23 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraTestBedStationHeader.h"
+#include "RawIcrrStationHeader.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
-ClassImp(RawAraTestBedStationHeader);
+ClassImp(RawIcrrStationHeader);
 
-RawAraTestBedStationHeader::RawAraTestBedStationHeader() 
+RawIcrrStationHeader::RawIcrrStationHeader() 
 {
    //Default Constructor
 }
 
-RawAraTestBedStationHeader::~RawAraTestBedStationHeader() {
+RawIcrrStationHeader::~RawIcrrStationHeader() {
    //Default Destructor
 }
 
 
-RawAraTestBedStationHeader::RawAraTestBedStationHeader(AraTestBedEventHeader_t *hdPtr)
+RawIcrrStationHeader::RawIcrrStationHeader(IcrrEventHeader_t *hdPtr)
 {
    unixTime=hdPtr->unixTime;
    unixTimeUs=hdPtr->unixTimeUs;
