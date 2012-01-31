@@ -21,6 +21,8 @@
 #define SATURATION 1300 
 #define NSPERSAMP 0.95
 
+#define ICRR_NO_STATIONS 2
+
 
 //!  AraCalType -- The Calibration Type
 /*!
@@ -70,27 +72,43 @@ class AraEventCalibrator : public TObject
    
 
    //TestBed calibrations
-   void setPedFile(char fileName[]); ///< Manually sets the pedestal file
+   //jd DONE
+   void setPedFile(char fileName[], UInt_t stationId); ///< Manually sets the pedestal file
+
+   //jd DONE
    void calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulAraTestBedStationEvent, called from UsefulAraTestBedStationEvent constructor
+
+   //jd DONE
    int doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
    
+   //jd?
    void fillRCOGuessArray(UsefulAraTestBedStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED]); ///< Utility function called by UsefulAraTestBedStationEvent
+   
+   //jd
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
 
    void calcClockAlignVals(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
    
-
+   //jd? DONE
    void loadTestBedPedestals(); ///< Loads the pedestals from a file
+   //jd? DONE
    void loadTestBedCalib(); ///< Loads the various calibration constants
-   int gotPedFile; ///<Flag to indicate whether a specific pedesal file has been selected
-   char pedFile[FILENAME_MAX]; ///< Filename of the pedesal file
-   float pedestalData[LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
-   double binWidths[LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
-   double epsilonVals[LAB3_PER_TESTBED][2]; ///<Array to hold the wrap-around calibration constants
-   double interleaveVals[8]; ///< There are only 8 interleaved channels
-   double clockAlignVals[LAB3_PER_TESTBED]; //Well by default clock align 0 is 0
-
+   //jd DONE
+   int gotPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a specific pedesal file has been selected
+   //jd DONE
+   char pedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedesal file
+ 
+   //jd DONE DONE
+   float pedestalData[ICRR_NO_STATIONS][LAB3_PER_TESTBED][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
+   //jd DONE DONE
+   double binWidths[ICRR_NO_STATIONS][LAB3_PER_TESTBED][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
+   //jd DONE DONE
+   double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_TESTBED][2]; ///<Array to hold the wrap-around calibration constants
+   //jd DONE DONE
+   double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
+   //jd DONE DONE
+   double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_TESTBED]; //Well by default clock align 0 is 0
 
    ///These are just utility arrays that are used in the calibration
    double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped

@@ -7,8 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=/unix/anita1/ara/data/fromWisconsin/raw
-ROOT_BASE_DIR=/unix/anita1/ara/data/fromWisconsin/root
+RAW_BASE_DIR=~/ara/data/event
+ROOT_BASE_DIR=~/ara/data/root
 
 
 RUN_NUM=$1
@@ -39,7 +39,7 @@ for file in ${RAW_DIR}/ev_*/*;
 done
 
 if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE}
+    ./makeAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE} 1
 #    cat ${EVENT_FILE_LIST}
     rm ${EVENT_FILE_LIST}
     echo "Done Event File"

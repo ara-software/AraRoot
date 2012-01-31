@@ -20,8 +20,8 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 #Now the bits we're actually compiling
 ROOT_LIBRARY = libAraEvent.${DLLSUF}
-LIB_OBJS = RawAraTestBedStationHeader.o RawAraTestBedStationEvent.o RawAraStationEvent.o  FullAraTestBedHkEvent.o AraEventCalibrator.o AraTestBedTriggerMonitor.o AraTestBedHkData.o AraRawTestBedRFChannel.o AraAntennaInfo.o AraGeomTool.o  UsefulAraStationEvent.o UsefulAraTestBedStationEvent.o AraOneEventHkData.o AraOneSensorHkData.o RawAraOneSimpleStationEvent.o RawAraOneStationBlock.o RawAraOneGenericHeader.o RawAraOneStationEvent.o UsefulAraOneStationEvent.o eventDict.o
-CLASS_HEADERS =RawAraTestBedStationHeader.h RawAraTestBedStationEvent.h  RawAraStationEvent.h  FullAraTestBedHkEvent.h  AraEventCalibrator.h AraTestBedTriggerMonitor.h AraTestBedHkData.h AraRawTestBedRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h UsefulAraTestBedStationEvent.h araTestbedStructures.h AraOneEventHkData.h AraOneSensorHkData.h araOneStructures.h araSoft.h araTestBedDefines.h RawAraOneSimpleStationEvent.h RawAraOneStationBlock.h RawAraOneGenericHeader.h RawAraOneStationEvent.h UsefulAraOneStationEvent.h
+LIB_OBJS = RawAraTestBedStationHeader.o RawAraTestBedStationEvent.o RawAraStationEvent.o  FullAraTestBedHkEvent.o AraEventCalibrator.o AraTestBedTriggerMonitor.o AraTestBedHkData.o AraRawTestBedRFChannel.o AraAntennaInfo.o AraGeomTool.o  UsefulAraStationEvent.o UsefulAraTestBedStationEvent.o AraOneEventHkData.o AraOneSensorHkData.o RawAraOneSimpleStationEvent.o RawAraOneStationBlock.o RawAraGenericHeader.o RawAraOneStationEvent.o UsefulAraOneStationEvent.o eventDict.o
+CLASS_HEADERS =RawAraTestBedStationHeader.h RawAraTestBedStationEvent.h  RawAraStationEvent.h  FullAraTestBedHkEvent.h  AraEventCalibrator.h AraTestBedTriggerMonitor.h AraTestBedHkData.h AraRawTestBedRFChannel.h AraAntennaInfo.h AraGeomTool.h  UsefulAraStationEvent.h UsefulAraTestBedStationEvent.h araTestbedStructures.h AraOneEventHkData.h AraOneSensorHkData.h araOneStructures.h araSoft.h araTestBedDefines.h RawAraOneSimpleStationEvent.h RawAraOneStationBlock.h RawAraGenericHeader.h RawAraOneStationEvent.h UsefulAraOneStationEvent.h
 
 
 all : $(ROOT_LIBRARY)
@@ -70,8 +70,10 @@ else
 	install -c -m 755 $(ROOT_LIBRARY) $(ARA_UTIL_LIB_DIR)
 endif
 	install -c -m 644  $(CLASS_HEADERS) $(ARA_UTIL_INC_DIR)
-	install -d $(ARA_UTIL_CALIB_DIR)
-	for file in calib/*.dat calib/*.csv calib/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR); done
+	install -d $(ARA_UTIL_CALIB_DIR)/ICRR/TestBed
+	for file in calib/ICRR/TestBed/*.dat calib/ICRR/TestBed/*.csv calib/ICRR/TestBed/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR)/ICRR/TestBed; done
+	install -d $(ARA_UTIL_CALIB_DIR)/ICRR/Station1
+	for file in calib/ICRR/Station1/*.dat calib/ICRR/Station1/*.csv calib/ICRR/Station1/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR)/ICRR/Station1; done
 
 
 clean:

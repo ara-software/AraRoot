@@ -89,7 +89,7 @@ void AraDisplay::zeroPointers()
   fTBRawEventPtr=0;
   fUsefulEventPtr=0;
   fRawEventPtr=0;
-  fTBData=0;
+  fTBData=1;
 
 
   fAraCanvas=0;

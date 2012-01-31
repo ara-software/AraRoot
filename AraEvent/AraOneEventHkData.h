@@ -11,7 +11,8 @@
 
 //Includes
 #include <TObject.h>
-#include "RawAraOneGenericHeader.h"
+//#include "RawAraOneGenericHeader.h"
+#include "RawAraGenericHeader.h"
 #include "araOneStructures.h"
 
 
@@ -20,7 +21,7 @@
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneEventHkData: public RawAraOneGenericHeader, public TObject
+class AraOneEventHkData: public RawAraGenericHeader, public TObject
 {
  public:
    AraOneEventHkData(); ///< Default constructor

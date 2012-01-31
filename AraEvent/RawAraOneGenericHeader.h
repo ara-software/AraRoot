@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraOneGenericHeader.h        Raw ARA station event class        /////
+/////  RawAraGenericHeader.h        Raw ARA station event class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     A simple class that is a wraper for                            /////
@@ -8,8 +8,8 @@
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef RAWARAONEGENERICHEADER_H
-#define RAWARAONEGENERICHEADER_H
+#ifndef RAWARAGENERICHEADER_H
+#define RAWARAGENERICHEADER_H
 
 //Includes
 #include <TObject.h>
@@ -17,17 +17,18 @@
 #include "araSoft.h"
 
 
-//!  RawAraOneGenericHeader -- The Raw ARA Station Event Class
+//!  RawAraGenericHeader -- The Raw ARA Station Event Class
 /*!
   The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
   \ingroup rootclasses
 */
-class RawAraOneGenericHeader
+class RawAraGenericHeader
 {
  public:
-   RawAraOneGenericHeader(); ///< Default constructor
-   RawAraOneGenericHeader(AraGenericHeader_t *gHdr); ///< Assignment constructor
-   ~RawAraOneGenericHeader(); ///< Destructor
+   RawAraGenericHeader(); ///< Default constructor
+   RawAraGenericHeader(AraGenericHeader_t *gHdr); ///< Assignment constructor
+   RawAraGenericHeader(UInt_t stationId); ///< Assignment constructor for ICRR type
+   ~RawAraGenericHeader(); ///< Destructor
  
 
    UChar_t softVerMajor;
@@ -41,10 +42,10 @@ class RawAraOneGenericHeader
    UInt_t numBytes;
    UShort_t checksum;
 
-  ClassDef(RawAraOneGenericHeader,1);
+  ClassDef(RawAraGenericHeader,1);
 };
 
 
 
 
-#endif //RAWARAONEGENERICHEADER
+#endif //RAWARAGENERICHEADER

@@ -14,9 +14,8 @@
 ClassImp(RawAraTestBedStationEvent);
 
 RawAraTestBedStationEvent::RawAraTestBedStationEvent()   
- :RawAraStationEvent(0)
+  :RawAraStationEvent(0)
 {
-  
   //Default Constructor
 }
 
@@ -32,6 +31,16 @@ RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPt
     chan[i].fillChannel(&(bdPtr->channel[i]));
   }
 }
+
+RawAraTestBedStationEvent::RawAraTestBedStationEvent(AraTestBedEventBody_t *bdPtr, UInt_t stationId)
+  :RawAraStationEvent(stationId),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
+{
+  for(int i=0;i<NUM_DIGITIZED_TESTBED_CHANNELS;i++) {
+    chan[i].fillChannel(&(bdPtr->channel[i]));
+  }
+}
+
+
 
 Int_t RawAraTestBedStationEvent::getEarliestSample(Int_t chanIndex)
 {

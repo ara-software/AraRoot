@@ -24,7 +24,7 @@ RawAraOneStationEvent::~RawAraOneStationEvent() {
 
 
 RawAraOneStationEvent::RawAraOneStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer) ///< Assignment constructor
-  :RawAraOneGenericHeader(&(hdPtr->gHdr)),RawAraStationEvent(hdPtr->gHdr.stationId)
+  :/*RawAraGenericHeader(&(hdPtr->gHdr)),*/RawAraStationEvent(hdPtr->gHdr.stationId, &(hdPtr->gHdr))
 {
   
    unixTime=hdPtr->unixTime; ///< Software event time in seconds (64-bits for future proofing)

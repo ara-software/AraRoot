@@ -13,14 +13,14 @@
 #include <TObject.h>
 #include "araSoft.h"
 #include "araOneStructures.h"
-#include "RawAraOneGenericHeader.h"
+#include "RawAraGenericHeader.h"
 
 //!  AraOneSensorHkData -- The HK data
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses
 */
-class AraOneSensorHkData: public RawAraOneGenericHeader, public TObject
+class AraOneSensorHkData: public RawAraGenericHeader, public TObject
 {
  public:
    AraOneSensorHkData(); ///< Default constructor

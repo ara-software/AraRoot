@@ -13,11 +13,12 @@ using namespace std;
 #define HACK_FOR_ROOT
 
 #include "araTestbedStructures.h"
+#include "araOneStructures.h"
 #include "RawAraTestBedStationEvent.h"  
 #include "UsefulAraTestBedStationEvent.h"
 
-void processEvent();
-void makeEventTree(char *inputName, char *outDir);
+void processEvent(UInt_t stationId);
+void makeEventTree(char *inputName, char *outDir, UInt_t stationId);
 
 AraTestBedEventBody_t theEventBody;
 TFile *theFile;
@@ -31,16 +32,16 @@ Int_t lastRunNumber;
 
 
 int main(int argc, char **argv) {
-  if(argc<3) {
-    std::cout << "Usage: " << basename(argv[0]) << " <file list> <out file>" << std::endl;
+  if(argc<4) {
+    std::cout << "Usage: " << basename(argv[0]) << " <file list> <out file> <stationId (TestBed==0 ARA1==1)>" << std::endl;
     return -1;
   }
-  makeEventTree(argv[1],argv[2]);
+  makeEventTree(argv[1],argv[2], atoi(argv[3]));
   return 0;
 }
   
 
-void makeEventTree(char *inputName, char *outFile) {
+void makeEventTree(char *inputName, char *outFile, UInt_t stationId) {
 
   bool debug = false; // set to true to increase the amount of commentary output
 
@@ -94,7 +95,7 @@ void makeEventTree(char *inputName, char *outFile) {
 	std::cerr << "Dodgy event\t" << theEventBody.hd.eventNumber << "\n";
       } 
       else {     
-	processEvent();
+	processEvent(stationId);
 	lastEventNumber=theEventBody.hd.eventNumber;
       }
       numBytes=gzread(infile,&theEventBody,sizeof(AraTestBedEventBody_t));
@@ -109,7 +110,7 @@ void makeEventTree(char *inputName, char *outFile) {
   //    theFile->Close();
 }
 
-void processEvent() {
+void processEvent(UInt_t stationId) {
   //  cout << "processEvent:\t" << theEventBody.eventNumber << endl;
   static int doneInit=0;
   
@@ -131,7 +132,7 @@ void processEvent() {
   //  cout << "Here: "  << theEvent.eventNumber << endl;
   if(theEvent) delete theEvent;
   if(theUsefulEvent) delete theUsefulEvent;
-  theEvent = new RawAraTestBedStationEvent(&theEventBody);
+  theEvent = new RawAraTestBedStationEvent(&theEventBody, stationId);
   theUsefulEvent = new UsefulAraTestBedStationEvent( theEvent , AraCalType::kFirstCalib );
   eventTree->Fill();  
   lastRunNumber=runNumber;

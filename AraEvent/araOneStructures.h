@@ -35,7 +35,8 @@ enum {
   ARA_HEADER_TYPE=0x2, ///< Standard event header (if not part of event)
   ARA_EVENT_HK_TYPE=0x3, ///< Scalers, thresholds, etc.
   ARA_SENSOR_HK_TYPE=0x4, ///< Temperatures, Voltages, Currents, etc.
-  ARA_SBC_HK_TYPE=0x5 ///< SBC related values disk space, etc.
+  ARA_SBC_HK_TYPE=0x5, ///< SBC related values disk space, etc.
+  ARA_ICRR_EVENT_TYPE=0x06 ///< ICRR Event Type
 } ;
 typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
 

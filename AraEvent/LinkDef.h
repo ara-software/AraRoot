@@ -23,7 +23,7 @@
 #pragma link C++ class AraEventCalibrator+;
 #pragma link C++ class RawAraOneStationBlock+;
 #pragma link C++ class RawAraOneStationEvent+;
-#pragma link C++ class RawAraOneGenericHeader+;
+#pragma link C++ class RawAraGenericHeader+;
 
 #pragma link C++ typedef AraDataStructureType_t;
 

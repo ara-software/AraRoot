@@ -29,6 +29,9 @@ class RawAraTestBedStationEvent: public RawAraStationEvent
  public:
    RawAraTestBedStationEvent(); ///< Default constructor
    RawAraTestBedStationEvent(AraTestBedEventBody_t *theBody); ///< Assignment constructor
+   RawAraTestBedStationEvent(AraTestBedEventBody_t *theBody, UInt_t stationId); ///< Assignment constructor to create RawAraGenericHeader
+
+
    ~RawAraTestBedStationEvent(); ///< Destructor
 
    //Important Stuff

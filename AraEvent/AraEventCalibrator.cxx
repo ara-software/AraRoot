@@ -74,7 +74,7 @@ AraEventCalibrator * AraEventCalibrator::fgInstance=0;
 
 AraEventCalibrator::AraEventCalibrator() 
 {
-  gotPedFile=0;
+  for(int station=0;station<ICRR_NO_STATIONS;station++) gotPedFile[station]=0;
   fGotAraOnePedFile=0;
   loadTestBedCalib();
   loadAraOneCalib();
@@ -97,16 +97,18 @@ AraEventCalibrator*  AraEventCalibrator::Instance()
 }
 
 
-void AraEventCalibrator::setPedFile(char fileName[])
+void AraEventCalibrator::setPedFile(char fileName[], UInt_t stationId)
 {
-  strncpy(pedFile,fileName,FILENAME_MAX);
-  gotPedFile=1;
+  strncpy(pedFile[stationId],fileName,FILENAME_MAX);
+  gotPedFile[stationId]=1;
   loadTestBedPedestals();
 }
 
+//jd?
 void AraEventCalibrator::loadTestBedPedestals()
 {
-  if(!gotPedFile) {
+  //TestBed
+  if(!gotPedFile[0]) {
     char *pedFileEnv = getenv( "ARA_PEDESTAL_FILE" );
     if ( pedFileEnv == NULL ) {
       char calibDir[FILENAME_MAX];
@@ -115,37 +117,69 @@ void AraEventCalibrator::loadTestBedPedestals()
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ./calib]");
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():TestBed: INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():TestBed: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
+	fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():TestBed INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
-      sprintf(pedFile,"%s/peds_1294924296.869787.run001202.dat",calibDir);
-      fprintf(stdout," = %s\n",pedFile);
+      sprintf(pedFile[0],"%s/ICRR/TestBed/peds_1294924296.869787.run001202.dat",calibDir);
+      fprintf(stdout," = %s\n",pedFile[0]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
-      strncpy(pedFile,pedFileEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals(): INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile);
+      strncpy(pedFile[0],pedFileEnv,FILENAME_MAX);
+      fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():TestBed: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[0]);
+    } // end of IF-block for pedestal file specified by environment variable
+  }
+
+  //Station1
+  if(!gotPedFile[1]) {
+    char *pedFileEnv = getenv( "ARA_PEDESTAL_FILE" );
+    if ( pedFileEnv == NULL ) {
+      char calibDir[FILENAME_MAX];
+      char *calibEnv=getenv("ARA_CALIB_DIR");
+      if(!calibEnv) {
+	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+	if(!utilEnv) {
+	  sprintf(calibDir,"calib");
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():Station1: INFO - Pedestal file [from ./calib]");
+	} else {
+	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
+	  fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():Station1: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	}
+      }
+      else {
+	strncpy(calibDir,calibEnv,FILENAME_MAX);
+	fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():Station1: INFO - Pedestal file [from ARA_CALIB_DIR]");
+      }
+      sprintf(pedFile[1],"%s/ICRR/Station1/peds_1326108401.602169.run003747.dat",calibDir);
+      fprintf(stdout," = %s\n",pedFile[1]);
+    } // end of IF-block for pedestal file not specified by environment variable
+    else {
+      strncpy(pedFile[1],pedFileEnv,FILENAME_MAX);
+      fprintf(stdout,"AraEventCalibrator::loadTestBedPedestals():Station1: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[1]);
     } // end of IF-block for pedestal file specified by environment variable
   }
 
   FullLabChipPedStruct_t peds;
-  gzFile inPed = gzopen(pedFile,"r");
-  if( !inPed ){
-    fprintf(stderr,"ERROR - Failed to open pedestal file %s.\n",pedFile);
+
+  //Testbed
+  fprintf(stdout, "AraEventCalibrator::loadTestBedPedestals():TestBed: INFO - loading %s\n", pedFile[0]);
+  gzFile inPedTB = gzopen(pedFile[0],"r");
+  if( !inPedTB ){
+    fprintf(stderr,"ERROR - Failed to open pedestal file for TestBed %s.\n",pedFile[0]);
     return;
   }
 
-  int nRead = gzread(inPed,&peds,sizeof(FullLabChipPedStruct_t));
+  int nRead = gzread(inPedTB,&peds,sizeof(FullLabChipPedStruct_t));
   if( nRead != sizeof(FullLabChipPedStruct_t)){
     int numErr;
-    fprintf(stderr,"ERROR - Error reading pedestal file %s; %s\n",pedFile,gzerror(inPed,&numErr));
-    gzclose(inPed);
+    fprintf(stderr,"ERROR - Error reading pedestal file %s; %s\n",pedFile[0],gzerror(inPedTB,&numErr));
+    gzclose(inPedTB);
     return;
   }
 
@@ -154,15 +188,47 @@ void AraEventCalibrator::loadTestBedPedestals()
     for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
       int chanIndex = chip*CHANNELS_PER_LAB3+chan;
       for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
-	pedestalData[chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
+	pedestalData[0][chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
       }
     }
   }
-  gzclose(inPed);
+  gzclose(inPedTB);
+
+  //ARA1
+  fprintf(stdout, "AraEventCalibrator::loadTestBedPedestals():Station1: INFO - loading %s\n", pedFile[1]);
+  gzFile inPedAra1 = gzopen(pedFile[1],"r");
+  if( !inPedAra1 ){
+    fprintf(stderr,"ERROR - Failed to open pedestal file for Station1 %s.\n",pedFile[1]);
+    return;
+  }
+
+  nRead = gzread(inPedAra1,&peds,sizeof(FullLabChipPedStruct_t));
+  if( nRead != sizeof(FullLabChipPedStruct_t)){
+    int numErr;
+    fprintf(stderr,"ERROR - Error reading pedestal file %s; %s\n",pedFile[1],gzerror(inPedAra1,&numErr));
+    gzclose(inPedAra1);
+    return;
+  }
+
+  for(chip=0;chip<LAB3_PER_TESTBED;++chip) {
+    for(chan=0;chan<CHANNELS_PER_LAB3;++chan) {
+      int chanIndex = chip*CHANNELS_PER_LAB3+chan;
+      for(samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
+	pedestalData[1][chip][chan][samp]=peds.chan[chanIndex].pedMean[samp];
+      }
+    }
+  }
+  gzclose(inPedAra1);
+
+
+
 }
 
 int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent, int chanIndex,int overrideRCO)
 {
+  //jd
+  int stationId=theEvent->stationId;
+
   int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
   int nChan=theEvent->chan[chanIndex].chanId%CHANNELS_PER_LAB3;
   int rco=overrideRCO;
@@ -182,7 +248,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent,
       calwv[samp]=0;
       pedsubadc[samp]=0;
     }else{
-      pedsubadc[samp]=rawadc[samp]-pedestalData[nChip][nChan][samp];
+      pedsubadc[samp]=rawadc[samp]-pedestalData[stationId][nChip][nChan][samp];
       calwv[samp]=pedsubadc[samp]*ADCMV;
       if(calwv[samp]>SATURATION) calwv[samp]=SATURATION;
       if(calwv[samp]<-1*SATURATION) calwv[samp]=-1*SATURATION;
@@ -197,19 +263,19 @@ int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent,
     if(hbwrap){ // Wrapped hitbus
       for(int samp=hbstart+1;samp<hbend;++samp) {
 	tempTimeNums[ir++]=calTime;
-	calTime+=binWidths[nChip][rco][samp];
+	calTime+=binWidths[stationId][nChip][rco][samp];
       }
     }
     else{
       for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
 	tempTimeNums[ir++]=calTime;
-	calTime+=binWidths[nChip][1-rco][samp];
+	calTime+=binWidths[stationId][nChip][1-rco][samp];
       }
       //Now add epsilon
-      calTime+=epsilonVals[nChip][rco];  //Need to check if this is rco or 1-rco
+      calTime+=epsilonVals[stationId][nChip][rco];  //Need to check if this is rco or 1-rco
       for(int samp=0;samp<hbstart;++samp) {
 	tempTimeNums[ir++]=calTime;
-	calTime+=binWidths[nChip][rco][samp];
+	calTime+=binWidths[stationId][nChip][rco][samp];
       }
     }
     for(int samp=ir;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) {
@@ -226,7 +292,7 @@ int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent,
       v[ir++]=calwv[samp];
   }else{
     for(int samp=hbend+1;samp<MAX_NUMBER_SAMPLES_LAB3;++samp) 
-      v[ir++]=calwv[samp];	
+      v[ir++]=calwv[samp];
     for(int samp=0;samp<hbstart;++samp)
       v[ir++]=calwv[samp];
   }
@@ -247,7 +313,9 @@ int AraEventCalibrator::doBinCalibration(UsefulAraTestBedStationEvent *theEvent,
 
 void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
-  
+  //jd
+  int stationId=theEvent->stationId;
+
   static int gotPeds=0;
   if(!gotPeds)  
     loadTestBedPedestals();
@@ -330,7 +398,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
     for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_TESTBED_CHANNELS; ++chanIndex ){
       int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
       for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
-	theEvent->fTimes[chanIndex][samp]+=clockAlignVals[nChip];
+	theEvent->fTimes[chanIndex][samp]+=clockAlignVals[stationId][nChip];
       }
     }
   }
@@ -368,7 +436,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
 	for(int i=0;i<theEvent->fNumPointsRF[rfchan];i++) {
 	  if(i1<theEvent->fNumPoints[ci1] && i2<theEvent->fNumPoints[ci2]) {
 	    //Both in play
-	    if(theEvent->fTimes[ci1][i1]<(theEvent->fTimes[ci2][i2]+interleaveVals[rfchan])) {
+	    if(theEvent->fTimes[ci1][i1]<(theEvent->fTimes[ci2][i2]+interleaveVals[stationId][rfchan])) {
 	      theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci1][i1];
 	      theEvent->fVoltsRF[rfchan][i]=theEvent->fVolts[ci1][i1]-mean;
 	      //	      std::cout << "A: " << i << "\t" << theEvent->fTimesRF[rfchan][i] << "\n";
@@ -377,7 +445,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
 	      continue;
 	    }
 	    else {
-	      theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci2][i2]+interleaveVals[rfchan];
+	      theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci2][i2]+interleaveVals[stationId][rfchan];
 	      theEvent->fVoltsRF[rfchan][i]=theEvent->fVolts[ci2][i2]-mean;
 	      //	      std::cout << "B: " << i << "\t" << theEvent->fTimesRF[rfchan][i] << "\n";
 	      i2++;
@@ -393,7 +461,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
 	  }
 	  else if(i2<theEvent->fNumPoints[ci2]) {
 
-	    theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci2][i2]+interleaveVals[rfchan];
+	    theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci2][i2]+interleaveVals[stationId][rfchan];
 	    theEvent->fVoltsRF[rfchan][i]=theEvent->fVolts[ci2][i2]-mean;
 	    //	    std::cout << "D: " << i << "\t" << theEvent->fTimesRF[rfchan][i] << "\n";
 	    i2++;
@@ -452,7 +520,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
   
 }
 
-
+//jd?
 void AraEventCalibrator::loadTestBedCalib()
 {
   char calibFile[FILENAME_MAX];
@@ -469,29 +537,58 @@ void AraEventCalibrator::loadTestBedCalib()
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
   int chip,rco,chan;
+ 
+  //TestBed
   //Bin Width Calib
-  sprintf(calibFile,"%s/binWidths.txt",calibDir);
-  std::ifstream BinFile(calibFile);
+  sprintf(calibFile,"%s/ICRR/TestBed/binWidths.txt",calibDir);
+  std::ifstream BinFileTB(calibFile);
   double width;
-  while(BinFile >> chip >> rco) {
+  while(BinFileTB >> chip >> rco) {
     for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
-      BinFile >> width;
-      binWidths[chip][rco][samp]=width;
+      BinFileTB >> width;
+      binWidths[0][chip][rco][samp]=width;
     }
   }
   //Epsilon Calib
-  sprintf(calibFile,"%s/epsilonFile.txt",calibDir);
-  std::ifstream EpsFile(calibFile);
+  sprintf(calibFile,"%s/ICRR/TestBed/epsilonFile.txt",calibDir);
+  std::ifstream EpsFileTB(calibFile);
   double epsilon;
-  while(EpsFile >> chip >> rco >> epsilon) {
-    epsilonVals[chip][rco]=epsilon;    
+  while(EpsFileTB >> chip >> rco >> epsilon) {
+    epsilonVals[0][chip][rco]=epsilon;    
   }
   //Interleave Calib
-  sprintf(calibFile,"%s/interleaveFile.txt",calibDir);
-  std::ifstream IntFile(calibFile);
+  sprintf(calibFile,"%s/ICRR/TestBed/interleaveFile.txt",calibDir);
+  std::ifstream IntFileTB(calibFile);
   double interleave;
-  while(IntFile >> chip >> chan >> interleave) {
-    interleaveVals[chan+4*chip]=interleave;    
+  while(IntFileTB >> chip >> chan >> interleave) {
+    interleaveVals[0][chan+4*chip]=interleave;    
+  }
+
+  //ARA1
+  //Bin Width Calib
+  
+  sprintf(calibFile,"%s/ICRR/Station1/binWidths.txt",calibDir);
+  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
+  std::ifstream BinFileAra1(calibFile);
+  while(BinFileAra1 >> chip >> rco) {
+    for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
+      BinFileAra1 >> width;
+      binWidths[1][chip][rco][samp]=width;
+    }
+  }
+  //Epsilon Calib
+  sprintf(calibFile,"%s/ICRR/Station1/epsilonFile.txt",calibDir);
+  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
+  std::ifstream EpsFileAra1(calibFile);
+  while(EpsFileAra1 >> chip >> rco >> epsilon) {
+    epsilonVals[1][chip][rco]=epsilon;    
+  }
+  //Interleave Calib
+  sprintf(calibFile,"%s/ICRR/Station1/interleaveFile.txt",calibDir);
+  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
+  std::ifstream IntFileAra1(calibFile);
+  while(IntFileAra1 >> chip >> chan >> interleave) {
+    interleaveVals[1][chan+4*chip]=interleave;    
   }
 }
 
@@ -499,11 +596,14 @@ void AraEventCalibrator::loadTestBedCalib()
 
 void AraEventCalibrator::calcClockAlignVals(UsefulAraTestBedStationEvent *theEvent, AraCalType::AraCalType_t calType)
 {
+  //jd
+  int stationId=theEvent->stationId;
+
   if(!AraCalType::hasClockAlignment(calType)) return;
   TGraph *grClock[LAB3_PER_TESTBED]={0};
   Double_t lag[LAB3_PER_TESTBED]={0};
   for(int chip=0;chip<LAB3_PER_TESTBED;chip++) {
-    clockAlignVals[chip]=0;    
+    clockAlignVals[stationId][chip]=0;    
     int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip; 
     grClock[chip]=theEvent->getGraphFromElecChan(chanIndex);
     lag[chip]=estimateClockLag(grClock[chip]);
@@ -511,13 +611,13 @@ void AraEventCalibrator::calcClockAlignVals(UsefulAraTestBedStationEvent *theEve
 
     if(chip>0) {
       //Then can actually do some alignment
-      clockAlignVals[chip]=lag[0]-lag[chip];
+      clockAlignVals[stationId][chip]=lag[0]-lag[chip];
       //The below fudge factors were "tuned" using pulser data 
       // to try and remove period ambiguities resulting from wrong cycle lag
       if(lag[chip]<8 && lag[0]>9) 
-	clockAlignVals[chip]-=25;
+	clockAlignVals[stationId][chip]-=25;
       if(lag[chip]>9 && lag[0]<7) 
-	clockAlignVals[chip]+=25;
+	clockAlignVals[stationId][chip]+=25;
       //      std::cout << "clockAlignVals[ " << chip << "] = " << clockAlignVals[chip] << "\n";
     }
     
@@ -579,7 +679,6 @@ Double_t AraEventCalibrator::estimateClockLag(TGraph *grClock)
 
 void AraEventCalibrator::fillRCOGuessArray(UsefulAraTestBedStationEvent *theEvent, int rcoGuess[LAB3_PER_TESTBED])
 {
-
   for(int chip=0;chip<LAB3_PER_TESTBED;chip++) {
     int chanIndex=TESTBED1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip;
     rcoGuess[chip]=theEvent->getRawRCO(chanIndex);

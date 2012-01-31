@@ -14,7 +14,8 @@
 //Includes
 #include <vector>
 #include <TObject.h>
-#include "RawAraOneGenericHeader.h"
+//#include "RawAraOneGenericHeader.h"
+//#include "RawAraGenericHeader.h"
 #include "RawAraStationEvent.h"
 #include "RawAraOneStationBlock.h"
 #include "araOneStructures.h"
@@ -28,7 +29,7 @@
   The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
   \ingroup rootclasses
 */
-class RawAraOneStationEvent: public RawAraOneGenericHeader, public RawAraStationEvent
+class RawAraOneStationEvent: /*public RawAraGenericHeader ,*/public RawAraStationEvent
 {
  public:
    RawAraOneStationEvent(); ///< Default constructor

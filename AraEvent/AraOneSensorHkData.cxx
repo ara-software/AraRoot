@@ -24,7 +24,7 @@ AraOneSensorHkData::~AraOneSensorHkData() {
 
 
 AraOneSensorHkData::AraOneSensorHkData(AraSensorHk_t *theHk)
-  :RawAraOneGenericHeader(&(theHk->gHdr))
+  :RawAraGenericHeader(&(theHk->gHdr))
 {
 
   unixTime=theHk->unixTime; ///< Time in seconds (64-bits for future proofing)

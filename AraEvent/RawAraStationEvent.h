@@ -12,16 +12,18 @@
 
 //Includes
 #include <TObject.h>
+#include <RawAraGenericHeader.h>
 
 //!  RawAraStationEvent -- Base Class for Station Event Data
 /*!
   The ROOT implementation of a base class for station event data. Should not be used directly instead one of the inherited classes should be used.
   \ingroup rootclasses
 */
-class RawAraStationEvent: public TObject {
+class RawAraStationEvent: public TObject, public RawAraGenericHeader {
 
  public:
   RawAraStationEvent(UInt_t stationId) ;
+  RawAraStationEvent(UInt_t stationId, AraGenericHeader_t *gHdr) ;
   RawAraStationEvent();///< Default constructor
   ~RawAraStationEvent(); ///< Destructor
   
