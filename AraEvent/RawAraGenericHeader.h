@@ -1,51 +1,51 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAraGenericHeader.cxx        ARA Generic Header Class        /////
+/////  RawAraGenericHeader.h        Raw ARA station event class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that stores AraGenericHeader_t stuff            ///// 
-/////   calibrated time and voltage stuff                                /////
+/////     A simple class that is a wraper for                            /////
+/////    AraStationEventEventHeader_t                                    /////
+/////    AraStationEventEventChannel_t                                   /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "RawAraGenericHeader.h"
-#include "AraRootVersion.h"
-#include <iostream>
-#include <fstream>
-#include <cstring>
-ClassImp(RawAraGenericHeader);
+#ifndef RAWARAGENERICHEADER_H
+#define RAWARAGENERICHEADER_H
 
-RawAraGenericHeader::RawAraGenericHeader()   
-  :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
-{  
-  //Default Constructor
-}
-
-RawAraGenericHeader::~RawAraGenericHeader() {
-   //Default Destructor
-}
+//Includes
+#include <TObject.h>
+#include "araOneStructures.h"
+#include "araSoft.h"
 
 
-RawAraGenericHeader::RawAraGenericHeader(AraGenericHeader_t *gHdr) ///< Assignment constructor
-  :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
+//!  RawAraGenericHeader -- The Raw ARA Station Event Class
+/*!
+  The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
+  \ingroup rootclasses
+*/
+class RawAraGenericHeader
 {
-  typeId=gHdr->typeId;
-  verId=gHdr->verId;
-  subVerId=gHdr->subVerId;
-  stationId=gHdr->stationId;
-  reserved=gHdr->reserved;
-  numBytes=gHdr->numBytes;
-  checksum=gHdr->checksum;
-}
-RawAraGenericHeader::RawAraGenericHeader(UInt_t station) ///< Assignment constructor for ICRR type
-  :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
-{
-  if(station==0||station==1){ //ICRR stationId==0 TestBed stationId==1 for Ara1
-    typeId=ARA_ICRR_EVENT_TYPE;
-    stationId=station;
-    verId=0;
-    subVerId=0;
-    reserved=0;
-    numBytes=0;
-    checksum=0;
-  }
-}
+ public:
+   RawAraGenericHeader(); ///< Default constructor
+   RawAraGenericHeader(AraGenericHeader_t *gHdr); ///< Assignment constructor
+   RawAraGenericHeader(UInt_t stationId); ///< Assignment constructor for ICRR type
+   ~RawAraGenericHeader(); ///< Destructor
+ 
+
+   UChar_t softVerMajor;
+   UChar_t softVerMinor;
+
+   AraDataStructureType_t typeId;
+   UChar_t verId;
+   UChar_t subVerId;
+   AraStationId_t stationId;
+   UShort_t reserved;
+   UInt_t numBytes;
+   UShort_t checksum;
+
+  ClassDef(RawAraGenericHeader,1);
+};
+
+
+
+
+#endif //RAWARAGENERICHEADER
