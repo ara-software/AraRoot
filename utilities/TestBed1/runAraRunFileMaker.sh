@@ -7,8 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=~/ara/data/event
-ROOT_BASE_DIR=~/ara/data/root
+RAW_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/event
+ROOT_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/root/Station1Test
 
 
 RUN_NUM=$1
@@ -29,7 +29,7 @@ else
 fi
 
 echo "Starting Event File"
-EVENT_FILE_LIST=`mktemp`
+EVENT_FILE_LIST=`mktemp event.XXXX`
 for file in ${RAW_DIR}/ev_*/*; 
   do
   if [[ -f $file ]]; then
@@ -50,7 +50,7 @@ fi
 
 
 echo "Starting Hk File"
-HK_FILE_LIST=`mktemp`
+HK_FILE_LIST=`mktemp hk.XXXX`
 for file in ${RAW_DIR}/hk_*/*; 
   do
   if [[ -f $file ]]; then

@@ -100,6 +100,7 @@ AraEventCalibrator*  AraEventCalibrator::Instance()
 void AraEventCalibrator::setPedFile(char fileName[], UInt_t stationId)
 {
   strncpy(pedFile[stationId],fileName,FILENAME_MAX);
+  fprintf(stdout, "AraEventCalibrator::setPedFile() setting ped %i to %s\n", stationId, pedFile[stationId]);
   gotPedFile[stationId]=1;
   loadTestBedPedestals();
 }
@@ -168,7 +169,6 @@ void AraEventCalibrator::loadTestBedPedestals()
   FullLabChipPedStruct_t peds;
 
   //Testbed
-  fprintf(stdout, "AraEventCalibrator::loadTestBedPedestals():TestBed: INFO - loading %s\n", pedFile[0]);
   gzFile inPedTB = gzopen(pedFile[0],"r");
   if( !inPedTB ){
     fprintf(stderr,"ERROR - Failed to open pedestal file for TestBed %s.\n",pedFile[0]);
@@ -193,12 +193,12 @@ void AraEventCalibrator::loadTestBedPedestals()
     }
   }
   gzclose(inPedTB);
+  gotPedFile[0]=1;
 
   //ARA1
-  fprintf(stdout, "AraEventCalibrator::loadTestBedPedestals():Station1: INFO - loading %s\n", pedFile[1]);
   gzFile inPedAra1 = gzopen(pedFile[1],"r");
   if( !inPedAra1 ){
-    fprintf(stderr,"ERROR - Failed to open pedestal file for Station1 %s.\n",pedFile[1]);
+    fprintf(stderr,"ERROR - Failed to open pedestal file for Station1 %s\n",pedFile[1]);
     return;
   }
 
@@ -219,8 +219,7 @@ void AraEventCalibrator::loadTestBedPedestals()
     }
   }
   gzclose(inPedAra1);
-
-
+  gotPedFile[1]=1;
 
 }
 
@@ -315,7 +314,6 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
 {
   //jd
   int stationId=theEvent->stationId;
-
   static int gotPeds=0;
   if(!gotPeds)  
     loadTestBedPedestals();
@@ -517,7 +515,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAraTestBedStationEvent *theEvent, 
       
  
   }
-  
+
 }
 
 //jd?
@@ -568,7 +566,6 @@ void AraEventCalibrator::loadTestBedCalib()
   //Bin Width Calib
   
   sprintf(calibFile,"%s/ICRR/Station1/binWidths.txt",calibDir);
-  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
   std::ifstream BinFileAra1(calibFile);
   while(BinFileAra1 >> chip >> rco) {
     for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
@@ -578,14 +575,12 @@ void AraEventCalibrator::loadTestBedCalib()
   }
   //Epsilon Calib
   sprintf(calibFile,"%s/ICRR/Station1/epsilonFile.txt",calibDir);
-  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
   std::ifstream EpsFileAra1(calibFile);
   while(EpsFileAra1 >> chip >> rco >> epsilon) {
     epsilonVals[1][chip][rco]=epsilon;    
   }
   //Interleave Calib
   sprintf(calibFile,"%s/ICRR/Station1/interleaveFile.txt",calibDir);
-  fprintf(stdout, "AraEventCalibrator::loadTestBedCalib() opening %s\n", calibFile);
   std::ifstream IntFileAra1(calibFile);
   while(IntFileAra1 >> chip >> chan >> interleave) {
     interleaveVals[1][chan+4*chip]=interleave;    

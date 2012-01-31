@@ -74,6 +74,10 @@ endif
 	for file in calib/ICRR/TestBed/*.dat calib/ICRR/TestBed/*.csv calib/ICRR/TestBed/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR)/ICRR/TestBed; done
 	install -d $(ARA_UTIL_CALIB_DIR)/ICRR/Station1
 	for file in calib/ICRR/Station1/*.dat calib/ICRR/Station1/*.csv calib/ICRR/Station1/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR)/ICRR/Station1; done
+	install -d $(ARA_UTIL_CALIB_DIR)
+	for file in calib/*.csv; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR); done
+
+
 
 
 clean:
