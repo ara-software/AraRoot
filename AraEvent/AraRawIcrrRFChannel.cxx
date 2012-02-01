@@ -22,12 +22,12 @@ AraRawIcrrRFChannel::~AraRawIcrrRFChannel() {
 }
 
 
-AraRawIcrrRFChannel::AraRawIcrrRFChannel(IcrrRFChannelFull_t *rfPtr)
+AraRawIcrrRFChannel::AraRawIcrrRFChannel(IcrrIcrrRFChannelFull_t *rfPtr)
 {
   fillChannel(rfPtr);
 }
 
-void AraRawIcrrRFChannel::fillChannel(IcrrRFChannelFull_t *rfPtr)
+void AraRawIcrrRFChannel::fillChannel(IcrrIcrrRFChannelFull_t *rfPtr)
 {
   chanId=rfPtr->header.chanId;
   chipIdFlag=rfPtr->header.chipIdFlag;
