@@ -105,7 +105,6 @@ void AraEventCalibrator::setPedFile(char fileName[], UInt_t stationId)
   loadIcrrPedestals();
 }
 
-//jd?
 void AraEventCalibrator::loadIcrrPedestals()
 {
   //TestBed
@@ -225,7 +224,6 @@ void AraEventCalibrator::loadIcrrPedestals()
 
 int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO)
 {
-  //jd
   int stationId=theEvent->stationId;
 
   int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
@@ -312,7 +310,6 @@ int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int c
 
 void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
-  //jd
   int stationId=theEvent->stationId;
   static int gotPeds=0;
   if(!gotPeds)  
@@ -518,7 +515,6 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 
 }
 
-//jd?
 void AraEventCalibrator::loadIcrrCalib()
 {
   char calibFile[FILENAME_MAX];
@@ -591,7 +587,6 @@ void AraEventCalibrator::loadIcrrCalib()
 
 void AraEventCalibrator::calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType)
 {
-  //jd
   int stationId=theEvent->stationId;
 
   if(!AraCalType::hasClockAlignment(calType)) return;

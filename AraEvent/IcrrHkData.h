@@ -33,17 +33,17 @@ class IcrrHkData: public TObject
    double getTemperature(int tempId);///< Get the temperature in some units
 
 
-   //From IcrrIcrrTemperatureDataStruct_t
+   //From IcrrTemperatureDataStruct_t
    unsigned short temp[8]; ///< Temperatures
    
-   //From IcrrIcrrRFPowerDataStruct_t   
+   //From IcrrRFPowerDataStruct_t   
   unsigned short rfpDiscone[8]; ///< RF Power
   unsigned short rfpBatwing[8]; ///< RF Power
 
-  //From IcrrIcrrDACDataStruct_t
+  //From IcrrDACDataStruct_t
   unsigned short dac[6][4]; ///< DAC for what?
 
-  //From IcrrIcrrSimpleScalerStruct_t
+  //From IcrrSimpleScalerStruct_t
   unsigned short sclDiscone[8];
   unsigned short sclBatPlus[8];
   unsigned short sclBatMinus[8];

@@ -13,7 +13,7 @@
 #include <TObject.h>
 //#include "RawAtriGenericHeader.h"
 #include "RawAraGenericHeader.h"
-#include "araOneStructures.h"
+#include "araIcrrStructures.h"
 
 
 //!  AtriEventHkData -- The HK data

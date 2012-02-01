@@ -18,12 +18,13 @@ function doFindAndReplace() {
 
 for file in *.h *.cxx Makefile; do
     echo $file
-    doFindAndReplace AraOne Atri $file
-    doFindAndReplace AraTestBed Icrr $file
-    doFindAndReplace ARAONE ATRI $file
-    doFindAndReplace ARATESTBED ICRR $file
-    doFindAndReplace TestBed Icrr $file
-    doFindAndReplace TESTBED ICRR $file
-    doFindAndReplace Testbed Icrr $file
+#    doFindAndReplace AraOne Atri $file
+#    doFindAndReplace AraTestBed Icrr $file
+#    doFindAndReplace ARAONE ATRI $file
+#    doFindAndReplace ARATESTBED ICRR $file
+#    doFindAndReplace TestBed Icrr $file
+#    doFindAndReplace TESTBED ICRR $file
+#    doFindAndReplace Testbed Icrr $file
+    doFindAndReplace IcrrIcrr Icrr $file
 
 done

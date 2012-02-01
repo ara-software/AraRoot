@@ -13,7 +13,7 @@ using namespace std;
 #define HACK_FOR_ROOT
 
 #include "araIcrrStructures.h"
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "RawIcrrStationEvent.h"  
 
 void processEvent(UInt_t stationId);

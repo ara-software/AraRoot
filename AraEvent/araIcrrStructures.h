@@ -98,7 +98,7 @@ typedef struct {
 typedef struct {
     AraRawIcrrRFChannelHeader_t header;
     unsigned short data[MAX_NUMBER_SAMPLES_LAB3];
-} IcrrIcrrRFChannelFull_t;
+} IcrrRFChannelFull_t;
 
 //!  A complete pedestal subtracted RF channel
 /*!
@@ -111,7 +111,7 @@ typedef struct {
     float mean; ///<Filled by pedestalLib
     float rms; ///<Filled by pedestalLib
     short data[MAX_NUMBER_SAMPLES_LAB3]; ///<Pedestal subtracted and 11bit data
-} IcrrIcrrRFChannelPedSubbed_t;
+} IcrrRFChannelPedSubbed_t;
 
 //!  The temperatures
 /*!
@@ -119,7 +119,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short temp[8]; ///< 
-} IcrrIcrrTemperatureDataStruct_t;
+} IcrrTemperatureDataStruct_t;
 
 //!  The RF power
 /*!
@@ -128,7 +128,7 @@ typedef struct {
 typedef struct {
   unsigned short discone[8]; ///< 
   unsigned short batwing[8]; ///< 
-} IcrrIcrrRFPowerDataStruct_t;
+} IcrrRFPowerDataStruct_t;
 
 //!  The DAC settings
 /*!
@@ -136,7 +136,7 @@ typedef struct {
 */
 typedef struct {
   unsigned short dac[6][4]; ///< 
-} IcrrIcrrDACDataStruct_t;
+} IcrrDACDataStruct_t;
 
 //!  Scaler data
 /*!
@@ -148,7 +148,7 @@ typedef struct {
   unsigned short batMinus[8];
   unsigned short trigL1[12];
   unsigned short global;
-} IcrrIcrrSimpleScalerStruct_t;
+} IcrrSimpleScalerStruct_t;
 
 
 
@@ -209,10 +209,10 @@ typedef struct {
   The main housekeeping data structure
 */
 typedef struct {    
-  IcrrIcrrTemperatureDataStruct_t temp;
-  IcrrIcrrRFPowerDataStruct_t rfPow;
-  IcrrIcrrDACDataStruct_t dac;
-  IcrrIcrrSimpleScalerStruct_t scaler;
+  IcrrTemperatureDataStruct_t temp;
+  IcrrRFPowerDataStruct_t rfPow;
+  IcrrDACDataStruct_t dac;
+  IcrrSimpleScalerStruct_t scaler;
 } IcrrHkDataStruct_t;
 
 typedef struct {
@@ -246,7 +246,7 @@ typedef struct {
   GenericHeader_t gHdr;
   IcrrEventHeader_t hd;
   //  unsigned int eventNumber;    /* Global event number */
-  IcrrIcrrRFChannelFull_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
+  IcrrRFChannelFull_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
   IcrrTriggerMonitorStruct_t trig;
   IcrrHkDataStruct_t hk;
 } IcrrEventBody_t;
@@ -272,9 +272,9 @@ typedef struct {
   GenericHeader_t gHdr;
   unsigned int eventNumber;    /* Global event number */
   unsigned int whichPeds; ///<whichPedestals did we subtract
-  IcrrIcrrRFChannelPedSubbed_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
+  IcrrRFChannelPedSubbed_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
   IcrrHkDataStruct_t hk;
-} IcrrIcrrPedSubbedEventBody_t;
+} IcrrPedSubbedEventBody_t;
 
 
 //This stuff is just for legacy will be deprecated

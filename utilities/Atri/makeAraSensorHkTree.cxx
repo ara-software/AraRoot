@@ -13,7 +13,7 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "AtriSensorHkData.h"  
 
 void processHk();

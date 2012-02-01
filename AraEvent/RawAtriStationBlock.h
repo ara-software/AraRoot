@@ -14,7 +14,7 @@
 //Includes
 #include <vector>
 #include <TObject.h>
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "araSoft.h"
 
 

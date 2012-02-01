@@ -11,7 +11,7 @@
 
 //Includes
 #include <TObject.h>
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "araIcrrDefines.h"
 #include "RawAraStationEvent.h"
 

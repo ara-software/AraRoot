@@ -12,7 +12,7 @@
 //Includes
 #include <TObject.h>
 #include "araSoft.h"
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 
@@ -20,9 +20,6 @@
 #define ADCMV 0.939   /* mV/adc, per Gary's email of 05/04/2006 */
 #define SATURATION 1300 
 #define NSPERSAMP 0.95
-
-#define ICRR_NO_STATIONS 2
-
 
 //!  AraCalType -- The Calibration Type
 /*!
@@ -72,42 +69,22 @@ class AraEventCalibrator : public TObject
    
 
    //Icrr calibrations
-   //jd DONE
    void setPedFile(char fileName[], UInt_t stationId); ///< Manually sets the pedestal file
-
-   //jd DONE
    void calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulIcrrStationEvent, called from UsefulIcrrStationEvent constructor
-
-   //jd DONE
    int doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
-   
-   //jd?
    void fillRCOGuessArray(UsefulIcrrStationEvent *theEvent, int rcoGuess[LAB3_PER_ICRR]); ///< Utility function called by UsefulIcrrStationEvent
-   
-   //jd
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
-
    void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
-   
-   //jd? DONE
    void loadIcrrPedestals(); ///< Loads the pedestals from a file
-   //jd? DONE
    void loadIcrrCalib(); ///< Loads the various calibration constants
-   //jd DONE
    int gotPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a specific pedesal file has been selected
-   //jd DONE
    char pedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedesal file
  
-   //jd DONE DONE
    float pedestalData[ICRR_NO_STATIONS][LAB3_PER_ICRR][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
-   //jd DONE DONE
    double binWidths[ICRR_NO_STATIONS][LAB3_PER_ICRR][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
-   //jd DONE DONE
    double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_ICRR][2]; ///<Array to hold the wrap-around calibration constants
-   //jd DONE DONE
    double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
-   //jd DONE DONE
    double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //Well by default clock align 0 is 0
 
    ///These are just utility arrays that are used in the calibration

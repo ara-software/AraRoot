@@ -45,13 +45,14 @@ typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
   Each data structure is going to have a one byte overhead saying where it came from
 */
 enum {
-  ARA_STATION_ICRR=0x0, ///< Icrr1 probably won't chnage the testbed data yet
-  ARA_STATION_ARA1=0x1 ///< ARA1 data
+  ARA_STATION_ICRR_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
+  ARA_STATION_ICRR_ARA1=0x1, ///< Icrr ARA1 data
+  ARA_STATION_ATRI_ARA2=0x2 ///< Atri type stations 
 } ;
 typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
 
 
-#define THIS_STATION ARA_STATION_ARA1
+#define THIS_STATION ARA_STATION_ATRI_ARA2
 
 
 

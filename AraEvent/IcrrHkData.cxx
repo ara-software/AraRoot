@@ -25,17 +25,17 @@ IcrrHkData::~IcrrHkData() {
 
 IcrrHkData::IcrrHkData(IcrrHkDataStruct_t *theHk)
 {
-  //From IcrrIcrrTemperatureDataStruct_t
+  //From IcrrTemperatureDataStruct_t
   memcpy(temp,theHk->temp.temp,8*sizeof(unsigned short)); ///< Temperatures
   
-  //From IcrrIcrrRFPowerDataStruct_t   
+  //From IcrrRFPowerDataStruct_t   
   memcpy(rfpDiscone,theHk->rfPow.discone,8*sizeof(unsigned short)); ///< RF Power
   memcpy(rfpBatwing,theHk->rfPow.batwing,8*sizeof(unsigned short)); ///< RF Power
   
-  //From IcrrIcrrDACDataStruct_t
+  //From IcrrDACDataStruct_t
   memcpy(dac,theHk->dac.dac,6*4*sizeof(unsigned short)); ///< DAC for what?
 
-  //From IcrrIcrrSimpleScalerStruct_t
+  //From IcrrSimpleScalerStruct_t
   memcpy(sclDiscone,theHk->scaler.discone,8*sizeof(unsigned short));
   memcpy(sclBatPlus,theHk->scaler.batPlus,8*sizeof(unsigned short));
   memcpy(sclBatMinus,theHk->scaler.batMinus,8*sizeof(unsigned short));

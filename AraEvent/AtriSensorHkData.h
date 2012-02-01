@@ -12,7 +12,7 @@
 //Includes
 #include <TObject.h>
 #include "araSoft.h"
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "RawAraGenericHeader.h"
 
 //!  AtriSensorHkData -- The HK data

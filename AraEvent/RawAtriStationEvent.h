@@ -14,11 +14,9 @@
 //Includes
 #include <vector>
 #include <TObject.h>
-//#include "RawAtriGenericHeader.h"
-//#include "RawAraGenericHeader.h"
 #include "RawAraStationEvent.h"
 #include "RawAtriStationBlock.h"
-#include "araOneStructures.h"
+#include "araAtriStructures.h"
 #include "araSoft.h"
 
 
