@@ -13,7 +13,7 @@
 
 //Includes
 #include <TObject.h>
-#include "araIcrrStructures.h"
+#include "araAtriStructures.h"
 #include "araSoft.h"
 
 
