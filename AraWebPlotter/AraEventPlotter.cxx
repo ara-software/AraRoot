@@ -32,7 +32,7 @@ AraEventPlotter::~AraEventPlotter()
 {
    std::cerr << "AraEventPlotter::~AraEventPlotter()\n";
    //  saveFiles();
-   //  for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+   //  for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
    //    if(fAverageFFTHisto[ant]) {
    //      delete fAverageFFTHisto[ant];
    //    }
@@ -63,12 +63,12 @@ void AraEventPlotter::saveFiles()
 	 if(fRcoCountHisto[i]) fRcoCountHisto[i]->Write(0,TObject::kWriteDelete);
       }
 
-      for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+      for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
 	 if(fWaveformRMSHisto[ant]) fWaveformRMSHisto[ant]->Write(0,TObject::kWriteDelete);
 	 if(fWaveformSNRHisto[ant]) fWaveformSNRHisto[ant]->Write(0,TObject::kWriteDelete);
       }
 
-      for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+      for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
 	 if(fAverageFFTHisto[ant]) fAverageFFTHisto[ant]->Write();
 
       }
@@ -117,7 +117,7 @@ void AraEventPlotter::initialiseTimeHists(Int_t binWidth)
 	 fTrigPatternHisto[bit] = new AraTimeHistoHandler(name,title,binWidth);
    }
   
-   for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
       sprintf(name,"waveformRMSHisto%d",ant);
       sprintf(title,"Waveform RMS (Ant %d)",ant);  
       fWaveformRMSHisto[ant] = (AraTimeHistoHandler*) fHistoFile->Get(name);
@@ -170,7 +170,7 @@ void AraEventPlotter::initialiseTimeHists(Int_t binWidth)
       fDeadTimeHisto = new AraTimeHistoHandler(name,title,binWidth);
   
 
-   for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
       sprintf(name,"averageFFTHisto%d",ant);
       sprintf(title,"Average FFT Chan %d",ant+1);
       fAverageFFTHisto[ant] = new AraHistoHandler(fHistoFile,name,title);
@@ -246,7 +246,7 @@ void AraEventPlotter::loadAllTimeHists()
 			   fTrigPatternHisto[bit]->addAraTimeHistoHandler(tempTrigPatternHisto);
 		     }
   
-		     for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+		     for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
 			sprintf(name,"waveformRMSHisto%d",ant);
 			sprintf(title,"Waveform RMS (Ant %d)",ant);  
 			AraTimeHistoHandler *tempWaveformRMSHisto = (AraTimeHistoHandler*) fpRun->Get(name);
@@ -302,7 +302,7 @@ void AraEventPlotter::loadAllTimeHists()
 			fDeadTimeHisto->addAraTimeHistoHandler(tempDeadTimeHisto);
   
 
-		     for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+		     for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
 			fAverageFFTHisto[ant]->addFile(fpRun);
 		     }
     
@@ -421,7 +421,7 @@ void AraEventPlotter::addEvent(Int_t runNumber,RawIcrrStationEvent *rawEvent)
 
    fHistoFile->cd();
    //Next we can make average FFT stuff
-   for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {
+   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {
       int good=0;
       if(!fftHist) {
 	 fftHist = usefulEventPtr->getFFTHistForRFChan(ant);//gEventCanvasMaker->getFFTHisto(ant);
@@ -874,10 +874,10 @@ void AraEventPlotter::makePlots()
       subPad.Draw();      
       subPad.SetLogy(0);         
       subPad.Divide(4,4);
-      TH1D *histFFT[ANTS_PER_TESTBED]={0};
+      TH1D *histFFT[ANTS_PER_ICRR]={0};
       Double_t minVal=1e9;
       Double_t maxVal=-1e9;
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 //      std::cerr << i << fAverageFFTHisto[i] << "\n";
 	 histFFT[i]= fAverageFFTHisto[i]->getTimeHisto(plotTime);
 	 if(histFFT[i]) {
@@ -900,7 +900,7 @@ void AraEventPlotter::makePlots()
 	    //	std::cout << histFFT[i]->GetMean() << "\t" << histFFT[i]->GetEntries() << "\n";
 	 }
       }
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFT[i]) {
 	    subPad.cd(i+1);
 	    if(histFFT[i]->GetYaxis()) {
@@ -915,7 +915,7 @@ void AraEventPlotter::makePlots()
       unlink(canName);
       canAverageFFT.Print(canName);
       canAverageFFT.Clear();
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFT[i]) delete histFFT[i];
       } 
    }
@@ -939,10 +939,10 @@ void AraEventPlotter::makePlots()
       subPad.Draw();      
       subPad.SetLogy(0);         
       subPad.Divide(4,4);
-      TH2D *histFFTTime[ANTS_PER_TESTBED]={0};
+      TH2D *histFFTTime[ANTS_PER_ICRR]={0};
       Double_t minVal=1e9;
       Double_t maxVal=-1e9;
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 //      std::cerr << i << fAverageFFTHisto[i] << "\n";
 	 histFFTTime[i]= fAverageFFTHisto[i]->getTimeColourHisto(plotTime,numPointsArray[timeInd]);
 	 if(histFFTTime[i]) {
@@ -966,7 +966,7 @@ void AraEventPlotter::makePlots()
 	    //	std::cout << histFFTTime[i]->GetMean() << "\t" << histFFTTime[i]->GetEntries() << "\n";
 	 }
       }
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFTTime[i]) {
 	    subPad.cd(i+1);
 	    if(histFFTTime[i]->GetZaxis()) {
@@ -982,7 +982,7 @@ void AraEventPlotter::makePlots()
       unlink(canName);
       canAverageFFTTime.Print(canName);
       canAverageFFTTime.Clear();
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFTTime[i]) delete histFFTTime[i];
       } 
    }
@@ -1409,10 +1409,10 @@ void AraEventPlotter::makeLatestRunPlots()
       subPad.Draw();      
       subPad.SetLogy(0);         
       subPad.Divide(4,4);
-      TH1D *histFFT[ANTS_PER_TESTBED]={0};
+      TH1D *histFFT[ANTS_PER_ICRR]={0};
       Double_t minVal=1e9;
       Double_t maxVal=-1e9;
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 //      std::cerr << i << fAverageFFTHisto[i] << "\n";
 	 histFFT[i]= fAverageFFTHisto[i]->getTimeHisto(fEarliestTime,fLatestTime);
 	 if(histFFT[i]) {
@@ -1435,7 +1435,7 @@ void AraEventPlotter::makeLatestRunPlots()
 	    //	std::cout << histFFT[i]->GetMean() << "\t" << histFFT[i]->GetEntries() << "\n";
 	 }
       }
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFT[i]) {
 	    subPad.cd(i+1);
 	    if(histFFT[i]->GetYaxis()) {
@@ -1448,7 +1448,7 @@ void AraEventPlotter::makeLatestRunPlots()
       unlink(canName);
       canAverageFFT.Print(canName);
       canAverageFFT.Clear();
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFT[i]) delete histFFT[i];
       } 
    }
@@ -1466,10 +1466,10 @@ void AraEventPlotter::makeLatestRunPlots()
       subPad.Draw();      
       subPad.SetLogy(0);         
       subPad.Divide(4,4);
-      TH2D *histFFTTime[ANTS_PER_TESTBED]={0};
+      TH2D *histFFTTime[ANTS_PER_ICRR]={0};
       Double_t minVal=1e9;
       Double_t maxVal=-1e9;
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 //      std::cerr << i << fAverageFFTHisto[i] << "\n";
 	 histFFTTime[i]= fAverageFFTHisto[i]->getTimeColourHisto(fEarliestTime,fLatestTime,12);
 	 if(histFFTTime[i]) {
@@ -1495,7 +1495,7 @@ void AraEventPlotter::makeLatestRunPlots()
 	    //	std::cout << histFFTTime[i]->GetMean() << "\t" << histFFTTime[i]->GetEntries() << "\n";
 	 }
       }
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFTTime[i]) {
 	    subPad.cd(i+1);
 	    if(histFFTTime[i]->GetZaxis()) {
@@ -1510,7 +1510,7 @@ void AraEventPlotter::makeLatestRunPlots()
       unlink(canName);
       canAverageFFTTime.Print(canName);
       canAverageFFTTime.Clear();
-      for(int i=0;i<ANTS_PER_TESTBED;i++) {
+      for(int i=0;i<ANTS_PER_ICRR;i++) {
 	 if(histFFTTime[i]) delete histFFTTime[i];
       } 
    }

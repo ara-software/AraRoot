@@ -51,7 +51,7 @@ AraEventCorrelator*  AraEventCorrelator::Instance(Int_t numAnts)
 
 void AraEventCorrelator::fillAntennaPositions()
 {AraGeomTool *araGeom=AraGeomTool::Instance();
-  for(int ant=0;ant<ANTS_PER_TESTBED;ant++) {   
+  for(int ant=0;ant<ANTS_PER_ICRR;ant++) {   
     int antPolNum=araGeom->fAntInfo[ant].antPolNum; 
     std::cerr << ant << "\t" << antPolNum << "\t" << araGeom->fAntInfo[ant].polType << "\n";
     if(araGeom->fAntInfo[ant].polType==AraAntPol::kVertical) {

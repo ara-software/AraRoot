@@ -16,7 +16,7 @@
 #define HACK_FOR_ROOT
 
 //ARA includes
-#include "araTestbedStructures.h"
+#include "araIcrrStructures.h"
 #include "RawIcrrStationEvent.h"  
 #include "FullIcrrHkEvent.h"  
 #include "AraWebPlotterConfig.h"

@@ -20,7 +20,7 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 
 TREE_MAKER = makeAraSensorHkTree makeAraEventHkTree makeSimpleAraEventTree makeAraEventTree
-SCRIPTS = runAtriRunFileMaker.sh
+SCRIPTS = runAraRunFileMaker.sh
 
 all : $(TREE_MAKER)
 

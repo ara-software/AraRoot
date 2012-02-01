@@ -16,7 +16,7 @@
 #include "AraHistoHandler.h"
 #include "RawIcrrStationEvent.h"
 #include "UsefulIcrrStationEvent.h"
-#include "araTestBedDefines.h"
+#include "araIcrrDefines.h"
 
 class AraEventPlotter
 {
@@ -50,13 +50,13 @@ class AraEventPlotter
   AraTimeHistoHandler *fRcoCountHisto[3];
   
   //Now the event FFT averages
-  AraHistoHandler *fAverageFFTHisto[ANTS_PER_TESTBED];
+  AraHistoHandler *fAverageFFTHisto[ANTS_PER_ICRR];
   AraHistoHandler *fAverageTriggerPattern;
   AraHistoHandler *fAverageUnixTimeUs;
 
   //Now some simple event analysis stuff
-  AraTimeHistoHandler *fWaveformRMSHisto[ANTS_PER_TESTBED];
-  AraTimeHistoHandler *fWaveformSNRHisto[ANTS_PER_TESTBED];
+  AraTimeHistoHandler *fWaveformRMSHisto[ANTS_PER_ICRR];
+  AraTimeHistoHandler *fWaveformSNRHisto[ANTS_PER_ICRR];
   
   //The histogram pointers
   TH1D *histTrigPat;

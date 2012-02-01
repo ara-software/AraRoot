@@ -56,15 +56,15 @@ AraWebPlotter/AraWebRootFileMaker:
 	$(LD)  $(CXXFLAGS) $(LDFLAGS) $<  $(LIBS) -o $@
 
 progs:
-	cd utilities/AraOne; make
-	cd utilities/TestBed1; make
+	cd utilities/Atri; make
+	cd utilities/Icrr; make
 
 install:
 	@cd AraEvent; make install
 	@cd AraDisplay; make install
 	@cd AraCorrelator; make install
-	@cd utilities/AraOne; make install
-	@cd utilities/TestBed1; make install
+	@cd utilities/Atri; make install
+	@cd utilities/Icrr; make install
 	@cd AraWebPlotter; make install
 
 

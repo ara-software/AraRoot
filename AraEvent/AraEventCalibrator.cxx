@@ -227,8 +227,6 @@ int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int c
 {
   //jd
   int stationId=theEvent->stationId;
-  fprintf(stdout, "doBinCalibration() stationId %i\n", stationId);
-
 
   int nChip=theEvent->chan[chanIndex].chanId/CHANNELS_PER_LAB3;
   int nChan=theEvent->chan[chanIndex].chanId%CHANNELS_PER_LAB3;
