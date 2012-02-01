@@ -20,14 +20,14 @@ libAraWebPlotter.so -- The library for the AraWebPlotter
 
 Executables:
 ------------
-makeAraEventTree -- Program to convert the raw ARA TestBed data into a ROOT format
+makeAraEventTree -- Program to convert the raw ARA TestBed / Station One data into a ROOT format
 AraWebRootFileMaker -- Program to make ROOT files for the webplotter
 AraWebPlotter -- Program that reads these files and plots stuff
 
 Scripts:
 ---------
-runAraEventFileMaker.sh -- Script for calling makeAraEventTree
-runAraEventFileMaker.sh -- Script for calling makeAraEventTree
+runAraTestBedEventFileMaker.sh -- Script for calling makeAraEventTree to create TestBed root files
+runAraOneEventFileMaker.sh -- Script for calling makeAraEventTree to create Station One root files
 
 ROOT Macros:
 ------------

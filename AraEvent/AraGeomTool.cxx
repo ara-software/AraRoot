@@ -310,6 +310,7 @@ void AraGeomTool::readChannelMap()
   }
 }
 
+//jd
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
 {
   if(antNum<8 && antNum>=0)
@@ -335,7 +336,7 @@ Double_t AraGeomTool::calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Doub
 
 }
 
-
+//jd
 Double_t AraGeomTool::calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave)
 {
   if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)
@@ -362,6 +363,7 @@ Double_t AraGeomTool::calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t p
 
 }
 
+//jd
 Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R)
 {
   if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)

@@ -25,7 +25,7 @@ Installation
       make install
 
 Making ROOT files
-The makeAraEventTree executable is usedto convert raw ARA Test Bed data into a ROOT format. The easiest way to do this is through the runAraEventFileMaker.sh script. The usage is
+The makeAraEventTree executable is usedto convert raw ARA Test Bed / Station1 data into a ROOT format. The easiest way to do this is through the runAraTestBedEventFileMaker.sh or runAraOneEventFileMaker.sh script. The usage is
 
 runAraEventFileMaker.sh (input dir) (outputfile)
 
