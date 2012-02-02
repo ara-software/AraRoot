@@ -33,7 +33,7 @@ Int_t lastRunNumber;
 
 int main(int argc, char **argv) {
   if(argc<4) {
-    std::cout << "Usage: " << basename(argv[0]) << " <file list> <out file> <stationId (Icrr==0 ARA1==1)>" << std::endl;
+    std::cout << "Usage: " << basename(argv[0]) << " <file list> <out file> <stationId (TestBed==0 Station1==1)>" << std::endl;
     return -1;
   }
   makeEventTree(argv[1],argv[2], atoi(argv[3]));

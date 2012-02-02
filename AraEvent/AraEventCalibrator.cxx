@@ -194,7 +194,7 @@ void AraEventCalibrator::loadIcrrPedestals()
   gzclose(inPedTB);
   gotPedFile[0]=1;
 
-  //ARA1
+  //Station1
   gzFile inPedAra1 = gzopen(pedFile[1],"r");
   if( !inPedAra1 ){
     fprintf(stderr,"ERROR - Failed to open pedestal file for Station1 %s\n",pedFile[1]);
@@ -558,7 +558,7 @@ void AraEventCalibrator::loadIcrrCalib()
     interleaveVals[0][chan+4*chip]=interleave;    
   }
 
-  //ARA1
+  //Station1
   //Bin Width Calib
   
   sprintf(calibFile,"%s/ICRR/Station1/binWidths.txt",calibDir);

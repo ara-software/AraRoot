@@ -20,7 +20,7 @@ GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 
 TREE_MAKER = makeAraEventTree makeAraHkTree makeAraCalibratedEventTree
-SCRIPTS = runAraEventFileMaker.sh runAraTimeFileMaker.sh
+SCRIPTS = runAraTestBedEventFileMaker.sh runAraTestBedTimeFileMaker.sh runAraOneEventFileMaker.sh runAraOneTimeFileMaker.sh
 
 all : $(TREE_MAKER)
 

@@ -31,7 +31,7 @@ class RawAraStationEvent: public TObject, public RawAraGenericHeader {
   Int_t getNumChannels() {return 0;}
   
 
-  UInt_t fStationId; //Icrr1 = 0x0, ARA1 =0x1, ...
+  UInt_t fStationId; //TestBed = 0x0, Station1 =0x1, ...
 
 
   ClassDef(RawAraStationEvent,1);
