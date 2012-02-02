@@ -953,7 +953,7 @@ void AraEventCalibrator::loadAtriPedestals()
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
 	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
-      sprintf(fAtriPedFile,"%s/araOnePedestals.txt",calibDir);
+      sprintf(fAtriPedFile,"%s/ATRI/araAtriPedestals.txt",calibDir);
       fprintf(stdout," = %s\n",fAtriPedFile);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
@@ -1003,7 +1003,7 @@ void AraEventCalibrator::loadAtriCalib()
   }  
 
   int dda,chan,sample,capArray;
-  sprintf(calibFile,"%s/araOneSampleTiming.txt",calibDir);
+  sprintf(calibFile,"%s/ATRI/araAtriSampleTiming.txt",calibDir);
   std::ifstream SampleFile(calibFile);
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
     for(chan=0;chan<RFCHAN_PER_DDA;chan++) {
