@@ -27,12 +27,8 @@ class RawAraStationEvent: public TObject, public RawAraGenericHeader {
   RawAraStationEvent();///< Default constructor
   ~RawAraStationEvent(); ///< Destructor
   
-  UInt_t getStationId() {return fStationId;}
   Int_t getNumChannels() {return 0;}
   
-
-  UInt_t fStationId; //TestBed = 0x0, Station1 =0x1, ...
-
 
   ClassDef(RawAraStationEvent,1);
 };

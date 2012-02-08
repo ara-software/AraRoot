@@ -2,6 +2,6 @@
 #define ARA_ROOT_VERSION_H
 
 #define ARA_ROOT_MAJOR 3
-#define ARA_ROOT_MINOR 0
+#define ARA_ROOT_MINOR 1
 
 #endif //ARA_ROOT_VERSION

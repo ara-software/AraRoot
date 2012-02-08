@@ -16,18 +16,15 @@ ClassImp(RawAraStationEvent);
 RawAraStationEvent::RawAraStationEvent(UInt_t stationId)
   :RawAraGenericHeader(stationId)
 {
-  fStationId=stationId;
 }
 
 RawAraStationEvent::RawAraStationEvent(UInt_t stationId, AraGenericHeader_t *gHdr)
   :RawAraGenericHeader(gHdr)
 {
-  fStationId=stationId;
 }
 
 RawAraStationEvent::RawAraStationEvent() 
 {
-  fStationId=0x0;
 }
 
 RawAraStationEvent::~RawAraStationEvent()
