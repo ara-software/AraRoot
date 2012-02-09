@@ -27,8 +27,7 @@ class RawAraStationEvent: public TObject, public RawAraGenericHeader {
   RawAraStationEvent();///< Default constructor
   ~RawAraStationEvent(); ///< Destructor
   
-  Int_t getNumChannels() {return 0;}
-  
+  Int_t getNumChannels(){ return 0; };
 
   ClassDef(RawAraStationEvent,1);
 };

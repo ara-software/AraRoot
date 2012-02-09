@@ -24,6 +24,7 @@
 #pragma link C++ class RawAtriStationBlock+;
 #pragma link C++ class RawAtriStationEvent+;
 #pragma link C++ class RawAraGenericHeader+;
+#pragma link C++ class AraFileUtility+;
 
 #pragma link C++ typedef AraDataStructureType_t;
 

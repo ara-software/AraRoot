@@ -34,6 +34,9 @@ class RawAtriStationEvent: /*public RawAraGenericHeader ,*/public RawAraStationE
    RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer); ///< Assignment constructor
    ~RawAtriStationEvent(); ///< Destructor
 
+   Int_t getNumChannels() { return 0; }
+
+
    ULong64_t unixTime; ///< Software event time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Software event time in microseconds (32-bits)
    UInt_t eventNumber; ///< Software event number

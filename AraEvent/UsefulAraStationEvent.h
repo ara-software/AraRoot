@@ -29,10 +29,10 @@ class UsefulAraStationEvent
    ~UsefulAraStationEvent(); ///< Destructor
 
 
-   Int_t getNumElecChannels(); ///< Or may not be the same
-   Int_t getNumRFChannels(); ///< May be the same
-   TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
-   TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel
+   virtual Int_t getNumElecChannels()=0; ///< Or may not be the same
+   virtual Int_t getNumRFChannels()=0; ///< May be the same
+   virtual TGraph *getGraphFromElecChan(int chan)=0; ///< Returns the voltages-time graph for the appropriate electronics channel
+   virtual TGraph *getGraphFromRFChan(int chan)=0; ///< Returns the voltage-time graph for the appropriate rf channel
 
 
   ClassDef(UsefulAraStationEvent,1);

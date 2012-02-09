@@ -13,6 +13,14 @@
 
 ClassImp(RawAraStationEvent);
 
+RawAraStationEvent::RawAraStationEvent() 
+{
+}
+
+RawAraStationEvent::~RawAraStationEvent()
+{
+
+}
 RawAraStationEvent::RawAraStationEvent(UInt_t stationId)
   :RawAraGenericHeader(stationId)
 {
@@ -23,11 +31,4 @@ RawAraStationEvent::RawAraStationEvent(UInt_t stationId, AraGenericHeader_t *gHd
 {
 }
 
-RawAraStationEvent::RawAraStationEvent() 
-{
-}
 
-RawAraStationEvent::~RawAraStationEvent()
-{
-
-}
