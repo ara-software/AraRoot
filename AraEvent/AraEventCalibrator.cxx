@@ -513,6 +513,8 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
  
   }
 
+  //  printf("calibrated the event\n");
+
 }
 
 void AraEventCalibrator::loadIcrrCalib()

@@ -19,6 +19,7 @@
 #pragma link C++ class UsefulIcrrStationEvent+;
 #pragma link C++ class UsefulAtriStationEvent+;
 #pragma link C++ class AraAntennaInfo+;
+#pragma link C++ class AraStationInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
 #pragma link C++ class RawAtriStationBlock+;

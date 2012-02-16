@@ -91,6 +91,10 @@ class AraAntennaInfo: public TObject
    Int_t numLabChans;
    AraLabChip::AraLabChip_t labChip;
    Int_t labChans[2]; ///<These will count from 0
+   Int_t isDiplexed; ///jpd
+   Int_t diplexedChans[2]; ///jpd
+
+
    Int_t preAmpNum;
    Double_t avgNoiseFigure;
    Int_t rcvrNum;

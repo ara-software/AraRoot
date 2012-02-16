@@ -15,6 +15,10 @@
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 #include "AraAntennaInfo.h"
+#include "AraStationInfo.h"
+
+//sqlite includes
+#include <sqlite3.h>
 
 
 //!  AraGeomTool -- The Ara Geometry and numbering tool
@@ -58,6 +62,9 @@ class AraGeomTool
 
    //jd   
    AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR];
+   AraAntennaInfo fAntInfoDb[TOTAL_ANTS_PER_ICRR];
+   //jpd added this 
+   AraStationInfo fStationInfo[ICRR_NO_STATIONS];
    int fAntLookupTable[3][8]; //At som point should lose the magic numbers
    
    //Some variables to do with ice properties
@@ -72,7 +79,8 @@ class AraGeomTool
 
  private:
    void readChannelMap();
-
+   //jpd this will be the implementation that will load from the sql DB
+   void readChannelMapDb(Int_t stationId);
 
 };
 
