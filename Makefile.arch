@@ -369,7 +369,7 @@ LD            = g++
 LDFLAGS       = $(OPT2) -mmacosx-version-min=$(MACOSXTARGET)
 # The SOFLAGS will be used to create the .dylib,
 # the .so will be created separately
-ifeq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifeq ($(subst $(MACOSX_MINOR),,123456),123456)
 DllSuf        = so
 else
 DllSuf        = dylib
@@ -393,7 +393,7 @@ LD            = icpc
 LDFLAGS       = $(OPT2) -mmacosx-version-min=$(MACOSXTARGET)
 # The SOFLAGS will be used to create the .dylib,
 # the .so will be created separately
-ifeq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifeq ($(subst $(MACOSX_MINOR),,123456),123456)
 DllSuf        = so
 else
 DllSuf        = dylib
@@ -410,7 +410,7 @@ LD            = g++
 LDFLAGS       = $(OPT2) -mmacosx-version-min=$(MACOSXTARGET)
 # The SOFLAGS will be used to create the .dylib,
 # the .so will be created separately
-ifeq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifeq ($(subst $(MACOSX_MINOR),,123456),123456)
 DllSuf        = so
 else
 DllSuf        = dylib

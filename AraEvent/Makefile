@@ -35,7 +35,7 @@ $(ROOT_LIBRARY) : $(LIB_OBJS)
 ifeq ($(PLATFORM),macosx)
 # We need to make both the .dylib and the .so
 		$(LD) $(SOFLAGS)$@ $(LDFLAGS) $(LIBS) $^ $(OutPutOpt) $@
-ifneq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifneq ($(subst $(MACOSX_MINOR),,123456),123456)
 ifeq ($(MACOSX_MINOR),4)
 		ln -sf $@ $(subst .$(DllSuf),.so,$@)
 else
@@ -77,7 +77,7 @@ endif
 	install -d $(ARA_UTIL_CALIB_DIR)/ATRI
 	for file in calib/ATRI/*.csv calib/ATRI/*.txt; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR)/ATRI; done
 	install -d $(ARA_UTIL_CALIB_DIR)
-	for file in calib/*.csv; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR); done
+	for file in calib/*.csv calib/*.sqlite; do install -c -m 644 "$${file}" $(ARA_UTIL_CALIB_DIR); done
 
 
 

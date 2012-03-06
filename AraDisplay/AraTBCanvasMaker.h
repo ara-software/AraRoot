@@ -93,8 +93,8 @@ class AraTBCanvasMaker
   
    
    void setupElecPadWithFrames(TPad *plotPad); ///< Worker function to setup the electronics view canvas.
-   void setupRFChanPadWithFrames(TPad *plotPad); ///< Worker function to setup the surf view canvas.
-   void setupAntPadWithFrames(TPad *plotPad); ///< Worker function to setup the surf view canvas.
+   void setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId); ///< Worker function to setup the surf view canvas.
+   void setupAntPadWithFrames(TPad *plotPad, Int_t stationId); ///< Worker function to setup the surf view canvas.
 
    void deleteTGraphsFromElecPad(TPad *paddy,int chan); ///< Worker fucntion to delete a specific graph from a pad.
    void deleteTGraphsFromRFPad(TPad *paddy,int ant); ///< Worker fucntion to delete specific graphs from a pad.

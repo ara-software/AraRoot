@@ -29,9 +29,9 @@ class AraStationInfo: public TObject
   AraStationInfo(); ///< Default constructor
   ~AraStationInfo(); ////< Destructor
   
-  AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR]; ///< One object per antenna
+  AraAntennaInfo fAntInfo[20]; ///< One object per antenna
   Double_t stationLocation[3]; ///< array-centric co-ordinates of the station
-
+  int numberRFChans;
 
   ClassDef(AraStationInfo,1);
 };

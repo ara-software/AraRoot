@@ -42,8 +42,11 @@ TGraph *UsefulIcrrStationEvent::getGraphFromElecChan(int chan)
 
 TGraph *UsefulIcrrStationEvent::getGraphFromRFChan(int chan)
 {
-  if(chan<0 || chan>=RFCHANS_PER_ICRR)
+  if(chan<0 || chan>=numRFChans)
     return NULL;
+
+  // printf("UsefulIcrrStationEvent::getGraphFromRFChan(int chan) - creating graph ");
+  // printf("fNumPointsRF[%i] %i, fTimesRF[%i] %i, fVoltsRF[%i] %i\n", chan,fNumPointsRF[chan], chan, fTimesRF[chan], chan, fVoltsRF[chan]);
   return new TGraph(fNumPointsRF[chan],fTimesRF[chan],fVoltsRF[chan]);
 }
 

@@ -8,8 +8,7 @@ fi
 
 #Only need to edit these two lines to point to the local directories 
 RAW_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/event
-ROOT_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/root/Station1Test
-
+ROOT_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/
 
 RUN_NUM=$1
 RUN_WITH_ZEROES=`printf %06d $RUN_NUM`

@@ -54,11 +54,11 @@ AraWaveformGraph *grTBElecHilbert[NUM_DIGITIZED_ICRR_CHANNELS]={0};
 AraFFTGraph *grTBElecFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
 AraFFTGraph *grTBElecAveragedFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
 
-AraWaveformGraph *grTBRFChan[RFCHANS_PER_ICRR]={0};
-AraWaveformGraph *grTBRFChanFiltered[RFCHANS_PER_ICRR]={0};
-AraWaveformGraph *grTBRFChanHilbert[RFCHANS_PER_ICRR]={0};
-AraFFTGraph *grTBRFChanFFT[RFCHANS_PER_ICRR]={0};
-AraFFTGraph *grTBRFChanAveragedFFT[RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grTBRFChan[MAX_RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grTBRFChanFiltered[MAX_RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grTBRFChanHilbert[MAX_RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grTBRFChanFFT[MAX_RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grTBRFChanAveragedFFT[MAX_RFCHANS_PER_ICRR]={0};
 
 
 TH1D *AraTBCanvasMaker::getFFTHisto(int ant)
@@ -112,11 +112,11 @@ AraTBCanvasMaker::AraTBCanvasMaker(AraCalType::AraCalType_t calType)
   memset(grTBElecFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
   memset(grTBElecAveragedFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
 
-  memset(grTBRFChan,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
-  memset(grTBRFChanFiltered,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
-  memset(grTBRFChanHilbert,0,sizeof(AraWaveformGraph*)*RFCHANS_PER_ICRR);
-  memset(grTBRFChanFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_ICRR);
-  memset(grTBRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*RFCHANS_PER_ICRR);  
+  memset(grTBRFChan,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grTBRFChanFiltered,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grTBRFChanHilbert,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grTBRFChanFFT,0,sizeof(AraFFTGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grTBRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*MAX_RFCHANS_PER_ICRR);  
   switch(fCalType) {
   case AraCalType::kNoCalib:
     fMaxVoltLimit=3000;
@@ -184,7 +184,10 @@ TPad *AraTBCanvasMaker::getEventInfoCanvas(UsefulIcrrStationEvent *evPtr,  TPad 
        TText *runText = leftPave->AddText(textLabel);
        runText->SetTextColor(50);
      }
-     sprintf(textLabel,"Event: %d",evPtr->head.eventNumber);
+     if(evPtr->stationId==0) sprintf(textLabel,"TestBed Event: %d",evPtr->head.eventNumber);
+     else if(evPtr->stationId==1) sprintf(textLabel,"Station1 Event: %d",evPtr->head.eventNumber);
+     else sprintf(textLabel,"Event: %d",evPtr->head.eventNumber);
+
      TText *eventText = leftPave->AddText(textLabel);
      eventText->SetTextColor(50);
      leftPave->Draw();
@@ -471,7 +474,7 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulIcrrStationEvent *evPtr,
   //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
 
 
-  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
+  for(int rfchan=0;rfchan<(evPtr->numRFChans);rfchan++) {
     if(grTBRFChan[rfchan]) delete grTBRFChan[rfchan];
     if(grTBRFChanFFT[rfchan]) delete grTBRFChanFFT[rfchan];
     if(grTBRFChanHilbert[rfchan]) delete grTBRFChanHilbert[rfchan];
@@ -481,6 +484,9 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulIcrrStationEvent *evPtr,
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
     grTBRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+
+    
+
     grTBRFChan[rfchan]->setRFChan(rfchan);
       //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
@@ -716,7 +722,7 @@ TPad *AraTBCanvasMaker::getCanvasForWebPlotter(UsefulIcrrStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupRFChanPadWithFrames(plotPad);
+  setupRFChanPadWithFrames(plotPad, evPtr->stationId);
 
 
 
@@ -799,12 +805,22 @@ TPad *AraTBCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupRFChanPadWithFrames(plotPad);
+  setupRFChanPadWithFrames(plotPad, evPtr->stationId);
+  int maxColumns=0;
+  int maxRows=0;
 
+  if(evPtr->stationId==1){
+    maxColumns=4;
+    maxRows=5;
+  }
+  else {
+    maxColumns=4;
+    maxRows=4;
+  }
 
   
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<maxColumns;column++) {
+    for(int row=0;row<maxRows;row++) {
       plotPad->cd();
       int rfChan=column+4*row;
       
@@ -860,7 +876,7 @@ TPad *AraTBCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
   
 }
 
-
+//jpd this is the next one to change
 TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {
@@ -893,7 +909,7 @@ TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupAntPadWithFrames(plotPad);
+  setupAntPadWithFrames(plotPad, evPtr->stationId);
 
   //  int rfChanMap[4][4]={
   AraAntPol::AraAntPol_t polMap[4][4]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
@@ -1194,8 +1210,47 @@ void AraTBCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
 
 
 
-void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
+void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId)
 {
+  int maxColumns=0;
+  int maxRows=0;
+  int numRFChans=0;
+  Double_t left[4]={0.04,0.27,0.50,0.73};
+  Double_t right[4]={0.27,0.50,0.73,0.96};
+  Double_t top[5]={0};
+  Double_t bottom[5]={0};
+  if(stationId==0){
+    maxColumns=4;
+    maxRows=4;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.72;
+    top[2]=0.49;
+    top[3]=0.26;
+    bottom[0]=0.72;
+    bottom[1]=0.49;
+    bottom[2]=0.26;
+    bottom[3]=0.03;
+  }
+
+  if(stationId==1){
+    maxColumns=4;
+    maxRows=5;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.77;
+    top[2]=0.59;
+    top[3]=0.41;
+    top[4]=0.23;
+    bottom[0]=0.77;
+    bottom[1]=0.59;
+    bottom[2]=0.41;
+    bottom[3]=0.23;
+    bottom[4]=0.05;
+  }
+
   static int rfChanPadsDone=0;
   char textLabel[180];
   char padName[180];
@@ -1212,7 +1267,7 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
   if(rfChanPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int rfChan=0;rfChan<RFCHANS_PER_ICRR;rfChan++) {
+    for(int rfChan=0;rfChan<numRFChans;rfChan++) {
 	sprintf(padName,"rfChanPad%d",rfChan);
 	TPad *paddy = (TPad*) plotPad->FindObject(padName);
 	if(!paddy)
@@ -1226,16 +1281,13 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   rfChanPadsDone=1;
   
   
-  Double_t left[4]={0.04,0.27,0.50,0.73};
-  Double_t right[4]={0.27,0.50,0.73,0.96};
-  Double_t top[4]={0.95,0.72,0.49,0.26};
-  Double_t bottom[4]={0.72,0.49,0.26,0.03};
+
   
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<4;column++) {
+  for(int column=0;column<maxColumns;column++) {
     sprintf(textLabel,"%d/%d",1+column,5+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
@@ -1248,6 +1300,8 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"5-8");
   texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"9-12");
   texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"13-16");
+  if(stationId==1) texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"17-20");
+  
 
  
   int count=0;
@@ -1257,8 +1311,8 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   //  9 10 11 12
   // 13 14 15 16
 
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<maxColumns;column++) {
+    for(int row=0;row<maxRows;row++) {
       plotPad->cd();
       //      int rfChan=column+4*row;
       sprintf(padName,"rfChanPad%d",column+4*row);
@@ -1271,7 +1325,9 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3)
+      if(row==3&&stationId==0)
+	paddy1->SetBottomMargin(0.1);
+      if(row==4&&stationId==1)
 	paddy1->SetBottomMargin(0.1);
       paddy1->Draw();
       paddy1->cd();
@@ -1292,12 +1348,19 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==3) {
+      if(row==4&&stationId==1) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
 	framey->GetYaxis()->SetTitleSize(0.09);
       }
+      if(row==3&&stationId==0) {
+	framey->GetXaxis()->SetLabelSize(0.09);
+	framey->GetXaxis()->SetTitleSize(0.09);
+	framey->GetYaxis()->SetLabelSize(0.09);
+	framey->GetYaxis()->SetTitleSize(0.09);
+      }
+
       if(fWebPlotterMode && column!=0) {
 	 framey->GetYaxis()->SetLabelSize(0);
 	 framey->GetYaxis()->SetTitleSize(0);
@@ -1311,7 +1374,7 @@ void AraTBCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
 
 
-void AraTBCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
+void AraTBCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
 {
   static int antPadsDone=0;
   char textLabel[180];

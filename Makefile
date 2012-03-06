@@ -38,7 +38,7 @@ all :
 	@cd utilities/Atri; make all
 	@cd utilities/Icrr; make all
 	@cd AraWebPlotter; make all
-	@cd calibration/ICRR/Station1; make all
+
 
 
 AraEvent/libAraEvent.so:
@@ -75,7 +75,7 @@ clean:
 	cd utilities/Atri; make clean
 	cd utilities/Icrr; make clean
 	cd AraWebPlotter; make clean
-	@cd calibration/ICRR/Station1; make clean
+	cd calibration/ICRR/Station1; make clean
 	@rm -f *Dict*
 	@rm -f *.${OBJSUF}
 	@rm -f $(TREE_MAKER)

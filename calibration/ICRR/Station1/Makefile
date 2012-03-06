@@ -31,4 +31,5 @@ all: $(TARGETS)
 	$(CXX) -c $(CXXFLAGS) $(INC_ARA_UTIL) $<
 
 clean:
-	rm $(TARGETS) $(TARGETS_OBJ)
+	@rm -f $(TARGETS)
+	@rm -f $(TARGETS_OBJ)

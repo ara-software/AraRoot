@@ -53,6 +53,9 @@ svn co svn+ssh://ara@hepts2.phys.hawaii.edu/data2/svnroot/ara/AraRoot AraRoot
 or download the latest tarball from the website at the top of the file
 
 Define the ARA_UTIL_INSTALL_DIR to point to the location you want the library installed (the library files will end up in (ARA_UTIL_INSTALL_DIR)/lib and the header files in (ARA_UTIL_INSTALL_DIR)/include and the executables in (ARA_UTIL_INSTALL_DIR)/bin). If this is not defined the installation directory will default to /usr/local
+
+Define ARA_ROOT_DIR to point to the location at which AraRoot/branches/{version} or AraRoot/trunk is located
+
 Do
 make
 make install

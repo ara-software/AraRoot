@@ -41,7 +41,7 @@ class AraCanvasMaker
 
 
   Int_t fNumAntsInMap; ///<The number of antennas to use in the interferometric map
-  Double_t fThisMinTime; ///<Thi minimum time
+  Double_t fThisMinTime; ///<The minimum time
   Double_t fThisMaxTime; ///< The maximum time
 
    Double_t fMinVoltLimit; ///< The minimum voltage. 

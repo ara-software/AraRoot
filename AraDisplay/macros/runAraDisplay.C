@@ -2,13 +2,14 @@ gSystem->Reset();
 
 void runAraDisplay() {
   char fileName[180];
-  int run=3763; //175MHz @ -20
+   int run=3763; //175MHz @ -20 - stationId==1 - Station1 event
+  //  int run=3764; //175MHz @ -20 - stationId==0 - TestBed event
   //  int run=3755; //680MHz @ -20
   //  int run=3750; //350MHz @ -20
 
 
-  sprintf(fileName,"~/ara/data/ara_station1_ICRR_calibration/root/Station1Test/run%d/event%d.root",run,run);
-  printf("~/ara/data/ara_station1_ICRR_calibration/root/Station1Test/run%d/event%d.root\n",run,run);
+  sprintf(fileName,"~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/run%d/event%d.root",run,run);
+  printf("~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/run%d/event%d.root\n",run,run);
   runAraDisplay(fileName);
 }
 
@@ -16,7 +17,7 @@ void runAraDisplay() {
 void runAraDisplay(char *eventFile) {
   gSystem->AddIncludePath("-I${ARA_UTIL_INSTALL_DIR}/include");
   // gSystem->AddIncludePath("-I/sw/include");
-  // gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
+  gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
   gSystem->Load("libfftw3.so");
   gSystem->Load("libgsl.so");
   gSystem->Load("libMathMore.so");

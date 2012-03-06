@@ -12,6 +12,7 @@
 #include "AraGeomTool.h"
 #include "TMath.h"
 #include "TGraph.h"
+#include "FFTtools.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -79,6 +80,7 @@ AraEventCalibrator::AraEventCalibrator()
   loadIcrrCalib();
   loadAtriCalib();
   //Default Constructor
+  printf("AraEventCalibrator::AraEventCalibrator() finished loading calib\n");
 }
 
 AraEventCalibrator::~AraEventCalibrator() {
@@ -88,11 +90,15 @@ AraEventCalibrator::~AraEventCalibrator() {
 //______________________________________________________________________________
 AraEventCalibrator*  AraEventCalibrator::Instance()
 {
+  
+  //  printf("AraEventCalibrator::Instance() creating an instance of the calibrator\n");
   //static function
   if(fgInstance)
     return fgInstance;
 
   fgInstance = new AraEventCalibrator();
+
+  //  printf("AraEventCalibrator::Instance() finished creating an instance of the calibrator\n");
   return fgInstance;
 }
 
@@ -100,7 +106,9 @@ AraEventCalibrator*  AraEventCalibrator::Instance()
 void AraEventCalibrator::setPedFile(char fileName[], UInt_t stationId)
 {
   strncpy(pedFile[stationId],fileName,FILENAME_MAX);
-  fprintf(stdout, "AraEventCalibrator::setPedFile() setting ped %i to %s\n", stationId, pedFile[stationId]);
+  if(stationId==0)  fprintf(stdout, "AraEventCalibrator::setPedFile() setting TestBed pedFile to %s\n",  pedFile[stationId]);
+  if(stationId==1)  fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 pedFile to %s\n", pedFile[stationId]);
+
   gotPedFile[stationId]=1;
   loadIcrrPedestals();
 }
@@ -318,6 +326,12 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
   if(AraCalType::hasBinWidthCalib(calType))
     theEvent->guessRCO(0); //Forces the calculation of the RCO phase from the clock
 
+  //set the number of rfchans in the event
+
+
+  //jpd make these defines!
+  if(stationId==0) theEvent->numRFChans=16;
+  else theEvent->numRFChans=20;
 
   // Calibrate waveforms
   for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
@@ -403,15 +417,24 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 
   //For now we just have the one calibration type for interleaving
   AraGeomTool *tempGeom = AraGeomTool::Instance();
-  for(int  rfchan = 0; rfchan < RFCHANS_PER_ICRR; ++rfchan ){
+
+  for(int  rfchan = 0; rfchan < (theEvent->numRFChans); ++rfchan ){
+    //   printf("AraEventCalibrator::calibrateEvent() rfchan %i stationId %i\n", rfchan, stationId);
+    
     memset(theEvent->fVoltsRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES_LAB3);
     memset(theEvent->fTimesRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES_LAB3);
-    if(tempGeom->getNumLabChansForChan(rfchan)==2) {
-      //      std::cout << chan << "\t"
-      //		<< tempGeom->getFirstLabChanIndexForChan(rfchan) << "\t"
-      //		<< tempGeom->getSecondLabChanIndexForChan(rfchan) << "\n";
-      int ci1=tempGeom->getFirstLabChanIndexForChan(rfchan);
-      int ci2=tempGeom->getSecondLabChanIndexForChan(rfchan);
+
+
+    if(tempGeom->getNumLabChansForChan(rfchan, stationId)==2) {
+      //      printf("interleaved channel\n");
+      // std::cout << rfchan << "\t"
+     	//	<< tempGeom->getFirstLabChanIndexForChan(rfchan, stationId) << "\t"
+	//     		<< tempGeom->getSecondLabChanIndexForChan(rfchan, stationId) << "\n";
+
+      //printf("rfchan %i stationId %i labChip %i FirstLabChan %i SecondLabChan %i numLabChans %i labChans[0] %i labChans[1] %i\n", rfchan, stationId, tempGeom->getLabChipForChan(rfchan, stationId), tempGeom->getFirstLabChanForChan(rfchan, stationId), tempGeom->getSecondLabChanForChan(rfchan, stationId),tempGeom->getNumLabChansForChan(rfchan, stationId), tempGeom->getFirstLabChanIndexForChan(rfchan, stationId), tempGeom->getSecondLabChanIndexForChan(rfchan, stationId));
+
+      int ci1=tempGeom->getFirstLabChanIndexForChan(rfchan, stationId);
+      int ci2=tempGeom->getSecondLabChanIndexForChan(rfchan, stationId);
       theEvent->fNumPointsRF[rfchan]=theEvent->fNumPoints[ci1]+theEvent->fNumPoints[ci2];
       //Need to zero mean, maybe should do this in each half seperately?
       //RJN hack 13/01/11
@@ -463,7 +486,7 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 	    continue;
 	  }
 	}
-      }
+      }//interleaved
       
       else {	
 	for(int i=0;i<theEvent->fNumPointsRF[rfchan];i++) {
@@ -481,11 +504,12 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 	}
       }
       
-    }
-    else {
+    }//numLabChans==2
+    else if(tempGeom->isDiplexed(rfchan, stationId)==0){
+      //    printf("non-interleaved non-diplexed channel\n");
       //      std::cout << rfchan << "\t"
       //      << tempGeom->getFirstLabChanIndexForChan(rfchan) << "\n";
-      int ci=tempGeom->getFirstLabChanIndexForChan(rfchan);
+      int ci=tempGeom->getFirstLabChanIndexForChan(rfchan, stationId);
       theEvent->fNumPointsRF[rfchan]=theEvent->fNumPoints[ci];   
 
       //Need to zero mean the data
@@ -500,10 +524,36 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 	theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci][i];
 	
       }
-    }
+    }//isDiplexed==0
+    else if(tempGeom->isDiplexed(rfchan, stationId)==1){
+      //  printf("non-interleaved diplexed channel\n");
+      //now need to work out how to do a diplexed channel
+      //find lab channel from which to derived rfchan
+      int ci=tempGeom->getFirstLabChanIndexForChan(rfchan,stationId);
+      int noPoints=theEvent->fNumPoints[ci];
+      Double_t lowPassFreq=tempGeom->getLowPassFilter(rfchan,stationId);
+      Double_t highPassFreq=tempGeom->getHighPassFilter(rfchan,stationId);
+
+      TGraph *gUnfiltered = new TGraph(noPoints, theEvent->fTimes[ci], theEvent->fVolts[ci]);
+  
+      TGraph *gFiltered = FFTtools::simplePassBandFilter(gUnfiltered, highPassFreq, lowPassFreq);
+      Double_t *filteredT = gFiltered->GetX();
+      Double_t *filteredV = gFiltered->GetY();
+
+
+      for(int i=0;i<noPoints;i++){
+	theEvent->fTimesRF[rfchan][i]=filteredT[i];
+	theEvent->fVoltsRF[rfchan][i]=filteredV[i];
+      }
+      theEvent->fNumPointsRF[rfchan]=noPoints;
+
+      delete gFiltered;
+      delete gUnfiltered;
+
+    }//isDiplexed==1
    
     if(AraCalType::hasCableDelays(calType)) {
-      Double_t delay=tempGeom->fAntInfo[rfchan].cableDelay;
+      Double_t delay=tempGeom->fStationInfo[stationId].fAntInfo[rfchan].cableDelay;
       //      delay-=180; //Just an arbitrary offset
       for(int i=0;i<theEvent->fNumPointsRF[rfchan];i++) {
 	theEvent->fTimesRF[rfchan][i]-=delay;

@@ -36,41 +36,55 @@ class AraGeomTool
    //   AraAntennaInfo *getAntByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);
    int getChanIndex(AraLabChip::AraLabChip_t chip, int chan) {return chip*CHANNELS_PER_LAB3 +chan;}
 
-   //jd
-   AraLabChip::AraLabChip_t getLabChipForChan(int chan) {return fAntInfo[chan].labChip;}
-   int getNumLabChansForChan(int chan) { return fAntInfo[chan].numLabChans;}
-   int getFirstLabChanForChan(int chan) { return fAntInfo[chan].labChans[0];}
-   int getSecondLabChanForChan(int chan) { return fAntInfo[chan].labChans[1];}
-   int getFirstLabChanIndexForChan(int chan) { return getChanIndex(getLabChipForChan(chan),getFirstLabChanForChan(chan));}
-   int getSecondLabChanIndexForChan(int chan) { return getChanIndex(getLabChipForChan(chan),getSecondLabChanForChan(chan));}
-   
-   //jd
-   int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);
+   //something wrong with this guy
+   AraLabChip::AraLabChip_t getLabChipForChan(int chan, int stationId) {return fStationInfo[stationId].fAntInfo[chan].labChip;}
 
+   int getNumLabChansForChan(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].numLabChans;}
+   int getFirstLabChanForChan(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].labChans[0];}
+   int getSecondLabChanForChan(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].labChans[1];}
+
+
+   //  int getFirstLabChanIndexForChan(int chan) { return getChanIndex(getLabChipForChan(chan),getFirstLabChanForChan(chan));}
+
+
+   int getFirstLabChanIndexForChan(int chan, int stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getFirstLabChanForChan(chan, stationId));}
+
+
+   int getSecondLabChanIndexForChan(int chan, int stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getSecondLabChanForChan(chan, stationId));}
+
+   //jpd helperfunction for diplexed channels
+   int isDiplexed(int chan, int stationId) {return fStationInfo[stationId].fAntInfo[chan].isDiplexed;}
+
+   Double_t getLowPassFilter(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].lowPassFilterMhz; }
+
+   Double_t getHighPassFilter(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].highPassFilterMhz; }
+
+
+
+   int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, int stationId);
+
+
+   //jpd this is a hack to try and get AraCanvasMaker.cxx to work 
+   int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);
    
+   
+
    Double_t calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Double_t phiWave, Double_t thetaWave);
    Double_t calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t phiWave, Double_t thetaWave,Double_t R);
 
-   //jd
-   Double_t calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave);
-   Double_t calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R);
-
+   Double_t calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave, int stationId);
+   Double_t calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R, int stationId);
 
    //Instance generator
    static AraGeomTool*  Instance();
 
 
-   //jd   
-   AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR];
-   AraAntennaInfo fAntInfoDb[TOTAL_ANTS_PER_ICRR];
-   //jpd added this 
+   AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR]; //jpd need to comment this out
    AraStationInfo fStationInfo[ICRR_NO_STATIONS];
-   int fAntLookupTable[3][8]; //At som point should lose the magic numbers
+   int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
    
    //Some variables to do with ice properties
    static Double_t nTopOfIce;
-
-
 
   
  protected:

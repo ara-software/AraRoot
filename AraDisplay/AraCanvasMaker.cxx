@@ -969,7 +969,7 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
   for(int row=0;row<4;row++) {
     for(int column=0;column<4;column++) {
       plotPad->cd();
-      int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column]);
+      int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
       //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       
       sprintf(padName,"antPad%d_%d",column,row);

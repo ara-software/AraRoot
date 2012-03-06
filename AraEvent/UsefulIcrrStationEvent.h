@@ -37,13 +37,13 @@ class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStatio
    Double_t fVolts[NUM_DIGITIZED_ICRR_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated voltages
    Double_t fTimes[NUM_DIGITIZED_ICRR_CHANNELS][MAX_NUMBER_SAMPLES_LAB3]; ///<Array of the times
    Int_t fNumPoints[NUM_DIGITIZED_ICRR_CHANNELS]; ///< Array of the number of valid samples
-   Double_t fVoltsRF[RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved voltages for the RF input channels
-   Double_t fTimesRF[RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
-   Int_t fNumPointsRF[RFCHANS_PER_ICRR]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
+   Double_t fVoltsRF[MAX_RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved voltages for the RF input channels
+   Double_t fTimesRF[MAX_RFCHANS_PER_ICRR][2*MAX_NUMBER_SAMPLES_LAB3]; ///< Array of the calibrated, interleaved times for the RF input channels
+   Int_t fNumPointsRF[MAX_RFCHANS_PER_ICRR]; ///< Number of valid samples for thecalibrated, interleaved waveforms from the RF input channels
 
 
    Int_t getNumElecChannels() {return NUM_DIGITIZED_ICRR_CHANNELS;}
-   Int_t getNumRFChannels() {return RFCHANS_PER_ICRR;} //jpd this will need to change to accomodate the extra 4 RF signals diplexed into last 4 Elec channels
+   Int_t getNumRFChannels() {return numRFChans;} //jpd this will need to change to accomodate the extra 4 RF signals diplexed into last 4 Elec channels
    TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel //jpd This will need to change to pull out extra 4 channels, need to do in frequency domain
    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns
@@ -60,6 +60,7 @@ class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStatio
      return chan[chanIndex].getRCO();
    } ///< Returns the RCO phase
 
+   Int_t numRFChans;
 
    AraEventCalibrator *fCalibrator; ///< Pointer to the AraEventCalibrator
 

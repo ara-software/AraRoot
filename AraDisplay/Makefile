@@ -34,7 +34,7 @@ $(ROOT_LIBRARY) : $(LIB_OBJS)
 ifeq ($(PLATFORM),macosx)
 # We need to make both the .dylib and the .so
 		$(LD) $(SOFLAGS)$@ $(LDFLAGS) $(LIBS) $(GLIBS) $^ $(OutPutOpt) $@
-ifneq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifneq ($(subst $(MACOSX_MINOR),,123456),123456)
 ifeq ($(MACOSX_MINOR),4)
 		ln -sf $@ $(subst .$(DllSuf),.so,$@)
 else

@@ -258,6 +258,12 @@ int AraDisplay::loadEventTree(char *eventFile)
     fEventTree->SetBranchAddress("event",&fRawEventPtr);  
   fEventTree->SetBranchAddress("run",&fCurrentRun);  
   fEventEntry=0;
+
+  //jdp this is where we will build the tree index on
+
+  fEventTree->BuildIndex("event.head.eventNumber");
+  fEventIndex = (TTreeIndex*) fEventTree->GetTreeIndex();
+
   return 0;
 }
 
