@@ -3,6 +3,7 @@
 #include <iostream>
 #include <zlib.h>
 #include <libgen.h>     
+#include <cstdlib>
  
 using namespace std;
 

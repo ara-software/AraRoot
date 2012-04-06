@@ -7,7 +7,8 @@ ifdef ARA_ROOT_DIR
 include ${ARA_ROOT_DIR}/StandardDefinitions.mk
 endif
 
-LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L${ARA_ROOT_DIR}/AraEvent -lAraEvent -lz
+# AraEvent uses ROOT (directly), and sqlite3 (directly), and the FFTLIBS (directly)
+LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L${ARA_ROOT_DIR}/AraEvent -lAraEvent -lz -lsqlite3 $(ROOTLIBS) $(FFTLIBS)
 INC_ARA_UTIL=-I$(ARA_UTIL_INC_DIR) -I ${ARA_ROOT_DIR}/AraEvent
 
 
@@ -15,7 +16,7 @@ INC_ARA_UTIL=-I$(ARA_UTIL_INC_DIR) -I ${ARA_ROOT_DIR}/AraEvent
 CXXFLAGS     += $(ROOTCFLAGS) $(FFTFLAG) $(SYSINCLUDES) $(INC_ARA_UTIL)
 LDFLAGS      += -g $(ROOTLDFLAGS) 
 
-LIBS          = $(ROOTLIBS)  -lMinuit $(SYSLIBS) $(LD_ARA_UTIL) $(FFTLIBS) 
+LIBS          = $(LD_ARA_UTIL) $(ROOTLIBS)  -lMinuit $(SYSLIBS) $(FFTLIBS) 
 GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 
@@ -25,10 +26,9 @@ SCRIPTS = runAraRunFileMaker.sh
 all : $(TREE_MAKER)
 
 
-
 % :  %.$(SRCSUF)
 	@echo "<**Linking**> "  
-	$(LD)  $(CXXFLAGS) $(LDFLAGS) $<  $(LIBS) -o $@
+	$(LD)  $< $(CXXFLAGS) $(LDFLAGS)  $(LIBS) -o $@
 
 install: $(TREE_MAKER)
 	install -d $(ARA_UTIL_BIN_DIR)
