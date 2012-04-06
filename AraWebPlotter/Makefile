@@ -14,8 +14,9 @@ CXXFLAGS     += $(ROOTCFLAGS) $(FFTFLAG) $(SYSINCLUDES) -I../AraEvent -I../AraDi
 LDFLAGS      += -g $(ROOTLDFLAGS) -lz
 
 
-
-LIBS          = $(ROOTLIBS)  -lMinuit $(SYSLIBS) $(LD_ARA_UTIL) $(FFTLIBS) -L../AraEvent -lAraEvent -L../AraDisplay -lAraDisplay -L../AraCorrelator -lAraCorrelator -Llib -lAraConfig -lAraKvp -L.
+# ARA libs go first - first AraDisplay, then AraCorrelator, then AraEvent
+# ROOT libs go LAST, they don't depend on anything else.
+LIBS          = -L../AraDisplay -lAraDisplay -L../AraCorrelator -lAraCorrelator -L../AraEvent -lAraEvent $(SYSLIBS) $(LD_ARA_UTIL) $(FFTLIBS) -Llib -lAraConfig -lAraKvp -L. -lsqlite3 $(ROOTLIBS) -lMinuit -lGui
 GLIBS         = $(ROOTGLIBS) $(SYSLIBS)
 
 #Now the bits we're actually compiling
@@ -72,7 +73,8 @@ endif
 
 % :  %.$(SRCSUF) $(ROOT_LIBRARY)
 	@echo "<**Linking**> "  
-	$(LD)  $(CXXFLAGS) $(LDFLAGS) $<  $(LIBS) -L. -lAraWebPlotter -o $@
+# Executable goes first, then AraWebPlotter. They depend on LDFLAGS stuff.
+	$(LD)  $(CXXFLAGS) $< -L. -lAraWebPlotter $(LDFLAGS)  $(LIBS) -o $@
 
 
 
