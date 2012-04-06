@@ -38,7 +38,7 @@ SRCSUF = ${SrcSuf}
 USE_FFT_TOOLS=1
 
 ifdef USE_FFT_TOOLS
-FFTLIBS = -lRootFftwWrapper -lfftw3 -lMathMore -lgsl
+FFTLIBS = -lRootFftwWrapper -lfftw3 -lMathMore -lgsl ${ROOTLIBS}
 FFTFLAG = -DUSE_FFT_TOOLS
 else
 FFTLIBS =
