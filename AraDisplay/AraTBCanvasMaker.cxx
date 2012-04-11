@@ -1029,7 +1029,7 @@ TPad *AraTBCanvasMaker::getIntMapCanvas(UsefulIcrrStationEvent *evPtr,
   }
   plotPad->cd();
   plotPad->Clear();
-  AraEventCorrelator *araCorPtr = AraEventCorrelator::Instance(fNumAntsInMap);
+  AraEventCorrelator *araCorPtr = AraEventCorrelator::Instance(fNumAntsInMap, evPtr->stationId);
   static TH2D* histMapH=0;  
   static TH2D* histMapV=0;  
   plotPad->Divide(1,2);
