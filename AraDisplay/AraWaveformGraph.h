@@ -31,7 +31,7 @@ class AraWaveformGraph : public TGraph
 
   void setElecChan(int elecChan);
   Int_t fElecChan; ///< Used in labelling.
-  void setRFChan(int rfChan);
+  void setRFChan(int rfChan, int stationId);
   Int_t fRFChan; ///< Used in labelling.
 
  private:

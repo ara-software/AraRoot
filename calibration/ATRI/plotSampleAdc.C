@@ -2,8 +2,8 @@
 #include <fstream>
 
 //Event Reader Includes
-#include "UsefulAraOneStationEvent.h"
-#include "RawAraOneStationEvent.h"
+#include "UsefulAtriStationEvent.h"
+#include "RawAtriStationEvent.h"
 #include "araSoft.h"
 
 //ROOT Includes
@@ -39,7 +39,7 @@ int plotSampleAdc(char *fileName,int numEvents, int dda,int chan)
     std::cerr << "Can't find eventTree\n";
     return -1;
   }
-  RawAraOneStationEvent *evPtr=0;
+  RawAtriStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
 
   Long64_t numEntries=eventTree->GetEntries();
@@ -57,7 +57,7 @@ int plotSampleAdc(char *fileName,int numEvents, int dda,int chan)
   for(int event=10;event<numEvents;event++) {
     
     eventTree->GetEntry(event);
-    UsefulAraOneStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
+    UsefulAtriStationEvent realEvent(evPtr,AraCalType::kVoltageTime);
     
     TGraph *gr1 =realEvent.getGraphFromElecChan(chan+8*dda);
     //    std::cout << event << "\t" << gr1->GetN() << "\n";

@@ -38,6 +38,8 @@ Double_t newTimeValsEpsilon[2][2][SAMPLES_PER_BLOCK/2];
 Double_t newEpsilon[2];
 Int_t lastRun=0, lastEvent=0, lastDda=0, lastChan=0, lastBlock=0;
 
+using namespace std;
+
 int main(int argc, char **argv)
 {
   if(argc<5) {

@@ -331,7 +331,7 @@ TPad *AraTBCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulIcrrStatio
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
     grTBRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grTBRFChan[rfchan]->setRFChan(rfchan);
+    grTBRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
       //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
       //		<< grTBElec[chan]->GetRMS(2) << std::endl;
@@ -487,7 +487,7 @@ TPad *AraTBCanvasMaker::getEventViewerCanvas(UsefulIcrrStationEvent *evPtr,
 
     
 
-    grTBRFChan[rfchan]->setRFChan(rfchan);
+    grTBRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
       //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
       //		<< grTBElec[chan]->GetRMS(2) << std::endl;
@@ -924,7 +924,7 @@ TPad *AraTBCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
   for(int row=0;row<4;row++) {
     for(int column=0;column<4;column++) {
       plotPad->cd();
-      int rfChan=fTBACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column]);
+      int rfChan=fTBACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
       //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       
       sprintf(padName,"antPad%d_%d",column,row);

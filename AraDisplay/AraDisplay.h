@@ -31,6 +31,8 @@ class RawIcrrStationEvent;
 class UsefulAtriStationEvent;
 class RawAtriStationEvent;
 
+class RawAraStationEvent;
+
 class TButton;
 class TTreeIndex;
 class TFile;
@@ -151,6 +153,8 @@ class AraDisplay
    UsefulAtriStationEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
    UsefulAtriStationEvent *fRawEventPtr; ///< Pointer to the raw event.
    Int_t fCurrentRun; ///<Run number
+   RawAraStationEvent *fRawStationEventPtr; //jpd
+
       
    TButton *fElecViewButton; ///< The vertical polarisation button.
    TButton *fRFViewButton; ///< The horizontal polarisation button.

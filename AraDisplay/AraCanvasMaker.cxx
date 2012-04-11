@@ -182,11 +182,11 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
      leftPave->SetBorderSize(0);
      leftPave->SetFillColor(0);
      leftPave->SetTextAlign(13);
-     if(runNumber) {
+     //     if(runNumber) {
        sprintf(textLabel,"Run: %d",runNumber);
        TText *runText = leftPave->AddText(textLabel);
        runText->SetTextColor(50);
-     }
+       //    }
      sprintf(textLabel,"Event: %d",evPtr->eventNumber);
      TText *eventText = leftPave->AddText(textLabel);
      eventText->SetTextColor(50);
@@ -372,7 +372,7 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationE
     }
 
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grRFChan[rfchan]->setRFChan(rfchan);
+    grRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
       //      std::cout << evPtr->eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
       //		<< grElec[chan]->GetRMS(2) << std::endl;
@@ -538,7 +538,7 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
       if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
     }
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grRFChan[rfchan]->setRFChan(rfchan);
+    grRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
       //      std::cout << evPtr->eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
       //		<< grElec[chan]->GetRMS(2) << std::endl;

@@ -99,14 +99,14 @@ void AraWaveformGraph::setElecChan(int elecChan)
   
 }
 
-void AraWaveformGraph::setRFChan(int rfChan)
+void AraWaveformGraph::setRFChan(int rfChan, int stationId)
 {
   fRFChan=rfChan;
   char graphName[180];
   sprintf(graphName,"grRFChan%d",rfChan);
   this->SetName(graphName);
   char graphTitle[180];
-  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->fAntInfo[rfChan].designator);
+  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->fStationInfo[stationId].fAntInfo[rfChan].designator);
   this->SetTitle(graphTitle);
 }
   

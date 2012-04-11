@@ -7,8 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=/Users/rjn/ara/data/ohio2011/
-ROOT_BASE_DIR=/Users/rjn/ara/data/ohio2011/root
+RAW_BASE_DIR=~/ara/data/miniATRI
+ROOT_BASE_DIR=~/ara/data/miniATRI/root
 #RAW_BASE_DIR=/tmp/fakeData
 #ROOT_BASE_DIR=/tmp/fakeRoot
 

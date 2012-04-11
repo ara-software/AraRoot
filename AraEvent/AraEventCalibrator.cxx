@@ -318,6 +318,7 @@ int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int c
 
 void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
+  printf("void AraEventCalibrator::calibrateEvent - trying to calibrate and Icrr event\n"); //jpd
   int stationId=theEvent->stationId;
   static int gotPeds=0;
   if(!gotPeds)  
@@ -814,6 +815,8 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
 
 void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
+
+  printf("void AraEventCalibrator::calibrateEvent - trying to calibrate an Atri event\n");
   //Really what we will do here is just kNoCalib
   static int gotPeds=0;
   if(!gotPeds)  {
@@ -985,7 +988,7 @@ void AraEventCalibrator::setAtriPedFile(char *filename)
 
 void AraEventCalibrator::loadAtriPedestals()
 {  
-  
+  printf("void AraEventCalibrator::loadAtriPedestals() - trying to load pedestals\n");//jpd
   if(!fGotAtriPedFile) {
     char *pedFileEnv = getenv( "ARA_ONE_PEDESTAL_FILE" );
     if ( pedFileEnv == NULL ) {

@@ -1,15 +1,20 @@
 gSystem->Reset();
 
 void runAraDisplay() {
-  char fileName[180];
-   int run=3763; //175MHz @ -20 - stationId==1 - Station1 event
+  
+  char fileName[180];  
+
+  int run=325;
   //  int run=3764; //175MHz @ -20 - stationId==0 - TestBed event
   //  int run=3755; //680MHz @ -20
   //  int run=3750; //350MHz @ -20
 
 
-  sprintf(fileName,"~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/run%d/event%d.root",run,run);
-  printf("~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/run%d/event%d.root\n",run,run);
+   //   sprintf(fileName,"~/ara/data/miniATRI/root/run191/event191.root");
+   sprintf(fileName, "~/ara/data/miniATRI/root/run%i/event%i.root", run, run);
+
+
+   //  printf("~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/run%d/event%d.root\n",run,run);
   runAraDisplay(fileName);
 }
 
@@ -32,11 +37,12 @@ void runAraDisplay(char *eventFile) {
 
 
   //-20 pedestal
-   AraEventCalibrator::Instance()->setPedFile( "/Users/jdavies/ara/data/ara_station1_ICRR_calibration/data/peds/run_003747/peds_1326108401/peds_1326108401.602169.run003747.dat",1);
+    AraEventCalibrator::Instance()->setAtriPedFile("~/ara/data/miniATRI/run_000302/pedestalValues.run000302.dat");
 
   //RoomTemp pedestal
   //  AraEventCalibrator::Instance()->setPedFile("/unix/ara/data/ara_station1_ICRR_calibration/data/peds/run_002442/peds_1324990418/peds_1324990418.988115.run002442.dat", 1);
 
-  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kFirstCalib);  
+        AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
+	//    AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);  
   magicPtr->startEventDisplay();
 }

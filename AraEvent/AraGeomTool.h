@@ -78,9 +78,7 @@ class AraGeomTool
    //Instance generator
    static AraGeomTool*  Instance();
 
-
-   AraAntennaInfo fAntInfo[TOTAL_ANTS_PER_ICRR]; //jpd need to comment this out
-   AraStationInfo fStationInfo[ICRR_NO_STATIONS];
+   AraStationInfo fStationInfo[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
    int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
    
    //Some variables to do with ice properties
@@ -92,7 +90,6 @@ class AraGeomTool
    // protect against multiple instances
 
  private:
-   void readChannelMap();
    //jpd this will be the implementation that will load from the sql DB
    void readChannelMapDb(Int_t stationId);
 

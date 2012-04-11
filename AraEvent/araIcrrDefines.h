@@ -35,23 +35,9 @@
 #define TRANS_PER_ICRR 6
 #define TOTAL_ANTS_PER_ICRR ANTS_PER_ICRR+TRANS_PER_ICRR
 
-
-//jd this is how it was
-
-/* //Station Id Codes */
-/* #define ICRR_ID_CODE 0x0 */
-/* #define ARA1_ID_CODE 0x1 */
-
-//jd - don't think this is needed here - currently something similar in araOneStructures
-//as
-/*
-enum {
-  ARA_STATION_ICRR_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
-  ARA_STATION_ICRR_STATION1=0x1, ///< Icrr Station1 data
-  ARA_STATION_ATRI_STATION2=0x2 ///< Atri type stations 
-} ;
-typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
-*/
+//New stuff added by jpd
+#define RFCHANS_TESTBED 16
+#define RFCHANS_STATION1 20
 
 //Legacy defines that will eventually disappear
 #define CHANNELS_PER_CHIP CHANNELS_PER_LAB3 

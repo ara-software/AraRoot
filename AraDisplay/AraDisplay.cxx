@@ -89,7 +89,7 @@ void AraDisplay::zeroPointers()
   fTBRawEventPtr=0;
   fUsefulEventPtr=0;
   fRawEventPtr=0;
-  fTBData=1;
+  fTBData=0;
 
 
   fAraCanvas=0;
@@ -164,6 +164,8 @@ void AraDisplay::startControlPanel()
 void AraDisplay::startEventDisplay()
 {
  
+
+  
   if(fTBData)
     fTBEventCanMaker=new AraTBCanvasMaker(this->fCalType);
   else
@@ -252,6 +254,20 @@ int AraDisplay::loadEventTree(char *eventFile)
     return -1;
   }
   //  std::cout << "Here\n";
+
+  //jpd now let's make a better decision about what type of event's we have
+  
+  
+
+  fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
+  fEventTree->GetEntry(1);
+  if(fRawStationEventPtr->stationId==0) fTBData=1;
+  else fTBData=0;
+
+  fEventTree->ResetBranchAddresses();
+
+  //jpd that should clear that up
+
   if(fTBData) 
     fEventTree->SetBranchAddress("event",&fTBRawEventPtr);  
   else
