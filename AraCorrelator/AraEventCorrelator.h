@@ -11,6 +11,7 @@
 
 //Includes
 #include <TObject.h>
+#include "AraStationInfo.h"
 #include "AraAntennaInfo.h"
 
 
@@ -50,6 +51,7 @@ class AraEventCorrelator : public TObject
    ~AraEventCorrelator(); ///< Destructor
    
    TH2D *getInterferometricMap(UsefulIcrrStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
+   TH2D *getInterferometricMap(UsefulAtriStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
    void fillAntennaPositions();
    void fillDeltaTArrays(AraCorrelatorType::AraCorrelatorType_t corType);
    void setupDeltaTInfinity();

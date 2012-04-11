@@ -2,7 +2,9 @@
 #include "AraEventCorrelator.h"
 #include "AraGeomTool.h"
 #include "AraAntennaInfo.h"
+#include "AraStationInfo.h"
 #include "UsefulIcrrStationEvent.h"
+#include "UsefulAtriStationEvent.h"
 #include "FFTtools.h"
 #include "TH2D.h"
 #include "TMath.h"
@@ -234,6 +236,120 @@ void AraEventCorrelator::getPairIndices(int pair, int &ant1, int &ant2)
 }
 
 TH2D *AraEventCorrelator::getInterferometricMap(UsefulIcrrStationEvent *evPtr, AraAntPol::AraAntPol_t polType,AraCorrelatorType::AraCorrelatorType_t corType)
+{
+  static int counter=0;
+  fillDeltaTArrays(corType);
+  //Now need to get correlations for the fNumPairs antenna pairs and then look up the correlation values of each one
+  Double_t scale=1./fNumPairs;
+  TH2D *histMap = new TH2D("histMap","histMap",NUM_PHI_BINS,-180,180,NUM_THETA_BINS,-90,90);
+  TGraph *grRaw[fNumAnts];
+  TGraph *grInt[fNumAnts];
+  TGraph *grNorm[fNumAnts];
+  TGraph *grCor[fNumPairs];
+  for(int i=0;i<fNumAnts;i++) {
+    grRaw[i]=0;
+    grInt[i]=0;
+    grNorm[i]=0;
+  }
+  for(int i=0;i<fNumPairs;i++) 
+    grCor[i]=0;
+
+  if(polType==AraAntPol::kVertical) {
+    for(int ind=0;ind<fNumAnts;ind++) {
+      //      std::cerr << ind << "\t" << fRfChanVPol[ind] << "\n";
+      grRaw[ind]=evPtr->getGraphFromRFChan(fRfChanVPol[ind]);
+      grInt[ind]=FFTtools::getInterpolatedGraph(grRaw[ind],0.5);
+      grNorm[ind]=getNormalisedGraph(grInt[ind]);
+    }
+    //    std::cerr << "Got graphs and made int maps\n";
+
+    for(int pair=0;pair<fNumPairs;pair++) {
+      int ind1=0;
+      int ind2=0;
+      getPairIndices(pair,ind1,ind2);
+      //      std::cerr << pair << "\t" << ind1 << "\t" << ind2 << "\n";
+
+      grCor[pair]=FFTtools::getCorrelationGraph(grNorm[ind1],grNorm[ind2]);      
+      for(int phiBin=0;phiBin<NUM_PHI_BINS;phiBin++) {
+	for(int thetaBin=0;thetaBin<NUM_THETA_BINS;thetaBin++) {
+	  //I think this is the correct equation to work out the bin number
+	  //Could just use TH2::GetBin(binx,biny) but the below should be faster
+	  Int_t globalBin=(phiBin+1)+(thetaBin+1)*(NUM_PHI_BINS+2);
+	  Double_t dt=fVPolDeltaT[pair][phiBin][thetaBin];
+	  //Double_t corVal=grCor[pair]->Eval(dt);
+	  Double_t corVal=fastEvalForEvenSampling(grCor[pair],dt);
+	  corVal*=scale;
+	  Double_t binVal=histMap->GetBinContent(globalBin);
+	  histMap->SetBinContent(globalBin,binVal+corVal);
+	}
+      }      
+    }
+  }
+  else {
+    for(int ind=0;ind<fNumAnts;ind++) {
+      grRaw[ind]=evPtr->getGraphFromRFChan(fRfChanHPol[ind]);
+      grInt[ind]=FFTtools::getInterpolatedGraph(grRaw[ind],0.5);
+      grNorm[ind]=getNormalisedGraph(grInt[ind]);
+    }
+
+    for(int pair=0;pair<fNumPairs;pair++) {
+      int ind1=0;
+      int ind2=0;
+      getPairIndices(pair,ind1,ind2);
+      grCor[pair]=FFTtools::getCorrelationGraph(grNorm[ind1],grNorm[ind2]);      
+      for(int phiBin=0;phiBin<NUM_PHI_BINS;phiBin++) {
+	for(int thetaBin=0;thetaBin<NUM_THETA_BINS;thetaBin++) {
+	  //I think this is the correct equation to work out the bin number
+	  //Could just use TH2::GetBin(binx,biny) but the below should be faster
+	  Int_t globalBin=(phiBin+1)+(thetaBin+1)*(NUM_PHI_BINS+2);
+	  Double_t dt=fHPolDeltaT[pair][phiBin][thetaBin];
+	  //	  Double_t corVal=grCor[pair]->Eval(dt);
+	  Double_t corVal=fastEvalForEvenSampling(grCor[pair],dt);
+	  corVal*=scale;
+	  Double_t binVal=histMap->GetBinContent(globalBin);
+	  histMap->SetBinContent(globalBin,binVal+corVal);
+	}
+      }      
+    }
+ }
+  if(fDebugMode) {
+    char histName[180];
+    for(int i=0;i<fNumAnts;i++) {
+      sprintf(histName,"grRaw%d_%d",i,counter);
+      grRaw[i]->SetName(histName);
+      grRaw[i]->SetTitle(histName);
+      grRaw[i]->Write();
+      sprintf(histName,"grInt%d_%d",i,counter);
+      grInt[i]->SetName(histName);
+      grInt[i]->SetTitle(histName);
+      grInt[i]->Write();
+      sprintf(histName,"grNorm%d_%d",i,counter);
+      grNorm[i]->SetName(histName);
+      grNorm[i]->SetTitle(histName);
+      grNorm[i]->Write();
+    }
+    for(int i=0;i<fNumPairs;i++) {
+      sprintf(histName,"grCor%d_%d",i,counter);
+      grCor[i]->SetName(histName);
+      grCor[i]->SetTitle(histName);
+      grCor[i]->Write();
+    }
+    counter++;
+  }
+  for(int i=0;i<fNumAnts;i++) {
+    if(grRaw[i]) delete grRaw[i];
+    if(grInt[i]) delete grInt[i];
+    if(grNorm[i]) delete grNorm[i];
+  }
+  for(int i=0;i<fNumPairs;i++) {
+    if(grCor[i]) delete grCor[i];
+  }
+  //Moved the scaling to earlier for optimisation reasons
+  //  histMap->Scale(scale);
+  return histMap;
+}
+
+TH2D *AraEventCorrelator::getInterferometricMap(UsefulAtriStationEvent *evPtr, AraAntPol::AraAntPol_t polType,AraCorrelatorType::AraCorrelatorType_t corType)
 {
   static int counter=0;
   fillDeltaTArrays(corType);

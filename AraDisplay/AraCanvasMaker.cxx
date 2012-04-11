@@ -1075,6 +1075,7 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   plotPad->cd();
   plotPad->Clear();
   AraEventCorrelator *araCorPtr = AraEventCorrelator::Instance(fNumAntsInMap, evPtr->stationId);
+
   static TH2D* histMapH=0;  
   static TH2D* histMapV=0;  
   plotPad->Divide(1,2);
@@ -1089,7 +1090,7 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
 
   
   //  if(!histMapV)
-  //    histMapV =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kVertical,fCorType);
+  histMapV =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kVertical,fCorType);
   histMapV->SetName("histMapV");
   histMapV->SetTitle("Vertical Polarisation");
   histMapV->SetXTitle("Azimuth (Degrees)");
@@ -1098,7 +1099,6 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   //  histMapV->SetMaximum(1);
   //  histMapV->SetMinimum(-1);
   histMapV->Draw("colz");
-
   plotPad->cd(2);
   if(histMapH) {
     if(!sameEvent) {
@@ -1106,8 +1106,9 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
       histMapH=0;
     }
   }
+
   //  if(!histMapH)
-  //    histMapH =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kHorizontal,fCorType);
+  histMapH =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kHorizontal,fCorType);
   histMapH->SetName("histMapH");
   histMapH->SetTitle("Hertical Polarisation");
   histMapH->SetXTitle("Azimuth (Degrees)");
@@ -1115,11 +1116,9 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   histMapH->SetStats(0);
   //  histMapH->SetMaximum(1);
   //  histMapH->SetMinimum(-1);
+
+
   histMapH->Draw("colz");
-  
-  
-
-
   
   if(!useCan)
     return canIntMap;

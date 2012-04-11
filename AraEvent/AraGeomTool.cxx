@@ -147,8 +147,6 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
   //if(stationId==1) sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
-  fprintf(stdout, "AraGeomTool::readChannelMapDb(Int_t stationId) - Opening database - %s\n", fileName);
-
   //open the database
   
   int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
