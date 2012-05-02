@@ -15,7 +15,6 @@ find_package(zlib REQUIRED)
 add_subdirectory(AraEvent)
 add_subdirectory(AraCorrelator)
 add_subdirectory(AraDisplay)
-
-#Will add these later
 add_subdirectory(AraWebPlotter)
-#add_subdirectory(utilities)
+
+#add_subdirectory(utilities) #FIXME
