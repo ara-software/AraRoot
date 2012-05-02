@@ -1,0 +1,9 @@
+Set(libname AraEvent)
+# ROOT is included in the template.
+Set(INCLUDE_DIRECTORIES ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+
+include(AraRootCMakeLists)
+
+target_link_libraries(AraEvent ${LIBROOTFFTWWRAPPER_LIBRARIES} ${SQLITE3_LIBRARIES} ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
+
+install(TARGETS AraEvent DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
