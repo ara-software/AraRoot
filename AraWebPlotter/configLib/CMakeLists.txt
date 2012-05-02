@@ -6,3 +6,7 @@ add_library(AraConfig SHARED configFileSpec.cxx configStore.cxx configLoad.cxx c
 
 target_link_libraries(AraConfig AraKvp)
 
+SET_TARGET_PROPERTIES(AraConfig PROPERTIES SUFFIX .so)
+
+install(TARGETS AraConfig DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
+

@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(ARAEVENT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
+#set(CMAKE_SHARED_LINKER_FLAGS " -dynamiclib")
+
 
 
 

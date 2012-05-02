@@ -47,13 +47,15 @@ include_directories( ${INCLUDE_DIRECTORIES} )
 # Here all objects ar put together into one share library
 Add_Library(${libname} SHARED ${${libname}Source} ${Dictionary})
 
+#This line forces cmake to create .so files on MAC systems
+SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
+
+
+
+
 # Linkages are added OUTSIDE of this file
 
 # Define all the header files which should be installed when
 # doing a "make install"
-
-#Install(FILES ${${libname}Headers} DESTINATION include)
-#trying to specify our own install directory
-
 
 Install(FILES ${${libname}Headers} DESTINATION ${ARAEVENT_INSTALL_PATH}/include)
