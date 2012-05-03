@@ -11,8 +11,8 @@ install(TARGETS AraEvent DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
 
 FILE(GLOB antennaFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/*.sqlite")
 FILE(GLOB atriCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ATRI/*.txt")
-FILE(GLOB icrrTestBedCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*")
-FILE(GLOB icrrStation1CalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*")
+FILE(GLOB icrrTestBedCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.dat")
+FILE(GLOB icrrStation1CalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.dat")
 
 
 install(FILES ${antennaFiles} DESTINATION ${ARAEVENT_INSTALL_PATH}/share/araCalib)
