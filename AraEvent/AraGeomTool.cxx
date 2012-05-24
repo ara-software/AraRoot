@@ -12,7 +12,7 @@
 #include <fstream>
 #include <cstring>
 #include <zlib.h>
-
+#include <sqlite3.h>
 #include <cstdlib>
 
 #include "TString.h"

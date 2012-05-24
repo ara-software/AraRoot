@@ -17,10 +17,6 @@
 #include "AraAntennaInfo.h"
 #include "AraStationInfo.h"
 
-//sqlite includes
-#include <sqlite3.h>
-
-
 //!  AraGeomTool -- The Ara Geometry and numbering tool
 /*!
   The Ara geometry and numbering tool
