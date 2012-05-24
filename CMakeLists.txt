@@ -15,8 +15,9 @@ find_package(zlib REQUIRED)
 
 
 add_subdirectory(AraEvent) #FIXME
-#add_subdirectory(AraCorrelator) #FIXME
-#add_subdirectory(AraDisplay) #FIXME
-#add_subdirectory(AraWebPlotter) #FIXME --Got to change to a library specific list of header files for all libraries as we run into cmake issues with this generic "everything that has .h at the end" business
+add_subdirectory(AraCorrelator) #FIXME
+add_subdirectory(AraDisplay) #FIXME
+add_subdirectory(AraWebPlotter) #FIXME --Got to change to a library specific list of header files for all libraries as we run into cmake issues with this generic "everything that has .h at the end" business
 
-#add_subdirectory(utilities) #FIXME
+add_subdirectory(utilities/Atri) #FIXME
+add_subdirectory(utilities/Icrr) #FIXME

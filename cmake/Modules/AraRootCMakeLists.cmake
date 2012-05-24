@@ -9,9 +9,18 @@ List(REMOVE_ITEM ${libname}Headers
                  "${CMAKE_CURRENT_SOURCE_DIR}/G__${libname}.h"
 		 ${EXCLUDE_HEADERS}
     )
+List(REMOVE_ITEM ${libname}Headers 
+                 "${CMAKE_CURRENT_SOURCE_DIR}/*~" 
+)
 # Find all source files
 File(GLOB ${libname}Source "${CMAKE_CURRENT_SOURCE_DIR}/*.cxx" 
   )
+List(REMOVE_ITEM ${libname}Source 
+                 "${CMAKE_CURRENT_SOURCE_DIR}/*~" 
+)
+
+
+
 if (EXCLUDE_SOURCES)
   List(REMOVE_ITEM ${libname}Source
     ${EXCLUDE_SOURCES}
@@ -39,7 +48,7 @@ ROOT_GENERATE_DICTIONARY("${${libname}Headers}"
 #jpd testing including everything
 #Set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${ROOT_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${CMAKE_SOURCE_DIR}/AraEvent ${CMAKE_SOURCE_DIR}/AraCorrelator ${CMAKE_SOURCE_DIR}/AraDisplay ${CMAKE_SOURCE_DIR}/AraWebPlotter ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS})
+Set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${CMAKE_SOURCE_DIR}/AraEvent ${CMAKE_SOURCE_DIR}/AraCorrelator ${CMAKE_SOURCE_DIR}/AraDisplay ${CMAKE_SOURCE_DIR}/AraWebPlotter ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS})
 
 
 include_directories( ${INCLUDE_DIRECTORIES} )
