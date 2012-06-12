@@ -53,7 +53,9 @@ fi
 cd $ARA_ROOT_DIR/build
 rm -r ./*
 
-#Now we run cmake to produce the makefiles. The install prefix is where things will be installed to. Make sure that the LD_LIBRARY_PATH / DYLD_LIBRARY_PATH has this destination listed in it so the system knows where to find shared object libraries at runtime
+#Now we run cmake to produce the makefiles. The install prefix is where things will be installed to.
+
 cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
+
 make
 make install

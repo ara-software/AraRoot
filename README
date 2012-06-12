@@ -2,6 +2,7 @@
 ###### ARA ROOT-based Test Bed Software                                 ######
 ######                                                                  ######
 ###### Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                          ######
+######  & a little bit by Jonathan Davies (jdavies@hep.ucl.ac.uk)       ######
 ##############################################################################
 
 Website
@@ -44,7 +45,8 @@ Optional Extras
 FFTW3 -- Fastest Fourier Transform in the West
 libRootFftwWrapper -- a ROOT wrapper for FFTW 3 downloadable from
 http://www.hep.ucl.ac.uk/uhen/libRootFftwWrapper/
-
+sqlite3 -- Used for storing the antenna and station information
+cmake -- Used for creating cross platform Makefiles
 
 Installation
 ============
@@ -56,6 +58,10 @@ Define the ARA_UTIL_INSTALL_DIR to point to the location you want the library in
 
 Define ARA_ROOT_DIR to point to the location at which AraRoot/branches/{version} or AraRoot/trunk is located
 
+version 3.3 has moved to using cmake
+Run the INSTALL.sh script (bash INSTALL.sh)
+
+Depricated
 Do
 make
 make install
@@ -64,7 +70,13 @@ make install
 Troubleshooting
 ================
 There are a myriad of ways that one can run into problems with the software
+
+
 Path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the ARA_UTIL_INSTALL_DIR and have it point to the location you want to install all the packages. If things are set up correctly you will end up with a ARA_UTIL_INSTALL_DIR/include and ARA_UTIL_INSTALL_DIR/lib and ARA_UTIL_INSTALL_DIR/share/anitaCalib all populated with essential headers, libraries and calibration constants. A quick round of
+
+Run the INSTALL.sh script
+
+Depricated
 make clean all install
 in libRootFftwWrapper and AraRoot can solve most such difficulties.
 
