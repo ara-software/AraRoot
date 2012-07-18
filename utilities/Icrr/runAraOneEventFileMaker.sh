@@ -25,7 +25,7 @@ for file in ${RAW_BASE_DIR}/ev_*/*;
 done
 
 if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAraEventTree ${EVENT_FILE_LIST} $2 1 # 1 - stationId for Station1
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeAraEventTree ${EVENT_FILE_LIST} $2 1 # 1 - stationId for Station1
 #    cat ${EVENT_FILE_LIST}
     rm ${EVENT_FILE_LIST}
     echo "Done Event File"

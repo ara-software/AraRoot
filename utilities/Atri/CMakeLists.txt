@@ -3,22 +3,24 @@ Set(INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/AraDisplay ${CMAKE_SOURCE_DIR}/AraCo
 
 include_directories( ${INCLUDE_DIRECTORIES} )
 
-add_executable(makeAtriSensorHkTree makeAraSensorHkTree.cxx)
+add_executable(makeAtriSensorHkTree makeAtriSensorHkTree.cxx)
 
 target_link_libraries(makeAtriSensorHkTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-add_executable(makeAtriEventHkTree makeAraEventHkTree.cxx)
+add_executable(makeAtriEventHkTree makeAtriEventHkTree.cxx)
 
 target_link_libraries(makeAtriEventHkTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-add_executable(makeSimpleAtriEventTree makeSimpleAraEventTree.cxx)
+add_executable(makeSimpleAtriEventTree makeSimpleAtriEventTree.cxx)
 
 target_link_libraries(makeSimpleAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-add_executable(makeAtriEventTree makeAraEventTree.cxx)
+add_executable(makeAtriEventTree makeAtriEventTree.cxx)
 
 target_link_libraries(makeAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
+#install the binaries
 install(TARGETS makeAtriSensorHkTree makeAtriEventHkTree makeSimpleAtriEventTree makeAtriEventTree DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
 
-install(FILES runAraRunFileMaker.sh DESTINATION ${ARAEVENT_INSTALL_PATH}/scripts)
+#install the scripts
+install(FILES runAtriRunFileMaker.sh DESTINATION ${ARAEVENT_INSTALL_PATH}/scripts)
