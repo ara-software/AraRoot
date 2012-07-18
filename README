@@ -2,7 +2,6 @@
 ###### ARA ROOT-based Test Bed Software                                 ######
 ######                                                                  ######
 ###### Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                          ######
-######  & a little bit by Jonathan Davies (jdavies@hep.ucl.ac.uk)       ######
 ##############################################################################
 
 Website
@@ -18,10 +17,12 @@ Libraries:
 libAraEvent.so  -- Contains all of the class definitions for storing and manipulating Ara Event and Housekeeping data
 libAraDisplay.so -- The library for AraDisplay (the MagicDisplay spin off)
 libAraWebPlotter.so -- The library for the AraWebPlotter
+libAraCorrelator.so -- Used to correlate events using plane wave or distance to vertex approximations		    
 
 Executables:
 ------------
-makeAraEventTree -- Program to convert the raw ARA TestBed / Station One data into a ROOT format
+makeIcrrEventTree -- Program to convert the raw ARA TestBed / Station One data into a ROOT format
+makeAtriEventTree -- Program to convert the raw ARA Atri electronics type station data into a ROOT format
 AraWebRootFileMaker -- Program to make ROOT files for the webplotter
 AraWebPlotter -- Program that reads these files and plots stuff
 
@@ -45,8 +46,9 @@ Optional Extras
 FFTW3 -- Fastest Fourier Transform in the West
 libRootFftwWrapper -- a ROOT wrapper for FFTW 3 downloadable from
 http://www.hep.ucl.ac.uk/uhen/libRootFftwWrapper/
-sqlite3 -- Used for storing the antenna and station information
-cmake -- Used for creating cross platform Makefiles
+GSL -- Needed by ROOT's Mathmore
+sqlite3 -- Need for loading of antenna information and station geometry
+CMake -- Cross platform Makefile generation - this makes installation a whole lot easier
 
 Installation
 ============
@@ -58,25 +60,14 @@ Define the ARA_UTIL_INSTALL_DIR to point to the location you want the library in
 
 Define ARA_ROOT_DIR to point to the location at which AraRoot/branches/{version} or AraRoot/trunk is located
 
-version 3.3 has moved to using cmake
-Run the INSTALL.sh script (bash INSTALL.sh)
-
-Depricated
 Do
-make
-make install
+bash INSTALL.sh in the directory of the source code (i.e. in ARA_ROOT_DIR) - cmake will take care of the rest
 
 
 Troubleshooting
 ================
 There are a myriad of ways that one can run into problems with the software
-
-
 Path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the ARA_UTIL_INSTALL_DIR and have it point to the location you want to install all the packages. If things are set up correctly you will end up with a ARA_UTIL_INSTALL_DIR/include and ARA_UTIL_INSTALL_DIR/lib and ARA_UTIL_INSTALL_DIR/share/anitaCalib all populated with essential headers, libraries and calibration constants. A quick round of
-
-Run the INSTALL.sh script
-
-Depricated
 make clean all install
 in libRootFftwWrapper and AraRoot can solve most such difficulties.
 

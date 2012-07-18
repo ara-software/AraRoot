@@ -6,8 +6,6 @@ set(ARAEVENT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 #This is in case you have multiple instances of for example sqlite3 - one of which is known to be the correct version
 set(SQLITE3_HINT_INCLUDES "~/repositories/sqlite3Test/include/")
 set(SQLITE3_HINT_LIBRARIES "~/repositories/sqlite3Test/lib/")
-MESSAGE(STATUS "SQLITE3_HINT_LIBRARIES is ${SQLITE3_HINT_LIBRARIES}")
-MESSAGE(STATUS "SQLITE3_HINT_INCLUDES is ${SQLITE3_HINT_INCLUDES}")
 
 project(AraRoot)
 find_package(ROOT REQUIRED COMPONENTS MathMore Gui)
@@ -16,11 +14,13 @@ find_package(FFTW REQUIRED)
 find_package(sqlite3 REQUIRED)
 find_package(zlib REQUIRED)
 
+#Build these sub-directories by searching for CMakeLists.txt files in there
+add_subdirectory(AraEvent)
+add_subdirectory(AraCorrelator)
+add_subdirectory(AraDisplay)
+add_subdirectory(AraWebPlotter)
+add_subdirectory(utilities/Atri)
+add_subdirectory(utilities/Icrr)
 
-add_subdirectory(AraEvent) #FIXME
-add_subdirectory(AraCorrelator) #FIXME
-add_subdirectory(AraDisplay) #FIXME
-add_subdirectory(AraWebPlotter) #FIXME --Got to change to a library specific list of header files for all libraries as we run into cmake issues with this generic "everything that has .h at the end" business
-
-add_subdirectory(utilities/Atri) #FIXME
-add_subdirectory(utilities/Icrr) #FIXME
+#add_subdirectory(analysis) #FIXME - Do we want to include this in CMake?
+#add_subdirectory(AraVertexRec) #FIXME - Need to add build of L2 vertexing

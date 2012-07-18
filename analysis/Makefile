@@ -5,7 +5,7 @@
 ##############################################################################
 include ../StandardDefinitions.mk
 
-LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L../AraEvent -lAraEvent -lz
+LD_ARA_UTIL=-L$(ARA_UTIL_LIB_DIR) -L../AraEvent -lAraEvent -lz -lsqlite3
 INC_ARA_UTIL=-I$(ARA_UTIL_INC_DIR) -I../AraEvent
 
 

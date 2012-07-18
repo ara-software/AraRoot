@@ -33,5 +33,10 @@ SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 
 target_link_libraries(AraDisplay AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
 
+#Install the libraries and headers
 install(TARGETS AraDisplay DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
 install(FILES ${${libname}Headers} DESTINATION ${ARAEVENT_INSTALL_PATH}/include)
+
+#Install the ROOT macros
+SET(${libname}macros macros/runAraDisplay.C)
+install(FILES ${${libname}macros} DESTINATION ${ARAEVENT_INSTALL_PATH}/macros)

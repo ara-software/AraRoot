@@ -4,7 +4,7 @@ void runAraDisplay() {
   
   char fileName[180];  
 
-  int run=394;
+  int run=399;
   //  int run=3764; //175MHz @ -20 - stationId==0 - TestBed event
   //  int run=3755; //680MHz @ -20
   //  int run=3750; //350MHz @ -20
@@ -48,14 +48,10 @@ void runAraDisplay(char *eventFile) {
   gSystem->Load("libAraDisplay");
   TChain *fred=0; //Will this work?
 
+  //This is how to set a pedestal file manually - note that you cannot use relative paths, you must use the full path for the pedestal file
+  AraEventCalibrator::Instance()->setAtriPedFile("/Users/jdavies/ara/data/miniATRI/run_000402/pedTest.txt");
 
-  //-20 pedestal
-  //    AraEventCalibrator::Instance()->setAtriPedFile("~/ara/data/miniATRI/run_000302/pedestalValues.run000302.dat");
-
-  //RoomTemp pedestal
-  //  AraEventCalibrator::Instance()->setPedFile("/unix/ara/data/ara_station1_ICRR_calibration/data/peds/run_002442/peds_1324990418/peds_1324990418.988115.run002442.dat", 1);
-
-  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
-	//    AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);  
+  //  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
+  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);  
   magicPtr->startEventDisplay();
 }
