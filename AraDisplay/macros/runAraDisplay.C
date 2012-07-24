@@ -8,9 +8,9 @@ void runAraDisplay() {
 
   //  sprintf(fileName, "~/ara/data/miniATRI/root/run%i/event%i.root", run, run);
   //JPD Testing TestBed
-  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
+  sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
   //JPD Testing Station1
-    sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
+  //    sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
   //JPD Testing AraRootBranches3.2
   //  sprintf(fileName, "~/ara/data/AraRoot_3-2/root/0808_2011/TestBed_2011_run005546.L0.root");
 

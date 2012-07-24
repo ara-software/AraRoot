@@ -60,7 +60,7 @@ cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
 
 make #VERBOSE=1
 if [ $? -eq 0 ] ; then
-    echo "success"
+    echo "build - success"
     make install
 #Now let us create a lib / include / bin/ scripts / macros structure in the build directory
     mkdir $ARA_ROOT_DIR/build/include
@@ -97,7 +97,7 @@ if [ $? -eq 0 ] ; then
     cp $ARA_ROOT_DIR/AraDisplay/macros/runAraDisplay* $ARA_ROOT_DIR/build/macros
     
 else
-    echo "fail"
+    echo "build - fail"
 fi
 
 

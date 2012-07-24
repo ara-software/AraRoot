@@ -276,7 +276,6 @@ int AraDisplay::loadEventTree(char *eventFile)
   fEventEntry=0;
 
   //jdp this is where we will build the tree index on
-
   fEventTree->BuildIndex("event.head.eventNumber");
   fEventIndex = (TTreeIndex*) fEventTree->GetTreeIndex();
 

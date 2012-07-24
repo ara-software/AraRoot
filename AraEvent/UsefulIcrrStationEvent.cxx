@@ -250,7 +250,6 @@ bool UsefulIcrrStationEvent::isCalPulserEvent( )
 bool UsefulIcrrStationEvent::shortWaveform()
 {
 
-  bool isShort=false;
   //Check to see if the hitbus is OK
   for(int chip=0; chip<LAB3_PER_ICRR; chip++){
     Int_t firstHitBus = this->getFirstHitBus(chip*CHANNELS_PER_LAB3+8);
@@ -259,20 +258,20 @@ bool UsefulIcrrStationEvent::shortWaveform()
     if(this->getWrappedHitBus(chip*CHANNELS_PER_LAB3+8)){
       if(lastHitBus - firstHitBus < 246)
 	{
-	  isShort=true;
+	  return true;
 	}
     }
     else{
       if(lastHitBus - firstHitBus > 10)
 	{
-	  isShort=true;
+	  return true;
 	}
 
     }//if-else wrapped
 
   }//chip
 
-  return isShort;
+  return false;
 
 }
 
@@ -286,14 +285,14 @@ bool UsefulIcrrStationEvent::shortWaveform(Int_t labChip)
   if(this->getWrappedHitBus(labChip*CHANNELS_PER_LAB3+8)){
     if(lastHitBus - firstHitBus < 246)
       {
-	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip) : bad hit bus\n";
+	//	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip = " << labChip << ") : bad hit bus\n";
 	isShort = true;
       }
   }
   else{
     if(lastHitBus - firstHitBus > 10)
       {
-	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip) : bad hit bus\n";
+	//	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip = " << labChip << ") : bad hit bus\n";
 	isShort = true;
       }
     

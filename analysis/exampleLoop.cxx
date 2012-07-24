@@ -119,14 +119,29 @@ int main(int argc, char **argv)
      if(isIcrrEvent){
 
        //Do stuff
-       std::cerr << "Doing stuff with the Icrr event\n";
+       //       std::cerr << "Doing stuff with the Icrr event\n";
        chan1 = realIcrrEvPtr->getGraphFromRFChan(0);
+       //Check the short waveform problems
+
+       int shortWaveform=0;
+       for(int chip=0; chip<3;chip++){
+	 shortWaveform=realIcrrEvPtr->shortWaveform(chip);
+	 if(shortWaveform){
+	   fprintf(stderr, "shortWaveform on labChip %i\n", chip);
+	 }
+
+       }
+       
      }
      else if(isAtriEvent){
 
        //Do stuff
-       std::cerr << "Doing stuff with the Atri event\n";
+       //       std::cerr << "Doing stuff with the Atri event\n";
        chan1 = realAtriEvPtr->getGraphFromRFChan(0);
+
+       
+
+
      }
 
      delete chan1;
