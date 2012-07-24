@@ -7,8 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/event
-ROOT_BASE_DIR=~/ara/data/ara_station1_ICRR_calibration/root/AraRoot/trunk/
+RAW_BASE_DIR=~/ara/data/testing_for_trunk/event/TestBed
+ROOT_BASE_DIR=~/ara/data/testing_for_trunk/root/TestBed
 
 RUN_NUM=$1
 RUN_WITH_ZEROES=`printf %06d $RUN_NUM`
@@ -38,7 +38,7 @@ for file in ${RAW_DIR}/ev_*/*;
 done
 
 if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAraEventTree ${EVENT_FILE_LIST} ${EVENT_FILE} 0 # 0 - stationId for TestBed
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeIcrrEventTree ${EVENT_FILE_LIST} ${EVENT_FILE} 0 # 0 - stationId for TestBed
 #    cat ${EVENT_FILE_LIST}
     rm ${EVENT_FILE_LIST}
     echo "Done Event File"
@@ -59,7 +59,7 @@ for file in ${RAW_DIR}/hk_*/*;
 done
 
 if  test `cat ${HK_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAraHkTree ${HK_FILE_LIST} ${HK_FILE}
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeIcrrHkTree ${HK_FILE_LIST} ${HK_FILE}
 #    cat ${HK_FILE_LIST}
     rm ${HK_FILE_LIST}
     echo "Done Hk File"

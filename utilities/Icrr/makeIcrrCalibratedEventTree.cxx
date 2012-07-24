@@ -134,7 +134,7 @@ void processEvent(UInt_t stationId) {
   if(theEvent) delete theEvent;
   if(theUsefulEvent) delete theUsefulEvent;
   theEvent = new RawIcrrStationEvent(&theEventBody, stationId);
-  theUsefulEvent = new UsefulIcrrStationEvent( theEvent , AraCalType::kFirstCalib );
+  theUsefulEvent = new UsefulIcrrStationEvent( theEvent , AraCalType::kLatestCalib );
   eventTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theEvent;
