@@ -261,7 +261,7 @@ int AraDisplay::loadEventTree(char *eventFile)
 
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
-  if(fRawStationEventPtr->stationId==0) fTBData=1;
+  if(fRawStationEventPtr->stationId<2) fTBData=1;
   else fTBData=0;
 
   fEventTree->ResetBranchAddresses();

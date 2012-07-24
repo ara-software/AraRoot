@@ -28,11 +28,10 @@ class AraGeomTool
    AraGeomTool(); ///< Default constructor
    ~AraGeomTool(); ///< Destructor
 
-   //   AraAntennaInfo *getAntByRfChan(int chan);
-   //   AraAntennaInfo *getAntByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);
+   //   AraAntennaInfo *getAntByRfChan(int chan);//FIXME
+   //   AraAntennaInfo *getAntByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);//FIXME
    int getChanIndex(AraLabChip::AraLabChip_t chip, int chan) {return chip*CHANNELS_PER_LAB3 +chan;}
 
-   //something wrong with this guy
    AraLabChip::AraLabChip_t getLabChipForChan(int chan, int stationId) {return fStationInfo[stationId].fAntInfo[chan].labChip;}
 
    int getNumLabChansForChan(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].numLabChans;}
@@ -40,15 +39,11 @@ class AraGeomTool
    int getSecondLabChanForChan(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].labChans[1];}
 
 
-   //  int getFirstLabChanIndexForChan(int chan) { return getChanIndex(getLabChipForChan(chan),getFirstLabChanForChan(chan));}
-
-
    int getFirstLabChanIndexForChan(int chan, int stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getFirstLabChanForChan(chan, stationId));}
 
 
    int getSecondLabChanIndexForChan(int chan, int stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getSecondLabChanForChan(chan, stationId));}
 
-   //jpd helperfunction for diplexed channels
    int isDiplexed(int chan, int stationId) {return fStationInfo[stationId].fAntInfo[chan].isDiplexed;}
 
    Double_t getLowPassFilter(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].lowPassFilterMhz; }
@@ -61,19 +56,19 @@ class AraGeomTool
 
 
    //jpd this is a hack to try and get AraCanvasMaker.cxx to work 
-   int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);
+   int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);//FIXME
    
    
 
    Double_t calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Double_t phiWave, Double_t thetaWave);
    Double_t calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t phiWave, Double_t thetaWave,Double_t R);
-
+   
    Double_t calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave, int stationId);
    Double_t calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R, int stationId);
-
+   
    //Instance generator
    static AraGeomTool*  Instance();
-
+   
    AraStationInfo fStationInfo[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
    int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
    
@@ -86,7 +81,6 @@ class AraGeomTool
    // protect against multiple instances
 
  private:
-   //jpd this will be the implementation that will load from the sql DB
    void readChannelMapDb(Int_t stationId);
 
 };

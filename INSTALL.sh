@@ -58,39 +58,47 @@ rm -r ./*
 
 cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
 
-make
-make install
-
+make #VERBOSE=1
+if [ $? -eq 0 ] ; then
+    echo "success"
+    make install
 #Now let us create a lib / include / bin/ scripts / macros structure in the build directory
-mkdir $ARA_ROOT_DIR/build/include
-cp $ARA_ROOT_DIR/AraCorrelator/*.h $ARA_ROOT_DIR/build/include
-cp $ARA_ROOT_DIR/AraDisplay/*.h $ARA_ROOT_DIR/build/include
-cp $ARA_ROOT_DIR/AraWebPlotter/*.h $ARA_ROOT_DIR/build/include
+    mkdir $ARA_ROOT_DIR/build/include
+    cp $ARA_ROOT_DIR/AraCorrelator/*.h $ARA_ROOT_DIR/build/include
+    cp $ARA_ROOT_DIR/AraDisplay/*.h $ARA_ROOT_DIR/build/include
+    cp $ARA_ROOT_DIR/AraWebPlotter/*.h $ARA_ROOT_DIR/build/include
+    
+    mkdir $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraCorrelator/libAraCorrelator.so $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraDisplay/libAraDisplay.so $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraEvent/libAraEvent.so $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/libAraWebPlotter.so $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/configLib/libAraConfig.so $ARA_ROOT_DIR/build/lib
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/kvpLib/libAraKvp.so $ARA_ROOT_DIR/build/lib
+    
+    mkdir $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/AraCorrelator/makeCorrelationMaps $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/AraTimeWebPlotterBin $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/AraWebPlotterBin $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/AraWebPlotter/getDirFromConfigBin $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriEventHkTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriEventTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriSensorHkTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Atri/makeSimpleAtriEventTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrCalibratedEventTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrEventTree $ARA_ROOT_DIR/build/bin
+    cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrHkTree $ARA_ROOT_DIR/build/bin
+    
+    mkdir $ARA_ROOT_DIR/build/scripts
+    cp $ARA_ROOT_DIR/utilities/Icrr/*.sh $ARA_ROOT_DIR/build/scripts
+    cp $ARA_ROOT_DIR/utilities/Atri/*.sh $ARA_ROOT_DIR/build/scripts
+    
+    mkdir $ARA_ROOT_DIR/build/macros
+    cp $ARA_ROOT_DIR/AraDisplay/macros/runAraDisplay* $ARA_ROOT_DIR/build/macros
+    
+else
+    echo "fail"
+fi
 
-mkdir $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraCorrelator/libAraCorrelator.so $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraDisplay/libAraDisplay.so $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraEvent/libAraEvent.so $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraWebPlotter/libAraWebPlotter.so $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraWebPlotter/configLib/libAraConfig.so $ARA_ROOT_DIR/build/lib
-cp $ARA_ROOT_DIR/build/AraWebPlotter/kvpLib/libAraKvp.so $ARA_ROOT_DIR/build/lib
 
-mkdir $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/AraCorrelator/makeCorrelationMaps $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/AraWebPlotter/AraTimeWebPlotterBin $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/AraWebPlotter/AraWebPlotterBin $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/AraWebPlotter/getDirFromConfigBin $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriEventHkTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriEventTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Atri/makeAtriSensorHkTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Atri/makeSimpleAtriEventTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrCalibratedEventTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrEventTree $ARA_ROOT_DIR/build/bin
-cp $ARA_ROOT_DIR/build/utilities/Icrr/makeIcrrHkTree $ARA_ROOT_DIR/build/bin
 
-mkdir $ARA_ROOT_DIR/build/scripts
-cp $ARA_ROOT_DIR/utilities/Icrr/*.sh $ARA_ROOT_DIR/build/scripts
-cp $ARA_ROOT_DIR/utilities/Atri/*.sh $ARA_ROOT_DIR/build/scripts
-
-mkdir $ARA_ROOT_DIR/build/macros
-cp $ARA_ROOT_DIR/AraDisplay/macros/runAraDisplay* $ARA_ROOT_DIR/build/macros

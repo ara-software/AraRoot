@@ -22,7 +22,7 @@
 
 Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
-  if(calType==kFirstCalibPlusCables || calType==kSecondCalibPlusCables)
+  if(calType==kFirstCalibPlusCables || calType==kSecondCalibPlusCables || calType==kSecondCalibPlusCablesUnDiplexed)
     return kTRUE;
   return kFALSE;
 }
@@ -30,7 +30,7 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 { 
   if(calType==kFirstCalibPlusCables || calType==kSecondCalibPlusCables ||
-     calType==kFirstCalib || calType==kSecondCalib)
+     calType==kFirstCalib || calType==kSecondCalib || calType==kSecondCalibPlusCablesUnDiplexed)
     return kTRUE;
   return kFALSE;
 }
@@ -46,7 +46,7 @@ Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 { 
   if(calType==kSecondCalibPlusCables ||
-     calType==kSecondCalib)
+     calType==kSecondCalib || calType==kSecondCalibPlusCablesUnDiplexed)
     return kTRUE;
   return kFALSE;
 }
@@ -64,6 +64,12 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
   return kFALSE;
   if(calType==kNoCalib) return kFALSE;
   return kTRUE;
+}
+
+Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
+{
+  if(calType==kSecondCalibPlusCablesUnDiplexed) return kTRUE;
+  return kFALSE;
 }
 
 
@@ -124,22 +130,22 @@ void AraEventCalibrator::loadIcrrPedestals()
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ./calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed INFO - Pedestal file [from ARA_CALIB_DIR]");
+	//	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(pedFile[0],"%s/ICRR/TestBed/peds_1294924296.869787.run001202.dat",calibDir);
-      fprintf(stdout," = %s\n",pedFile[0]);
+      //      fprintf(stdout," = %s\n",pedFile[0]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(pedFile[0],pedFileEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[0]);
+      //      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[0]);
     } // end of IF-block for pedestal file specified by environment variable
   }
 
@@ -153,22 +159,22 @@ void AraEventCalibrator::loadIcrrPedestals()
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ./calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_CALIB_DIR]");
+	//	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(pedFile[1],"%s/ICRR/Station1/peds_1326108401.602169.run003747.dat",calibDir);
-      fprintf(stdout," = %s\n",pedFile[1]);
+      //      fprintf(stdout," = %s\n",pedFile[1]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(pedFile[1],pedFileEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[1]);
+      //      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",pedFile[1]);
     } // end of IF-block for pedestal file specified by environment variable
   }
 
@@ -242,9 +248,7 @@ int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int c
   char hbextra = (theEvent->chan[chanIndex].chipIdFlag&0xf0)>>4;
   short hbstart=theEvent->chan[chanIndex].firstHitbus;
   short hbend=theEvent->chan[chanIndex].lastHitbus+hbextra;
-    
-
-
+ 
   double calTime=0;
   for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
     rawadc[samp]=theEvent->chan[chanIndex].data[samp];
@@ -341,8 +345,6 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
   for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_ICRR_CHANNELS; ++chanIndex ){
     int numValid=doBinCalibration(theEvent,chanIndex);
 
-
-
     //Now we stuff it back into the UsefulIcrrStationEvent object
          
     if(calType==AraCalType::kNoCalib) {
@@ -411,9 +413,6 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
     }
   }
   
-
-
-
   //For now we just have the one calibration type for interleaving
   AraGeomTool *tempGeom = AraGeomTool::Instance();
 
@@ -504,7 +503,9 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
       }
       
     }//numLabChans==2
-    else if(tempGeom->isDiplexed(rfchan, stationId)==0){
+    
+    //FIXME -- we might need to introduce another calType here
+    else if(tempGeom->isDiplexed(rfchan, stationId)==0||!(AraCalType::hasUnDiplexing(calType))){
       //    printf("non-interleaved non-diplexed channel\n");
       //      std::cout << rfchan << "\t"
       //      << tempGeom->getFirstLabChanIndexForChan(rfchan) << "\n";
@@ -523,8 +524,9 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 	theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci][i];
 	
       }
-    }//isDiplexed==0
-    else if(tempGeom->isDiplexed(rfchan, stationId)==1){
+    }//numLabChannels!=2&&isDiplexed==0
+    
+    else if(tempGeom->isDiplexed(rfchan, stationId)==1&&(AraCalType::hasUnDiplexing(calType))){
       //  printf("non-interleaved diplexed channel\n");
       //now need to work out how to do a diplexed channel
       //find lab channel from which to derived rfchan

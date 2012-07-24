@@ -30,7 +30,8 @@ UsefulIcrrStationEvent::UsefulIcrrStationEvent(RawIcrrStationEvent *rawEvent, Ar
   :RawIcrrStationEvent(*rawEvent)
 {
   fCalibrator=AraEventCalibrator::Instance();
-  fCalibrator->calibrateEvent(this,calType);  
+  fCalibrator->calibrateEvent(this,calType); 
+ 
 }
 
 TGraph *UsefulIcrrStationEvent::getGraphFromElecChan(int chan)
@@ -234,7 +235,7 @@ bool UsefulIcrrStationEvent::isCalPulserEvent( )
 
 // printf("UsefulIcrrStationEvent::isCalPulserEvent() - DEBUG - %d %d",msw_clock_counter,lsw_clock_counter);
    if ( ( msw_clock_counter == 0 ) &&                                                                /* Rb peak is at msw=0 && lsw=5801+/-5 */
-        ( TMath::Abs(lsw_clock_counter-5801) < 5 ) ) {
+        ( TMath::Abs(lsw_clock_counter-5801) < 25 ) ) {
 //    printf(" <- is cal pulser\n");
       retcode = true;
    } else {
@@ -245,4 +246,61 @@ bool UsefulIcrrStationEvent::isCalPulserEvent( )
    return retcode;
 
 } // end of UsefulIcrrStationEvent::isCalPulserEvent() member function
+
+bool UsefulIcrrStationEvent::shortWaveform()
+{
+
+  bool isShort=false;
+  //Check to see if the hitbus is OK
+  for(int chip=0; chip<LAB3_PER_ICRR; chip++){
+    Int_t firstHitBus = this->getFirstHitBus(chip*CHANNELS_PER_LAB3+8);
+    Int_t lastHitBus = this->getLastHitBus(chip*CHANNELS_PER_LAB3+8);
+
+    if(this->getWrappedHitBus(chip*CHANNELS_PER_LAB3+8)){
+      if(lastHitBus - firstHitBus < 246)
+	{
+	  isShort=true;
+	}
+    }
+    else{
+      if(lastHitBus - firstHitBus > 10)
+	{
+	  isShort=true;
+	}
+
+    }//if-else wrapped
+
+  }//chip
+
+  return isShort;
+
+}
+
+bool UsefulIcrrStationEvent::shortWaveform(Int_t labChip)
+{
+
+  //Check to see if the hitbus is OK
+  Int_t firstHitBus = this->getFirstHitBus(labChip*CHANNELS_PER_LAB3+8);
+  Int_t lastHitBus = this->getLastHitBus(labChip*CHANNELS_PER_LAB3+8);
+  bool isShort=false;
+  if(this->getWrappedHitBus(labChip*CHANNELS_PER_LAB3+8)){
+    if(lastHitBus - firstHitBus < 246)
+      {
+	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip) : bad hit bus\n";
+	isShort = true;
+      }
+  }
+  else{
+    if(lastHitBus - firstHitBus > 10)
+      {
+	std::cerr << "UsefulIcrrStationEvent::shortWaveform(Int_t labChip) : bad hit bus\n";
+	isShort = true;
+      }
+    
+  }//if-else wrapped
+  
+
+  return isShort;
+
+}
 

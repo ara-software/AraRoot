@@ -37,7 +37,9 @@ namespace AraCalType {
     kFirstCalibPlusCables           = 0x06, ///< Same as First Calib but also doing the cable delays
     kSecondCalib                    = 0x07, ///< Same as first calib but also doing the clock alignment
     kSecondCalibPlusCables          = 0x08,///< Same as second calib but also doing the clock alignment
-    kLatestCalib                    = 0x08 ///< Currenly this is kSecondCalibPlusCables
+    kSecondCalibPlusCablesUnDiplexed = 0x09,///< Same as secondCalibPlusCableDelays but with the undiplexing of diplexed channels
+
+    kLatestCalib                    = 0x09 ///< Currenly this is kSecondCalibPlusCables
   } AraCalType_t;
 
   Bool_t hasCableDelays(AraCalType::AraCalType_t calType); ///< Does the calibration type ccount for the cable delays?
@@ -46,6 +48,7 @@ namespace AraCalType {
   Bool_t hasClockAlignment(AraCalType::AraCalType_t calType); ///< Does the calibration type perform a clock alignment calibration
   Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
   Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
+  Bool_t hasUnDiplexing(AraCalType::AraCalType_t calType); ///<Does the calibration type perform un-diplexing
 
 } 
 

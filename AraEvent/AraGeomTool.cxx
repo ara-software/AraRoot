@@ -47,7 +47,6 @@ AraGeomTool*  AraGeomTool::Instance()
   return fgInstance;
 }
 
-//jpd
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, int stationId)
 {
   if(antNum<8 && antNum>=0)
@@ -65,7 +64,7 @@ int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
   if(antNum<8 && antNum>=0)
     return fAntLookupTable[0][antPol][antNum];
   return -1;
-}
+}//FIXME -- this just loads the stuff for station1
 
 
 
@@ -142,13 +141,10 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   else {
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
-
-  //jpd this is where we would decide to have a different database
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
   //if(stationId==1) sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
   //open the database
-  
   int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
   if(rc!=SQLITE_OK){
     printf("AraGeomTool::readChannelMapDb(Int_t stationId) - Can't open database: %s\n", sqlite3_errmsg(db));
@@ -162,8 +158,6 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   if(stationId==0) query = "select * from TestBed";
   if(stationId==1) query = "select * from Station1";
 
-  //  printf("Database query set to '%s'\n", query);
-
   //prepare an sql statment which will be used to obtain information from the data base
   rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
 
@@ -175,7 +169,6 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   }
   int row=0;
   while(1){
-
     //printf("row number %i\n", row);
     rc=sqlite3_step(stmt);
     if(rc==SQLITE_DONE) break;
@@ -443,15 +436,30 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
 	//printf("fStationInfo[%i].fAntInfo[%i].debugTotalCableDelay %f\n", stationId, row, fStationInfo[stationId].fAntInfo[row].debugTotalCableDelay);
 
 	break;
-      case 39: //antOrient
+      case 40: //antOrient[0]
 
-	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kEastWest")==0) fStationInfo[stationId].fAntInfo[row].antOrient=AraSurfaceOrientation::kEastWest;
-
-	//printf("fStationInfo[%i].fAntInfo[%i].antOrient %i\n", stationId, row, fStationInfo[stationId].fAntInfo[row].antOrient);
+	fStationInfo[stationId].fAntInfo[row].antOrient[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfo[%i].fAntInfo[%i].antOrient[0] %1.10f\n", stationId, row, fStationInfo[stationId].fAntInfo[row].antOrient[0]);
 
 	break;
+
+      case 41: //antOrient[1]
+
+	fStationInfo[stationId].fAntInfo[row].antOrient[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfo[%i].fAntInfo[%i].antOrient[1] %1.10f\n", stationId, row, fStationInfo[stationId].fAntInfo[row].antOrient[1]);
+
+	break;
+
+      case 42: //antOrient[2]
+
+	fStationInfo[stationId].fAntInfo[row].antOrient[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfo[%i].fAntInfo[%i].antOrient[2] %1.10f\n", stationId, row, fStationInfo[stationId].fAntInfo[row].antOrient[2]);
+
+	break;
+
+
       default:
+
 	break;
 
       }//switch(column)

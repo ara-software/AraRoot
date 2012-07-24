@@ -23,9 +23,9 @@ class AraRawIcrrRFChannel: public TObject
 {
  public:
    AraRawIcrrRFChannel(); ///< Default constructor
-   AraRawIcrrRFChannel(IcrrIcrrRFChannelFull_t *rfChan); ///< Assignment constructor
+   AraRawIcrrRFChannel(IcrrRFChannelFull_t *rfChan); ///< Assignment constructor
    ~AraRawIcrrRFChannel(); ///< Destructor
-   void fillChannel(IcrrIcrrRFChannelFull_t *rfChan);
+   void fillChannel(IcrrRFChannelFull_t *rfChan);
    
    //!  Channel Id
    /*!

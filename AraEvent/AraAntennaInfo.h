@@ -67,12 +67,14 @@ namespace AraAntDir {
   } AraAntDir_t;
 }
     
-namespace AraSurfaceOrientation {
-  typedef enum EAraSurfaceOrientation {
-    kNorthSouth =1,
-    kEastWest =2
-  } AraSurfaceOrientation_t;
-}
+
+//JPD Depricated
+/* namespace AraSurfaceOrientation { */
+/*   typedef enum EAraSurfaceOrientation { */
+/*     kNorthSouth =1, */
+/*     kEastWest =2 */
+/*   } AraSurfaceOrientation_t; */
+/* } */
 
 class AraAntennaInfo: public TObject
 {
@@ -106,8 +108,10 @@ class AraAntennaInfo: public TObject
    Double_t antLocation[3]; ///< x,y,z in m
    Double_t cableDelay; ///< In ns
    AraAntDir::AraAntDir_t antDir;
-   AraSurfaceOrientation::AraSurfaceOrientation_t antOrient; ///<Only for surface antennas
-   
+   // JPD depricated - now using an array of doubles
+   //   AraSurfaceOrientation::AraSurfaceOrientation_t antOrient; ///<Only for surface antennas 
+   Double_t antOrient[3];
+
    Double_t debugHolePosition[3]; ////< x,y,z in m
    Double_t debugPreAmpDz; ///< in m
    Double_t debugHolePositionZft; ///< in ft

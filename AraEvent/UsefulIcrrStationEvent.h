@@ -55,6 +55,8 @@ class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStatio
    TH1D   *getFFTHistForClock(int clock_number); ///<Utility function for webplotter
    int     fillFFTHistoForClock(int clock_number, TH1D *histFFT); ///<Utility function for webplotter
    bool    isCalPulserEvent( ); ///< Returns whether (true) or not (false) the event is a calpulser event based on a cut applied to the Rb clock counter
+   bool    shortWaveform(); ///< Returns whether (true) or not (false) the event has the short waveform problem as identified in <http://ara.physics.wisc.edu/docs/0005/000517/001/9_7_2012_AraRoot_ShortWaveForm_Issue.pdf>
+   bool    shortWaveform(Int_t labChip); ///< Returns whether (true) or not (false) the event has the short waveform problem on Int_t labChip as identified in <http://ara.physics.wisc.edu/docs/0005/000517/001/9_7_2012_AraRoot_ShortWaveForm_Issue.pdf>
 
    Int_t getRawRCO(Int_t chanIndex) {
      return chan[chanIndex].getRCO();
