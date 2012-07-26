@@ -145,7 +145,8 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   //if(stationId==1) sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
   //open the database
-  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
     printf("AraGeomTool::readChannelMapDb(Int_t stationId) - Can't open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
@@ -159,7 +160,8 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   if(stationId==1) query = "select * from Station1";
 
   //prepare an sql statment which will be used to obtain information from the data base
-  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
+  //  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
+  rc=sqlite3_prepare(db, query, strlen(query)+1, &stmt, NULL);
 
   if(rc!=SQLITE_OK){
     printf("statement not prepared OK\n");
