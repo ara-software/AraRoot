@@ -4,8 +4,8 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class AraCanvasMaker+;
-#pragma link C++ class AraTBCanvasMaker+;
+#pragma link C++ class AraAtriCanvasMaker+;
+#pragma link C++ class AraIcrrCanvasMaker+;
 #pragma link C++ class AraControlPanel+;
 #pragma link C++ class AraDisplay+;
 #pragma link C++ class AraFFTGraph+;

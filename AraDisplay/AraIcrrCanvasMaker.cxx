@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraCanvasMaker.cxx        ARA Event Canvas make               /////
+/////  AraIcrrCanvasMaker.cxx        ARA Event Canvas make               /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////     Class for making pretty event canvases for ARA-II            /////
@@ -7,13 +7,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <fstream>
 #include <iostream>
-#include "AraCanvasMaker.h"
+#include "AraIcrrCanvasMaker.h"
 #include "AraGeomTool.h"
-#include "UsefulAtriStationEvent.h"
+#include "UsefulIcrrStationEvent.h"
 #include "AraWaveformGraph.h"
 #include "AraEventCorrelator.h"
 #include "AraFFTGraph.h"
-#include "araSoft.h"
+#include "araIcrrDefines.h"
 
 
 #include "TString.h"
@@ -42,38 +42,38 @@
 #include "FFTtools.h"
 
 
-AraCanvasMaker*  AraCanvasMaker::fgInstance = 0;
-AraGeomTool *fACMGeomTool=0;
+AraIcrrCanvasMaker*  AraIcrrCanvasMaker::fgInstance = 0;
+AraGeomTool *fIcrrACMGeomTool=0;
 
 
 
 
-AraWaveformGraph *grElec[CHANNELS_PER_ATRI]={0}; 
-AraWaveformGraph *grElecFiltered[CHANNELS_PER_ATRI]={0};
-AraWaveformGraph *grElecHilbert[CHANNELS_PER_ATRI]={0};
-AraFFTGraph *grElecFFT[CHANNELS_PER_ATRI]={0};
-AraFFTGraph *grElecAveragedFFT[CHANNELS_PER_ATRI]={0};
+AraWaveformGraph *grIcrrElec[NUM_DIGITIZED_ICRR_CHANNELS]={0}; 
+AraWaveformGraph *grIcrrElecFiltered[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraWaveformGraph *grIcrrElecHilbert[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraFFTGraph *grIcrrElecFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
+AraFFTGraph *grIcrrElecAveragedFFT[NUM_DIGITIZED_ICRR_CHANNELS]={0};
 
-AraWaveformGraph *grRFChan[CHANNELS_PER_ATRI]={0};
-AraWaveformGraph *grRFChanFiltered[CHANNELS_PER_ATRI]={0};
-AraWaveformGraph *grRFChanHilbert[CHANNELS_PER_ATRI]={0};
-AraFFTGraph *grRFChanFFT[CHANNELS_PER_ATRI]={0};
-AraFFTGraph *grRFChanAveragedFFT[CHANNELS_PER_ATRI]={0};
+AraWaveformGraph *grIcrrRFChan[MAX_RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grIcrrRFChanFiltered[MAX_RFCHANS_PER_ICRR]={0};
+AraWaveformGraph *grIcrrRFChanHilbert[MAX_RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grIcrrRFChanFFT[MAX_RFCHANS_PER_ICRR]={0};
+AraFFTGraph *grIcrrRFChanAveragedFFT[MAX_RFCHANS_PER_ICRR]={0};
 
 
-TH1D *AraCanvasMaker::getFFTHisto(int ant)
+TH1D *AraIcrrCanvasMaker::getFFTHisto(int ant)
 {
-  if(ant<0 || ant>=CHANNELS_PER_ATRI) return NULL;
-  if(grRFChan[ant])
-    return grRFChan[ant]->getFFTHisto();
+  if(ant<0 || ant>=RFCHANS_PER_ICRR) return NULL;
+  if(grIcrrRFChan[ant])
+    return grIcrrRFChan[ant]->getFFTHisto();
     return NULL;
 
 }
 
-AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
+AraIcrrCanvasMaker::AraIcrrCanvasMaker(AraCalType::AraCalType_t calType)
 {
   //Default constructor
-  fACMGeomTool=AraGeomTool::Instance();
+  fIcrrACMGeomTool=AraGeomTool::Instance();
   fNumAntsInMap=4;
   fWebPlotterMode=0;
   fPassBandFilter=0;
@@ -89,9 +89,7 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=2000;
-  fThisMinTime=0;
-  fThisMaxTime=100;
+  fMaxTimeLimit=250;
   if(AraCalType::hasCableDelays(calType)) {
     fMinTimeLimit=-200;
     fMaxTimeLimit=150;
@@ -108,25 +106,24 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
   fCalType=calType;
   fCorType=AraCorrelatorType::kSphericalDist40;
   fgInstance=this;
-  memset(grElec,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grElecFiltered,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grElecHilbert,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grElecFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
-  memset(grElecAveragedFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
+  memset(grIcrrElec,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grIcrrElecFiltered,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grIcrrElecHilbert,0,sizeof(AraWaveformGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grIcrrElecFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
+  memset(grIcrrElecAveragedFFT,0,sizeof(AraFFTGraph*)*NUM_DIGITIZED_ICRR_CHANNELS);
 
-  memset(grRFChan,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanFiltered,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanHilbert,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);  
+  memset(grIcrrRFChan,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grIcrrRFChanFiltered,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grIcrrRFChanHilbert,0,sizeof(AraWaveformGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grIcrrRFChanFFT,0,sizeof(AraFFTGraph*)*MAX_RFCHANS_PER_ICRR);
+  memset(grIcrrRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*MAX_RFCHANS_PER_ICRR);  
   switch(fCalType) {
   case AraCalType::kNoCalib:
     fMaxVoltLimit=3000;
     fMinVoltLimit=1000;
-    break;
   case AraCalType::kJustUnwrap:
     fMinTimeLimit=0;
-    fMaxTimeLimit=50;
+    fMaxTimeLimit=260;
     break;
   default:
     break;
@@ -135,7 +132,7 @@ AraCanvasMaker::AraCanvasMaker(AraCalType::AraCalType_t calType)
 
 }
 
-AraCanvasMaker::~AraCanvasMaker()
+AraIcrrCanvasMaker::~AraIcrrCanvasMaker()
 {
    //Default destructor
 }
@@ -143,14 +140,14 @@ AraCanvasMaker::~AraCanvasMaker()
 
 
 //______________________________________________________________________________
-AraCanvasMaker*  AraCanvasMaker::Instance()
+AraIcrrCanvasMaker*  AraIcrrCanvasMaker::Instance()
 {
    //static function
-   return (fgInstance) ? (AraCanvasMaker*) fgInstance : new AraCanvasMaker();
+   return (fgInstance) ? (AraIcrrCanvasMaker*) fgInstance : new AraIcrrCanvasMaker();
 }
 
 
-TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
+TPad *AraIcrrCanvasMaker::getEventInfoCanvas(UsefulIcrrStationEvent *evPtr,  TPad *useCan, Int_t runNumber)
 {
    static UInt_t lastEventNumber=0;
    static TPaveText *leftPave=0;
@@ -159,8 +156,8 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
    static TPaveText *rightPave=0;
 
 
-   if(!fACMGeomTool)
-      fACMGeomTool=AraGeomTool::Instance();
+   if(!fIcrrACMGeomTool)
+      fIcrrACMGeomTool=AraGeomTool::Instance();
    char textLabel[180];
    TPad *topPad;
    if(!useCan) {
@@ -182,17 +179,17 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
      leftPave->SetBorderSize(0);
      leftPave->SetFillColor(0);
      leftPave->SetTextAlign(13);
-     //     if(runNumber) {
+     if(runNumber) {
        sprintf(textLabel,"Run: %d",runNumber);
        TText *runText = leftPave->AddText(textLabel);
        runText->SetTextColor(50);
-       //    }
-     sprintf(textLabel,"Event: %d",evPtr->eventNumber);
+     }
+     if(evPtr->stationId==0) sprintf(textLabel,"TestBed Event: %d",evPtr->head.eventNumber);
+     else if(evPtr->stationId==1) sprintf(textLabel,"Station1 Event: %d",evPtr->head.eventNumber);
+     else sprintf(textLabel,"Event: %d",evPtr->head.eventNumber);
+
      TText *eventText = leftPave->AddText(textLabel);
      eventText->SetTextColor(50);
-     sprintf(textLabel,"Event Id: %d",evPtr->eventId);
-     TText *eventText2 = leftPave->AddText(textLabel);
-     eventText2->SetTextColor(50);
      leftPave->Draw();
 
 
@@ -204,7 +201,7 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
      midLeftPave->SetName("midLeftPave");
      midLeftPave->SetBorderSize(0);
      midLeftPave->SetTextAlign(13);
-     TTimeStamp trigTime((time_t)evPtr->unixTime,(Int_t)1000*evPtr->unixTimeUs);
+     TTimeStamp trigTime((time_t)evPtr->head.unixTime,(Int_t)1000*evPtr->head.unixTimeUs);
      sprintf(textLabel,"Time: %s",trigTime.AsString("s"));
      TText *timeText = midLeftPave->AddText(textLabel);
      timeText->SetTextColor(1);
@@ -222,25 +219,23 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
      midRightPave->SetBorderSize(0);
      midRightPave->SetTextAlign(13);
      sprintf(textLabel,"PPS Num %d",
-	     evPtr->ppsNumber);
+	     evPtr->trig.ppsNum);
      midRightPave->AddText(textLabel);
-     sprintf(textLabel,"Trig Time %d",
-	     evPtr->timeStamp);
+     sprintf(textLabel,"Trig Type %d%d%d",
+	     evPtr->trig.isInTrigType(2),
+	     evPtr->trig.isInTrigType(1),
+	     evPtr->trig.isInTrigType(0));
      midRightPave->AddText(textLabel);
-     // sprintf(textLabel,"Trig Type %d%d%d",
-     // 	     evPtr->isInTrigType(2),
-     // 	     evPtr->isInTrigType(1),
-     // 	     evPtr->isInTrigType(0));
-     // midRightPave->AddText(textLabel);
-     // sprintf(textLabel,"Pattern %d%d%d%d%d%d%d%d",
-     // 	     evPtr->isInTrigPattern(7),
-     // 	     evPtr->isInTrigPattern(6),
-     // 	     evPtr->isInTrigPattern(5),
-     // 	     evPtr->isInTrigPattern(4),
-     // 	     evPtr->isInTrigPattern(3),
-     // 	     evPtr->isInTrigPattern(2),
-     // 	     evPtr->isInTrigPattern(1),
-     // 	     evPtr->isInTrigPattern(0));
+     sprintf(textLabel,"Pattern %d%d%d%d%d%d%d%d",
+	     evPtr->trig.isInTrigPattern(7),
+	     evPtr->trig.isInTrigPattern(6),
+	     evPtr->trig.isInTrigPattern(5),
+	     evPtr->trig.isInTrigPattern(4),
+	     evPtr->trig.isInTrigPattern(3),
+	     evPtr->trig.isInTrigPattern(2),
+	     evPtr->trig.isInTrigPattern(1),
+	     evPtr->trig.isInTrigPattern(0));
+     midRightPave->AddText(textLabel);
      midRightPave->Draw();
 
      
@@ -248,39 +243,23 @@ TPad *AraCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPad *u
      if(rightPave) delete rightPave;
      rightPave = new TPaveText(0,0.1,1,0.95);
      rightPave->SetBorderSize(0);
-     rightPave->SetTextAlign(13);
-     sprintf(textLabel,"Num readout blocks %d",
-	     evPtr->numReadoutBlocks);
-     rightPave->AddText(textLabel); 
-     sprintf(textLabel,"Blocks");
-     rightPave->AddText(textLabel); 
-     sprintf(textLabel,"%d -- ",0);
-     for(int i=0;i<evPtr->numReadoutBlocks;i++) {
-       if(i>0 && i%4==0) {
-	 rightPave->AddText(textLabel); 	 
-	 sprintf(textLabel,"%d -- ",i);
-       }	 
-       sprintf(textLabel,"%s %d",textLabel,evPtr->blockVec[i].getBlock());
-     }
-     rightPave->AddText(textLabel); 
-
+     rightPave->SetTextAlign(13); 
      rightPave->Draw();
      topPad->Update();
      topPad->Modified();
                
-     lastEventNumber=evPtr->eventNumber;
+     lastEventNumber=evPtr->head.eventNumber;
    }
       
    return topPad;
 }
 
 
-TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationEvent *evPtr,  TPad *useCan)
+TPad *AraIcrrCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulIcrrStationEvent *evPtr,  TPad *useCan)
 {
   TPad *retCan=0;
   fWebPlotterMode=1;
   //  static Int_t lastEventView=0;
-  int foundTimeRange = 0;
 
   if(fAutoScale) {
     fMinVoltLimit=1e9;
@@ -291,49 +270,34 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationE
 
 
 
-  for(int chan=0;chan<CHANNELS_PER_ATRI;chan++) {
-    if(grElec[chan]) delete grElec[chan];
-    if(grElecFFT[chan]) delete grElecFFT[chan];
-    if(grElecHilbert[chan]) delete grElecHilbert[chan];
-    grElec[chan]=0;
-    grElecFFT[chan]=0;
-    grElecHilbert[chan]=0;
-    //    if(grElecAveragedFFT[chan]) delete grElecAveragedFFT[chan];
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
+    if(grIcrrElec[chan]) delete grIcrrElec[chan];
+    if(grIcrrElecFFT[chan]) delete grIcrrElecFFT[chan];
+    if(grIcrrElecHilbert[chan]) delete grIcrrElecHilbert[chan];
+    grIcrrElec[chan]=0;
+    grIcrrElecFFT[chan]=0;
+    grIcrrElecHilbert[chan]=0;
+    //    if(grIcrrElecAveragedFFT[chan]) delete grIcrrElecAveragedFFT[chan];
     
     TGraph *grTemp = evPtr->getGraphFromElecChan(chan);
-    if (!foundTimeRange && grTemp->GetN()) {
-      foundTimeRange = 1;
-      fThisMinTime=grTemp->GetX()[0];
-      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
-    }
-
-    // If GetN() returns 0, it's just an empty graph.
-    // Draw will throw a bunch of stupid errors ("illegal number of points")
-    // but other than that it'll be fine. Maybe we'll put a check somewhere
-    // on Draw to shut up the errors.
-    if (grTemp->GetN()) {
-      if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
-      if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
-    }
-
-    grElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grElec[chan]->setElecChan(chan);
-      //      std::cout << evPtr->eventNumber << "\n";
+    grIcrrElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+    grIcrrElec[chan]->setElecChan(chan);
+      //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
-      //		<< grElec[chan]->GetRMS(2) << std::endl;
+      //		<< grIcrrElec[chan]->GetRMS(2) << std::endl;
     
     if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT) {
-      TGraph *grTempFFT = grElec[chan]->getFFT();
-      grElecFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
+      TGraph *grTempFFT = grIcrrElec[chan]->getFFT();
+      grIcrrElecFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
-      if(!grElecAveragedFFT[chan]) {
-	grElecAveragedFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
+      if(!grIcrrElecAveragedFFT[chan]) {
+	grIcrrElecAveragedFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
       }
       else {
-	grElecAveragedFFT[chan]->AddFFT(grElecFFT[chan]);
+	grIcrrElecAveragedFFT[chan]->AddFFT(grIcrrElecFFT[chan]);
       }
       delete grTempFFT;      
     }
@@ -354,45 +318,42 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationE
     delete grTemp;
   }
 
-  foundTimeRange = 0;
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
-    if(grRFChan[rfchan]) delete grRFChan[rfchan];
-    if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
-    if(grRFChanHilbert[rfchan]) delete grRFChanHilbert[rfchan];
-    grRFChan[rfchan]=0;
-    grRFChanFFT[rfchan]=0;
-    grRFChanHilbert[rfchan]=0;
-    //    if(grRFChanAveragedFFT[chan]) delete grRFChanAveragedFFT[chan];
+  
+
+  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
+    if(grIcrrRFChan[rfchan]) delete grIcrrRFChan[rfchan];
+    if(grIcrrRFChanFFT[rfchan]) delete grIcrrRFChanFFT[rfchan];
+    if(grIcrrRFChanHilbert[rfchan]) delete grIcrrRFChanHilbert[rfchan];
+    grIcrrRFChan[rfchan]=0;
+    grIcrrRFChanFFT[rfchan]=0;
+    grIcrrRFChanHilbert[rfchan]=0;
+    //    if(grIcrrRFChanAveragedFFT[chan]) delete grIcrrRFChanAveragedFFT[chan];
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
-    if (!foundTimeRange && grTemp->GetN()) {
-      foundTimeRange = 1;
-      fThisMinTime=grTemp->GetX()[0];
-      fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
-    }
-
-    grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
-      //      std::cout << evPtr->eventNumber << "\n";
+    grIcrrRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+    grIcrrRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
+      //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
-      //		<< grElec[chan]->GetRMS(2) << std::endl;
+      //		<< grIcrrElec[chan]->GetRMS(2) << std::endl;
     
  
     if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT) {
-      TGraph *grTempFFT = grRFChan[rfchan]->getFFT();
-      grRFChanFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
+      TGraph *grTempFFT = grIcrrRFChan[rfchan]->getFFT();
+      grIcrrRFChanFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
-      if(!grRFChanAveragedFFT[rfchan]) {
-	grRFChanAveragedFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
+      if(!grIcrrRFChanAveragedFFT[rfchan]) {
+	grIcrrRFChanAveragedFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
       }
       else {
-	grRFChanAveragedFFT[rfchan]->AddFFT(grRFChanFFT[rfchan]);
+	grIcrrRFChanAveragedFFT[rfchan]->AddFFT(grIcrrRFChanFFT[rfchan]);
       }
       delete grTempFFT;      
     }
+
+
 
     if(fAutoScale) {
       Int_t numPoints=grTemp->GetN();
@@ -431,7 +392,7 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationE
 
   fRedoEventCanvas=0;
 
-  retCan=AraCanvasMaker::getCanvasForWebPlotter(evPtr,useCan);
+  retCan=AraIcrrCanvasMaker::getCanvasForWebPlotter(evPtr,useCan);
 
  
 
@@ -439,14 +400,12 @@ TPad *AraCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStationE
 
 }
 
-TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
+TPad *AraIcrrCanvasMaker::getEventViewerCanvas(UsefulIcrrStationEvent *evPtr,
 					   TPad *useCan)
 {
   TPad *retCan=0;
 
   static UInt_t lastEventNumber=0;
-
-  int foundTimeRange = 0;
 
   if(fAutoScale) {
     fMinVoltLimit=1e9;
@@ -457,34 +416,31 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
 
 
 
-  for(int chan=0;chan<CHANNELS_PER_ATRI;chan++) {
-    if(grElec[chan]) delete grElec[chan];
-    if(grElecFFT[chan]) delete grElecFFT[chan];
-    if(grElecHilbert[chan]) delete grElecHilbert[chan];
-    grElec[chan]=0;
-    grElecFFT[chan]=0;
-    grElecHilbert[chan]=0;
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
+    if(grIcrrElec[chan]) delete grIcrrElec[chan];
+    if(grIcrrElecFFT[chan]) delete grIcrrElecFFT[chan];
+    if(grIcrrElecHilbert[chan]) delete grIcrrElecHilbert[chan];
+    grIcrrElec[chan]=0;
+    grIcrrElecFFT[chan]=0;
+    grIcrrElecHilbert[chan]=0;
     
     TGraph *grTemp = evPtr->getGraphFromElecChan(chan);
-    if (grTemp->GetN() && !foundTimeRange) {
-      fThisMinTime = grTemp->GetX()[0];
-      fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
-      foundTimeRange = 1;
-    }
-    grElec[chan] = new AraWaveformGraph(grTemp->GetN(), grTemp->GetX(),grTemp->GetY());
-    grElec[chan]->setElecChan(chan);
+    grIcrrElec[chan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+    grIcrrElec[chan]->setElecChan(chan);
+
+
     if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT) {
-      TGraph *grTempFFT = grElec[chan]->getFFT();
-      grElecFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
+      TGraph *grTempFFT = grIcrrElec[chan]->getFFT();
+      grIcrrElecFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
-      if(!grElecAveragedFFT[chan]) {
-	grElecAveragedFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
+      if(!grIcrrElecAveragedFFT[chan]) {
+	grIcrrElecAveragedFFT[chan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
       }
       else {
-	grElecAveragedFFT[chan]->AddFFT(grElecFFT[chan]);
+	grIcrrElecAveragedFFT[chan]->AddFFT(grIcrrElecFFT[chan]);
       }
       delete grTempFFT;      
     }
@@ -494,7 +450,7 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
       Int_t numPoints=grTemp->GetN();
       Double_t *yVals=grTemp->GetY();
       	
-      if(chan%8==7) {
+      if(chan%9==8) {
 	//Clock channel
 	for(int i=0;i<numPoints;i++) {	
 	  if(yVals[i]<fMinClockVoltLimit)
@@ -516,45 +472,38 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
     delete grTemp;
   }
   //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
-  foundTimeRange = 0;
-  
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
-    if(grRFChan[rfchan]) delete grRFChan[rfchan];
-    if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
-    if(grRFChanHilbert[rfchan]) delete grRFChanHilbert[rfchan];
-    grRFChan[rfchan]=0;
-    grRFChanFFT[rfchan]=0;
-    grRFChanHilbert[rfchan]=0;
+
+
+  for(int rfchan=0;rfchan<(evPtr->numRFChans);rfchan++) {
+    if(grIcrrRFChan[rfchan]) delete grIcrrRFChan[rfchan];
+    if(grIcrrRFChanFFT[rfchan]) delete grIcrrRFChanFFT[rfchan];
+    if(grIcrrRFChanHilbert[rfchan]) delete grIcrrRFChanHilbert[rfchan];
+    grIcrrRFChan[rfchan]=0;
+    grIcrrRFChanFFT[rfchan]=0;
+    grIcrrRFChanHilbert[rfchan]=0;
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
-    if (grTemp->GetN() && !foundTimeRange) {
-      fThisMinTime = grTemp->GetX()[0];
-      fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
-      foundTimeRange = 1;
-    }
+    grIcrrRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 
-    if (grTemp->GetN()) {
-      if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
-      if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
-    }
-    grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
-    grRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
-      //      std::cout << evPtr->eventNumber << "\n";
+    
+
+    grIcrrRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
+      //      std::cout << evPtr->head.eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
-      //		<< grElec[chan]->GetRMS(2) << std::endl;
+      //		<< grIcrrElec[chan]->GetRMS(2) << std::endl;
     
     if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT) {
-      TGraph *grTempFFT = grRFChan[rfchan]->getFFT();
-      grRFChanFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
+      TGraph *grTempFFT = grIcrrRFChan[rfchan]->getFFT();
+      grIcrrRFChanFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
-      if(!grRFChanAveragedFFT[rfchan]) {
-	grRFChanAveragedFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
+      if(!grIcrrRFChanAveragedFFT[rfchan]) {
+	grIcrrRFChanAveragedFFT[rfchan]=new AraFFTGraph(grTempFFT->GetN(),
 				      grTempFFT->GetX(),
 				      grTempFFT->GetY());
       }
       else {
-	grRFChanAveragedFFT[rfchan]->AddFFT(grRFChanFFT[rfchan]);
+	grIcrrRFChanAveragedFFT[rfchan]->AddFFT(grIcrrRFChanFFT[rfchan]);
       }
       delete grTempFFT;      
     }
@@ -601,16 +550,16 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
 
   
   if(fCanvasLayout==AraDisplayCanvasLayoutOption::kElectronicsView) {
-    retCan=AraCanvasMaker::getElectronicsCanvas(evPtr,useCan);
+    retCan=AraIcrrCanvasMaker::getElectronicsCanvas(evPtr,useCan);
   }
   else if(fCanvasLayout==AraDisplayCanvasLayoutOption::kRFChanView) {
-    retCan=AraCanvasMaker::getRFChannelCanvas(evPtr,useCan);
+    retCan=AraIcrrCanvasMaker::getRFChannelCanvas(evPtr,useCan);
   }
   else if(fCanvasLayout==AraDisplayCanvasLayoutOption::kAntennaView) {
-    retCan=AraCanvasMaker::getAntennaCanvas(evPtr,useCan);
+    retCan=AraIcrrCanvasMaker::getAntennaCanvas(evPtr,useCan);
   }
   else if(fCanvasLayout==AraDisplayCanvasLayoutOption::kIntMapView) {
-    retCan=AraCanvasMaker::getIntMapCanvas(evPtr,useCan);
+    retCan=AraIcrrCanvasMaker::getIntMapCanvas(evPtr,useCan);
   }
 
 
@@ -622,13 +571,13 @@ TPad *AraCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
 }
 
 
-TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *useCan)
+TPad *AraIcrrCanvasMaker::getElectronicsCanvas(UsefulIcrrStationEvent *evPtr,TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
   
-  if(!fACMGeomTool)
-    fACMGeomTool=AraGeomTool::Instance();
+  if(!fIcrrACMGeomTool)
+    fIcrrACMGeomTool=AraGeomTool::Instance();
   char textLabel[180];
   char padName[180];
   TPad *canElec=0;
@@ -642,7 +591,7 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *u
     canElec->SetTopMargin(0);
     TPaveText *leftPave = new TPaveText(0.05,0.92,0.95,0.98);
     leftPave->SetBorderSize(0);
-    sprintf(textLabel," Event %d",evPtr->eventNumber);
+    sprintf(textLabel," Event %d",evPtr->head.eventNumber);
     TText *eventText = leftPave->AddText(textLabel);
     eventText->SetTextColor(50);
     leftPave->Draw();
@@ -669,17 +618,15 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *u
   // 1 3 5 7 9 
   // 2 4 6 8 
 
-
-
-  for(int row=0;row<RFCHAN_PER_DDA;row++) {    
-    for(int column=0;column<DDA_PER_ATRI;column++) {
+  for(int row=0;row<6;row++) {    
+    for(int column=0;column<5;column++) {
       plotPad->cd();
-      int channel=row;
-      int dda=column;
-      int chanIndex=row+column*RFCHAN_PER_DDA;
-      //if(channel>8) continue;
+      int labChip=(row/2); //0, 1 or 2
+      int channel=(row%2)+2*column;
+      int chanIndex=channel+9*labChip;
+      if(channel>8) continue;
 
-      sprintf(padName,"elecChanPad%d",row+column*RFCHAN_PER_DDA);
+      sprintf(padName,"elecChanPad%d",column+row*5);
       //      std::cout << chanIndex << "\t" << labChip << "\t" << channel << "\t" << padName << "\n";
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
       paddy1->SetEditable(kTRUE);
@@ -688,38 +635,36 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *u
 
 
       if(fWaveformOption==AraDisplayFormatOption::kPowerSpectralDensity){
-	if(!grElecFFT[chanIndex]) {
-	  TGraph *grTemp=grElec[chanIndex]->getFFT();
-	  grElecFFT[chanIndex]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrElecFFT[chanIndex]) {
+	  TGraph *grTemp=grIcrrElec[chanIndex]->getFFT();
+	  grIcrrElecFFT[chanIndex]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grElecFFT[chanIndex]->Draw("l");
+	grIcrrElecFFT[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grElecAveragedFFT[chanIndex]->Draw("l");
+	grIcrrElecAveragedFFT[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
-	if(!grElecHilbert[chanIndex]) {
-	  TGraph *grTemp=grElec[chanIndex]->getHilbert();
-	  grElecHilbert[chanIndex]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrElecHilbert[chanIndex]) {
+	  TGraph *grTemp=grIcrrElec[chanIndex]->getHilbert();
+	  grIcrrElecHilbert[chanIndex]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grElecHilbert[chanIndex]->Draw("l");
+	grIcrrElecHilbert[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform){
 
-	grElec[chanIndex]->Draw("l");
+	grIcrrElec[chanIndex]->Draw("l");
 	
 	
-	TList *listy = gPad->GetListOfPrimitives();
-	for(int i=0;i<listy->GetSize();i++) {
-	  TObject *fred = listy->At(i);
-	  TH1F *tempHist = (TH1F*) fred;
-	  if(tempHist->InheritsFrom("TH1")) {
-	    tempHist->GetXaxis()->SetRangeUser(fThisMinTime,fThisMaxTime);
-	    //	    std::cout << fThisMinTime << "\t" << fThisMaxTime << "\n";
-	    if(fAutoScale) {
-	      if(channel<7) {
+	if(fAutoScale) {
+	  TList *listy = gPad->GetListOfPrimitives();
+	  for(int i=0;i<listy->GetSize();i++) {
+	    TObject *fred = listy->At(i);
+	    TH1F *tempHist = (TH1F*) fred;
+	    if(tempHist->InheritsFrom("TH1")) {
+	      if(channel<8) {
 		tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit,fMaxVoltLimit);
 	      }
 	      else {
@@ -745,14 +690,14 @@ TPad *AraCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPad *u
 }
 
 
-TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
+TPad *AraIcrrCanvasMaker::getCanvasForWebPlotter(UsefulIcrrStationEvent *evPtr,
 					     TPad *useCan)
 {
   //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
 
-  if(!fACMGeomTool)
-    fACMGeomTool=AraGeomTool::Instance();
+  if(!fIcrrACMGeomTool)
+    fIcrrACMGeomTool=AraGeomTool::Instance();
   char textLabel[180];
   char padName[180];
   TPad *canRFChan=0;
@@ -766,7 +711,7 @@ TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
     canRFChan->SetTopMargin(0);
     TPaveText *leftPave = new TPaveText(0.05,0.92,0.95,0.98);
     leftPave->SetBorderSize(0);
-    sprintf(textLabel,"Event %d",evPtr->eventNumber);
+    sprintf(textLabel,"Event %d",evPtr->head.eventNumber);
     TText *eventText = leftPave->AddText(textLabel);
     eventText->SetTextColor(50);
     leftPave->Draw();
@@ -777,7 +722,7 @@ TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupRFChanPadWithFrames(plotPad);
+  setupRFChanPadWithFrames(plotPad, evPtr->stationId);
 
 
 
@@ -800,7 +745,7 @@ TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
       deleteTGraphsFromRFPad(paddy1,rfChan);
       paddy1->cd();
      
-      grRFChan[rfChan]->Draw("l");
+      grIcrrRFChan[rfChan]->Draw("l");
 
       if(fAutoScale) {
 	TList *listy = gPad->GetListOfPrimitives();
@@ -828,14 +773,14 @@ TPad *AraCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
 
 }
 
-TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
+TPad *AraIcrrCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
 					 TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
 
-  if(!fACMGeomTool)
-    fACMGeomTool=AraGeomTool::Instance();
+  if(!fIcrrACMGeomTool)
+    fIcrrACMGeomTool=AraGeomTool::Instance();
   char textLabel[180];
   char padName[180];
   TPad *canRFChan=0;
@@ -849,7 +794,7 @@ TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
     canRFChan->SetTopMargin(0);
     TPaveText *leftPave = new TPaveText(0.05,0.92,0.95,0.98);
     leftPave->SetBorderSize(0);
-    sprintf(textLabel,"Event %d",evPtr->eventNumber);
+    sprintf(textLabel,"Event %d",evPtr->head.eventNumber);
     TText *eventText = leftPave->AddText(textLabel);
     eventText->SetTextColor(50);
     leftPave->Draw();
@@ -860,12 +805,22 @@ TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupRFChanPadWithFrames(plotPad);
+  setupRFChanPadWithFrames(plotPad, evPtr->stationId);
+  int maxColumns=0;
+  int maxRows=0;
 
+  if(evPtr->stationId==1){
+    maxColumns=4;
+    maxRows=5;
+  }
+  else {
+    maxColumns=4;
+    maxRows=4;
+  }
 
   
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<maxColumns;column++) {
+    for(int row=0;row<maxRows;row++) {
       plotPad->cd();
       int rfChan=column+4*row;
       
@@ -876,26 +831,26 @@ TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
       paddy1->cd();
       
       if(fWaveformOption==AraDisplayFormatOption::kPowerSpectralDensity){
-	if(!grRFChanFFT[rfChan]) {
-	  TGraph *grTemp=grRFChan[rfChan]->getFFT();
-	  grRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrRFChanFFT[rfChan]) {
+	  TGraph *grTemp=grIcrrRFChan[rfChan]->getFFT();
+	  grIcrrRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanFFT[rfChan]->Draw("l");
+	grIcrrRFChanFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grRFChanAveragedFFT[rfChan]->Draw("l");
+	grIcrrRFChanAveragedFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
-	if(!grRFChanHilbert[rfChan])  {
-	  TGraph *grTemp=grRFChan[rfChan]->getHilbert();
-	  grRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrRFChanHilbert[rfChan])  {
+	  TGraph *grTemp=grIcrrRFChan[rfChan]->getHilbert();
+	  grIcrrRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanHilbert[rfChan]->Draw("l");
+	grIcrrRFChanHilbert[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform) {
-	grRFChan[rfChan]->Draw("l");
+	grIcrrRFChan[rfChan]->Draw("l");
 
 	if(fAutoScale) {
 	  TList *listy = gPad->GetListOfPrimitives();
@@ -921,15 +876,15 @@ TPad *AraCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
   
 }
 
-
-TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
+//jpd this is the next one to change
+TPad *AraIcrrCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
 
-  if(!fACMGeomTool)
-    fACMGeomTool=AraGeomTool::Instance();
+  if(!fIcrrACMGeomTool)
+    fIcrrACMGeomTool=AraGeomTool::Instance();
   char textLabel[180];
   char padName[180];
   TPad *canRFChan=0;
@@ -943,7 +898,7 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
     canRFChan->SetTopMargin(0);
     TPaveText *leftPave = new TPaveText(0.05,0.92,0.95,0.98);
     leftPave->SetBorderSize(0);
-    sprintf(textLabel,"Event %d",evPtr->eventNumber);
+    sprintf(textLabel,"Event %d",evPtr->head.eventNumber);
     TText *eventText = leftPave->AddText(textLabel);
     eventText->SetTextColor(50);
     leftPave->Draw();
@@ -954,7 +909,7 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
-  setupAntPadWithFrames(plotPad);
+  setupAntPadWithFrames(plotPad, evPtr->stationId);
 
   //  int rfChanMap[4][4]={
   AraAntPol::AraAntPol_t polMap[4][4]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
@@ -969,7 +924,7 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
   for(int row=0;row<4;row++) {
     for(int column=0;column<4;column++) {
       plotPad->cd();
-      int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
+      int rfChan=fIcrrACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
       //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       
       sprintf(padName,"antPad%d_%d",column,row);
@@ -979,26 +934,26 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
       paddy1->cd();
       
       if(fWaveformOption==AraDisplayFormatOption::kPowerSpectralDensity){
-	if(!grRFChanFFT[rfChan]) {	  
-	  TGraph *grTemp=grRFChan[rfChan]->getFFT();
-	  grRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrRFChanFFT[rfChan]) {	  
+	  TGraph *grTemp=grIcrrRFChan[rfChan]->getFFT();
+	  grIcrrRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanFFT[rfChan]->Draw("l");
+	grIcrrRFChanFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grRFChanAveragedFFT[rfChan]->Draw("l");
+	grIcrrRFChanAveragedFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
-	if(!grRFChanHilbert[rfChan]) {	  
-	  TGraph *grTemp=grRFChan[rfChan]->getHilbert();
-	  grRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
+	if(!grIcrrRFChanHilbert[rfChan]) {	  
+	  TGraph *grTemp=grIcrrRFChan[rfChan]->getHilbert();
+	  grIcrrRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanHilbert[rfChan]->Draw("l");
+	grIcrrRFChanHilbert[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform) {
-	grRFChan[rfChan]->Draw("l");
+	grIcrrRFChan[rfChan]->Draw("l");
 
 	if(fAutoScale) {
 	  TList *listy = gPad->GetListOfPrimitives();
@@ -1025,30 +980,30 @@ TPad *AraCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 }
 
 
-TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
+TPad *AraIcrrCanvasMaker::getIntMapCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {
   static UInt_t lastEventNumber=0;
   static UInt_t lastUnixTime=0;
   static UInt_t lastUnixTimeUs=0;
   Int_t sameEvent=0;
-  if(lastEventNumber==evPtr->eventNumber) {
-    if(lastUnixTime==evPtr->unixTime) {
-      if(lastUnixTimeUs==evPtr->unixTimeUs) {
+  if(lastEventNumber==evPtr->head.eventNumber) {
+    if(lastUnixTime==evPtr->head.unixTime) {
+      if(lastUnixTimeUs==evPtr->head.unixTimeUs) {
 	sameEvent=1;
       }
     }
   }
-  lastEventNumber=evPtr->eventNumber;
-  lastUnixTime=evPtr->unixTime;
-  lastUnixTimeUs=evPtr->unixTimeUs;
+  lastEventNumber=evPtr->head.eventNumber;
+  lastUnixTime=evPtr->head.unixTime;
+  lastUnixTimeUs=evPtr->head.unixTimeUs;
   
 
    //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
 
-  if(!fACMGeomTool)
-    fACMGeomTool=AraGeomTool::Instance();
+  if(!fIcrrACMGeomTool)
+    fIcrrACMGeomTool=AraGeomTool::Instance();
   char textLabel[180];
   char padName[180];
   TPad *canIntMap=0;
@@ -1062,7 +1017,7 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
     canIntMap->SetTopMargin(0);
     TPaveText *leftPave = new TPaveText(0.05,0.92,0.95,0.98);
     leftPave->SetBorderSize(0);
-    sprintf(textLabel,"Event %d",evPtr->eventNumber);
+    sprintf(textLabel,"Event %d",evPtr->head.eventNumber);
     TText *eventText = leftPave->AddText(textLabel);
     eventText->SetTextColor(50);
     leftPave->Draw();
@@ -1075,7 +1030,6 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   plotPad->cd();
   plotPad->Clear();
   AraEventCorrelator *araCorPtr = AraEventCorrelator::Instance(fNumAntsInMap, evPtr->stationId);
-
   static TH2D* histMapH=0;  
   static TH2D* histMapV=0;  
   plotPad->Divide(1,2);
@@ -1089,8 +1043,8 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   }
 
   
-  //  if(!histMapV)
-  histMapV =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kVertical,fCorType);
+  if(!histMapV)
+    histMapV =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kVertical,fCorType);
   histMapV->SetName("histMapV");
   histMapV->SetTitle("Vertical Polarisation");
   histMapV->SetXTitle("Azimuth (Degrees)");
@@ -1099,6 +1053,7 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   //  histMapV->SetMaximum(1);
   //  histMapV->SetMinimum(-1);
   histMapV->Draw("colz");
+
   plotPad->cd(2);
   if(histMapH) {
     if(!sameEvent) {
@@ -1106,9 +1061,8 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
       histMapH=0;
     }
   }
-
-  //  if(!histMapH)
-  histMapH =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kHorizontal,fCorType);
+  if(!histMapH)
+    histMapH =araCorPtr->getInterferometricMap(evPtr,AraAntPol::kHorizontal,fCorType);
   histMapH->SetName("histMapH");
   histMapH->SetTitle("Hertical Polarisation");
   histMapH->SetXTitle("Azimuth (Degrees)");
@@ -1116,9 +1070,11 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   histMapH->SetStats(0);
   //  histMapH->SetMaximum(1);
   //  histMapH->SetMinimum(-1);
-
-
   histMapH->Draw("colz");
+  
+  
+
+
   
   if(!useCan)
     return canIntMap;
@@ -1133,7 +1089,7 @@ TPad *AraCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
 
 
 
-void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
+void AraIcrrCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
 {
   char textLabel[180];
   char padName[180];
@@ -1147,14 +1103,10 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
 
   fLastCanvasView=AraDisplayCanvasLayoutOption::kElectronicsView; 
 
-
-  int numRows=RFCHAN_PER_DDA;
-  int numCols=DDA_PER_ATRI;
-
   static int elecPadsDone=0;
   if(elecPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int i=0;i<numRows*numCols;i++) {
+    for(int i=0;i<30;i++) {
       sprintf(padName,"elecChanPad%d",i);
       TPad *paddy = (TPad*) plotPad->FindObject(padName);
       if(!paddy)
@@ -1167,27 +1119,27 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
   elecPadsDone=1;
     
 
-  Double_t left[DDA_PER_ATRI]={0.04,0.28,0.52,0.76};
-  Double_t right[DDA_PER_ATRI]={0.28,0.52,0.76,0.99};
-  Double_t top[RFCHAN_PER_DDA]={0.93,0.80,0.69,0.58,0.47,0.36,0.25,0.14};
-  Double_t bottom[RFCHAN_PER_DDA]={0.80,0.69,0.58,0.47,0.36,0.25,0.14,0.03};
+  Double_t left[5]={0.04,0.23,0.42,0.61,0.80};
+  Double_t right[5]={0.23,0.42,0.61,0.80,0.99};
+  Double_t top[6]={0.93,0.78,0.63,0.48,0.33,0.18};
+  Double_t bottom[6]={0.78,0.63,0.48,0.33,0.18,0.03};
   
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<numCols;column++) {
-    sprintf(textLabel,"DDA %d",column+1);
-    if(column==numCols-1)
+  for(int column=0;column<5;column++) {
+    sprintf(textLabel,"Chan %d/%d",1+(2*column),2+(2*column));
+    if(column==4)
       texy.DrawTextNDC(right[column]-0.1,0.97,textLabel);
     else
       texy.DrawTextNDC(right[column]-0.09,0.97,textLabel);
   }
   texy.SetTextAlign(21);  
   texy.SetTextAngle(90);
-  //  texy.DrawTextNDC(left[0]-0.01,bottom[0],"A");
-  //  texy.DrawTextNDC(left[0]-0.01,bottom[2],"B");
-  //  texy.DrawTextNDC(left[0]-0.01,bottom[4],"C");
+  texy.DrawTextNDC(left[0]-0.01,bottom[0],"A");
+  texy.DrawTextNDC(left[0]-0.01,bottom[2],"B");
+  texy.DrawTextNDC(left[0]-0.01,bottom[4],"C");
 
   // A
   // 1 3 5 7 9 
@@ -1204,21 +1156,21 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
 
 
 
-  for(int row=0;row<numRows;row++) {
-    for(int column=0;column<numCols;column++) {
+  for(int row=0;row<6;row++) {
+    for(int column=0;column<5;column++) {
       plotPad->cd();
       //      if(row%2==1 && column==4) continue;
-      sprintf(padName,"elecChanPad%d",row+column*RFCHAN_PER_DDA);
+      sprintf(padName,"elecChanPad%d",column+5*row);
       TPad *paddy1 = new TPad(padName,padName,left[column],bottom[row],right[column],top[row]);   
       paddy1->SetTopMargin(0);
       paddy1->SetBottomMargin(0);
       paddy1->SetLeftMargin(0);
       paddy1->SetRightMargin(0);
-      if(column==numCols-1)
+      if(column==4)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==numRows-1)
+      if(row==5)
 	paddy1->SetBottomMargin(0.1);
       paddy1->Draw();
       paddy1->cd();
@@ -1230,8 +1182,8 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
   
 
       if(fWaveformOption==AraDisplayFormatOption::kWaveform || fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) 
-	//framey = (TH1F*) paddy1->DrawFrame(0,fMinVoltLimit,250,fMaxVoltLimit);
-	framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
+	framey = (TH1F*) paddy1->DrawFrame(0,fMinVoltLimit,250,fMaxVoltLimit);
+	//	framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
       else if(fWaveformOption==AraDisplayFormatOption::kFFT || fWaveformOption==AraDisplayFormatOption::kAveragedFFT)
 	framey = (TH1F*) paddy1->DrawFrame(fMinFreqLimit,fMinPowerLimit,fMaxFreqLimit,fMaxPowerLimit); 
 
@@ -1239,7 +1191,7 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
 	 
-      if(row==numRows-1) {
+      if(row==4) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
@@ -1258,8 +1210,47 @@ void AraCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
 
 
 
-void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
+void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId)
 {
+  int maxColumns=0;
+  int maxRows=0;
+  int numRFChans=0;
+  Double_t left[4]={0.04,0.27,0.50,0.73};
+  Double_t right[4]={0.27,0.50,0.73,0.96};
+  Double_t top[5]={0};
+  Double_t bottom[5]={0};
+  if(stationId==0){
+    maxColumns=4;
+    maxRows=4;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.72;
+    top[2]=0.49;
+    top[3]=0.26;
+    bottom[0]=0.72;
+    bottom[1]=0.49;
+    bottom[2]=0.26;
+    bottom[3]=0.03;
+  }
+
+  if(stationId==1){
+    maxColumns=4;
+    maxRows=5;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.77;
+    top[2]=0.59;
+    top[3]=0.41;
+    top[4]=0.23;
+    bottom[0]=0.77;
+    bottom[1]=0.59;
+    bottom[2]=0.41;
+    bottom[3]=0.23;
+    bottom[4]=0.05;
+  }
+
   static int rfChanPadsDone=0;
   char textLabel[180];
   char padName[180];
@@ -1276,7 +1267,7 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
   if(rfChanPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int rfChan=0;rfChan<CHANNELS_PER_ATRI;rfChan++) {
+    for(int rfChan=0;rfChan<numRFChans;rfChan++) {
 	sprintf(padName,"rfChanPad%d",rfChan);
 	TPad *paddy = (TPad*) plotPad->FindObject(padName);
 	if(!paddy)
@@ -1290,16 +1281,13 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   rfChanPadsDone=1;
   
   
-  Double_t left[4]={0.04,0.27,0.50,0.73};
-  Double_t right[4]={0.27,0.50,0.73,0.96};
-  Double_t top[4]={0.95,0.72,0.49,0.26};
-  Double_t bottom[4]={0.72,0.49,0.26,0.03};
+
   
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<4;column++) {
+  for(int column=0;column<maxColumns;column++) {
     sprintf(textLabel,"%d/%d",1+column,5+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
@@ -1312,6 +1300,8 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"5-8");
   texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"9-12");
   texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"13-16");
+  if(stationId==1) texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"17-20");
+  
 
  
   int count=0;
@@ -1321,8 +1311,8 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   //  9 10 11 12
   // 13 14 15 16
 
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<maxColumns;column++) {
+    for(int row=0;row<maxRows;row++) {
       plotPad->cd();
       //      int rfChan=column+4*row;
       sprintf(padName,"rfChanPad%d",column+4*row);
@@ -1335,7 +1325,9 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3)
+      if(row==3&&stationId==0)
+	paddy1->SetBottomMargin(0.1);
+      if(row==4&&stationId==1)
 	paddy1->SetBottomMargin(0.1);
       paddy1->Draw();
       paddy1->cd();
@@ -1356,12 +1348,19 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==3) {
+      if(row==4&&stationId==1) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
 	framey->GetYaxis()->SetTitleSize(0.09);
       }
+      if(row==3&&stationId==0) {
+	framey->GetXaxis()->SetLabelSize(0.09);
+	framey->GetXaxis()->SetTitleSize(0.09);
+	framey->GetYaxis()->SetLabelSize(0.09);
+	framey->GetYaxis()->SetTitleSize(0.09);
+      }
+
       if(fWebPlotterMode && column!=0) {
 	 framey->GetYaxis()->SetLabelSize(0);
 	 framey->GetYaxis()->SetTitleSize(0);
@@ -1375,7 +1374,7 @@ void AraCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
 
 
-void AraCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
+void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
 {
   static int antPadsDone=0;
   char textLabel[180];
@@ -1491,40 +1490,40 @@ void AraCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
 
 
 
-void AraCanvasMaker::deleteTGraphsFromElecPad(TPad *paddy,int chan)
+void AraIcrrCanvasMaker::deleteTGraphsFromElecPad(TPad *paddy,int chan)
 {
   paddy->cd();
-  if(fLastWaveformFormat==AraDisplayFormatOption::kWaveform) paddy->GetListOfPrimitives()->Remove(grElec[chan]);
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kFFT) paddy->GetListOfPrimitives()->Remove(grElecFFT[chan]); 
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kAveragedFFT) paddy->GetListOfPrimitives()->Remove(grElecAveragedFFT[chan]); 
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kHilbertEnvelope) paddy->GetListOfPrimitives()->Remove(grElecHilbert[chan]);  
+  if(fLastWaveformFormat==AraDisplayFormatOption::kWaveform) paddy->GetListOfPrimitives()->Remove(grIcrrElec[chan]);
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kFFT) paddy->GetListOfPrimitives()->Remove(grIcrrElecFFT[chan]); 
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kAveragedFFT) paddy->GetListOfPrimitives()->Remove(grIcrrElecAveragedFFT[chan]); 
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kHilbertEnvelope) paddy->GetListOfPrimitives()->Remove(grIcrrElecHilbert[chan]);  
   //  paddy->Update();
 }
 
 
-void AraCanvasMaker::deleteTGraphsFromRFPad(TPad *paddy,int rfchan)
+void AraIcrrCanvasMaker::deleteTGraphsFromRFPad(TPad *paddy,int rfchan)
 {
   paddy->cd();
-  if(fLastWaveformFormat==AraDisplayFormatOption::kWaveform) paddy->GetListOfPrimitives()->Remove(grRFChan[rfchan]);
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kFFT) paddy->GetListOfPrimitives()->Remove(grRFChanFFT[rfchan]); 
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kAveragedFFT) paddy->GetListOfPrimitives()->Remove(grRFChanAveragedFFT[rfchan]); 
-  else if(fLastWaveformFormat==AraDisplayFormatOption::kHilbertEnvelope) paddy->GetListOfPrimitives()->Remove(grRFChanHilbert[rfchan]);  
+  if(fLastWaveformFormat==AraDisplayFormatOption::kWaveform) paddy->GetListOfPrimitives()->Remove(grIcrrRFChan[rfchan]);
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kFFT) paddy->GetListOfPrimitives()->Remove(grIcrrRFChanFFT[rfchan]); 
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kAveragedFFT) paddy->GetListOfPrimitives()->Remove(grIcrrRFChanAveragedFFT[rfchan]); 
+  else if(fLastWaveformFormat==AraDisplayFormatOption::kHilbertEnvelope) paddy->GetListOfPrimitives()->Remove(grIcrrRFChanHilbert[rfchan]);  
   //  paddy->Update();
 }
 
 
-void AraCanvasMaker::resetAverage() 
+void AraIcrrCanvasMaker::resetAverage() 
 {
-  for(int chan=0;chan<CHANNELS_PER_ATRI;chan++) {
-    if(grElecAveragedFFT[chan]) {
-      delete grElecAveragedFFT[chan];
-      grElecAveragedFFT[chan]=0;
+  for(int chan=0;chan<NUM_DIGITIZED_ICRR_CHANNELS;chan++) {
+    if(grIcrrElecAveragedFFT[chan]) {
+      delete grIcrrElecAveragedFFT[chan];
+      grIcrrElecAveragedFFT[chan]=0;
     }
   }
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
-    if(grRFChanAveragedFFT[rfchan]) {
-      delete grRFChanAveragedFFT[rfchan];
-      grRFChanAveragedFFT[rfchan]=0;
+  for(int rfchan=0;rfchan<RFCHANS_PER_ICRR;rfchan++) {
+    if(grIcrrRFChanAveragedFFT[rfchan]) {
+      delete grIcrrRFChanAveragedFFT[rfchan];
+      grIcrrRFChanAveragedFFT[rfchan]=0;
     }
   }
 }

@@ -8,5 +8,5 @@ target_link_libraries(AraConfig AraKvp)
 
 SET_TARGET_PROPERTIES(AraConfig PROPERTIES SUFFIX .so)
 
-install(TARGETS AraConfig DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
+install(TARGETS AraConfig DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
 

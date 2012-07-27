@@ -18,8 +18,8 @@
 #include "AraEventCorrelator.h"
 #include "AraControlPanel.h"
 #include "araIcrrDefines.h"
-#include "AraTBCanvasMaker.h"
-#include "AraCanvasMaker.h"
+#include "AraIcrrCanvasMaker.h"
+#include "AraAtriCanvasMaker.h"
 
 #include "araSoft.h"
 
@@ -99,9 +99,9 @@ class AraDisplay
   void applyCut(char *cutString); ///< Applies a cut to the head tree
 
   void setCorrelatorType(AraCorrelatorType::AraCorrelatorType_t corType) 
-  { if(fEventCanMaker) fEventCanMaker->setCorrelatorType(corType);}
+  { if(fAtriEventCanMaker) fAtriEventCanMaker->setCorrelatorType(corType);}
   void setNumAntsInMap(int numAnts) 
-  { if(fEventCanMaker) fEventCanMaker->setNumAntsInMap(numAnts);}
+  { if(fAtriEventCanMaker) fAtriEventCanMaker->setNumAntsInMap(numAnts);}
   //! Returns a pointer to the active AraDisplay. This is very useful if you want to access the TTree's directly or if you want to explicitly call one of the methods.
   /*!
     \return A pointer to the active AraDisplay.
@@ -138,8 +138,8 @@ class AraDisplay
   AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fCanvasLayout;
   AraDisplayFormatOption::AraDisplayFormatOption_t fWaveformFormat; ///< The format for displaying waveforms.
 
-  AraTBCanvasMaker *fTBEventCanMaker;
-  AraCanvasMaker *fEventCanMaker;
+  AraIcrrCanvasMaker *fIcrrEventCanMaker;
+  AraAtriCanvasMaker *fAtriEventCanMaker;
 
 
   AraControlPanel *fControlPanel;
@@ -148,12 +148,12 @@ class AraDisplay
    TPad *fAraMainPad; ///< The main event display pad.
    TPad *fAraEventInfoPad; ///< The event display info pad.
 
-   UsefulIcrrStationEvent *fTBUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulIcrrStationEvent *fTBRawEventPtr; ///< Pointer to the raw event.
-   UsefulAtriStationEvent *fUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulAtriStationEvent *fRawEventPtr; ///< Pointer to the raw event.
+   UsefulIcrrStationEvent *fIcrrUsefulEventPtr; ///< Pointer to the calibrated event.
+   UsefulIcrrStationEvent *fIcrrRawEventPtr; ///< Pointer to the raw event.
+   UsefulAtriStationEvent *fAtriUsefulEventPtr; ///< Pointer to the calibrated event.
+   UsefulAtriStationEvent *fAtriRawEventPtr; ///< Pointer to the raw event.
    Int_t fCurrentRun; ///<Run number
-   RawAraStationEvent *fRawStationEventPtr; //jpd
+   RawAraStationEvent *fRawStationEventPtr; ///< Pointer to raw event base class - used to identify the electronics type (Atri vs. Icrr)
 
       
    TButton *fElecViewButton; ///< The vertical polarisation button.
@@ -171,7 +171,7 @@ class AraDisplay
 
    Int_t fInEventPlayMode; ///< Flag that indicates playback mode
    Int_t fEventPlaySleepMs; ///< Length of sleep between events in playback mode.
-   Int_t fTBData;
+   Int_t fIcrrData;
    Int_t fApplyEventCut; ///< Apply an event cut
    TEventList *fCutEventList; ///<The cut eventlist
    

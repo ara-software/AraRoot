@@ -8,10 +8,10 @@
 #include "TPaveText.h"
 
 #include "FFTtools.h"
-#include "AraTBCanvasMaker.h"
+#include "AraIcrrCanvasMaker.h"
 #include "AraGeomTool.h"
 
-AraTBCanvasMaker *gEventCanvasMaker=0;
+AraIcrrCanvasMaker *gEventCanvasMaker=0;
 
 AraEventPlotter::AraEventPlotter(char *plotDir, char *dataDir)
 {
@@ -995,7 +995,7 @@ void AraEventPlotter::makePlots()
 void AraEventPlotter::plotEvent(Int_t runNumber,UsefulIcrrStationEvent *usefulEvent)
 {
 
-   gEventCanvasMaker=AraTBCanvasMaker::Instance();
+   gEventCanvasMaker=AraIcrrCanvasMaker::Instance();
    char gifName[180];
    if(!fAraDisplayCanvas) {
       fAraDisplayCanvas = new TCanvas("canAraDisplay","canAraDisplay",1200,800);

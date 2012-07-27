@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraCanvasMaker.h        ARA Canvas Maker                      /////
+/////  AraAtriCanvasMaker.h        ARA Canvas Maker                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////                                                                    ///// 
@@ -27,7 +27,7 @@ class TFile;
 /*!
   This is where all the heavy lifting regarding the main event display canvas takes place. Lots of things are hard-coded and unchangeable in order to make the display look reasonable (on my computer at least). 
 */
-class AraCanvasMaker 
+class AraAtriCanvasMaker 
 {
  public:
   //Something of a sleazy hack for the web plotter.
@@ -104,14 +104,14 @@ class AraCanvasMaker
    
    //!  The assignment constructor.
    /*!
-     Creates an AraCanvasMaker object/
+     Creates an AraAtriCanvasMaker object/
      /param calType The calibration type used (only needed to set the time axis for ns vs samples).
    */
-   AraCanvasMaker(AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
-   ~AraCanvasMaker(); ///<Destructor.
+   AraAtriCanvasMaker(AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
+   ~AraAtriCanvasMaker(); ///<Destructor.
    
    //Instance generator
-   static AraCanvasMaker*  Instance(); ///< The instance generator.
+   static AraAtriCanvasMaker*  Instance(); ///< The instance generator.
    
    void setPassBandFilterFlag( int flag) { fPassBandFilter=flag;} ///<Flags the pass band filter on or off
    void setNotchFilterFlag( int flag) { fNotchFilter=flag;} ///<Flags the notch filter on or off
@@ -124,7 +124,7 @@ class AraCanvasMaker
    AraCalType::AraCalType_t fCalType; ///< The calibration type.
    
  protected:
-   static AraCanvasMaker *fgInstance; ///< To protect against multiple instances.
+   static AraAtriCanvasMaker *fgInstance; ///< To protect against multiple instances.
 
  private:
    Int_t fWebPlotterMode;

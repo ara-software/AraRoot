@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
-set(ARAEVENT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
+set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 
 #Set the hint variables to point to where cmake should look first for a header / library file
 #This is in case you have multiple instances of for example sqlite3 - one of which is known to be the correct version
@@ -23,4 +23,4 @@ add_subdirectory(utilities/Atri)
 add_subdirectory(utilities/Icrr)
 
 add_subdirectory(analysis) #FIXME - Do we want to include this in CMake?
-#add_subdirectory(AraVertexRec) #FIXME - Need to add build of L2 vertexing
+add_subdirectory(AraVertex) #FIXME - Need to add build of L2 vertexing

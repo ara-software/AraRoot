@@ -35,7 +35,7 @@ add_executable(makeCorrelationMaps makeCorrelationMaps.cxx)
 # makeCorrelationMaps uses AraCorrelator, AraEvent, and ROOT
 target_link_libraries(makeCorrelationMaps AraCorrelator AraEvent)
 
-install(FILES ${${libname}Headers} DESTINATION ${ARAEVENT_INSTALL_PATH}/include)
-install(TARGETS AraCorrelator DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
+install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
+install(TARGETS AraCorrelator DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
 #not sure this will work
-install(TARGETS makeCorrelationMaps DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
+install(TARGETS makeCorrelationMaps DESTINATION ${ARAROOT_INSTALL_PATH}/bin)

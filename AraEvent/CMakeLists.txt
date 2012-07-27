@@ -48,11 +48,11 @@ FILE(GLOB atriCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ATRI/*.txt")
 FILE(GLOB icrrTestBedCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.dat")
 FILE(GLOB icrrStation1CalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.dat")
 
-install(TARGETS AraEvent DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
-install(FILES ${${libname}Headers} DESTINATION ${ARAEVENT_INSTALL_PATH}/include)
+install(TARGETS AraEvent DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
+install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
 
-install(FILES ${antennaFiles} DESTINATION ${ARAEVENT_INSTALL_PATH}/share/araCalib)
-install(FILES ${atriCalibFiles} DESTINATION ${ARAEVENT_INSTALL_PATH}/share/araCalib/ATRI)
-install(FILES ${icrrTestBedCalibFiles} DESTINATION ${ARAEVENT_INSTALL_PATH}/share/araCalib/ICRR/TestBed)
-install(FILES ${icrrStation1CalibFiles} DESTINATION ${ARAEVENT_INSTALL_PATH}/share/araCalib/ICRR/Station1)
+install(FILES ${antennaFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib)
+install(FILES ${atriCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ATRI)
+install(FILES ${icrrTestBedCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/TestBed)
+install(FILES ${icrrStation1CalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/Station1)
 

@@ -45,8 +45,8 @@
 //Magic Display Includes
 #include "AraDisplay.h"
 #include "AraWaveformGraph.h"
-#include "AraCanvasMaker.h"
-#include "AraTBCanvasMaker.h"
+#include "AraAtriCanvasMaker.h"
+#include "AraIcrrCanvasMaker.h"
 #include "AraControlPanel.h"
 
 //Event Reader Includes
@@ -77,19 +77,19 @@ AraDisplay*  AraDisplay::fgInstance = 0;
 
 void AraDisplay::zeroPointers() 
 {
-  fTBEventCanMaker=0;
-  fEventCanMaker=0;
+  fIcrrEventCanMaker=0;
+  fAtriEventCanMaker=0;
   fCurrentRun=0;
   fApplyEventCut=0;
   fEventCutListEntry=-1;
   fEventTreeIndexEntry=-1;
   fEventEntry=0;
   fEventFile=0;
-  fTBUsefulEventPtr=0;
-  fTBRawEventPtr=0;
-  fUsefulEventPtr=0;
-  fRawEventPtr=0;
-  fTBData=0;
+  fIcrrUsefulEventPtr=0;
+  fIcrrRawEventPtr=0;
+  fAtriUsefulEventPtr=0;
+  fAtriRawEventPtr=0;
+  fIcrrData=0;
 
 
   fAraCanvas=0;
@@ -166,10 +166,10 @@ void AraDisplay::startEventDisplay()
  
 
   
-  if(fTBData)
-    fTBEventCanMaker=new AraTBCanvasMaker(this->fCalType);
+  if(fIcrrData)
+    fIcrrEventCanMaker=new AraIcrrCanvasMaker(this->fCalType);
   else
-    fEventCanMaker = new AraCanvasMaker(this->fCalType);
+    fAtriEventCanMaker = new AraAtriCanvasMaker(this->fCalType);
   int retVal=this->getEventEntry();
   if(retVal==0)
       this->refreshEventDisplay();   
@@ -191,15 +191,15 @@ int AraDisplay::getEventEntry()
   }
   
   
-  if(fTBData) {
-    if(fTBUsefulEventPtr)
-    delete fTBUsefulEventPtr;
-    fTBUsefulEventPtr = new UsefulIcrrStationEvent(fTBRawEventPtr,fCalType);
+  if(fIcrrData) {
+    if(fIcrrUsefulEventPtr)
+    delete fIcrrUsefulEventPtr;
+    fIcrrUsefulEventPtr = new UsefulIcrrStationEvent(fIcrrRawEventPtr,fCalType);
   }
   else {
-    if(fUsefulEventPtr)
-    delete fUsefulEventPtr;
-    fUsefulEventPtr = new UsefulAtriStationEvent(fRawEventPtr,fCalType);
+    if(fAtriUsefulEventPtr)
+    delete fAtriUsefulEventPtr;
+    fAtriUsefulEventPtr = new UsefulAtriStationEvent(fAtriRawEventPtr,fCalType);
   }
   
   //Need to make configurable at some point
@@ -255,23 +255,20 @@ int AraDisplay::loadEventTree(char *eventFile)
   }
   //  std::cout << "Here\n";
 
-  //jpd now let's make a better decision about what type of event's we have
-  
-  
+  //JPD - Use the RawStationEvent base class to interogate the tree
+  //      and decide if this is a Icrr or Atri type station
 
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
-  if(fRawStationEventPtr->stationId<2) fTBData=1;
-  else fTBData=0;
+  if(fRawStationEventPtr->stationId<2) fIcrrData=1;//FIXME -- are stationId > 1 Atri?
+  else fIcrrData=0;
 
   fEventTree->ResetBranchAddresses();
 
-  //jpd that should clear that up
-
-  if(fTBData) 
-    fEventTree->SetBranchAddress("event",&fTBRawEventPtr);  
+  if(fIcrrData) 
+    fEventTree->SetBranchAddress("event",&fIcrrRawEventPtr);  
   else
-    fEventTree->SetBranchAddress("event",&fRawEventPtr);  
+    fEventTree->SetBranchAddress("event",&fAtriRawEventPtr);  
   fEventTree->SetBranchAddress("run",&fCurrentRun);  
   fEventEntry=0;
 
@@ -305,17 +302,17 @@ void AraDisplay::refreshEventDisplay()
 
            
    //This will need to change  
-   if(fTBData) {
-     fTBEventCanMaker->getEventInfoCanvas(fTBUsefulEventPtr,fAraEventInfoPad,fCurrentRun);   
-     fTBEventCanMaker->setWaveformFormat(fWaveformFormat);
-     fTBEventCanMaker->setCanvasLayout(fCanvasLayout);
-     fTBEventCanMaker->getEventViewerCanvas(fTBUsefulEventPtr,fAraMainPad);      
+   if(fIcrrData) {
+     fIcrrEventCanMaker->getEventInfoCanvas(fIcrrUsefulEventPtr,fAraEventInfoPad,fCurrentRun);   
+     fIcrrEventCanMaker->setWaveformFormat(fWaveformFormat);
+     fIcrrEventCanMaker->setCanvasLayout(fCanvasLayout);
+     fIcrrEventCanMaker->getEventViewerCanvas(fIcrrUsefulEventPtr,fAraMainPad);      
    }
    else {
-     fEventCanMaker->getEventInfoCanvas(fUsefulEventPtr,fAraEventInfoPad,fCurrentRun);   
-     fEventCanMaker->setWaveformFormat(fWaveformFormat);
-     fEventCanMaker->setCanvasLayout(fCanvasLayout);
-     fEventCanMaker->getEventViewerCanvas(fUsefulEventPtr,fAraMainPad);      
+     fAtriEventCanMaker->getEventInfoCanvas(fAtriUsefulEventPtr,fAraEventInfoPad,fCurrentRun);   
+     fAtriEventCanMaker->setWaveformFormat(fWaveformFormat);
+     fAtriEventCanMaker->setCanvasLayout(fCanvasLayout);
+     fAtriEventCanMaker->getEventViewerCanvas(fAtriUsefulEventPtr,fAraMainPad);      
    }
    fAraCanvas->Update();
 }
@@ -351,10 +348,10 @@ int AraDisplay::displayNextEvent()
     if(fEventCutListEntry<fCutEventList->GetN()) {
       fEventEntry=fCutEventList->GetEntry(fEventCutListEntry);  
       int retVal=getEventEntry();
-      if(fTBData)
-	fTBEventCanMaker->fNewEvent=1;
+      if(fIcrrData)
+	fIcrrEventCanMaker->fNewEvent=1;
       else 
-	fEventCanMaker->fNewEvent=1;
+	fAtriEventCanMaker->fNewEvent=1;
       if(retVal==0) {
 	refreshEventDisplay(); 
       }
@@ -368,10 +365,10 @@ int AraDisplay::displayNextEvent()
   else {
     fEventEntry++;
     int retVal=getEventEntry();
-    if(fTBData)
-      fTBEventCanMaker->fNewEvent=1;
+    if(fIcrrData)
+      fIcrrEventCanMaker->fNewEvent=1;
     else
-      fEventCanMaker->fNewEvent=1;
+      fAtriEventCanMaker->fNewEvent=1;
     if(retVal==0) {
       refreshEventDisplay(); 
     }
@@ -391,10 +388,10 @@ int AraDisplay::displayFirstEvent()
     if(fEventCutListEntry<fCutEventList->GetN()) {
       fEventEntry=fCutEventList->GetEntry(fEventCutListEntry);  
       int retVal=getEventEntry();
-      if(fTBData)
-	fTBEventCanMaker->fNewEvent=1;
+      if(fIcrrData)
+	fIcrrEventCanMaker->fNewEvent=1;
       else
-	fEventCanMaker->fNewEvent=1;
+	fAtriEventCanMaker->fNewEvent=1;
       if(retVal==0) {
 	refreshEventDisplay(); 
       }
@@ -408,10 +405,10 @@ int AraDisplay::displayFirstEvent()
   else  {    
     fEventEntry=0;
     int retVal=getEventEntry();
-    if(fTBData)
-      fTBEventCanMaker->fNewEvent=1;
+    if(fIcrrData)
+      fIcrrEventCanMaker->fNewEvent=1;
     else
-      fEventCanMaker->fNewEvent=1;
+      fAtriEventCanMaker->fNewEvent=1;
     if(retVal==0) {
       refreshEventDisplay(); 
     }
@@ -433,10 +430,10 @@ int AraDisplay::displayLastEvent()
     if(fEventCutListEntry<fCutEventList->GetN() && fEventCutListEntry>=0) {
       fEventEntry=fCutEventList->GetEntry(fEventCutListEntry);  
       int retVal=getEventEntry();
-      if(fTBData)
-	fTBEventCanMaker->fNewEvent=1;
+      if(fIcrrData)
+	fIcrrEventCanMaker->fNewEvent=1;
       else
-	fEventCanMaker->fNewEvent=1;
+	fAtriEventCanMaker->fNewEvent=1;
       if(retVal==0) {
 	refreshEventDisplay(); 
       }
@@ -450,10 +447,10 @@ int AraDisplay::displayLastEvent()
   else  {    
     fEventEntry=eventEnts-1;
     int retVal=getEventEntry();
-    if(fTBData)
-      fTBEventCanMaker->fNewEvent=1;
+    if(fIcrrData)
+      fIcrrEventCanMaker->fNewEvent=1;
     else
-      fEventCanMaker->fNewEvent=1;
+      fAtriEventCanMaker->fNewEvent=1;
     if(retVal==0) {
       refreshEventDisplay(); 
     }
@@ -475,10 +472,10 @@ int AraDisplay::displayPreviousEvent()
     if(fEventCutListEntry>=0 && fEventCutListEntry<fCutEventList->GetN()) {
       fEventEntry=fCutEventList->GetEntry(fEventCutListEntry);  
       int retVal=getEventEntry();
-      if(fTBData)
-	fTBEventCanMaker->fNewEvent=1;
+      if(fIcrrData)
+	fIcrrEventCanMaker->fNewEvent=1;
       else
-	fEventCanMaker->fNewEvent=1;
+	fAtriEventCanMaker->fNewEvent=1;
       if(retVal==0) {
 	refreshEventDisplay(); 
       }
@@ -498,10 +495,10 @@ int AraDisplay::displayPreviousEvent()
     else 
       return -1;
    int retVal=getEventEntry();
-   if(fTBData)
-     fTBEventCanMaker->fNewEvent=1;
+   if(fIcrrData)
+     fIcrrEventCanMaker->fNewEvent=1;
    else
-     fEventCanMaker->fNewEvent=1;
+     fAtriEventCanMaker->fNewEvent=1;
    if(retVal==0) {
      refreshEventDisplay(); 
    }  
@@ -514,7 +511,7 @@ int AraDisplay::displayThisEvent(UInt_t eventNumber)
 {
   cout << "displayThisEvent: " << eventNumber  <<endl;  
   
-  if(!fTBEventCanMaker && !fEventCanMaker) startEventDisplay();
+  if(!fIcrrEventCanMaker && !fAtriEventCanMaker) startEventDisplay();
   
 
   if(eventNumber==0) {
@@ -567,11 +564,11 @@ void AraDisplay::drawEventButtons() {
    butStop->SetFillColor(kRed-10);
    butStop->Draw();
    TButton *butReset; 
-   if(fTBData) {
-     butReset = new TButton("Reset Avg","AraTBCanvasMaker::Instance()->resetAverage();",0.85,0.975,0.90,1);
+   if(fIcrrData) {
+     butReset = new TButton("Reset Avg","AraIcrrCanvasMaker::Instance()->resetAverage();",0.85,0.975,0.90,1);
    }
    else {
-     butReset = new TButton("Reset Avg","AraCanvasMaker::Instance()->resetAverage();",0.85,0.975,0.90,1);
+     butReset = new TButton("Reset Avg","AraAtriCanvasMaker::Instance()->resetAverage();",0.85,0.975,0.90,1);
 
    }
    butReset->SetTextSize(0.5);
@@ -717,11 +714,11 @@ void AraDisplay::setWaveformFormat(AraDisplayFormatOption::AraDisplayFormatOptio
 
 UInt_t AraDisplay::getCurrentEvent()
 {
-  if(fTBData) {
-    if(fTBUsefulEventPtr) return fTBUsefulEventPtr->head.eventNumber; 
+  if(fIcrrData) {
+    if(fIcrrUsefulEventPtr) return fIcrrUsefulEventPtr->head.eventNumber; 
   }
   else {
-    if(fUsefulEventPtr) return fUsefulEventPtr->eventNumber;
+    if(fAtriUsefulEventPtr) return fAtriUsefulEventPtr->eventNumber;
   }
   return 0;
 }

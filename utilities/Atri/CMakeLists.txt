@@ -20,7 +20,7 @@ add_executable(makeAtriEventTree makeAtriEventTree.cxx)
 target_link_libraries(makeAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
 #install the binaries
-install(TARGETS makeAtriSensorHkTree makeAtriEventHkTree makeSimpleAtriEventTree makeAtriEventTree DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
+install(TARGETS makeAtriSensorHkTree makeAtriEventHkTree makeSimpleAtriEventTree makeAtriEventTree DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 #install the scripts
-install(FILES runAtriRunFileMaker.sh DESTINATION ${ARAEVENT_INSTALL_PATH}/scripts)
+install(FILES runAtriRunFileMaker.sh DESTINATION ${ARAROOT_INSTALL_PATH}/scripts)

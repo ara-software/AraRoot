@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  AraTBCanvasMaker.h        ARA Canvas Maker                      /////
+/////  AraIcrrCanvasMaker.h        ARA Canvas Maker                      /////
 /////                                                                    /////
 /////  Description:                                                      /////
 /////                                                                    ///// 
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARATBCANVASMAKER_H
-#define ARATBCANVASMAKER_H
+#ifndef ARAICRRCANVASMAKER_H
+#define ARAICRRCANVASMAKER_H
 
 //Includes
 #include <iostream>
@@ -27,7 +27,7 @@ class TFile;
 /*!
   This is where all the heavy lifting regarding the main event display canvas takes place. Lots of things are hard-coded and unchangeable in order to make the display look reasonable (on my computer at least). 
 */
-class AraTBCanvasMaker 
+class AraIcrrCanvasMaker 
 {
  public:
   //Something of a sleazy hack for the web plotter.
@@ -101,14 +101,14 @@ class AraTBCanvasMaker
    
    //!  The assignment constructor.
    /*!
-     Creates an AraTBCanvasMaker object/
+     Creates an AraIcrrCanvasMaker object/
      /param calType The calibration type used (only needed to set the time axis for ns vs samples).
    */
-   AraTBCanvasMaker(AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
-   ~AraTBCanvasMaker(); ///<Destructor.
+   AraIcrrCanvasMaker(AraCalType::AraCalType_t calType=AraCalType::kVoltageTime);
+   ~AraIcrrCanvasMaker(); ///<Destructor.
    
    //Instance generator
-   static AraTBCanvasMaker*  Instance(); ///< The instance generator.
+   static AraIcrrCanvasMaker*  Instance(); ///< The instance generator.
    
    void setPassBandFilterFlag( int flag) { fPassBandFilter=flag;} ///<Flags the pass band filter on or off
    void setNotchFilterFlag( int flag) { fNotchFilter=flag;} ///<Flags the notch filter on or off
@@ -121,7 +121,7 @@ class AraTBCanvasMaker
    AraCalType::AraCalType_t fCalType; ///< The calibration type.
    
  protected:
-   static AraTBCanvasMaker *fgInstance; ///< To protect against multiple instances.
+   static AraIcrrCanvasMaker *fgInstance; ///< To protect against multiple instances.
 
  private:
    Int_t fWebPlotterMode;
@@ -168,4 +168,4 @@ class AraTBCanvasMaker
 };
 
 
-#endif //ARATBCANVASMAKER_H
+#endif //ARAICRRCANVASMAKER_H

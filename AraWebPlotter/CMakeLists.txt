@@ -46,12 +46,12 @@ target_link_libraries(getDirFromConfigBin AraWebPlotter AraEvent AraCorrelator $
 
 
 #install stuff
-install(FILES ${${libname}Headers} DESTINATION ${ARAEVENT_INSTALL_PATH}/include)
-install(TARGETS AraWebPlotter DESTINATION ${ARAEVENT_INSTALL_PATH}/lib)
+install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
+install(TARGETS AraWebPlotter DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
 
 #not sure this will work
-install(TARGETS getDirFromConfigBin DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
-install(TARGETS AraWebPlotterBin DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
-install(TARGETS AraTimeWebPlotterBin DESTINATION ${ARAEVENT_INSTALL_PATH}/bin)
+install(TARGETS getDirFromConfigBin DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS AraWebPlotterBin DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS AraTimeWebPlotterBin DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 
