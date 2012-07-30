@@ -51,11 +51,10 @@ class AraGeomTool
    Double_t getHighPassFilter(int chan, int stationId) { return fStationInfo[stationId].fAntInfo[chan].highPassFilterMhz; }
 
 
-
+   //This is the new version this function
    int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, int stationId);
 
-
-   //jpd this is a hack to try and get AraCanvasMaker.cxx to work 
+   //FIXME -- Only used by web-plotter. Should be fixed when the Web-Plotter is up and running
    int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);//FIXME
    
    

@@ -13,6 +13,8 @@ void runAraDisplay() {
   sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
   //JPD Testing AraRootBranches3.2
   //  sprintf(fileName, "~/ara/data/AraRoot_3-2/root/0808_2011/TestBed_2011_run005546.L0.root");
+  //JPD Testing TestBed vs branches/TestBed1
+  //  sprintf(fileName,"~/ara/data/testing_for_trunk/root/TestBed/run5546/event5546.root");
 
   runAraDisplay(fileName);
 }

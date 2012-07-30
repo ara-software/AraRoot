@@ -588,7 +588,7 @@ void AraDisplay::drawEventButtons() {
 
    fElecViewButton = new TButton("Elec. View","AraDisplay::Instance()->setCanvasLayout(AraDisplayCanvasLayoutOption::kElectronicsView); AraDisplay::Instance()->refreshEventDisplay();",0,0.975,0.1,1);
    fElecViewButton->SetTextSize(0.5);
-   fElecViewButton->SetFillColor(kGray);
+   fElecViewButton->SetFillColor(kGray+3);
    fElecViewButton->Draw();
    fRFViewButton = new TButton("RF Chan#","AraDisplay::Instance()->setCanvasLayout(AraDisplayCanvasLayoutOption::kRFChanView); AraDisplay::Instance()->refreshEventDisplay();",0,0.95,0.1,0.975);
    fRFViewButton->SetTextSize(0.5);
@@ -596,7 +596,7 @@ void AraDisplay::drawEventButtons() {
    fRFViewButton->Draw();
    fAntViewButton = new TButton("Antenna","AraDisplay::Instance()->setCanvasLayout(AraDisplayCanvasLayoutOption::kAntennaView); AraDisplay::Instance()->refreshEventDisplay();",0,0.925,0.1,0.95);
    fAntViewButton->SetTextSize(0.5);
-   fAntViewButton->SetFillColor(kGray+3);
+   fAntViewButton->SetFillColor(kGray);
    fAntViewButton->Draw();
    fMapViewButton = new TButton("Int. Map","AraDisplay::Instance()->setCanvasLayout(AraDisplayCanvasLayoutOption::kIntMapView); AraDisplay::Instance()->refreshEventDisplay();",0,0.90,0.1,0.925);
    fMapViewButton->SetTextSize(0.5);

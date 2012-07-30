@@ -809,7 +809,7 @@ TPad *AraIcrrCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
   int maxColumns=0;
   int maxRows=0;
 
-  if(evPtr->stationId==1){
+  if(evPtr->stationId==1){//FIXME --This should be something like if num antennas is 20 or something
     maxColumns=4;
     maxRows=5;
   }
@@ -911,23 +911,133 @@ TPad *AraIcrrCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
   plotPad->cd();
   setupAntPadWithFrames(plotPad, evPtr->stationId);
 
-  //  int rfChanMap[4][4]={
-  AraAntPol::AraAntPol_t polMap[4][4]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
-				       {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kSurface,AraAntPol::kSurface},
-				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
-				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal}};
-  int antPolNumMap[4][4]={{0,1,2,3},{4,5,0,1},{0,1,2,3},{4,5,6,7}};
-  
+  // TestBed
+  // V V V V
+  // V V S S
+  // H H H H
+  // H H H H
+  // Station 1
+  // V V V V
+  // V V V V
+  // H H H H
+  // H H H H
+  // S S S S
 
 
+  AraAntPol::AraAntPol_t polMap[5][4]={{AraAntPol::kVertical}}; //Temp value
+  int antPolNumMap[5][4]={{0}};
   
-  for(int row=0;row<4;row++) {
-    for(int column=0;column<4;column++) {
+  if(evPtr->stationId==0){
+    polMap[0][0]=AraAntPol::kVertical;
+    polMap[0][1]=AraAntPol::kVertical;
+    polMap[0][2]=AraAntPol::kVertical;
+    polMap[0][3]=AraAntPol::kVertical;
+    antPolNumMap[0][0]=0;
+    antPolNumMap[0][1]=1;
+    antPolNumMap[0][2]=2;
+    antPolNumMap[0][3]=3;
+
+    polMap[1][0]=AraAntPol::kVertical;
+    polMap[1][1]=AraAntPol::kVertical;
+    polMap[1][2]=AraAntPol::kSurface;
+    polMap[1][3]=AraAntPol::kSurface;
+    antPolNumMap[1][0]=4;
+    antPolNumMap[1][1]=5;
+    antPolNumMap[1][2]=0;
+    antPolNumMap[1][3]=1;
+
+    polMap[2][0]=AraAntPol::kHorizontal;
+    polMap[2][1]=AraAntPol::kHorizontal;
+    polMap[2][2]=AraAntPol::kHorizontal;
+    polMap[2][3]=AraAntPol::kHorizontal;
+    antPolNumMap[2][0]=0;
+    antPolNumMap[2][1]=1;
+    antPolNumMap[2][2]=2;
+    antPolNumMap[2][3]=3;
+
+    polMap[3][0]=AraAntPol::kHorizontal;
+    polMap[3][1]=AraAntPol::kHorizontal;
+    polMap[3][2]=AraAntPol::kHorizontal;
+    polMap[3][3]=AraAntPol::kHorizontal;
+    antPolNumMap[3][0]=4;
+    antPolNumMap[3][1]=5;
+    antPolNumMap[3][2]=6;
+    antPolNumMap[3][3]=7;
+
+  }
+
+  if(evPtr->stationId==1){
+ 
+    polMap[0][0]=AraAntPol::kVertical;
+    polMap[0][1]=AraAntPol::kVertical;
+    polMap[0][2]=AraAntPol::kVertical;
+    polMap[0][3]=AraAntPol::kVertical;
+    antPolNumMap[0][0]=0;
+    antPolNumMap[0][1]=1;
+    antPolNumMap[0][2]=2;
+    antPolNumMap[0][3]=3;
+
+    polMap[1][0]=AraAntPol::kVertical;
+    polMap[1][1]=AraAntPol::kVertical;
+    polMap[1][2]=AraAntPol::kVertical;
+    polMap[1][3]=AraAntPol::kVertical;
+    antPolNumMap[1][0]=4;
+    antPolNumMap[1][1]=5;
+    antPolNumMap[1][2]=6;
+    antPolNumMap[1][3]=7;
+
+    polMap[2][0]=AraAntPol::kHorizontal;
+    polMap[2][1]=AraAntPol::kHorizontal;
+    polMap[2][2]=AraAntPol::kHorizontal;
+    polMap[2][3]=AraAntPol::kHorizontal;
+    antPolNumMap[2][0]=0;
+    antPolNumMap[2][1]=1;
+    antPolNumMap[2][2]=2;
+    antPolNumMap[2][3]=3;
+
+    polMap[3][0]=AraAntPol::kHorizontal;
+    polMap[3][1]=AraAntPol::kHorizontal;
+    polMap[3][2]=AraAntPol::kHorizontal;
+    polMap[3][3]=AraAntPol::kHorizontal;
+    antPolNumMap[3][0]=4;
+    antPolNumMap[3][1]=5;
+    antPolNumMap[3][2]=6;
+    antPolNumMap[3][3]=7;
+
+    polMap[4][0]=AraAntPol::kSurface;
+    polMap[4][1]=AraAntPol::kSurface;
+    polMap[4][2]=AraAntPol::kSurface;
+    polMap[4][3]=AraAntPol::kSurface;
+    antPolNumMap[4][0]=0;
+    antPolNumMap[4][1]=1;
+    antPolNumMap[4][2]=2;
+    antPolNumMap[4][3]=3;
+
+  }
+
+  int maxColumns=0;
+  int maxRows=0;
+
+  if(evPtr->stationId==1){//FIXME --This should be something like if num antennas is 20 or something
+    maxColumns=4;
+    maxRows=5;
+  }
+  else {
+    maxColumns=4;
+    maxRows=4;
+  }
+
+  
+
+  //FIXME //polandant
+  
+  for(int row=0;row<maxRows;row++) {
+    for(int column=0;column<maxColumns;column++) {
       plotPad->cd();
       int rfChan=fIcrrACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
       //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       
-      sprintf(padName,"antPad%d_%d",column,row);
+      sprintf(padName,"antPad%d", column + 4*row );
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
       paddy1->SetEditable(kTRUE);
       deleteTGraphsFromRFPad(paddy1,rfChan);
@@ -1219,7 +1329,7 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
   Double_t right[4]={0.27,0.50,0.73,0.96};
   Double_t top[5]={0};
   Double_t bottom[5]={0};
-  if(stationId==0){
+  if(stationId==0){ //FIXME -- stationID
     maxColumns=4;
     maxRows=4;
     numRFChans=maxRows*maxColumns;
@@ -1234,7 +1344,7 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
     bottom[3]=0.03;
   }
 
-  if(stationId==1){
+  if(stationId==1){//FIXME -- Station ID
     maxColumns=4;
     maxRows=5;
     numRFChans=maxRows*maxColumns;
@@ -1300,7 +1410,7 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
   texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"5-8");
   texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"9-12");
   texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"13-16");
-  if(stationId==1) texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"17-20");
+  if(stationId==1) texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"17-20");//FIXME -- station ID
   
 
  
@@ -1325,7 +1435,7 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3&&stationId==0)
+      if(row==3&&stationId==0) //FIXME -- stationId
 	paddy1->SetBottomMargin(0.1);
       if(row==4&&stationId==1)
 	paddy1->SetBottomMargin(0.1);
@@ -1337,7 +1447,7 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
-	if(row<3) {
+	if(row<3) { //FIXME -- maybe stationId case?
 	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
 	}
 	else{
@@ -1348,13 +1458,13 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==4&&stationId==1) {
+      if(row==4&&stationId==1) { //FIXME -- station ID
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
 	framey->GetYaxis()->SetTitleSize(0.09);
       }
-      if(row==3&&stationId==0) {
+      if(row==3&&stationId==0) { //FIXME -- station ID
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
@@ -1376,6 +1486,49 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
 
 void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
 {
+
+  //First we must set up the pad sizes according to the station ID
+  int maxColumns=0;
+  int maxRows=0;
+  int numRFChans=0;
+  Double_t left[4]={0.04,0.27,0.50,0.73};
+  Double_t right[4]={0.27,0.50,0.73,0.96};
+  Double_t top[5]={0};
+  Double_t bottom[5]={0};
+  if(stationId==0){ //FIXME -- stationID
+    maxColumns=4;
+    maxRows=4;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.72;
+    top[2]=0.49;
+    top[3]=0.26;
+    bottom[0]=0.72;
+    bottom[1]=0.49;
+    bottom[2]=0.26;
+    bottom[3]=0.03;
+  }
+
+  if(stationId==1){//FIXME -- Station ID
+    maxColumns=4;
+    maxRows=5;
+    numRFChans=maxRows*maxColumns;
+
+    top[0]=0.95;
+    top[1]=0.77;
+    top[2]=0.59;
+    top[3]=0.41;
+    top[4]=0.23;
+    bottom[0]=0.77;
+    bottom[1]=0.59;
+    bottom[2]=0.41;
+    bottom[3]=0.23;
+    bottom[4]=0.05;
+  }
+
+
+
   static int antPadsDone=0;
   char textLabel[180];
   char padName[180];
@@ -1392,13 +1545,11 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
 
   if(antPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int column=0;column<4;column++) {
-      for(int row=0;row<4;row++) {
-	sprintf(padName,"antPad%d_%d",column,row);
-	TPad *paddy = (TPad*) plotPad->FindObject(padName);
-	if(!paddy)
-	  errors++;
-      }
+    for(int rfChan=0; rfChan<numRFChans;rfChan++){
+      sprintf(padName,"antPad%d", rfChan);
+      TPad *paddy = (TPad*) plotPad->FindObject(padName);
+      if(!paddy)
+	errors++;
     }
     if(!errors)
       return;
@@ -1408,16 +1559,11 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
   antPadsDone=1;
   
   
-  Double_t left[4]={0.04,0.27,0.50,0.73};
-  Double_t right[4]={0.27,0.50,0.73,0.96};
-  Double_t top[4]={0.95,0.72,0.49,0.26};
-  Double_t bottom[4]={0.72,0.49,0.26,0.03};
-  
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<4;column++) {
+  for(int column=0;column<maxColumns;column++) {
     sprintf(textLabel,"%d/%d",1+column,5+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
@@ -1426,21 +1572,38 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
   }
   texy.SetTextAlign(21);  
   texy.SetTextAngle(90);
-  texy.DrawTextNDC(left[0]-0.01,bottom[0]+0.1,"V");
-  texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"V/S");
-  texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"H");
-  texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"H");
 
+  if(stationId==0){
+    texy.DrawTextNDC(left[0]-0.01,bottom[0]+0.1,"V");
+    texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"V/S");
+    texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"H");
+    texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"H");
+  }
+  if(stationId==1){
+    texy.DrawTextNDC(left[0]-0.01,bottom[0]+0.1,"V");
+    texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"V");
+    texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"H");
+    texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"H");
+    texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"S");
+  }
+  //TestBed
+  // V V V V
+  // V V S S
+  // H H H H
+  // H H H H
+  //Station1
+  // V V V V
+  // V V V V
+  // H H H H
+  // H H H H
+  // S S S S 
  
   int count=0;
-
-
-
   
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<maxColumns;column++) {
+    for(int row=0;row<maxRows;row++) {
       plotPad->cd();
-      sprintf(padName,"antPad%d_%d",column,row);
+      sprintf(padName,"antPad%d", column+4*row);
     
       TPad *paddy1 = new TPad(padName,padName,left[column],bottom[row],right[column],top[row]);   
       paddy1->SetTopMargin(0);
@@ -1451,8 +1614,11 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3)
+      if(row==3&&stationId==0) //FIXME stationId
 	paddy1->SetBottomMargin(0.1);
+      if(row==4&&stationId==1)
+	paddy1->SetBottomMargin(0.1);
+
       paddy1->Draw();
       paddy1->cd();
       TH1F *framey=0;
@@ -1461,7 +1627,7 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
-	if(row<3) {
+	if((row<3&&stationId==0)||(row<4&&stationId==1)) { //FIXME
 	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
 	}
 	else{
@@ -1472,7 +1638,14 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==3) {
+      if(row==3&&stationId==0) {
+	framey->GetXaxis()->SetLabelSize(0.09);
+	framey->GetXaxis()->SetTitleSize(0.09);
+	framey->GetYaxis()->SetLabelSize(0.09);
+	framey->GetYaxis()->SetTitleSize(0.09);
+      }
+
+      if(row==4&&stationId==1) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);

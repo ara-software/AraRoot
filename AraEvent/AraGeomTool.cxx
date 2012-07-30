@@ -495,16 +495,21 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
 
   //Now let's populate the antenna lookups
   //fAntLookUpTable[stationId][AraAntPol][antPolNum]=chanNum-1
+
   for(int ant=0;ant<fStationInfo[stationId].numberRFChans;++ant){
+    //printf("ant %i\t", ant);//FIXME//DEBUG
     switch(fStationInfo[stationId].fAntInfo[ant].polType){
     case AraAntPol::kVertical:
       fAntLookupTable[stationId][0][fStationInfo[stationId].fAntInfo[ant].antPolNum]=fStationInfo[stationId].fAntInfo[ant].chanNum-1;
+      //printf("antPolNum %i\t chanNum %i\t kVertical\n", fStationInfo[stationId].fAntInfo[ant].antPolNum,  fStationInfo[stationId].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
       break;
     case AraAntPol::kHorizontal:
       fAntLookupTable[stationId][1][fStationInfo[stationId].fAntInfo[ant].antPolNum]=fStationInfo[stationId].fAntInfo[ant].chanNum-1;
+      //printf("antPolNum %i\t chanNum %i\t kHorizontal\n", fStationInfo[stationId].fAntInfo[ant].antPolNum,  fStationInfo[stationId].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
       break;
     case AraAntPol::kSurface:
       fAntLookupTable[stationId][2][fStationInfo[stationId].fAntInfo[ant].antPolNum]=fStationInfo[stationId].fAntInfo[ant].chanNum-1;
+      //printf("antPolNum %i\t chanNum %i\t kSurface\n", fStationInfo[stationId].fAntInfo[ant].antPolNum,  fStationInfo[stationId].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
       break;
     default:
       std::cerr << "Unknown AraPolType\n";
