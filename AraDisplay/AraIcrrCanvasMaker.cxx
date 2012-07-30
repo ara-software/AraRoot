@@ -876,7 +876,7 @@ TPad *AraIcrrCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
   
 }
 
-//jpd this is the next one to change
+//FIXME //jpd This needs to be tested and or fixed to comply with station1
 TPad *AraIcrrCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
 				       TPad *useCan)
 {

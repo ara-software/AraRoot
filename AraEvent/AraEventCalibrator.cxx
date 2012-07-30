@@ -331,10 +331,8 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 
   //set the number of rfchans in the event
 
-
-  //jpd make these defines!
-  if(stationId==0) theEvent->numRFChans=16;
-  else theEvent->numRFChans=20;
+  if(stationId==0) theEvent->numRFChans=RFCHANS_TESTBED;
+  else theEvent->numRFChans=RFCHANS_STATION1;
 
   // Calibrate waveforms
   for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
@@ -504,7 +502,7 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
       
     }//numLabChans==2
     
-    //FIXME -- we might need to introduce another calType here
+    //Perform undiplexing of channels (ARA1 has surface antennae diplexed in to HPOL channels)
     else if(tempGeom->isDiplexed(rfchan, stationId)==0||!(AraCalType::hasUnDiplexing(calType))){
       //    printf("non-interleaved non-diplexed channel\n");
       //      std::cout << rfchan << "\t"

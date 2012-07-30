@@ -120,11 +120,7 @@ class AraDisplay
   Long64_t fEventTreeIndexEntry; ///< The current entry in the TTreeIndex
   Long64_t fEventEntry; ///< The current event+header entry.
 
-  //jpd event index
   TTreeIndex *fEventIndex; ///< Reused
-  
-
-
   UInt_t fCurrentFileTime; ///< The current file time
   Char_t fCurrentBaseDir[180]; ///< The base directory for the ROOT files.
   

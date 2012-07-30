@@ -24,14 +24,15 @@
 
 //!  RawAtriStationEvent -- The Raw ARA Station Event Class
 /*!
-  The ROOT implementation of the raw ARA Station Event containing the samples from one event readout of the IRS
+  The ROOT implementation of the raw ARA Station Event from an ATRI type station containing the samples from one event readout of the IRS
   \ingroup rootclasses
 */
-class RawAtriStationEvent: /*public RawAraGenericHeader ,*/public RawAraStationEvent
+class RawAtriStationEvent: public RawAraStationEvent
 {
  public:
    RawAtriStationEvent(); ///< Default constructor
    RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer); ///< Assignment constructor
+
    ~RawAtriStationEvent(); ///< Destructor
 
    Int_t getNumChannels() { return 0; }

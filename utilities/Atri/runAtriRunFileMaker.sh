@@ -63,7 +63,7 @@ for file in ${RAW_DIR}/sensorHk/sensorHk_*/*;
 done
 
 if  test `cat ${SENSOR_HK_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAtriSensorHkTree ${SENSOR_HK_FILE_LIST} ${SENSOR_HK_FILE} ${RUN_NUM}
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeAtriSensorHkTree ${SENSOR_HK_FILE_LIST} ${SENSOR_HK_FILE} ${RUN_NUM}
 #    cat ${SENSOR_HK_FILE_LIST}
     rm ${SENSOR_HK_FILE_LIST}
     echo "Done Sensor Hk File"
@@ -85,7 +85,7 @@ for file in ${RAW_DIR}/eventHk/eventHk_*/*;
 done
 
 if  test `cat ${EVENT_HK_FILE_LIST} | wc -l` -gt 0 ; then
-    ./makeAtriEventHkTree ${EVENT_HK_FILE_LIST} ${EVENT_HK_FILE} ${RUN_NUM}
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeAtriEventHkTree ${EVENT_HK_FILE_LIST} ${EVENT_HK_FILE} ${RUN_NUM}
 #    cat ${EVENT_HK_FILE_LIST}
     rm ${EVENT_HK_FILE_LIST}
     echo "Done Event Hk File"

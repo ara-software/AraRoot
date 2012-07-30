@@ -5,16 +5,15 @@ Set(INCLUDE_DIRECTORIES ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
 #These are the headers
 File(GLOB ${libname}Headers AraAntennaInfo.h            AraStationInfo.h            RawIcrrStationEvent.h       araIcrrDefines.h
 AraEventCalibrator.h        AtriEventHkData.h           RawAraGenericHeader.h       RawIcrrStationHeader.h      araIcrrStructures.h
-AraFileUtility.h            AtriSensorHkData.h          RawAraStationEvent.h        UsefulAraStationEvent.h     araSoft.h
-AraGeomTool.h               FullIcrrHkEvent.h           RawAtriSimpleStationEvent.h UsefulAtriStationEvent.h
-AraRawIcrrRFChannel.h       IcrrHkData.h                RawAtriStationBlock.h       UsefulIcrrStationEvent.h
-AraRootVersion.h            IcrrTriggerMonitor.h        RawAtriStationEvent.h       araAtriStructures.h
+AtriSensorHkData.h          RawAraStationEvent.h        UsefulAraStationEvent.h     araSoft.h  			AraGeomTool.h
+FullIcrrHkEvent.h           RawAtriSimpleStationEvent.h UsefulAtriStationEvent.h    AraRawIcrrRFChannel.h       IcrrHkData.h                
+RawAtriStationBlock.h       UsefulIcrrStationEvent.h   	AraRootVersion.h            IcrrTriggerMonitor.h        RawAtriStationEvent.h       
+araAtriStructures.h
 	  )
 
 #Source for library
 File(GLOB ${libname}Source AraAntennaInfo.cxx            AraRawIcrrRFChannel.cxx       FullIcrrHkEvent.cxx           RawAraStationEvent.cxx        RawIcrrStationEvent.cxx       UsefulIcrrStationEvent.cxx  AraEventCalibrator.cxx     AraStationInfo.cxx            IcrrHkData.cxx                RawAtriSimpleStationEvent.cxx RawIcrrStationHeader.cxx
-AraFileUtility.cxx         AtriEventHkData.cxx           IcrrTriggerMonitor.cxx        RawAtriStationBlock.cxx       UsefulAraStationEvent.cxx
-AraGeomTool.cxx            AtriSensorHkData.cxx          RawAraGenericHeader.cxx       RawAtriStationEvent.cxx       UsefulAtriStationEvent.cxx
+AtriEventHkData.cxx	   IcrrTriggerMonitor.cxx        RawAtriStationBlock.cxx       UsefulAraStationEvent.cxx     AraGeomTool.cxx               AtriSensorHkData.cxx          RawAraGenericHeader.cxx     RawAtriStationEvent.cxx       UsefulAtriStationEvent.cxx
 	  )
 
 #message(STATUS "${libname}Source ${${libname}Source}")

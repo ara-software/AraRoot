@@ -26,7 +26,7 @@ AraGeomTool::AraGeomTool()
 {
    //Default Constructor
 
-  //jpd read in the channel maps for the TestBed and Station1
+  //Read in the channel maps for the TestBed and Station1
   readChannelMapDb(0);
   readChannelMapDb(1);
 
@@ -56,7 +56,7 @@ int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum,
 }
 
 
-//jpd this is most definitely a hack to make AraCanvasMaker work -> this will only
+//FIXME //jpd this is most definitely a hack to make AraCanvasMaker work -> this will only
 //return the testbed lookup stuff not station1
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
 {
@@ -155,7 +155,7 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
 
   const char *query;
 
-  //jpd this is where we decide which table to access in the database
+  //This is where we decide which table to access in the database
   if(stationId==0) query = "select * from TestBed";
   if(stationId==1) query = "select * from Station1";
 
@@ -474,8 +474,6 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   }//while(1)
   //now insert the no of rfchannels
 
-  //jpd RFCHANS_TESTBED (16) and RFCHANS_STATION1 (20) defined in araIcrrDefines.h
-
   if(stationId==0)  fStationInfo[0].numberRFChans=RFCHANS_TESTBED;
   if(stationId==1)  fStationInfo[1].numberRFChans=RFCHANS_STATION1;
 
@@ -489,13 +487,13 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
 
-  //jpd now check that we read it in OK
+  //Now check that we read it in OK
 
   for(int ant=0;ant<fStationInfo[stationId].numberRFChans;++ant){
     //    fStationInfo[stationId].fAntInfo[ant].printAntennaInfo();
   }
 
-  //jpd now let's populate the antenna lookups
+  //Now let's populate the antenna lookups
   //fAntLookUpTable[stationId][AraAntPol][antPolNum]=chanNum-1
   for(int ant=0;ant<fStationInfo[stationId].numberRFChans;++ant){
     switch(fStationInfo[stationId].fAntInfo[ant].polType){

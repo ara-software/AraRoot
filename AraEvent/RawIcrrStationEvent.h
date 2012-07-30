@@ -21,7 +21,7 @@
 
 //!  RawIcrrStationEvent -- The Raw ARA Event Data
 /*!
-  The ROOT implementation of the raw ARA event data
+  The ROOT implementation of the raw ARA event data for the Icrr electronics type stations (TestBed and Station1). Contained in this class are the header information, raw ADC values, house keeping, trigger information etc. There are functions for returning the raw electronics waveforms.
   \ingroup rootclasses
 */
 class RawIcrrStationEvent: public RawAraStationEvent

@@ -23,19 +23,19 @@ RawAtriStationEvent::~RawAtriStationEvent() {
 }
 
 
-RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer) ///< Assignment constructor
-  :/*RawAraGenericHeader(&(hdPtr->gHdr)),*/RawAraStationEvent(hdPtr->gHdr.stationId, &(hdPtr->gHdr))
+RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer) // Assignment constructor
+  :RawAraStationEvent(hdPtr->gHdr.stationId, &(hdPtr->gHdr))
 {
   
-   unixTime=hdPtr->unixTime; ///< Software event time in seconds (64-bits for future proofing)
-   unixTimeUs=hdPtr->unixTimeUs; ///< Software event time in microseconds (32-bits)
-   eventNumber=hdPtr->eventNumber; ///< Software event number
-   ppsNumber=hdPtr->ppsNumber; ///< For matching up with thresholds etc.
-   numStationBytes=hdPtr->numBytes; ///<Bytes in station readout
+   unixTime=hdPtr->unixTime;
+   unixTimeUs=hdPtr->unixTimeUs;
+   eventNumber=hdPtr->eventNumber;
+   ppsNumber=hdPtr->ppsNumber;
+   numStationBytes=hdPtr->numBytes;
    //   std::cerr << eventNumber << "\t" << ppsNumber << "\t" << numStationBytes;
-   timeStamp=hdPtr->timeStamp; ///< Timestamp
-   eventId=hdPtr->eventId; ///< Event Id
-   numReadoutBlocks=hdPtr->numReadoutBlocks; ///< Number of readout blocks which follow header
+   timeStamp=hdPtr->timeStamp;
+   eventId=hdPtr->eventId;
+   numReadoutBlocks=hdPtr->numReadoutBlocks; 
    
    for(int trig=0;trig<MAX_TRIG_BLOCKS;trig++) {
      triggerPattern[trig]=hdPtr->triggerPattern[trig];

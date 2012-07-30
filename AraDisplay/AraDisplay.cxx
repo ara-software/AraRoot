@@ -5,11 +5,11 @@
 /////     The main Ara Display class displaying data                     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
-/*! \mainpage Ara ROOT based Test Bed Software
+/*! \mainpage Ara ROOT v3.3 Software
  *
  * \section intro_sec Introduction
  *
- * Here is some Doxygen generated documentation for the ARA ROOT based Test Bed software which is baed on the ANITA software. 
+ * Here is some Doxygen generated documentation for the ARA ROOT v3.3  software which is based on the ANITA software. 
  *
  * \section prereq_sec Prerequisites
  *
@@ -23,6 +23,8 @@
  * -# ARA Display, the display program based on the Marvellous ANITA Graphical Interface and Classy Display (Magic Display).
  * -# ARA Web Plotter, the library and code which produces the dynamically updating webpages
  * -# Utilities, programs for converting raw ARA data into ROOT-ified versions
+ * -# ARA Vertex - This is the vertex reconstuction code implemented in the production of L2 data
+ * -# - NB this does not have Doxygen documentation
  *
  * \section install_sec Installation
  * -# Ensure all the prerequisites are installed and in LD_LIBRARY_PATH or system paths.
