@@ -79,10 +79,11 @@ class AraEventCalibrator : public TObject
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
    void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
-   void loadIcrrPedestals(); ///< Loads the pedestals from a file
-   void loadIcrrCalib(); ///< Loads the various calibration constants
-   int gotPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a specific pedesal file has been selected
-   char pedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedesal file
+   void loadIcrrPedestals(Int_t stationId); ///< Loads the pedestals from a file
+   void loadIcrrCalib(Int_t stationId); ///< Loads the various calibration constants according to stationId -- only does it once
+   int gotIcrrCalibFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's calib file has been loaded
+   int gotIcrrPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's pedestal file has been loaded
+   char IcrrPedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedestal file
  
    float pedestalData[ICRR_NO_STATIONS][LAB3_PER_ICRR][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
    double binWidths[ICRR_NO_STATIONS][LAB3_PER_ICRR][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
@@ -104,9 +105,9 @@ class AraEventCalibrator : public TObject
 
 
    //Atri Calibrations
-   UShort_t *fAtriPeds;
-   Int_t fGotAtriPedFile;
-   char fAtriPedFile[FILENAME_MAX];
+   UShort_t *fAtriPeds; ///< Storage array to hold the ATRI pedestal data
+   Int_t fGotAtriPedFile; ///< Flag to indicate whether the ATRI pedestals have been loaded
+   char fAtriPedFile[FILENAME_MAX]; ///< Filename of the ATRI pedestal file
    Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
    Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
    Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block

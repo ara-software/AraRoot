@@ -53,7 +53,7 @@
 #define ONLY_BLOCK_FRAME_START 0x6f  //'o'
 #define ONLY_BLOCK_FRAME_OTHER 0x4f  //'O'
 
-
+#define ATRI_NO_STATIONS 1 ///<Future proofing such that there can be multiple ATRI stations
 
 //PID Files  //will change to /var/run
 #define ARAD_PID_FILE "/tmp/arad.pid"
