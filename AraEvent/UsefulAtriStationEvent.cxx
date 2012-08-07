@@ -38,6 +38,8 @@ UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, Ar
   fCalibrator=AraEventCalibrator::Instance();
   fNumChannels=0;
   fCalibrator->calibrateEvent(this,calType);
+  //  fprintf(stderr, "UsefulAtriStationEvent::UsefulAtriStationEvent() -- finished constructing event\n");  //DEBUG
+
 }
 
 

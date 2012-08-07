@@ -47,7 +47,7 @@ AraGeomTool*  AraGeomTool::Instance()
   return fgInstance;
 }
 
-int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, int stationId)
+int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, AraStationId_t stationId)
 {
   if(antNum<8 && antNum>=0)
     return fAntLookupTable[stationId][antPol][antNum];
@@ -84,7 +84,7 @@ Double_t AraGeomTool::calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Doub
 }
 
 //jd
-Double_t AraGeomTool::calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave, int stationId)
+Double_t AraGeomTool::calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave, AraStationId_t stationId)
 {
   if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)
     return 0;
@@ -111,7 +111,7 @@ Double_t AraGeomTool::calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t p
 }
 
 //jd
-Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R, int stationId)
+Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R, AraStationId_t stationId)
 {
   if(chan1<0 || chan1>=TOTAL_ANTS_PER_ICRR)
     return 0;
@@ -123,7 +123,7 @@ Double_t AraGeomTool::calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Do
 
 //______________________________________________________________________________
 
-void AraGeomTool::readChannelMapDb(Int_t stationId){
+void AraGeomTool::readChannelMapDb(AraStationId_t stationId){
   sqlite3 *db;
   char *zErrMsg = 0;
   sqlite3_stmt *stmt;
@@ -142,13 +142,12 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
-  //if(stationId==1) sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
   //open the database
   //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
   int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
-    printf("AraGeomTool::readChannelMapDb(Int_t stationId) - Can't open database: %s\n", sqlite3_errmsg(db));
+    printf("AraGeomTool::readChannelMapDb(AraStationId_t stationId) - Can't open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
     return;
   }
@@ -156,8 +155,8 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   const char *query;
 
   //This is where we decide which table to access in the database
-  if(stationId==0) query = "select * from TestBed";
-  if(stationId==1) query = "select * from Station1";
+  if(stationId==ARA_TESTBED) query = "select * from TestBed";
+  if(stationId==ARA_STATION1) query = "select * from Station1";
 
   //prepare an sql statment which will be used to obtain information from the data base
   //  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
@@ -474,8 +473,8 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
   }//while(1)
   //now insert the no of rfchannels
 
-  if(stationId==0)  fStationInfo[0].numberRFChans=RFCHANS_TESTBED;
-  if(stationId==1)  fStationInfo[1].numberRFChans=RFCHANS_STATION1;
+  if(stationId==ARA_TESTBED)  fStationInfo[0].numberRFChans=RFCHANS_TESTBED;
+  if(stationId==ARA_STATION1)  fStationInfo[1].numberRFChans=RFCHANS_STATION1;
 
   //now need to destroy the sqls statement prepared earlier
   rc = sqlite3_finalize(stmt);
@@ -521,4 +520,267 @@ void AraGeomTool::readChannelMapDb(Int_t stationId){
 
 }
 
+bool AraGeomTool::isIcrrStation(AraStationId_t stationId){ 
+  
+  if(stationId==ARA_TESTBED||stationId==ARA_STATION1) return true; 
+  else return false;
+  
+}
 
+bool AraGeomTool::isAtriStation(AraStationId_t stationId){
+
+  if(isIcrrStation(stationId)) return false;
+  else return true;
+
+}
+
+Int_t AraGeomTool::getStationCalibIndex(AraStationId_t stationId){
+
+  switch(stationId){
+
+  case ARA_TESTBED:
+    return 0;
+    break;
+  case ARA_STATION1:
+    return 1;
+    break;
+  case ARA_STATION2:
+    return 0;
+    break;
+  case ARA_STATION3:
+    return 1;
+    break;
+  case ARA_STATION4:
+    return 2;
+    break;
+  case ARA_STATION5:
+    return 3;
+    break;
+  case ARA_STATION6:
+    return 4;
+    break;
+  case ARA_STATION7:
+    return 5;
+    break;
+  case ARA_STATION8:
+    return 6;
+    break;
+  case ARA_STATION9:
+    return 7;
+    break;
+  case ARA_STATION10:
+    return 8;
+    break;
+  case ARA_STATION11:
+    return 9;
+    break;
+  case ARA_STATION12:
+    return 10;
+    break;
+  case ARA_STATION13:
+    return 11;
+    break;
+  case ARA_STATION14:
+    return 12;
+    break;
+  case ARA_STATION15:
+    return 13;
+    break;
+  case ARA_STATION16:
+    return 14;
+    break;
+  case ARA_STATION17:
+    return 15;
+    break;
+  case ARA_STATION18:
+    return 16;
+    break;
+  case ARA_STATION19:
+    return 17;
+    break;
+  case ARA_STATION20:
+    return 18;
+    break;
+  case ARA_STATION21:
+    return 19;
+    break;
+  case ARA_STATION22:
+    return 20;
+    break;
+  case ARA_STATION23:
+    return 21;
+    break;
+  case ARA_STATION24:
+    return 22;
+    break;
+  case ARA_STATION25:
+    return 23;
+    break;
+  case ARA_STATION26:
+    return 24;
+    break;
+  case ARA_STATION27:
+    return 25;
+    break;
+  case ARA_STATION28:
+    return 26;
+    break;
+  case ARA_STATION29:
+    return 27;
+    break;
+  case ARA_STATION30:
+    return 28;
+    break;
+  case ARA_STATION31:
+    return 29;
+    break;
+  case ARA_STATION32:
+    return 30;
+    break;
+  case ARA_STATION33:
+    return 31;
+    break;
+  case ARA_STATION34:
+    return 32;
+    break;
+  case ARA_STATION35:
+    return 33;
+    break;
+  case ARA_STATION36:
+    return 34;
+    break;
+  case ARA_STATION37:
+    return 35;
+    break;
+  default:
+    //    std::cerr << "AraGeomTool::getStationCalibIndex -- Error - Unknown stationId " << static_cast<int>(stationId) << std::endl;
+    fprintf(stderr, "AraGeomTool::getStationCalibIndex -- Error - Unknown stationId %i\n", stationId);
+
+    return -1;
+  }
+}
+
+void AraGeomTool::printStationName(AraStationId_t stationId){
+
+  switch(stationId){
+
+  case ARA_TESTBED:
+    std::cout << "TESTBED\n";
+    break;
+  case ARA_STATION1:
+    std::cout << "STATION1\n";
+    break;
+  case ARA_STATION2:
+    std::cout << "STATION2\n";
+    break;
+  case ARA_STATION3:
+    std::cout << "STATION3\n";
+    break;
+  case ARA_STATION4:
+    std::cout << "STATION4\n";
+    break;
+  case ARA_STATION5:
+    std::cout << "STATION5\n";
+    break;
+  case ARA_STATION6:
+    std::cout << "STATION6\n";
+    break;
+  case ARA_STATION7:
+    std::cout << "STATION7\n";
+    break;
+  case ARA_STATION8:
+    std::cout << "STATION8\n";
+    break;
+  case ARA_STATION9:
+    std::cout << "STATION9\n";
+    break;
+  case ARA_STATION10:
+    std::cout << "STATION10\n";
+    break;
+  case ARA_STATION11:
+    std::cout << "STATION11\n";
+    break;
+  case ARA_STATION12:
+    std::cout << "STATION12\n";
+    break;
+  case ARA_STATION13:
+    std::cout << "STATION13\n";
+    break;
+  case ARA_STATION14:
+    std::cout << "STATION14\n";
+    break;
+  case ARA_STATION15:
+    std::cout << "STATION15\n";
+    break;
+  case ARA_STATION16:
+    std::cout << "STATION16\n";
+    break;
+  case ARA_STATION17:
+    std::cout << "STATION17\n";
+    break;
+  case ARA_STATION18:
+    std::cout << "STATION18\n";
+    break;
+  case ARA_STATION19:
+    std::cout << "STATION19\n";
+    break;
+  case ARA_STATION20:
+    std::cout << "STATION20\n";
+    break;
+  case ARA_STATION21:
+    std::cout << "STATION21\n";
+    break;
+  case ARA_STATION22:
+    std::cout << "STATION22\n";
+    break;
+  case ARA_STATION23:
+    std::cout << "STATION23\n";
+    break;
+  case ARA_STATION24:
+    std::cout << "STATION24\n";
+    break;
+  case ARA_STATION25:
+    std::cout << "STATION25\n";
+    break;
+  case ARA_STATION26:
+    std::cout << "STATION26\n";
+    break;
+  case ARA_STATION27:
+    std::cout << "STATION27\n";
+    break;
+  case ARA_STATION28:
+    std::cout << "STATION28\n";
+    break;
+  case ARA_STATION29:
+    std::cout << "STATION29\n";
+    break;
+  case ARA_STATION30:
+    std::cout << "STATION30\n";
+    break;
+  case ARA_STATION31:
+    std::cout << "STATION31\n";
+    break;
+  case ARA_STATION32:
+    std::cout << "STATION32\n";
+    break;
+  case ARA_STATION33:
+    std::cout << "STATION33\n";
+    break;
+  case ARA_STATION34:
+    std::cout << "STATION34\n";
+    break;
+  case ARA_STATION35:
+    std::cout << "STATION35\n";
+    break;
+  case ARA_STATION36:
+    std::cout << "STATION36\n";
+    break;
+  case ARA_STATION37:
+    std::cout << "STATION37\n";
+    break;
+  default:
+    std::cout <<"Unkown StationId\n";
+    break;
+  }
+
+}

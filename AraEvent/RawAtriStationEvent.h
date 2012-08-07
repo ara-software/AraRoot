@@ -32,6 +32,9 @@ class RawAtriStationEvent: public RawAraStationEvent
  public:
    RawAtriStationEvent(); ///< Default constructor
    RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer); ///< Assignment constructor
+   RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *dataBuffer, AraStationId_t forcedStationId); ///< Assignment constructor, forcing the stationId to the value forced stationId
+
+
 
    ~RawAtriStationEvent(); ///< Destructor
 

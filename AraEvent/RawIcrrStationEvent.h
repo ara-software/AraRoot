@@ -29,7 +29,7 @@ class RawIcrrStationEvent: public RawAraStationEvent
  public:
    RawIcrrStationEvent(); ///< Default constructor
    RawIcrrStationEvent(IcrrEventBody_t *theBody); ///< Assignment constructor
-   RawIcrrStationEvent(IcrrEventBody_t *theBody, UInt_t stationId); ///< Assignment constructor to create RawAraGenericHeader
+   RawIcrrStationEvent(IcrrEventBody_t *theBody, AraStationId_t stationId); ///< Assignment constructor to create RawAraGenericHeader
 
 
    ~RawIcrrStationEvent(); ///< Destructor

@@ -22,8 +22,8 @@
 class RawAraStationEvent: public TObject, public RawAraGenericHeader {
 
  public:
-  RawAraStationEvent(UInt_t stationId) ;
-  RawAraStationEvent(UInt_t stationId, AraGenericHeader_t *gHdr) ;
+  RawAraStationEvent(AraStationId_t stationId); ///< Constructor to be called for Icrr type stations
+  RawAraStationEvent(AraGenericHeader_t *gHdr); ///< Constructor to be called for Atri type stations
   RawAraStationEvent();///< Default constructor
   ~RawAraStationEvent(); ///< Destructor
   

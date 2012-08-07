@@ -18,6 +18,7 @@
 #include "AraEventCorrelator.h"
 #include "AraControlPanel.h"
 #include "araIcrrDefines.h"
+#include "araAtriStructures.h"
 #include "AraIcrrCanvasMaker.h"
 #include "AraAtriCanvasMaker.h"
 

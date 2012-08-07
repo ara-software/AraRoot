@@ -39,7 +39,7 @@ RawAraGenericHeader::RawAraGenericHeader(AraGenericHeader_t *gHdr) ///< Assignme
 RawAraGenericHeader::RawAraGenericHeader(UInt_t thisStationId) ///< Assignment constructor for ICRR type
   :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
 {
-  if(thisStationId==ARA_STATION_ICRR_TESTBED||thisStationId==ARA_STATION_ICRR_STATION1){ //Is this an Icrr type station?
+  if(thisStationId==ARA_TESTBED||thisStationId==ARA_STATION1){ //Is this an Icrr type station?
     typeId=ARA_ICRR_EVENT_TYPE;
     stationId=thisStationId;
     verId=0;

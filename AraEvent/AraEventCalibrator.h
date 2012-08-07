@@ -37,7 +37,7 @@ namespace AraCalType {
     kFirstCalibPlusCables           = 0x06, ///< Same as First Calib but also doing the cable delays
     kSecondCalib                    = 0x07, ///< Same as first calib but also doing the clock alignment
     kSecondCalibPlusCables          = 0x08,///< Same as second calib but also doing the clock alignment
-    kSecondCalibPlusCablesUnDiplexed = 0x09,///< Same as secondCalibPlusCableDelays but with the undiplexing of diplexed channels
+    kSecondCalibPlusCablesUnDiplexed = 0x09,///< Same as secondCalibPlusCableDelays but with the undiplexing of diplexed channels in ARA_STATION1
 
     kLatestCalib                    = 0x09 ///< Currenly this is kSecondCalibPlusCables
   } AraCalType_t;
@@ -72,15 +72,15 @@ class AraEventCalibrator : public TObject
    
 
    //Icrr calibrations
-   void setPedFile(char fileName[], UInt_t stationId); ///< Manually sets the pedestal file
+   void setPedFile(char fileName[], AraStationId_t stationId); ///< Manually sets the pedestal file
    void calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulIcrrStationEvent, called from UsefulIcrrStationEvent constructor
    int doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
    void fillRCOGuessArray(UsefulIcrrStationEvent *theEvent, int rcoGuess[LAB3_PER_ICRR]); ///< Utility function called by UsefulIcrrStationEvent
    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
    void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
-   void loadIcrrPedestals(Int_t stationId); ///< Loads the pedestals from a file
-   void loadIcrrCalib(Int_t stationId); ///< Loads the various calibration constants according to stationId -- only does it once
+   void loadIcrrPedestals(AraStationId_t stationId); ///< Loads the pedestals from a file
+   void loadIcrrCalib(AraStationId_t stationId); ///< Loads the various calibration constants according to stationId -- only does it once
    int gotIcrrCalibFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's calib file has been loaded
    int gotIcrrPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's pedestal file has been loaded
    char IcrrPedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedestal file
@@ -106,20 +106,18 @@ class AraEventCalibrator : public TObject
 
    //Atri Calibrations
    UShort_t *fAtriPeds; ///< Storage array to hold the ATRI pedestal data
-   Int_t fGotAtriPedFile; ///< Flag to indicate whether the ATRI pedestals have been loaded
-   char fAtriPedFile[FILENAME_MAX]; ///< Filename of the ATRI pedestal file
+   Int_t fGotAtriPedFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI pedestals have been loaded and for which station
+   Int_t fGotAtriCalibFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI calib have been loaded and for which station
+   char fAtriPedFile[ATRI_NO_STATIONS][FILENAME_MAX]; ///< Filename of the ATRI pedestal file
    Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
    Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
    Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
 
    void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
-   void setAtriPedFile(char *filename);
-   void loadAtriPedestals();
-   void loadAtriCalib();
-
-
-
-
+   void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
+   void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
+   void loadAtriCalib(AraStationId_t stationId); ///< Internally used fuction that loads the calibration values into memory.
+   
  protected:
    static AraEventCalibrator *fgInstance;  ///< protect against multiple instances
 

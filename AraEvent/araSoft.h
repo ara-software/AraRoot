@@ -44,6 +44,9 @@
 #define MAX_TRIG_BLOCKS 4
 #define CHANNELS_PER_ATRI DDA_PER_ATRI*RFCHAN_PER_DDA
 
+
+
+
 #define FIRST_BLOCK_FRAME_START 0x65  //'e'
 #define FIRST_BLOCK_FRAME_OTHER 0x45  //'E'
 #define MIDDLE_BLOCK_FRAME_START 0x62 // 'b'
@@ -53,7 +56,7 @@
 #define ONLY_BLOCK_FRAME_START 0x6f  //'o'
 #define ONLY_BLOCK_FRAME_OTHER 0x4f  //'O'
 
-#define ATRI_NO_STATIONS 1 ///<Future proofing such that there can be multiple ATRI stations
+#define ATRI_NO_STATIONS 35 ///<Future proofing such that there can be multiple ATRI stations
 
 //PID Files  //will change to /var/run
 #define ARAD_PID_FILE "/tmp/arad.pid"

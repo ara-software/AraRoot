@@ -21,12 +21,12 @@ RawAraStationEvent::~RawAraStationEvent()
 {
 
 }
-RawAraStationEvent::RawAraStationEvent(UInt_t stationId)
+RawAraStationEvent::RawAraStationEvent(AraStationId_t stationId)
   :RawAraGenericHeader(stationId)
 {
 }
 
-RawAraStationEvent::RawAraStationEvent(UInt_t stationId, AraGenericHeader_t *gHdr)
+RawAraStationEvent::RawAraStationEvent(AraGenericHeader_t *gHdr)
   :RawAraGenericHeader(gHdr)
 {
 }

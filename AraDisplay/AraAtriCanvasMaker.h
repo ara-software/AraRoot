@@ -43,27 +43,27 @@ class AraAtriCanvasMaker
   Int_t fNumAntsInMap; ///<The number of antennas to use in the interferometric map
   Double_t fThisMinTime; ///<The minimum time
   Double_t fThisMaxTime; ///< The maximum time
-
-   Double_t fMinVoltLimit; ///< The minimum voltage. 
-   Double_t fMaxVoltLimit; ///< The maximum voltage.
-   Int_t fAutoScale; ///< Fixed or auto-scaling y-axis?
-   Double_t fMinClockVoltLimit; ///< The minimum voltage in the clock channels.
-   Double_t fMaxClockVoltLimit; ///< The maximum voltage in the clock channels.
-   Double_t fMinTimeLimit; ///< The minimum time in the waveform (typically 0).
-   Double_t fMaxTimeLimit; ///< The maximum time in the waveform (typically 100).
-   Double_t fMinPowerLimit; ///< The minimum power in the PSDs.
-   Double_t fMaxPowerLimit; ///< The maximum power in the PSDs.
-   Double_t fMinFreqLimit; ///< The minimum frequency in the PSDs (typically 0).
-   Double_t fMaxFreqLimit; ///< The maximum frequency in the PSDs (typically 1200).
-
-   AraCorrelatorType::AraCorrelatorType_t fCorType; ///<Which kind of correlation should we use
-   AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fCanvasLayout; ///<Which canvas layout were we in
-   AraDisplayFormatOption::AraDisplayFormatOption_t fWaveformOption; ///< Are we viewing PSDs, waveforms or other stuff?
-   Int_t fRedoEventCanvas; ///< Do we neeed to redraw the event canvas (eg. switching from phi to SURF)?
-   //Int_t fRedoSurfCanvas;
-   AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fLastCanvasView; ///<Which canvas layout were we in
-   AraDisplayFormatOption::AraDisplayFormatOption_t fLastWaveformFormat; ///< What did we plot last time??
-   Int_t fNewEvent; ///< Is this a new event?
+  
+  Double_t fMinVoltLimit; ///< The minimum voltage. 
+  Double_t fMaxVoltLimit; ///< The maximum voltage.
+  Int_t fAutoScale; ///< Fixed or auto-scaling y-axis?
+  Double_t fMinClockVoltLimit; ///< The minimum voltage in the clock channels.
+  Double_t fMaxClockVoltLimit; ///< The maximum voltage in the clock channels.
+  Double_t fMinTimeLimit; ///< The minimum time in the waveform (typically 0).
+  Double_t fMaxTimeLimit; ///< The maximum time in the waveform (typically 100).
+  Double_t fMinPowerLimit; ///< The minimum power in the PSDs.
+  Double_t fMaxPowerLimit; ///< The maximum power in the PSDs.
+  Double_t fMinFreqLimit; ///< The minimum frequency in the PSDs (typically 0).
+  Double_t fMaxFreqLimit; ///< The maximum frequency in the PSDs (typically 1200).
+  
+  AraCorrelatorType::AraCorrelatorType_t fCorType; ///<Which kind of correlation should we use
+  AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fCanvasLayout; ///<Which canvas layout were we in
+  AraDisplayFormatOption::AraDisplayFormatOption_t fWaveformOption; ///< Are we viewing PSDs, waveforms or other stuff?
+  Int_t fRedoEventCanvas; ///< Do we neeed to redraw the event canvas (eg. switching from phi to SURF)?
+  //Int_t fRedoSurfCanvas;
+  AraDisplayCanvasLayoutOption::AraDisplayCanvasLayoutOption_t fLastCanvasView; ///<Which canvas layout were we in
+  AraDisplayFormatOption::AraDisplayFormatOption_t fLastWaveformFormat; ///< What did we plot last time??
+  Int_t fNewEvent; ///< Is this a new event?
   
    //!  The main event view canvas getter.
    /*!

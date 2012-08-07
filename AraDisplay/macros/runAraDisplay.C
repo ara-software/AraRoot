@@ -10,11 +10,17 @@ void runAraDisplay() {
   //JPD Testing TestBed
   //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
   //JPD Testing Station1
-  sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
+  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
   //JPD Testing AraRootBranches3.2
   //  sprintf(fileName, "~/ara/data/AraRoot_3-2/root/0808_2011/TestBed_2011_run005546.L0.root");
   //JPD Testing TestBed vs branches/TestBed1
   //  sprintf(fileName,"~/ara/data/testing_for_trunk/root/TestBed/run5546/event5546.root");
+  //JPD Testing ARA2 (an example of an ATRI station) -- miniATRI - one stack enabled
+  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run403/event403.root");
+  //JPD Testing ARA2 (an example of an ATRI station) -- ATRI run from 2011
+  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run768/event768.root");
+
+
 
   runAraDisplay(fileName);
 }
@@ -22,9 +28,10 @@ void runAraDisplay() {
  
 void runAraDisplay(char *eventFile) {
   gSystem->AddIncludePath("-I${ARA_UTIL_INSTALL_DIR}/include");
-  gSystem->AddIncludePath("-I/sw/include");
+  //  gSystem->AddIncludePath("-I/sw/include");
   gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
-  //  gSystem->Load("libsqlite3.so");
+  //  gSystem->Load("~/repositories/InstallDir/utilities/lib/libsqlite3.so");
+  gSystem->Load("libsqlite3.so");
   gSystem->Load("libfftw3.so");
   gSystem->Load("libgsl.so");
   gSystem->Load("libMathMore.so");

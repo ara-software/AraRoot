@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  RawAtriSimpleStationEvent.cxx        ARA header reading class                  /////
+/////  RawAtriSimpleStationEvent.cxx        ARA header reading class     /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that reads in raw ARA headers and produces     ///// 
+/////     A simple class that reads in raw ARA headers and produces      ///// 
 /////   calibrated time and voltage stuff                                /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,6 @@
 ClassImp(RawAtriSimpleStationEvent);
 
 RawAtriSimpleStationEvent::RawAtriSimpleStationEvent()   
- :RawAraStationEvent(0)
 {
   
   //Default Constructor

@@ -14,7 +14,7 @@
 ClassImp(RawIcrrStationEvent);
 
 RawIcrrStationEvent::RawIcrrStationEvent()   
-  :RawAraStationEvent(0)
+  :RawAraStationEvent(ARA_TESTBED)
 {
   //Default Constructor
 }
@@ -25,14 +25,14 @@ RawIcrrStationEvent::~RawIcrrStationEvent() {
 
 
 RawIcrrStationEvent::RawIcrrStationEvent(IcrrEventBody_t *bdPtr)
-  :RawAraStationEvent(0),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
+  :RawAraStationEvent(ARA_TESTBED),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
   for(int i=0;i<NUM_DIGITIZED_ICRR_CHANNELS;i++) {
     chan[i].fillChannel(&(bdPtr->channel[i]));
   }
 }
 
-RawIcrrStationEvent::RawIcrrStationEvent(IcrrEventBody_t *bdPtr, UInt_t stationId)
+RawIcrrStationEvent::RawIcrrStationEvent(IcrrEventBody_t *bdPtr, AraStationId_t stationId)
   :RawAraStationEvent(stationId),head(&(bdPtr->hd)),trig(&(bdPtr->trig)),hk(&(bdPtr->hk))
 {
   for(int i=0;i<NUM_DIGITIZED_ICRR_CHANNELS;i++) {

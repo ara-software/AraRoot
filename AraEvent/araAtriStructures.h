@@ -45,15 +45,53 @@ typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
   Each data structure is going to have a one byte overhead saying where it came from
 */
 enum {
-  ARA_STATION_ICRR_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
-  ARA_STATION_ICRR_STATION1=0x1, ///< Icrr Station1 data
-  ARA_STATION_ATRI_STATION2=0x2 ///< Atri type stations 
+  ARA_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
+  ARA_STATION1=0x1, ///< Icrr Station1 data
+  ARA_STATION2=0x2, ///< ATRI Station2 data
+  ARA_STATION3=0x3, ///< ATRI Station3 data
+  ARA_STATION4=0x4, ///< ATRI Station4 data
+  ARA_STATION5=0x5, ///< ATRI Station5 data
+  ARA_STATION6=0x6, ///< ATRI Station6 data
+  ARA_STATION7=0x7, ///< ATRI Station7 data
+  ARA_STATION8=0x8, ///< ATRI Station8 data
+  ARA_STATION9=0x9, ///< ATRI Station9 data
+
+  ARA_STATION10=10, ///< ATRI Station10 data
+  ARA_STATION11=11, ///< ATRI Station11 data
+  ARA_STATION12=12, ///< ATRI Station12 data
+  ARA_STATION13=13, ///< ATRI Station13 data
+  ARA_STATION14=14, ///< ATRI Station14 data
+  ARA_STATION15=15, ///< ATRI Station15 data
+  ARA_STATION16=16, ///< ATRI Station16 data
+  ARA_STATION17=17, ///< ATRI Station17 data
+  ARA_STATION18=18, ///< ATRI Station18 data
+  ARA_STATION19=19, ///< ATRI Station19 data
+
+  ARA_STATION20=20, ///< ATRI Station20 data
+  ARA_STATION21=21, ///< ATRI Station21 data
+  ARA_STATION22=22, ///< ATRI Station22 data
+  ARA_STATION23=23, ///< ATRI Station23 data
+  ARA_STATION24=24, ///< ATRI Station24 data
+  ARA_STATION25=25, ///< ATRI Station25 data
+  ARA_STATION26=26, ///< ATRI Station26 data
+  ARA_STATION27=27, ///< ATRI Station27 data
+  ARA_STATION28=28, ///< ATRI Station28 data
+  ARA_STATION29=29, ///< ATRI Station29 data
+
+  ARA_STATION30=30, ///< ATRI Station30 data
+  ARA_STATION31=31, ///< ATRI Station31 data
+  ARA_STATION32=32, ///< ATRI Station32 data
+  ARA_STATION33=33, ///< ATRI Station33 data
+  ARA_STATION34=34, ///< ATRI Station34 data
+  ARA_STATION35=35, ///< ATRI Station35 data
+  ARA_STATION36=36, ///< ATRI Station36 data
+  ARA_STATION37=37  ///< ATRI Station37 data
+
 } ;
 typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
 
-
-#define THIS_STATION ARA_STATION_ATRI_ARA2
-
+#define THIS_STATION ARA_STATION2
+//SBC_DEFINE -- Each SBC should be running AraSoft with the correct stationId set as THIS_STATION
 
 
 //!  The ARA Generic Header

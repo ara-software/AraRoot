@@ -16,7 +16,10 @@
  * -# <A HREF="http://root.cern.ch">ROOT</A>
  * -# <A HREF="http://www.fftw.org/">FFTW 3 -- Fastest Fourier Transform in the West</a>
  * -# <A HREF="http://www.hep.ucl.ac.uk/uhen/anita/libRootFftwWrapper">libRootFftwWrapper -- a ROOT wrapper for FFTW 3</a>
- * 
+ * -# <A HREF="http://www.gnu.org/software/gsl/">GNU Scientific Library -- library used by ROOT's MathMore library</A>
+ * -# <A HREF="http://www.sqlite.org/">Sqlite3 -- Library for simple SQL database management and transactions </A>
+ * -# <A HREF="http://www.cmake.org/">CMAKE -- cross-platform, open-source build system. Generates Makefiles for the user's system </A>
+
  * \section comp_sec Components
  *
  * -# ARA Event Library, ROOT classes for storing ARA data in ROOT files
@@ -24,18 +27,41 @@
  * -# ARA Web Plotter, the library and code which produces the dynamically updating webpages
  * -# Utilities, programs for converting raw ARA data into ROOT-ified versions
  * -# ARA Vertex - This is the vertex reconstuction code implemented in the production of L2 data
- * -# - NB this does not have Doxygen documentation
+ *    NB this does not have Doxygen documentation
  *
  * \section install_sec Installation
- * -# Ensure all the prerequisites are installed and in LD_LIBRARY_PATH or system paths.
- * -# Set the environmental variable ARA_UTIL_INSTALL_DIR to point to the location you want the software installed in (note that lib, bin, etc. sub directories will be made)
- * -# Do <PRE>make</PRE><PRE>make install</PRE>
- *
+ * The user must first specify the following two environmental variables:
+ * <PRE>ARA_UTIL_INSTALL_DIR = {The install destination choosen by the user}</PRE>
+ * <PRE>ARA_ROOT_DIR = {Location of the source code of AraRoot}</PRE>
+ * Once these are set correctly the user needs to run
+ * <PRE>bash INSTALL.sh</PRE>
+ * This builds in the ARA_ROOT_DIR/build directory, then installs into ARA_UTIL_INSTALL_DIR
+
+
+
+
  * \section rootfile_sec Making ROOT files
- * The makeAraEventTree executable is usedto convert raw ARA Test Bed data into a ROOT format. The easiest way to do this is through the runAraEventFileMaker.sh script. The usage is <PRE>runAraEventFileMaker.sh (input dir) (outputfile)</PRE> where input dir is a directory that contains the ev_XXXXXXXX sub directories.
+ * The makeAtriEventTree and makeIcrrEventTree executables are used to convert raw ARA data into a ROOT format. The easiest way to do this is through the runAraOneEventFileMaker.sh, runTestBedEventFileMaker.sh or runAtriEventFileMaker.sh scripts. The user must edit the following two variables in the scripts:
+ * <PRE>RAW_BASE_DIR={base directory in which run_XXXXXX directories are kept}</PRE>
+ * <PRE>ROOT_BASE_DIR={base directiry in which to write output root files}</PRE>
+ * 
+
+
+
  *
  *\section display_sec Running AraDisplay
  * The easiest way to get AraDisplay running is to use the runAraDisplay.C macro (it is in AraDisplay/macros). You can either edit the macro to point to a ROOT event file (created as above) or you can pass the ROOT file name from the command line as in <PRE>root 'macros/runAraDisplay.C("/Users/rjn/ara/data/root/event_200MHz_DISC01.root")'</PRE> note the use of signal and double quotations so that the shell passes the argument to ROOT correctly.
+ *\section installation_issues Installation Issues
+ * This section will detail know issues with the installation of the software and is intended to provide a reference for anyone installing the software
+ *
+ * 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 
@@ -50,6 +76,7 @@
 #include "AraAtriCanvasMaker.h"
 #include "AraIcrrCanvasMaker.h"
 #include "AraControlPanel.h"
+#include "AraGeomTool.h"
 
 //Event Reader Includes
 #include "UsefulIcrrStationEvent.h"
@@ -255,15 +282,16 @@ int AraDisplay::loadEventTree(char *eventFile)
     cout << "Couldn't open: " << eventName << "\n";
     return -1;
   }
-  //  std::cout << "Here\n";
-
   //JPD - Use the RawStationEvent base class to interogate the tree
   //      and decide if this is a Icrr or Atri type station
 
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
-  if(fRawStationEventPtr->stationId<2) fIcrrData=1;//FIXME -- are stationId > 1 Atri?
-  else fIcrrData=0;
+
+  //  fprintf(stderr, "loadEventTree -- stationId %i\n", fRawStationEventPtr->stationId);
+
+  fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
+
 
   fEventTree->ResetBranchAddresses();
 

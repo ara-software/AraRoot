@@ -709,8 +709,7 @@ TPad *AraAtriCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPa
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform){
 
 	grElec[chanIndex]->Draw("l");
-	
-	
+		
 	TList *listy = gPad->GetListOfPrimitives();
 	for(int i=0;i<listy->GetSize();i++) {
 	  TObject *fred = listy->At(i);
@@ -895,6 +894,7 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 	grRFChanHilbert[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform) {
+
 	grRFChan[rfChan]->Draw("l");
 
 	if(fAutoScale) {

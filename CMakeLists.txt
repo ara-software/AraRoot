@@ -4,8 +4,8 @@ set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 
 #Set the hint variables to point to where cmake should look first for a header / library file
 #This is in case you have multiple instances of for example sqlite3 - one of which is known to be the correct version
-set(SQLITE3_HINT_INCLUDES "~/repositories/sqlite3Test/include/")
-set(SQLITE3_HINT_LIBRARIES "~/repositories/sqlite3Test/lib/")
+#set(SQLITE3_HINT_INCLUDES "~/repositories/InstallDir/utilities/include/")
+#set(SQLITE3_HINT_LIBRARIES "~/repositories/InstallDir/utilities/lib")
 
 project(AraRoot)
 find_package(ROOT REQUIRED COMPONENTS MathMore Gui)

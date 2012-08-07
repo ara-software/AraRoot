@@ -15,9 +15,16 @@ add_executable(makeSimpleAtriEventTree makeSimpleAtriEventTree.cxx)
 
 target_link_libraries(makeSimpleAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-add_executable(makeAtriEventTree makeAtriEventTree.cxx)
+
+#add_executable(makeAtriEventTree makeAtriEventTree.cxx)
+
+#target_link_libraries(makeAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
+
+
+add_executable(makeAtriEventTree makeAtriEventTreeForceStationId.cxx)
 
 target_link_libraries(makeAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
+
 
 add_executable(makeAtriCalibratedEventTree makeAtriCalibratedEventTree.cxx)
 
