@@ -47,6 +47,7 @@ typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
 enum {
   ARA_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
   ARA_STATION1=0x1, ///< Icrr Station1 data
+  ARA_STATION1A=-1, ///< Placeholder for ATRI updated Station1
   ARA_STATION2=0x2, ///< ATRI Station2 data
   ARA_STATION3=0x3, ///< ATRI Station3 data
   ARA_STATION4=0x4, ///< ATRI Station4 data

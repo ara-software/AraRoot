@@ -51,3 +51,11 @@ Int_t UsefulAraStationEvent::getNumRFChannels()
   return -1;
   
 }
+
+bool UsefulAraStationEvent::isCalPulserEventWithIndex(int /*pulserIndex*/)
+{
+
+  std::cerr << "Error calling UsefulAraStationEvent::isCalPulserEventWithIndex()\n";
+  return -1;
+
+}

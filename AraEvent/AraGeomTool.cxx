@@ -544,118 +544,119 @@ Int_t AraGeomTool::getStationCalibIndex(AraStationId_t stationId){
   case ARA_STATION1:
     return 1;
     break;
-  case ARA_STATION2:
+  case ARA_STATION1A:
     return 0;
     break;
-  case ARA_STATION3:
+  case ARA_STATION2:
     return 1;
     break;
-  case ARA_STATION4:
+  case ARA_STATION3:
     return 2;
     break;
-  case ARA_STATION5:
+  case ARA_STATION4:
     return 3;
     break;
-  case ARA_STATION6:
+  case ARA_STATION5:
     return 4;
     break;
-  case ARA_STATION7:
+  case ARA_STATION6:
     return 5;
     break;
-  case ARA_STATION8:
+  case ARA_STATION7:
     return 6;
     break;
-  case ARA_STATION9:
+  case ARA_STATION8:
     return 7;
     break;
-  case ARA_STATION10:
+  case ARA_STATION9:
     return 8;
     break;
-  case ARA_STATION11:
+  case ARA_STATION10:
     return 9;
     break;
-  case ARA_STATION12:
+  case ARA_STATION11:
     return 10;
     break;
-  case ARA_STATION13:
+  case ARA_STATION12:
     return 11;
     break;
-  case ARA_STATION14:
+  case ARA_STATION13:
     return 12;
     break;
-  case ARA_STATION15:
+  case ARA_STATION14:
     return 13;
     break;
-  case ARA_STATION16:
+  case ARA_STATION15:
     return 14;
     break;
-  case ARA_STATION17:
+  case ARA_STATION16:
     return 15;
     break;
-  case ARA_STATION18:
+  case ARA_STATION17:
     return 16;
     break;
-  case ARA_STATION19:
+  case ARA_STATION18:
     return 17;
     break;
-  case ARA_STATION20:
+  case ARA_STATION19:
     return 18;
     break;
-  case ARA_STATION21:
+  case ARA_STATION20:
     return 19;
     break;
-  case ARA_STATION22:
+  case ARA_STATION21:
     return 20;
     break;
-  case ARA_STATION23:
+  case ARA_STATION22:
     return 21;
     break;
-  case ARA_STATION24:
+  case ARA_STATION23:
     return 22;
     break;
-  case ARA_STATION25:
+  case ARA_STATION24:
     return 23;
     break;
-  case ARA_STATION26:
+  case ARA_STATION25:
     return 24;
     break;
-  case ARA_STATION27:
+  case ARA_STATION26:
     return 25;
     break;
-  case ARA_STATION28:
+  case ARA_STATION27:
     return 26;
     break;
-  case ARA_STATION29:
+  case ARA_STATION28:
     return 27;
     break;
-  case ARA_STATION30:
+  case ARA_STATION29:
     return 28;
     break;
-  case ARA_STATION31:
+  case ARA_STATION30:
     return 29;
     break;
-  case ARA_STATION32:
+  case ARA_STATION31:
     return 30;
     break;
-  case ARA_STATION33:
+  case ARA_STATION32:
     return 31;
     break;
-  case ARA_STATION34:
+  case ARA_STATION33:
     return 32;
     break;
-  case ARA_STATION35:
+  case ARA_STATION34:
     return 33;
     break;
-  case ARA_STATION36:
+  case ARA_STATION35:
     return 34;
     break;
-  case ARA_STATION37:
+  case ARA_STATION36:
     return 35;
     break;
+  case ARA_STATION37:
+    return 36;
+    break;
   default:
-    //    std::cerr << "AraGeomTool::getStationCalibIndex -- Error - Unknown stationId " << static_cast<int>(stationId) << std::endl;
     fprintf(stderr, "AraGeomTool::getStationCalibIndex -- Error - Unknown stationId %i\n", stationId);
-
     return -1;
   }
 }
@@ -669,6 +670,9 @@ void AraGeomTool::printStationName(AraStationId_t stationId){
     break;
   case ARA_STATION1:
     std::cout << "STATION1\n";
+    break;
+  case ARA_STATION1A:
+    std::cout << "STATION1A\n";
     break;
   case ARA_STATION2:
     std::cout << "STATION2\n";
@@ -780,6 +784,133 @@ void AraGeomTool::printStationName(AraStationId_t stationId){
     break;
   default:
     std::cout <<"Unkown StationId\n";
+    break;
+  }
+
+}
+char* AraGeomTool::getStationName(AraStationId_t stationId){
+
+  switch(stationId){
+
+  case ARA_TESTBED:
+    return "TESTBED";
+    break;
+  case ARA_STATION1:
+    return "STATION1";
+    break;
+  case ARA_STATION1A:
+    return "STATION1A";
+    break;
+  case ARA_STATION2:
+    return "STATION2";
+    break;
+  case ARA_STATION3:
+    return "STATION3";
+    break;
+  case ARA_STATION4:
+    return "STATION4";
+    break;
+  case ARA_STATION5:
+    return "STATION5";
+    break;
+  case ARA_STATION6:
+    return "STATION6";
+    break;
+  case ARA_STATION7:
+    return "STATION7";
+    break;
+  case ARA_STATION8:
+    return "STATION8";
+    break;
+  case ARA_STATION9:
+    return "STATION9";
+    break;
+  case ARA_STATION10:
+    return "STATION10";
+    break;
+  case ARA_STATION11:
+    return "STATION11";
+    break;
+  case ARA_STATION12:
+    return "STATION12";
+    break;
+  case ARA_STATION13:
+    return "STATION13";
+    break;
+  case ARA_STATION14:
+    return "STATION14";
+    break;
+  case ARA_STATION15:
+    return "STATION15";
+    break;
+  case ARA_STATION16:
+    return "STATION16";
+    break;
+  case ARA_STATION17:
+    return "STATION17";
+    break;
+  case ARA_STATION18:
+    return "STATION18";
+    break;
+  case ARA_STATION19:
+    return "STATION19";
+    break;
+  case ARA_STATION20:
+    return "STATION20";
+    break;
+  case ARA_STATION21:
+    return "STATION21";
+    break;
+  case ARA_STATION22:
+    return "STATION22";
+    break;
+  case ARA_STATION23:
+    return "STATION23";
+    break;
+  case ARA_STATION24:
+    return "STATION24";
+    break;
+  case ARA_STATION25:
+    return "STATION25";
+    break;
+  case ARA_STATION26:
+    return "STATION26";
+    break;
+  case ARA_STATION27:
+    return "STATION27";
+    break;
+  case ARA_STATION28:
+    return "STATION28";
+    break;
+  case ARA_STATION29:
+    return "STATION29";
+    break;
+  case ARA_STATION30:
+    return "STATION30";
+    break;
+  case ARA_STATION31:
+    return "STATION31";
+    break;
+  case ARA_STATION32:
+    return "STATION32";
+    break;
+  case ARA_STATION33:
+    return "STATION33";
+    break;
+  case ARA_STATION34:
+    return "STATION34";
+    break;
+  case ARA_STATION35:
+    return "STATION35";
+    break;
+  case ARA_STATION36:
+    return "STATION36";
+    break;
+  case ARA_STATION37:
+    return "STATION37";
+    break;
+  default:
+    return "Unkown StationId";
     break;
   }
 

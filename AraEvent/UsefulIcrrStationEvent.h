@@ -46,8 +46,8 @@ class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStatio
    Int_t getNumRFChannels() {return numRFChans;} //
    TGraph *getGraphFromElecChan(int chan); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chan); ///< Returns the voltage-time graph for the appropriate rf channel 
-   TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns
-   TH1D *getFFTHistForRFChan(int chan); ///< Utility function for webplotter
+   TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns - the returned TGraph is from FFTtools::makePowerSpectrumMilliVoltsNanoSecondsdB()
+   TH1D *getFFTHistForRFChan(int chan); ///< Utility function for webplotter -- produces a TH1D form of getFFTForRFChan(int chan)
    int fillFFTHistoForRFChan(int chan, TH1D *histFFT); ///< Utility function for webplotter
    int guessRCO(int chanIndex); ///< Looks at clock channel to try and guess which RCO phase we are in.
    int getRCO(int chanIndex) { return guessRCO(chanIndex);} ///< Note that this function now calls guessRCO rather than relying on the predetermined RCO phase

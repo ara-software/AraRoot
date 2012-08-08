@@ -28,11 +28,12 @@ class UsefulAraStationEvent
    UsefulAraStationEvent(); ///< Default constructor
    ~UsefulAraStationEvent(); ///< Destructor
 
-
-   virtual Int_t getNumElecChannels()=0; ///< Or may not be the same
-   virtual Int_t getNumRFChannels()=0; ///< May be the same
+   virtual Int_t getNumElecChannels()=0; ///< Returns the number of electronics channels
+   virtual Int_t getNumRFChannels()=0; ///< Returns the number of Antennae - this may not be the same as the number of electronics channels (interleaving / di-plexing)
    virtual TGraph *getGraphFromElecChan(int chan)=0; ///< Returns the voltages-time graph for the appropriate electronics channel
    virtual TGraph *getGraphFromRFChan(int chan)=0; ///< Returns the voltage-time graph for the appropriate rf channel
+   virtual bool isCalPulserEventWithIndex(int pulserIndex); ///< Check to see if this event is from a particular calibration pulser -- NB This is not yet implemented, it is a placeholder / virtual function //FIXME -- Is this what we want for AraSim?
+
 
 
   ClassDef(UsefulAraStationEvent,1);

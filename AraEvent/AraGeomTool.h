@@ -70,9 +70,11 @@ class AraGeomTool
 
    static bool isAtriStation(AraStationId_t stationId); ///< Returns TRUE if the station is an ATRIA station and false otherwise
 
-   static Int_t getStationCalibIndex(AraStationId_t stationId); ///< Used by the calibrator. This function returns the calibration and pedestal index for a stationId (TESTBED==0, STATION1==1, STATION2==0, STATION3==1, STATION4==2...)
+   static Int_t getStationCalibIndex(AraStationId_t stationId); ///< Used by the calibrator. This function returns the calibration and pedestal index for a stationId (TESTBED==0, STATION1==1, STATION1A==0, STATION2==1, STATION3==2...)
 
    static void printStationName(AraStationId_t stationId); ///< Print to stdout the station Name
+
+   static char *getStationName(AraStationId_t stationId); ///< Return char* with the station Name from the stationId
 
    //Instance generator
    static AraGeomTool*  Instance();
