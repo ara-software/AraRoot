@@ -8,7 +8,7 @@ void runAraDisplay() {
 
   //  sprintf(fileName, "~/ara/data/miniATRI/root/run%i/event%i.root", run, run);
   //JPD Testing TestBed
-  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
+    sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
   //JPD Testing Station1
   //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
   //JPD Testing AraRootBranches3.2
@@ -18,7 +18,7 @@ void runAraDisplay() {
   //JPD Testing ARA2 (an example of an ATRI station) -- miniATRI - one stack enabled
   //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run403/event403.root");
   //JPD Testing ARA2 (an example of an ATRI station) -- ATRI run from 2011
-  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run768/event768.root");
+  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run768/event768.root");
 
 
 

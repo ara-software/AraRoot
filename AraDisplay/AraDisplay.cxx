@@ -29,15 +29,38 @@
  * -# ARA Vertex - This is the vertex reconstuction code implemented in the production of L2 data
  *    NB this does not have Doxygen documentation
  *
+
+ * \section bin_sec Executables
+ *  - makeIcrrEventTree -- Program to convert the raw ARA TestBed / Station One data into a ROOT format
+ *  - makeAtriEventTree -- Program to convert the raw ARA Atri electronics type station data into a ROOT format
+ *  - AraWebRootFileMaker -- Program to make ROOT files for the webplotter
+ *  - AraWebPlotter -- Program that reads these files and plots stuff
+ *  - exampleLoop -- An example of analysis code that illustrates to the user how to load AraRoot files, loop through them, create "Useful" objects and perform some sort of analysis
+ *  - exampleLoopL2 -- An example of analysis code that illustrates to the user how to process L0 or L1 (RawEvent or UsefulEvent) ROOT files and produce L2 files
+
+ * \section script_sec Scripts
+ * - runAraTestBedEventFileMaker.sh -- Script for calling makeAraEventTree to create TestBed root files
+ * - runAraOneEventFileMaker.sh -- Script for calling makeAraEventTree to create Station One root files
+ * - runAtriEventFileMaker.sh -- Script for calling makeAraEventTree to create ATRI station root files
+ * - runAtriEventFileMakerForcedStationId.sh -- Script for calling makeAraEventTree to create ATRI station root files, but forcing a particular stationId into the event objects
+
+
+
+
+
+
  * \section install_sec Installation
  * The user must first specify the following two environmental variables:
  * <PRE>ARA_UTIL_INSTALL_DIR = {The install destination choosen by the user}</PRE>
  * <PRE>ARA_ROOT_DIR = {Location of the source code of AraRoot}</PRE>
  * Once these are set correctly the user needs to run
- * <PRE>bash INSTALL.sh</PRE>
- * This builds in the ARA_ROOT_DIR/build directory, then installs into ARA_UTIL_INSTALL_DIR
-
-
+ * Do
+ * <PRE>bash INSTALL.sh MODE </PRE> in the directory of the source code (i.e. in ARA_ROOT_DIR) - cmake will take care of the rest.
+ *
+ * MODE should be one of the following:
+ * - 0 - re-build bins / libs that have been modified
+ * - 1 - re-build all
+ * - 99 - re-build debugging mode - this will produce more verbose output from the build process
 
 
  * \section rootfile_sec Making ROOT files
@@ -55,6 +78,36 @@
  * This section will detail know issues with the installation of the software and is intended to provide a reference for anyone installing the software
  *
  * 
+
+ * \section analysis_sec Adding Analysis Code to CMake Build List
+ * Create your .cxx file in analysis and edit the analysis/CMakeLists.txt file. You will need to copy the lines that involved "exampleLoop", replacing it with the name of your executable
+
+ * You should then be able to run INSTALL.sh 0 which will notice that there is something that it hasn't built yet and do the (hopefully) right thing and build it for you.
+
+ * The executable will be created in two loactions:
+
+ * ${ARA_ROOT_DIR}/build/analysis
+ * and
+ * ${ARA_UTIL_INSTALL_DIR}/bin
+
+ *\section trouble_sec Troubleshooting
+
+ * There are a myriad of ways that one can run into problems with the software
+ * Path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the ARA_UTIL_INSTALL_DIR and have it point to the location you want to install all the packages. If things are set up correctly you will end up with 
+ * - ARA_UTIL_INSTALL_DIR/include 
+ * - ARA_UTIL_INSTALL_DIR/lib
+ * - ARA_UTIL_INSTALL_DIR/bin
+ * - ARA_UTIL_INSTALL_DIR/scripts 
+ * - ARA_UTIL_INSTALL_DIR/share/araCalib  
+ * all populated with essential headers, libraries and calibration constants. 
+
+ * Most problems are fixed by running INSTALL.sh 1 to re-build AraRoot from scratch. 
+ * If this doesn't fix things try removing everything from the ARA_UTIL_INSTALL_DIR, re-installating libRootFftwWrapper and then re-running INSTALL.sh with either 1 or 99.
+
+ * If problems persist please contact <A HREF="/~jdavies/">Jonathan Davies</a>
+
+
+
  *
  *
  *

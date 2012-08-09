@@ -6,7 +6,7 @@
 #include <cmath>
 #include <AraGeomTool.h>
 #include "AraVertex.h"
-#include "FFTtools.cxx"
+#include "FFTtools.h"
 
 //#include <cmath.h>
 //using namespace std;
