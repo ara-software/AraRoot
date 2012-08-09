@@ -44,8 +44,9 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  int stationId= 0;
-  L2 *l2=new L2(123,AraGeomTool::Instance(),stationId);
+  int run=atoi(argv[2]);
+  L2 *l2=new L2(run,AraGeomTool::Instance());
+
   TFile *fp = TFile::Open(argv[1]);
   if(!fp) {
     std::cerr << "Can't open file\n";
@@ -98,19 +99,23 @@ int main(int argc, char **argv)
    //jpd print to screen some info
    //   std::cerr << "isAtri " << isAtriEvent << " isIcrr " << isIcrrEvent << " number of entries is " <<  numEntries << std::endl;
 
-   //   numEntries=1000 ;
+   //   numEntries=100;
 
 
    l2->FillGeoTree();
 
+   numEntries=50;//FIXME
+
    for(Long64_t event=0;event<numEntries;event++) {
+	cout<<"Looking at eventy Number "<<event<<endl;
      if(event%starEvery==0) {
         std::cerr << "*";       
      }
  
      //This line gets the RawIcrr or RawAtri Event
-     eventTree->GetEntry(event*2+100);
-     
+     eventTree->GetEntry(event);
+     //          eventTree->GetEntry(event*2+100);
+
      //Here we create a useful event Either an Icrr or Atri event
 
      if(isIcrrEvent){
@@ -123,11 +128,10 @@ int main(int argc, char **argv)
 	    l2->FillEvent(realIcrrEvPtr);
 	    delete realIcrrEvPtr;
      }
-   
 
- 
-    
-   }  
+     //     if (event%100==1) l2->AutoSave();
+   }
+
 
 
    l2->Save();

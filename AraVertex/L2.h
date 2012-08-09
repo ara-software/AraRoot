@@ -11,18 +11,25 @@
 
 class L2 {
  public:
-  L2(int runNumber,AraGeomTool *geometryInfo, int station);
+  L2(int runNumber,AraGeomTool *geometryInfo);
   ~L2();
   int FillHeader(double x,double y);
   int FillEvent(UsefulIcrrStationEvent *realIcrrEvPtr);
   int FillGeoTree();
   void Save();
+  void AutoSave();
  private: 
   vector<Int_t> InIceV;
   vector<Int_t> InIceH;
   vector<Int_t> InIceAll;
+  vector<Int_t> InIceTrig;
+
+  AraVertex *Reco;
   RECOOUT  DoReconstruction(vector<Int_t> chList, Int_t dtMethod);
   Double_t getTimeDiff(int ch1, int ch2, int method);
+  TGraph * getCorrelationGraph(int ch1, int ch2);
+  Double_t getCorreMax(TGraph *grCorI) ;
+  Double_t fillFFTHistoForRFChanL2(int chan, TH1D *histFFT);
 
   UsefulIcrrStationEvent * event;
   TTree * L2EventTree;
@@ -30,7 +37,7 @@ class L2 {
   TTree * L2GeoTree;
   TFile * L2File;
   TIME timeader;
-  RUNHEADER runheader;
+  RUNHEADER *runheader;
   TRIGGER trigger;
   HK hk;
   WF wf;
@@ -40,12 +47,21 @@ class L2 {
 
   RECOOUT recoVmax;
   RECOOUT recoHmax;
-  RECOOUT recoVoutSig1;
+  RECOOUT recoVxcor;
+  RECOOUT recoHxcor;
+  RECOOUT recoAllmax;
+  RECOOUT recoAllxcor;
+  // RECOOUT recoTrigmax;
+  //RECOOUT recoTrigxcor;
+
+
+  /*  RECOOUT recoVoutSig1;
   RECOOUT recoHoutSig1;
   RECOOUT recoVoutSig2;
   RECOOUT recoHoutSig2;
   RECOOUT recoVoutMax;
   RECOOUT recoHoutMax;
+  */
   int runNumber;
   AraGeomTool * araGeom;
   int Station;

@@ -1,13 +1,20 @@
 #include <TTimeStamp.h>
  
 
+const int N_POWER_BINS=250;
+const int FREQ_POWER_MAX=1000;
+const int FREQ_POWER_MIN=0;
+
+const int N_POWER_BINS_L=10;
+const int FREQ_POWER_MAX_L=300;
+const int FREQ_POWER_MIN_L=0;
 
 
 class TIMESTAMP {
  public:
   TIMESTAMP(){}
   TIMESTAMP(unsigned int unixTime) {TTimeStamp* ts=new TTimeStamp(unixTime); epoch=unixTime; DOY=ts->GetDayOfYear(); int dat=ts->GetTime(); hour=(int) dat/10000; minute=(int) dat/100 - hour*100; second=dat-hour*10000-minute*100; DOW=ts->GetDayOfWeek();
-    printf ("dat=%i %i \n",dat,unixTime);
+//    printf ("dat=%i %i \n",dat,unixTime);
 
 };
   ~TIMESTAMP(){};
@@ -26,8 +33,8 @@ typedef struct {
   Double_t vertexfindervtx[3];
   Int_t nhits;
   Double_t chisqvtx;
-  Float_t Rxtresid[16];
-  Float_t deltaTime[16];
+  Float_t Rxtresid[ANTS_PER_ICRR];
+  Float_t deltaTime[ANTS_PER_ICRR];
   Float_t convergence[2];
 
 
@@ -50,11 +57,17 @@ typedef struct {
 typedef struct {
   Double_t mean[ANTS_PER_ICRR];
   Double_t rms[ANTS_PER_ICRR];
+  Double_t v2[ANTS_PER_ICRR];
+  Double_t power[ANTS_PER_ICRR];
+  Float_t freqMax[ANTS_PER_ICRR];
+  Float_t freqMaxVal[ANTS_PER_ICRR];
+  
+  Float_t powerBin[ANTS_PER_ICRR][N_POWER_BINS];
   Int_t isInTrigPattern[ANTS_PER_ICRR];
+
 } WF;
 
-
- typedef struct {
+typedef struct {
    Int_t RunNumber;
    TIMESTAMP RunStartTime;
    TIMESTAMP RunEndTime;
@@ -67,7 +80,7 @@ typedef struct {
    Int_t NumberOfForcedEvents;
    Int_t NumberOfUnknownEvents;
    Int_t Nall;
- } RUNHEADER;
+}  RUNHEADER;
 
 
 typedef struct {
@@ -79,6 +92,7 @@ typedef struct {
 } TRIGGER;
 
 typedef struct {
+ unsigned int RunNumber;
 TIMESTAMP unixTime;   //-i
 unsigned int unixTimeusec;//-i
 unsigned int eventNumber;
@@ -90,7 +104,7 @@ UChar_t errorFlag;
 
 typedef struct {
   Double_t temperature[8];
-  Double_t RFPower[16];
+  Double_t RFPower[ANTS_PER_ICRR];
   UShort_t sclGlobal; 
   UShort_t sclL1[12];  
   UShort_t scl[24];

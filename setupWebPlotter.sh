@@ -1,8 +1,0 @@
-#!/bin/bash
-export ARA_UTIL_INSTALL_DIR=/home/rjn/install/
-export ARA_WEBPLOTTER_CONFIG_DIR=/home/rjn/ara/AraRoot/trunk/AraWebPlotter/config
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ARA_UTIL_INSTALL_DIR}/lib
-export PATH=${PATH}:${ARA_UTIL_INSTALL_DIR}/bin
-
-echo "ARA_UTIL_INSTALL_DIR = $ARA_UTIL_INSTALL_DIR"
-echo "ARA_WEBPLOTTER_CONFIG_DIR = $ARA_WEBPLOTTER_CONFIG_DIR"

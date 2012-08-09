@@ -58,6 +58,7 @@ class iceProp {
     A=n_deep;
     B=n_shallow-n_deep;
     C=n_c;
+   
   }
 
 

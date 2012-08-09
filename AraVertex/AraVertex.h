@@ -13,22 +13,33 @@ using namespace std;
 #define ARAVERTEX_H
 
 
-typedef struct  {
-  Double_t FitPoint[3];
-  Double_t R, theta,phi;
-  Double_t FitPerror[3];
-  Int_t nhits;
-  Double_t chisqvtx;  
+
+ struct  RECOOUT{
+   Double_t X,Y,Z; //FitPoint[3];
+   Double_t R, theta,phi;
+   Double_t dX, dY, dZ; //FitPerror[3];
+   Double_t chisq;  
+   Double_t trackR, trackPhi, trackTheta;
+   Double_t Edm;
+   Int_t nhits;
+   Int_t Status;
+   
   //Float_t Rxtresid[16];
   //  Float_t deltaTime[16];
-   Float_t convergence[2];
-}RECOOUT; 
+  //Float_t convergence[2];
+    RECOOUT() {
+      X=-990; Y=-991; Z=-992; R=-993; theta=-994; phi=-995; dX=-996; dY=-997; dZ=-998; nhits=0; chisq=-999;Status=1.; Edm=-1000;
+      trackR=-999; trackPhi=-999; trackTheta=-999;
+    }
+   ~RECOOUT(){}
+}; 
+
 
 
 class AraVertex {
  public:
   AraVertex();
-  ~AraVertex(){};
+  ~AraVertex(){delete ice;};
 
 
   struct inputAnt{
@@ -63,16 +74,19 @@ class AraVertex {
   Float_t Xmin, Xmax, Ymin, Ymax,Zmin,Zmax, Tmin,Tmax;
   Float_t Tstep,Xstep,Ystep,Zstep;
   void addHit(Double_t t0, Double_t x0, Double_t y0, Double_t z0, Int_t ch);
-  void addPair(Double_t dt, Double_t x1, Double_t y1, Double_t z1, Double_t x2, Double_t y2, Double_t z2);
-
+  void addPair(Double_t dt, Double_t x1, Double_t y1, Double_t z1, double x2, double y2, double z2);
+  void clear(){RxIn.clear(); RxPairIn.clear(); };
   void printHits();
   void printPairs();
+
+
   RECOOUT doFit();
   RECOOUT doPairFit();
   void printPair(int i){printf ("\nusing to calculate transit time pair %d:(%f,%f,%f) (%f %f %f), dt=%f \n",i,RxPairIn[i].X1,RxPairIn[i].Y1,RxPairIn[i].Z1,RxPairIn[i].X2,RxPairIn[i].Y2,RxPairIn[i].Z2,RxPairIn[i].dT);};
 
  private:
-  RECOOUT recoOut;
+  //  RECOOUT recoOut;
+ RECOOUT ro;
   iceProp *ice;
   double CalcChiSquare(const double *xx );
   double CalcChiSquareDiff(const double *xx );
