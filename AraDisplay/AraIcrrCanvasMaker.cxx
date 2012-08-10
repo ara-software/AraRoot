@@ -89,11 +89,11 @@ AraIcrrCanvasMaker::AraIcrrCanvasMaker(AraCalType::AraCalType_t calType)
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=250;
-  if(AraCalType::hasCableDelays(calType)) {
-    fMinTimeLimit=-200;
-    fMaxTimeLimit=150;
-  }
+  fMaxTimeLimit=0;
+  // if(AraCalType::hasCableDelays(calType)) {
+  //   fMinTimeLimit=-200;
+  //   fMaxTimeLimit=150;
+  // }
   fMinPowerLimit=-60;
   fMaxPowerLimit=60;
   fMinFreqLimit=0;
@@ -805,6 +805,26 @@ TPad *AraIcrrCanvasMaker::getRFChannelCanvas(UsefulIcrrStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
+
+  //FIXME -- jpd - this is where we will set the fMaxTime and fMinTime
+
+  TGraph *tempGraph=0;
+  Double_t *tempX;
+  
+  for(int rfChan=0; rfChan<evPtr->getNumRFChannels();++rfChan){
+    tempGraph=evPtr->getGraphFromRFChan(rfChan);
+    int nEntries=tempGraph->GetN();
+    tempX=tempGraph->GetX();
+    if(tempX[0]<fMinTimeLimit) fMinTimeLimit=tempX[0];
+    if(tempX[nEntries-1]>fMaxTimeLimit) fMaxTimeLimit=tempX[nEntries-1];
+    //    fprintf(stderr, "getRFChannelCanvas() -- rfChan %i fMinTimeLimit %f tempX[0] %f fMaxTimeLimit %f tempX[N-1] %f\n", rfChan, fMinTimeLimit, tempX[0], fMaxTimeLimit, tempX[nEntries-1]);
+
+
+    delete tempGraph;
+  }
+
+  //  fprintf(stderr, "\nfMinTimeLimit %f fMaxTimeLimit %f\n", fMinTimeLimit, fMaxTimeLimit);//DEBUG
+
   setupRFChanPadWithFrames(plotPad, evPtr->stationId);
   int maxColumns=0;
   int maxRows=0;
@@ -909,6 +929,26 @@ TPad *AraIcrrCanvasMaker::getAntennaCanvas(UsefulIcrrStationEvent *evPtr,
     plotPad=useCan;
   }
   plotPad->cd();
+
+  //FIXME -- jpd - this is where we will set the fMaxTime and fMinTime
+
+  TGraph *tempGraph=0;
+  Double_t *tempX;
+  
+  for(int rfChan=0; rfChan<evPtr->getNumRFChannels();++rfChan){
+    tempGraph=evPtr->getGraphFromRFChan(rfChan);
+    int nEntries=tempGraph->GetN();
+    tempX=tempGraph->GetX();
+    if(tempX[0]<fMinTimeLimit) fMinTimeLimit=tempX[0];
+    if(tempX[nEntries-1]>fMaxTimeLimit) fMaxTimeLimit=tempX[nEntries-1];
+    //    fprintf(stderr, "getRFChannelCanvas() -- rfChan %i fMinTimeLimit %f tempX[0] %f fMaxTimeLimit %f tempX[N-1] %f\n", rfChan, fMinTimeLimit, tempX[0], fMaxTimeLimit, tempX[nEntries-1]);
+
+
+    delete tempGraph;
+  }
+
+  //  fprintf(stderr, "\nfMinTimeLimit %f fMaxTimeLimit %f\n", fMinTimeLimit, fMaxTimeLimit);//DEBUG
+
   setupAntPadWithFrames(plotPad, evPtr->stationId);
 
   // TestBed
@@ -1391,8 +1431,6 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
   rfChanPadsDone=1;
   
   
-
-  
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
@@ -1448,10 +1486,10 @@ void AraIcrrCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad, Int_t stationId
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(row<3) { //FIXME -- maybe stationId case?
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
+	  framey = (TH1F*) paddy1->DrawFrame((10*(int)fMinTimeLimit)/10 - 40, fMinVoltLimit, (10*(int)fMaxTimeLimit)/10 + 40,fMaxVoltLimit);
 	}
 	else{
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinClockVoltLimit,fMaxTimeLimit,fMaxClockVoltLimit);
+	  framey = (TH1F*) paddy1->DrawFrame((10*(int)fMinTimeLimit)/10 - 40,fMinClockVoltLimit,(10*(int)fMaxTimeLimit)/10 + 40,fMaxClockVoltLimit);
 	}
       }
 
@@ -1628,10 +1666,10 @@ void AraIcrrCanvasMaker::setupAntPadWithFrames(TPad *plotPad, Int_t stationId)
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if((row<3&&stationId==0)||(row<4&&stationId==1)) { //FIXME
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit,fMaxTimeLimit,fMaxVoltLimit);
+	  framey = (TH1F*) paddy1->DrawFrame((10*(int)fMinTimeLimit)/10 - 40,fMinVoltLimit,(10*(int)fMaxTimeLimit)/10 + 40,fMaxVoltLimit);
 	}
 	else{
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinClockVoltLimit,fMaxTimeLimit,fMaxClockVoltLimit);
+	  framey = (TH1F*) paddy1->DrawFrame((10*(int)fMinTimeLimit)/10 - 40,fMinClockVoltLimit,(10*(int)fMaxTimeLimit)/10 + 40,fMaxClockVoltLimit);
 	}
       }
 
