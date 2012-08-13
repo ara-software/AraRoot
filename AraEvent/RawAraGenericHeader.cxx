@@ -2,7 +2,7 @@
 /////  RawAraGenericHeader.cxx        ARA Generic Header Class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that stores AraGenericHeader_t stuff            ///// 
+/////     A simple class that stores AtriGenericHeader_t stuff            ///// 
 /////   calibrated time and voltage stuff                                /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ RawAraGenericHeader::~RawAraGenericHeader() {
 }
 
 
-RawAraGenericHeader::RawAraGenericHeader(AraGenericHeader_t *gHdr) ///< Assignment constructor
+RawAraGenericHeader::RawAraGenericHeader(AtriGenericHeader_t *gHdr) ///< Assignment constructor
   :softVerMajor(ARA_ROOT_MAJOR),softVerMinor(ARA_ROOT_MINOR)
 {
   typeId=gHdr->typeId;

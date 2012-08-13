@@ -16,11 +16,6 @@
 #include "RawIcrrStationEvent.h"
 #include "AraEventCalibrator.h"
 
-//!  AraAntennaInfo -- ARA Antenna Information
-/*!
-  A simple class for storing information about an Ara Antenna
-  \ingroup rootclasses
-*/
 
 namespace AraAntType {
   typedef enum EAraAntType {
@@ -75,6 +70,13 @@ namespace AraAntDir {
 /*     kEastWest =2 */
 /*   } AraSurfaceOrientation_t; */
 /* } */
+
+//!  Part of AraEvent library. A class for storing information about the Antennae in the ARA stations.
+/*!
+  A simple class for storing information about an Ara Antenna
+  \ingroup rootclasses
+*/
+
 
 class AraAntennaInfo: public TObject
 {

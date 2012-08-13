@@ -56,7 +56,7 @@ class UsefulAtriStationEvent;
 class UsefulIcrrStationEvent;
 class TGraph; 
 
-//!  AraEventCalibrator -- The Ara Event Calibrator
+//!  Part of AraEvent library. The calibrator takes Raw ATRI / ICRR events and applies Voltage, timing and bandpass filter calibrations to produce Useful ATRI / ICRR events.
 /*!
   The Ara Event Calibrator
   \ingroup rootclasses

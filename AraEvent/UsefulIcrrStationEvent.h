@@ -19,12 +19,11 @@
 #include "AraEventCalibrator.h"
 #include "UsefulAraStationEvent.h"
 
-//!  UsefulIcrrStationEvent -- The Useful ARA Event Data
+//!  Part of AraEvent library. ICRR specific Useful event class.
 /*!
-  The ROOT implementation of the useful ARA event data
+  The raw ADC values from a RawAtriStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
 
-  This is the most useful class for analysing the ARA data. The raw ADC values from a RawIcrrStationEvent object are converted into calibrated voltage-time arrays using one of the calibration types defined in AraEventCalibrator. Utility functions are provided to access these arrays as TGraphs, or in the frequency domain.
-
+  Both ATRI and ICRR specific useful events inherit from a common bas class (UsefulAraStationEvent). It is intended that analysis code process objects of the type UsefulAraStationEvent, using the provided overloaded functions (getGraphFromRFChannel etc.). Code will then be able to process both ICRR and ATRI type events instead of being station specific.
   \ingroup rootclasses
 */
 class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStationEvent

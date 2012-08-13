@@ -14,7 +14,7 @@
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 
-//!  IcrrHkData -- The HK data
+//!  Part of AraEvent library. The ICRR Hk data class.
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses

@@ -14,16 +14,16 @@
 #include <TObject.h>
 #include <RawAraGenericHeader.h>
 
-//!  RawAraStationEvent -- Base Class for Station Event Data
+//!  Part of AraEvent library. The Base Class for Raw ICRR / ATRI / ARASIM(?) events.
 /*!
-  The ROOT implementation of a base class for station event data. Should not be used directly instead one of the inherited classes should be used.
+  The ROOT implementation of a base class for station event data. This class should not be used directly, instead one of the inherited classes should be used.
   \ingroup rootclasses
 */
 class RawAraStationEvent: public TObject, public RawAraGenericHeader {
 
  public:
   RawAraStationEvent(AraStationId_t stationId); ///< Constructor to be called for Icrr type stations
-  RawAraStationEvent(AraGenericHeader_t *gHdr); ///< Constructor to be called for Atri type stations
+  RawAraStationEvent(AtriGenericHeader_t *gHdr); ///< Constructor to be called for Atri type stations
   RawAraStationEvent();///< Default constructor
   ~RawAraStationEvent(); ///< Destructor
   

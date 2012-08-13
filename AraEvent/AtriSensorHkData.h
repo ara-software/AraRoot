@@ -15,7 +15,7 @@
 #include "araAtriStructures.h"
 #include "RawAraGenericHeader.h"
 
-//!  AtriSensorHkData -- The HK data
+//!  Part of AraEvent library. Class for storing ATRI sensor housekeeping data.
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses

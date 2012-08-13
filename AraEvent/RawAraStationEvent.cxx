@@ -26,7 +26,7 @@ RawAraStationEvent::RawAraStationEvent(AraStationId_t stationId)
 {
 }
 
-RawAraStationEvent::RawAraStationEvent(AraGenericHeader_t *gHdr)
+RawAraStationEvent::RawAraStationEvent(AtriGenericHeader_t *gHdr)
   :RawAraGenericHeader(gHdr)
 {
 }

@@ -14,7 +14,7 @@
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 
-//!  AraRawIcrrRFChannel -- The Raw ARA Event Data
+//!  Part of AraEvent library. The raw ICRR RF channel information. Contains the raw ADC data and LABCHIP information (RCO, hitbus...).
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses

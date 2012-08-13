@@ -39,7 +39,7 @@ class TTreeIndex;
 class TFile;
 class TEventList;
 
-//!  AraDisplay based on the Marvellous ANITA Graphical Interface and Class Display (Magic Display)
+//!  Part of AraDisplay library. AraDisplay based on the Marvellous ANITA Graphical Interface and Class Display (Magic Display)
 /*!
   AraDisplay is the main class that controls the display. This class is responsible for opening files and reading trees and owns the various canvases and that sort of thing.
 

@@ -22,7 +22,8 @@
 
 
 
-//!  RawAtriStationEvent -- The Raw ARA Station Event Class
+//! Part of AraEvent library. This is the ATRI specific Raw Event class, inheriting from RawAraStationEvent.
+
 /*!
   The ROOT implementation of the raw ARA Station Event from an ATRI type station containing the samples from one event readout of the IRS
   \ingroup rootclasses

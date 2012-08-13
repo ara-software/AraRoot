@@ -14,7 +14,7 @@
 #include "araIcrrDefines.h"
 #include "araIcrrStructures.h"
 
-//!  RawIcrrStationHeader -- The Raw ARA Event Header
+//!  Part of AraEvent library. The Raw ICRR header class.
 /*!
   The ROOT implementation of the raw ARA event header
   \ingroup rootclasses

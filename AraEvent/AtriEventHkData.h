@@ -15,7 +15,7 @@
 #include "araIcrrStructures.h"
 
 
-//!  AtriEventHkData -- The HK data
+//!  Part of AraEvent library. The ATRI Housekeeping data class.
 /*!
   The ROOT implementation of the HK data
   \ingroup rootclasses

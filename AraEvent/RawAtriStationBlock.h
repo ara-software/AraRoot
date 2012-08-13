@@ -20,7 +20,7 @@
 
 
 
-//!  RawAtriStationBlock -- The Raw ARA Station Block Class
+//!  Part of AraEvent library. A raw ATRI station block - Raw ADC readout from the the IRS chip
 /*!
   The ROOT implementation of the raw ARA Station Block containing the samples from one block readout of the IRS
   \ingroup rootclasses

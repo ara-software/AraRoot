@@ -18,7 +18,7 @@
 class AraWaveformGraph;
 
 
-//!  The correlation factory which takes two waveforms and correlates them
+//!  Part of AraDisplay library. The correlation factory which takes two waveforms and correlates them
 /*!
   It's a factory the produces correlations.
 */

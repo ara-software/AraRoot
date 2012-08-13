@@ -6,7 +6,7 @@
 class TObject;
 class TGaxis;
 
-//!  The PSD display graph class that inherits from ROOT's TGraph.
+//!  Part of AraDisplay library. The PSD display graph class that inherits from ROOT's TGraph.
 /*!
   The AraFFTGraph is one of the things that makes AraDisplay purr. It's really quite simple but allows for the fucntionality to click on a graph and have it draw in a new window.
 */

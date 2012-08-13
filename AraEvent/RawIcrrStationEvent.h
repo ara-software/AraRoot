@@ -19,7 +19,7 @@
 #include "IcrrTriggerMonitor.h"
 #include "IcrrHkData.h"
 
-//!  RawIcrrStationEvent -- The Raw ARA Event Data
+//! Part of AraEvent library. This is the ICRR specific Raw Event class, inheriting from RawAraStationEvent.
 /*!
   The ROOT implementation of the raw ARA event data for the Icrr electronics type stations (TestBed and Station1). Contained in this class are the header information, raw ADC values, house keeping, trigger information etc. There are functions for returning the raw electronics waveforms.
   \ingroup rootclasses

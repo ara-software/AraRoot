@@ -22,19 +22,20 @@
 //Structures
 ///////////////////////////////////////////////////////////////////////////
 
-//!  The Generic Header
+//!  Part of AraEvent library. The generic raw ICRR header structure.
 /*!
   This is the 16 byte header that prefaces all ANITA data. The PacketCode_t 
   tells one what kind of packet it is, and the checksum can be used to
   validate the data.
+  \struct
 */
 typedef struct {
     unsigned short numBytes;
     unsigned char verId;
   //    unsigned int checksum;
-} GenericHeader_t;
+} IcrrGenericHeader_t;
 
-//!  The trigger monitor I/O struct
+//!  Part of AraEvent library. The ICRR trigger monitor I/O struct
 /*!
   Contains all sorts of useful info
   about trigger patterns, deadTime, trigger time and trigger type.
@@ -57,7 +58,7 @@ typedef struct {
   unsigned short rcoCount[3]; // RCO counter for LAB chips
 } IcrrTriggerMonitorStruct_t;
 
-//!  The channel header
+//!  Part of AraEvent library. The ICRR RF channel header structure.
 /*!
   Contains useful info like which channel it is, which LABRADOR chip and when
   the HITBUS (the write pointer wraparound) is.
@@ -91,7 +92,7 @@ typedef struct {
 
 } AraRawIcrrRFChannelHeader_t;
 
-//!  A complete RF channel
+//!  Part of AraEvent library. The ICRR complete RF channel structure
 /*!
   A complete RF channel  (header + waveform)
 */
@@ -100,7 +101,7 @@ typedef struct {
     unsigned short data[MAX_NUMBER_SAMPLES_LAB3];
 } IcrrRFChannelFull_t;
 
-//!  A complete pedestal subtracted RF channel
+//!  Part of AraEvent library. The ICRR complete pedestal subtracted RF channel structure
 /*!
   A complete pedestal subtracted RF channel. UNUSED at the moment
 */
@@ -113,7 +114,7 @@ typedef struct {
     short data[MAX_NUMBER_SAMPLES_LAB3]; ///<Pedestal subtracted and 11bit data
 } IcrrRFChannelPedSubbed_t;
 
-//!  The temperatures
+//!  Part of AraEvent library. The ICRR temperatures structure
 /*!
   The onboard temperatue readout
 */
@@ -121,7 +122,7 @@ typedef struct {
   unsigned short temp[8]; ///< 
 } IcrrTemperatureDataStruct_t;
 
-//!  The RF power
+//!  Part of AraEvent library. The ICRR RF power structure
 /*!
   The RF power readout
 */
@@ -130,7 +131,7 @@ typedef struct {
   unsigned short batwing[8]; ///< 
 } IcrrRFPowerDataStruct_t;
 
-//!  The DAC settings
+//!  Part of AraEvent library. The ICRR DAC settings
 /*!
   The DAC setting
 */
@@ -138,7 +139,7 @@ typedef struct {
   unsigned short dac[6][4]; ///< 
 } IcrrDACDataStruct_t;
 
-//!  Scaler data
+//!  Part of AraEvent library. The ICRR Scaler data
 /*!
   Raw scaler data
 */
@@ -152,8 +153,7 @@ typedef struct {
 
 
 
-
-//!  On board pedestal struct
+//!  Part of AraEvent library. The ICRR on board pedestal struct
 /*!
   On board pedestal struct
 */
@@ -166,7 +166,7 @@ typedef struct {
 
 
 
-//!  ARA Event Header 
+//!  Part of AraEvent library. The ARA ICRR Event Header structure
 /*!
   ARA Event Header, contains all kinds of fun information about the event
   including times, trigger patterns, event numbers and error words
@@ -175,7 +175,7 @@ typedef struct {
   unsigned int unixTime;       ///< unix UTC sec
   unsigned int unixTimeUs;     ///< unix UTC microsec 
 
-  //!  GPS timestamp
+  //!  Part of AraEvent library. The ICRR GPS timestamp structure
   /*!
      the GPS fraction of second (in ns) 
      (for the X events per second that get 
@@ -204,7 +204,7 @@ typedef struct {
 
 
 
-//! Hk Data Struct
+//! Part of AraEvent library. The ICRR Hk Data Struct
 /*!
   The main housekeeping data structure
 */
@@ -222,12 +222,12 @@ typedef struct {
   unsigned int errorFlag;
 } IcrrHkDataHeader_t;
 
-//! Pedestal Block
+//! Part of AraEvent library. The ICRR Lab Chip pedestal block structure.
 /*!
   Pedestal Block
 */
 typedef struct {
-    GenericHeader_t gHdr;
+    IcrrGenericHeader_t gHdr;
     unsigned int unixTimeStart;
     unsigned int unixTimeEnd;
     LabChipChannelPedStruct_t chan[NUM_DIGITIZED_ICRR_CHANNELS];
@@ -238,12 +238,12 @@ typedef struct {
 // On-board structs
 ////////////////////////////////////////////////////////////////////////////
 
-//! Raw event format 
+//! Part of AraEvent library. The ICRR Raw event format structure
 /*!
   Raw event format
 */
 typedef struct {
-  GenericHeader_t gHdr;
+  IcrrGenericHeader_t gHdr;
   IcrrEventHeader_t hd;
   //  unsigned int eventNumber;    /* Global event number */
   IcrrRFChannelFull_t channel[NUM_DIGITIZED_ICRR_CHANNELS];
@@ -251,25 +251,25 @@ typedef struct {
   IcrrHkDataStruct_t hk;
 } IcrrEventBody_t;
 
-//! Raw housekeeping event format 
+//! Part of AraEvent library. The ICRR Raw housekeeping event format structure
 /*!
   Raw housekeeping event format
 */
 
 typedef struct {
-  GenericHeader_t gHdr;
+  IcrrGenericHeader_t gHdr;
   IcrrHkDataHeader_t hd;
   IcrrTriggerMonitorStruct_t trig;
   IcrrHkDataStruct_t hk;
 } IcrrHkBody_t;
 
 
-//! Pedestal subtracted event format  
+//! Part of AraEvent library. The ICRR pedestal subtracted event format structure
 /*!
   Pedestal subtracted event format
 */
 typedef struct {
-  GenericHeader_t gHdr;
+  IcrrGenericHeader_t gHdr;
   unsigned int eventNumber;    /* Global event number */
   unsigned int whichPeds; ///<whichPedestals did we subtract
   IcrrRFChannelPedSubbed_t channel[NUM_DIGITIZED_ICRR_CHANNELS];

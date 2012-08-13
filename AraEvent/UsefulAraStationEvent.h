@@ -14,7 +14,7 @@
 #include <TGraph.h>
 #include <TH1.h>
 
-//!  UsefulAraStationEvent -- The Useful ARA Event Data
+//!  Part of AraEvent library. Base class of UsefulEvent classes that are used for analysing ARA data. 
 /*!
   The ROOT implementation of the useful ARA event data
 

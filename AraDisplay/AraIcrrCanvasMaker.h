@@ -23,7 +23,7 @@
 class TPad;
 class TFile;
 
-//!  The event display canvas maker.
+//!  Part of AraDisplay library. This is the ICRR event canvas maker.
 /*!
   This is where all the heavy lifting regarding the main event display canvas takes place. Lots of things are hard-coded and unchangeable in order to make the display look reasonable (on my computer at least). 
 */

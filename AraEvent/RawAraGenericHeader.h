@@ -17,7 +17,7 @@
 #include "araSoft.h"
 
 
-//!  RawAraGenericHeader -- The Raw ARA Station Event Class
+//!  Part of AraEvent library. The base class that stores the stationId and AraRoot version used to produce a Raw / Useful event.
 /*!
   This class is a base class that contains header information common to all Raw and Useful event types. 
   \ingroup rootclasses
@@ -26,7 +26,7 @@ class RawAraGenericHeader
 {
  public:
    RawAraGenericHeader(); ///< Default constructor
-   RawAraGenericHeader(AraGenericHeader_t *gHdr); ///< Assignment constructor
+   RawAraGenericHeader(AtriGenericHeader_t *gHdr); ///< Assignment constructor
    RawAraGenericHeader(UInt_t thisStationId); ///< Assignment constructor using the stationID -- this is implemented for ICRR type stations
    ~RawAraGenericHeader(); ///< Destructor
 

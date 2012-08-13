@@ -95,7 +95,7 @@ typedef uint8_t AraStationId_t;  ///< Ensure that it is just 8 bits
 //SBC_DEFINE -- Each SBC should be running AraSoft with the correct stationId set as THIS_STATION
 
 
-//!  The ARA Generic Header
+//!  Part of AraEvent library. The ATRI generic header data structure.
 /*!
   This is the 8 byte header that prefaces all ARA one data written to disk. Contains information about which type and version a packet was, and a checksum to ensure the data is valid.
 */
@@ -108,15 +108,15 @@ typedef struct {
   uint16_t checksum;
   uint16_t reserved;
   uint32_t alsoReserved;
-} AraGenericHeader_t;
+} AtriGenericHeader_t;
 
 
-//!  The ARA Event Housekeeping Structure
+//!  Part of AraEvent library. The ATRI housekeeping data structure.
 /*!
   This is the N-byte structure that contains information about the various housekeeping values associated with the event readout.
 */
 typedef struct {
-  AraGenericHeader_t gHdr; ///< The generic header 
+  AtriGenericHeader_t gHdr; ///< The generic header 
   uint64_t unixTime; ///< Time in seconds (64-bits for future proofing)
   uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
   uint32_t firmwareVersion; ///< Firmware version
@@ -142,12 +142,12 @@ typedef struct {
 } AraEventHk_t;
 
 
-//!  The ARA Sensor Housekeeping Structure
+//!  Part of AraEvent library. The ATRI sensor housekeeping data structure.
 /*!
   This is the N-byte structure that contains information about the various housekeeping values not associated with the event readout.
 */
 typedef struct {
-  AraGenericHeader_t gHdr; ///< The generic header 
+  AtriGenericHeader_t gHdr; ///< The generic header 
   uint64_t unixTime; ///< Time in seconds (64-bits for future proofing)
   uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
   uint8_t atriVoltage; ///< ATRI Voltage (conversion??)
@@ -159,12 +159,12 @@ typedef struct {
 } AraSensorHk_t;
 
 
-//!  The ARA Station Simple Event Structure
+//!  Part of AraEvent library. A simple structure used for development when getting the ATRI data format running.
 /*!
   This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working
 */
 typedef struct {
-  AraGenericHeader_t gHdr; ///< The generic header 
+  AtriGenericHeader_t gHdr; ///< The generic header 
   uint64_t unixTime; ///< Time in seconds (64-bits for future proofing)
   uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
   uint32_t eventNumber; ///< Event number
@@ -177,12 +177,12 @@ typedef struct {
 
 #define EXTRA_SOFTWARE_HEADER_BYTES 32 ///I think
 
-//!  The ARA Station Event Header Format
+//!  Part of the AraEvent library. The ARA ATRI Station Event Header Format
 /*!
   This is the N-byte structure that contains the event data in some format. This format will change when we have the full system working
 */
 typedef struct {
-  AraGenericHeader_t gHdr; ///< The generic header 
+  AtriGenericHeader_t gHdr; ///< The generic header 
   uint64_t unixTime; ///< Software event time in seconds (64-bits for future proofing)
   uint32_t unixTimeUs; ///< Software event time in microseconds (32-bits)
   uint32_t eventNumber; ///< Software event number
@@ -199,7 +199,7 @@ typedef struct {
   
 
 
-//!  The ARA Station Event Block Header Format
+//!  Part of AraEvent library. The ARA ATRI Station Event Block Header Format
 /*!
   This is the 4-byte structure that contains the Ara Station Event Block Header
 */
@@ -211,7 +211,7 @@ typedef struct {
 } AraStationEventBlockHeader_t;
 
 
-//!  The ARA Station Event Block Channel
+//!  Part of AraEvent library. The ARA ATRI Station Event Block Channel
 /*!
   This is the 128-byte structure which contains the 64 samples in a single channel
 */

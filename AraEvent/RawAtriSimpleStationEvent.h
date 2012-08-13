@@ -15,7 +15,7 @@
 #include "araIcrrDefines.h"
 #include "RawAraStationEvent.h"
 
-//!  RawAtriSimpleStationEvent -- The Raw ARA Event Data
+//!  Part of AraEvent library. A simple class for ATRI station electronics used for development and debugging.
 /*!
   The ROOT implementation of the raw ARA event data
   \ingroup rootclasses

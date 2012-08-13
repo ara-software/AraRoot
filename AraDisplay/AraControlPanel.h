@@ -49,7 +49,7 @@
 
 
 
-//!  The Magic Display control panel
+//!  Part of AraDisplay library. This is the main control panel class for AraDisplay.
 /*!
   This is the horribly buggy control panel that was meant to enable easy control of magic Display, without resorting to command line power user mode. Unfortunately, it doesn't yet really work in a non segmentation violation frenzy way. I blame ROOT, others may have different opinions.
 */

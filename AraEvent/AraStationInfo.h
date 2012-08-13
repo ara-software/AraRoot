@@ -15,7 +15,7 @@
 #include "araIcrrDefines.h"
 #include "AraAntennaInfo.h"
 
-//!  AraStationInfo -- ARA Station Information
+//!  Part of the AraEvent library. Stores information about the station's location and the antenna information. Populated by AraGeomTool
 /*!
   A simple class for storing information about an Ara Station
   \ingroup rootclasses

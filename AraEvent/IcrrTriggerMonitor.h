@@ -14,7 +14,7 @@
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 
-//!  IcrrTriggerMonitor -- The Trigger Monitor
+//!  Part of AraEvent library. The ICRR Trigger monitor class.
 /*!
   The ROOT implementation of the Trigger Monitor
   \ingroup rootclasses

@@ -16,7 +16,7 @@
 #include "IcrrTriggerMonitor.h"
 #include "IcrrHkData.h"
 
-//!  FullIcrrHkEvent -- The ARA Hk Data
+//!  Part of AraEvent library. A class combining the raw ICRR housekeeping and trigger data.
 /*!
   The ROOT implementation of the raw ARA housekeeping data
   \ingroup rootclasses
