@@ -81,10 +81,6 @@ AraEventCalibrator * AraEventCalibrator::fgInstance=0;
 
 AraEventCalibrator::AraEventCalibrator() 
 {
-  //   for(AraStationId_t station=0;station<ICRR_NO_STATIONS;station++){
-  //     gotIcrrPedFile[station]=0;
-  //     gotIcrrCalibFile[station]=0;
-  //   }
 
   //Loop through and set the got ped / calib flags to zero. This assumes stationId's first n elements
   //are for ICRR stations and the remaining N-n are ATRI
@@ -101,10 +97,6 @@ AraEventCalibrator::AraEventCalibrator()
 
   }
 
-
-  //   fGotAtriPedFile=0;
-  //   loadAtriCalib();
-  //Default Constructor
 }
 
 AraEventCalibrator::~AraEventCalibrator() {
@@ -122,29 +114,33 @@ AraEventCalibrator*  AraEventCalibrator::Instance()
 
   fgInstance = new AraEventCalibrator();
 
-  //  printf("AraEventCalibrator::Instance() finished creating an instance of the calibrator\n");
   return fgInstance;
 }
 
 
 void AraEventCalibrator::setPedFile(char fileName[], AraStationId_t stationId)
 {
-  strncpy(IcrrPedFile[stationId],fileName,FILENAME_MAX);
-  if(stationId==ARA_TESTBED)  fprintf(stdout, "AraEventCalibrator::setPedFile() setting TestBed IcrrPedFile to %s\n",  IcrrPedFile[stationId]);
-  if(stationId==ARA_STATION1)  fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 IcrrPedFile to %s\n", IcrrPedFile[stationId]);
 
+  strncpy(IcrrPedFile[stationId],fileName,FILENAME_MAX);
+  if(stationId==ARA_TESTBED){
+    fprintf(stdout, "AraEventCalibrator::setPedFile() setting TestBed IcrrPedFile to %s\n",  IcrrPedFile[stationId]);
+    gotIcrrPedFile[0]=1;
+  }
+
+  if(stationId==ARA_STATION1){
+    fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 IcrrPedFile to %s\n", IcrrPedFile[stationId]);
+    gotIcrrPedFile[1]=1;
+  }
+
+  
   loadIcrrPedestals(stationId);
 }
 
 void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
 {
-  //First let us check if the pedestals are already loaded
-  if(gotIcrrPedFile[0]==1&&stationId==ARA_TESTBED) return;
-  if(gotIcrrPedFile[1]==1&&stationId==ARA_STATION1) return;
-  
 
-  //TestBed
-  if(stationId==ARA_TESTBED) {
+  if(stationId==ARA_TESTBED&&gotIcrrPedFile[0]==0){
+    //populate the IcrrPedFile[0] variable
     char *pedFileEnv = getenv( "ARA_PEDESTAL_FILE" );
     if ( pedFileEnv == NULL ) {
       char calibDir[FILENAME_MAX];
@@ -153,27 +149,23 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	//	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(IcrrPedFile[0],"%s/ICRR/TestBed/peds_1294924296.869787.run001202.dat",calibDir);
-      //      fprintf(stdout," = %s\n",IcrrPedFile[0]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(IcrrPedFile[0],pedFileEnv,FILENAME_MAX);
-      //      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():TestBed: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",IcrrPedFile[0]);
     } // end of IF-block for pedestal file specified by environment variable
-  }
 
-  //Station1
-  if(stationId==ARA_STATION1) {
+
+  }
+  if(stationId==ARA_STATION1&&gotIcrrPedFile[1]==0){
+    //populate the IcrrPedFile[1] variable
     char *pedFileEnv = getenv( "ARA_PEDESTAL_FILE" );
     if ( pedFileEnv == NULL ) {
       char calibDir[FILENAME_MAX];
@@ -182,35 +174,31 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  //	  fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	//	fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(IcrrPedFile[1],"%s/ICRR/Station1/peds_1326108401.602169.run003747.dat",calibDir);
-      //      fprintf(stdout," = %s\n",IcrrPedFile[1]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(IcrrPedFile[1],pedFileEnv,FILENAME_MAX);
-      //      fprintf(stdout,"AraEventCalibrator::loadIcrrPedestals():Station1: INFO - Pedestal file [from ARA_PEDESTAL_FILE] = %s\n",IcrrPedFile[1]);
     } // end of IF-block for pedestal file specified by environment variable
+
   }
+  //Finished populating the IcrrPedFile variables
 
   FullLabChipPedStruct_t peds;
 
-  //TestBed
+  //Now we load in the pedestals
   if(stationId==ARA_TESTBED){
     gzFile inPedTB = gzopen(IcrrPedFile[0],"r");
     if( !inPedTB ){
       fprintf(stderr,"ERROR - Failed to open pedestal file for TestBed %s.\n",IcrrPedFile[0]);
       return;
     }
-    
     int nRead = gzread(inPedTB,&peds,sizeof(FullLabChipPedStruct_t));
     if( nRead != sizeof(FullLabChipPedStruct_t)){
       int numErr;
@@ -229,10 +217,11 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
       }
     }
     gzclose(inPedTB);
+    
     gotIcrrPedFile[0]=1;
+    gotIcrrPedFile[1]=0;
+    //last thing is to set the gotIcrrPedFile flags appropriately
   }
-
-  //Station1
   if(stationId==ARA_STATION1){
     gzFile inPedAra1 = gzopen(IcrrPedFile[1],"r");
     if( !inPedAra1 ){
@@ -258,8 +247,14 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
       }
     }
     gzclose(inPedAra1);
+    gotIcrrPedFile[0]=0;
     gotIcrrPedFile[1]=1;
+    //last thing is to set the gotIcrrPedFile flags appropriately
   }
+  //Finished loading pedestals
+
+
+
 }
 
 int AraEventCalibrator::doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO)
@@ -350,12 +345,19 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 {
 
   AraStationId_t stationId=theEvent->stationId;
-
-  loadIcrrPedestals(stationId); //This will only load the pedestals once
-  loadIcrrCalib(stationId); //This will only load the calib values once
+  if(gotIcrrPedFile[stationId]==0)
+    {
+      loadIcrrPedestals(stationId); //This will only load the pedestals once
+    }
+  
+  if(gotIcrrCalibFile[stationId]==0){
+    loadIcrrCalib(stationId); //This will only load the calib values once
+  }
 
   if(AraCalType::hasBinWidthCalib(calType))
     theEvent->guessRCO(0); //Forces the calculation of the RCO phase from the clock
+  //FIXME -- should this be a zero or do we want the actual channel number?
+
 
   //set the number of rfchans in the event
 
@@ -590,18 +592,14 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
  
   }
 
-  //  printf("calibrated the event\n");
-
 }
 
 void AraEventCalibrator::loadIcrrCalib(AraStationId_t stationId)
 {
-  if(gotIcrrCalibFile[0]==1&&stationId==ARA_TESTBED) return;
-  if(gotIcrrCalibFile[1]==1&&stationId==ARA_STATION1) return;
-  //These two tests will make sure that we don't reload the calibration unneccessarily
-
-  char calibFile[FILENAME_MAX];
   char calibDir[FILENAME_MAX];
+  char binWidthFileName[FILENAME_MAX];
+  char epsilonFileName[FILENAME_MAX];
+  char interleaveFileName[FILENAME_MAX];
   char *calibEnv=getenv("ARA_CALIB_DIR");
   if(!calibEnv) {
     char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
@@ -613,65 +611,51 @@ void AraEventCalibrator::loadIcrrCalib(AraStationId_t stationId)
   else {
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
-  int chip,rco,chan;
- 
-  //TestBed
-  if(stationId==ARA_TESTBED){
-    //Bin Width Calib
-    sprintf(calibFile,"%s/ICRR/TestBed/binWidths.txt",calibDir);
-    std::ifstream BinFileTB(calibFile);
-    double width;
-    while(BinFileTB >> chip >> rco) {
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
-	BinFileTB >> width;
-	binWidths[0][chip][rco][samp]=width;
-      }
-    }
-    //Epsilon Calib
-    sprintf(calibFile,"%s/ICRR/TestBed/epsilonFile.txt",calibDir);
-    std::ifstream EpsFileTB(calibFile);
-    double epsilon;
-    while(EpsFileTB >> chip >> rco >> epsilon) {
-      epsilonVals[0][chip][rco]=epsilon;    
-    }
-    //Interleave Calib
-    sprintf(calibFile,"%s/ICRR/TestBed/interleaveFile.txt",calibDir);
-    std::ifstream IntFileTB(calibFile);
-    double interleave;
-    while(IntFileTB >> chip >> chan >> interleave) {
-      interleaveVals[0][chan+4*chip]=interleave;    
-    }
-    gotIcrrCalibFile[0]=1;
+  //Populate the binWidthFileName, epsilonFileName and interleaveFileName variables
+  if(stationId==ARA_TESTBED&&gotIcrrCalibFile[0]==0){
+    sprintf(binWidthFileName,"%s/ICRR/TestBed/binWidths.txt",calibDir);
+    sprintf(epsilonFileName,"%s/ICRR/TestBed/epsilonFile.txt",calibDir);
+    sprintf(interleaveFileName,"%s/ICRR/TestBed/interleaveFile.txt",calibDir);
   }
+  if(stationId==ARA_STATION1&&gotIcrrCalibFile[1]==0){
+    sprintf(binWidthFileName,"%s/ICRR/Station1/binWidths.txt",calibDir);
+    sprintf(epsilonFileName,"%s/ICRR/Station1/epsilonFile.txt",calibDir);
+    sprintf(interleaveFileName,"%s/ICRR/Station1/interleaveFile.txt",calibDir);
+  }
+  //load the calibration files
+
+  std::ifstream binWidthFile(binWidthFileName);
+  std::ifstream epsilonFile(epsilonFileName);
+  std::ifstream interleaveFile(interleaveFileName);
+  int chip, rco, chan;
+  double width, epsilon, interleave;
+  while(binWidthFile >> chip >> rco){
+    for(int samp=0; samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
+      binWidthFile >> width;
+      binWidths[stationId][chip][rco][samp]=width;
+    }
+  }
+  binWidthFile.close();
+  while(epsilonFile >> chip >> rco >> epsilon){
+    epsilonVals[stationId][chip][rco]=epsilon;
+  }
+  epsilonFile.close();
+  while(interleaveFile >> chip >> chan >> interleave){
+    interleaveVals[stationId][chan+4*chip]=interleave;
+  }
+  interleaveFile.close();
   
-  //Station1
+  //Set the gotIcrrCalibFile flags
+  if(stationId==ARA_TESTBED){
+    gotIcrrCalibFile[0]=1;
+    gotIcrrCalibFile[1]=0;
+  }
   if(stationId==ARA_STATION1){
-    //Bin Width Calib
-    sprintf(calibFile,"%s/ICRR/Station1/binWidths.txt",calibDir);
-    std::ifstream BinFileAra1(calibFile);
-    double width;
-    while(BinFileAra1 >> chip >> rco) {
-      for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;samp++) {
-	BinFileAra1 >> width;
-	binWidths[1][chip][rco][samp]=width;
-      }
-    }
-    //Epsilon Calib
-    sprintf(calibFile,"%s/ICRR/Station1/epsilonFile.txt",calibDir);
-    std::ifstream EpsFileAra1(calibFile);
-    double epsilon;
-    while(EpsFileAra1 >> chip >> rco >> epsilon) {
-      epsilonVals[1][chip][rco]=epsilon;    
-    }
-    //Interleave Calib
-    sprintf(calibFile,"%s/ICRR/Station1/interleaveFile.txt",calibDir);
-    std::ifstream IntFileAra1(calibFile);
-    double interleave;
-    while(IntFileAra1 >> chip >> chan >> interleave) {
-      interleaveVals[1][chan+4*chip]=interleave;    
-    }
+    gotIcrrCalibFile[0]=0;
     gotIcrrCalibFile[1]=1;
   }
+
+
 }
 
 
@@ -1173,3 +1157,4 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   }
 
 }
+

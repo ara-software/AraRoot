@@ -8,7 +8,7 @@ void runAraDisplay() {
 
   //  sprintf(fileName, "~/ara/data/miniATRI/root/run%i/event%i.root", run, run);
   //JPD Testing TestBed
-    sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
+  //sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
   //JPD Testing Station1
   //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
   //JPD Testing AraRootBranches3.2
@@ -20,7 +20,8 @@ void runAraDisplay() {
   //JPD Testing ARA2 (an example of an ATRI station) -- ATRI run from 2011
   //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run768/event768.root");
 
-
+  //JPD TestBed Calibration file
+  sprintf(fileName, "~/ara/data/calibration/ICRR/TestBed/root/200MHz_At_158mV_trunk.root");
 
   runAraDisplay(fileName);
 }
@@ -31,7 +32,7 @@ void runAraDisplay(char *eventFile) {
   //  gSystem->AddIncludePath("-I/sw/include");
   gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
   //  gSystem->Load("~/repositories/InstallDir/utilities/lib/libsqlite3.so");
-  gSystem->Load("libsqlite3.so");
+  //  gSystem->Load("libsqlite3.so");
   gSystem->Load("libfftw3.so");
   gSystem->Load("libgsl.so");
   gSystem->Load("libMathMore.so");
@@ -47,7 +48,9 @@ void runAraDisplay(char *eventFile) {
 
   //This is how to set a pedestal file manually - note that you cannot use relative paths, you must use the full path for the pedestal file
   //  AraEventCalibrator::Instance()->setAtriPedFile("/Users/jdavies/ara/data/miniATRI/run_000402/pedTest.txt");
+  AraEventCalibrator::Instance()->setPedFile("/Users/jdavies/ara/data/calibration/ICRR/TestBed/pedestals/peds_1291239657.193855.dat", 0);
 
   AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kLatestCalib);  
+
   magicPtr->startEventDisplay();
 }
