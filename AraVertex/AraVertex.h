@@ -23,7 +23,7 @@ using namespace std;
    Double_t Edm;
    Int_t nhits;
    Int_t Status;
-   
+   Double_t dt[32];   
   //Float_t Rxtresid[16];
   //  Float_t deltaTime[16];
   //Float_t convergence[2];
@@ -41,6 +41,9 @@ class AraVertex {
   AraVertex();
   ~AraVertex(){delete ice;};
 
+
+
+  void SetCOG(Double_t x, Double_t y, Double_t z) {COG_x=x; COG_y=y; COG_z=z;};
 
   struct inputAnt{
     Double_t T;
@@ -78,7 +81,9 @@ class AraVertex {
   void clear(){RxIn.clear(); RxPairIn.clear(); };
   void printHits();
   void printPairs();
+  TVector3 getVtrack() ;
 
+  RECOOUT doPairFitSpherical();
 
   RECOOUT doFit();
   RECOOUT doPairFit();
@@ -90,8 +95,15 @@ class AraVertex {
   iceProp *ice;
   double CalcChiSquare(const double *xx );
   double CalcChiSquareDiff(const double *xx );
+  double CalcChiSquareDiff_Spherical(const double *xx );
+
   inputAnt RxInEarly;
   int nHits;
+  // Center of gravity coordinates of the detector w.r.t actual ARA coordinates (COG_z will be negative for in ice antennas)
+  Double_t COG_x;
+  Double_t COG_y;
+  Double_t COG_z;
+
  // TMinuit *eventrecoMinuit;
 };
 #endif

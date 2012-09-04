@@ -99,12 +99,10 @@ int main(int argc, char **argv)
    //jpd print to screen some info
    //   std::cerr << "isAtri " << isAtriEvent << " isIcrr " << isIcrrEvent << " number of entries is " <<  numEntries << std::endl;
 
-   //   numEntries=100;
+           numEntries=100;
 
 
    l2->FillGeoTree();
-
-   numEntries=50;//FIXME
 
    for(Long64_t event=0;event<numEntries;event++) {
 	cout<<"Looking at eventy Number "<<event<<endl;

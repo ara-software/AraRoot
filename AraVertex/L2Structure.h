@@ -9,6 +9,8 @@ const int N_POWER_BINS_L=10;
 const int FREQ_POWER_MAX_L=300;
 const int FREQ_POWER_MIN_L=0;
 
+  //T->SetBranch("header",&header,"runNumber/i:unixTime/i:DOY/I:hour/I:minute/I:second/I:DOW/I:unixTimeUsec/i:eventNumber/i:gpsSubTime/I:calibStatus/s:priority/b:errorFlag/b");
+
 
 class TIMESTAMP {
  public:
@@ -18,13 +20,13 @@ class TIMESTAMP {
 
 };
   ~TIMESTAMP(){};
+
   unsigned int epoch;
   Int_t DOY;
   Int_t hour;
   Int_t minute;
   Int_t second;
   Int_t DOW;
-
 };
 
 typedef struct {
@@ -50,25 +52,45 @@ typedef struct {
   double cableDelay;
   Int_t antPol;
   Int_t antType;
+  //Int_t antOrient;
   Double_t antOrient[3];
+
   Double_t averageNoiseFigure;
 } ANTENNA;
+
+typedef struct {
+  unsigned int RunNumber;
+  unsigned int epoch;
+  Int_t DOY;
+  Int_t hour;
+  Int_t minute;
+  Int_t second;
+  Int_t DOW;
+  unsigned int unixTimeusec;//-i
+  unsigned int eventNumber;
+  int gpsSubTime;
+  UShort_t calibStatus;
+  UChar_t priority;
+  UChar_t errorFlag;
+} HEADERSIMPLE;
 
 typedef struct {
   Double_t mean[ANTS_PER_ICRR];
   Double_t rms[ANTS_PER_ICRR];
   Double_t v2[ANTS_PER_ICRR];
   Double_t power[ANTS_PER_ICRR];
+  Double_t maxV[ANTS_PER_ICRR];	
   Float_t freqMax[ANTS_PER_ICRR];
   Float_t freqMaxVal[ANTS_PER_ICRR];
   
   Float_t powerBin[ANTS_PER_ICRR][N_POWER_BINS];
   Int_t isInTrigPattern[ANTS_PER_ICRR];
-
+  Double_t trackR, trackPhi, trackTheta;
 } WF;
 
 typedef struct {
    Int_t RunNumber;
+  Int_t stationId;
    TIMESTAMP RunStartTime;
    TIMESTAMP RunEndTime;
    Int_t RunDuration;
@@ -93,6 +115,7 @@ typedef struct {
 
 typedef struct {
  unsigned int RunNumber;
+  unsigned int stationId;
 TIMESTAMP unixTime;   //-i
 unsigned int unixTimeusec;//-i
 unsigned int eventNumber;

@@ -7,6 +7,9 @@
 #ifndef L2_H
 #define L2_H
 
+Double_t Station_COG_X;
+Double_t Station_COG_Y;
+Double_t Station_COG_Z;
 
 
 class L2 {
@@ -25,7 +28,9 @@ class L2 {
   vector<Int_t> InIceTrig;
 
   AraVertex *Reco;
-  RECOOUT  DoReconstruction(vector<Int_t> chList, Int_t dtMethod);
+  void  FilldTPairs(vector<Int_t> chList, Int_t method);
+
+  RECOOUT  DoReconstruction(vector<Int_t> chList, Int_t dtMethod, Int_t minMethod);
   Double_t getTimeDiff(int ch1, int ch2, int method);
   TGraph * getCorrelationGraph(int ch1, int ch2);
   Double_t getCorreMax(TGraph *grCorI) ;
@@ -37,7 +42,7 @@ class L2 {
   TTree * L2GeoTree;
   TFile * L2File;
   TIME timeader;
-  RUNHEADER *runheader;
+  RUNHEADER runheader;
   TRIGGER trigger;
   HK hk;
   WF wf;
@@ -51,6 +56,9 @@ class L2 {
   RECOOUT recoHxcor;
   RECOOUT recoAllmax;
   RECOOUT recoAllxcor;
+  RECOOUT recoVxcorSimple;
+  RECOOUT recoHxcorSimple;
+
   // RECOOUT recoTrigmax;
   //RECOOUT recoTrigxcor;
 
