@@ -693,10 +693,12 @@ TPad *AraAtriCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPa
 	  grElecFFT[chanIndex]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grElecFFT[chanIndex]->Draw("l");
+	if(grElecFFT[chanIndex]->GetN())
+	  grElecFFT[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grElecAveragedFFT[chanIndex]->Draw("l");
+	if(	grElecAveragedFFT[chanIndex]->GetN())
+	  grElecAveragedFFT[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(!grElecHilbert[chanIndex]) {
@@ -704,11 +706,12 @@ TPad *AraAtriCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPa
 	  grElecHilbert[chanIndex]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grElecHilbert[chanIndex]->Draw("l");
+	if(grElecHilbert[chanIndex]->GetN())
+	  grElecHilbert[chanIndex]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform){
-
-	grElec[chanIndex]->Draw("l");
+	if(grElec[chanIndex]->GetN())
+	  grElec[chanIndex]->Draw("l");
 		
 	TList *listy = gPad->GetListOfPrimitives();
 	for(int i=0;i<listy->GetSize();i++) {
@@ -880,10 +883,12 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 	  grRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanFFT[rfChan]->Draw("l");
+	if(grRFChanFFT[rfChan]->GetN())
+	  grRFChanFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grRFChanAveragedFFT[rfChan]->Draw("l");
+	if(grRFChanAveragedFFT[rfChan]->GetN())
+	  grRFChanAveragedFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(!grRFChanHilbert[rfChan])  {
@@ -891,7 +896,8 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 	  grRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanHilbert[rfChan]->Draw("l");
+	if(grRFChanHilbert[rfChan]->GetN())
+	  grRFChanHilbert[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform) {
 
@@ -984,10 +990,12 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 	  grRFChanFFT[rfChan]=new AraFFTGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanFFT[rfChan]->Draw("l");
+	if(grRFChanFFT[rfChan]->GetN())
+	  grRFChanFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kAveragedFFT){
-	grRFChanAveragedFFT[rfChan]->Draw("l");
+	if(grRFChanAveragedFFT[rfChan]->GetN())
+	  grRFChanAveragedFFT[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(!grRFChanHilbert[rfChan]) {	  
@@ -995,10 +1003,12 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 	  grRFChanHilbert[rfChan]=new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
 	  delete grTemp;
 	}
-	grRFChanHilbert[rfChan]->Draw("l");
+	if(grRFChanHilbert[rfChan]->GetN())
+	  grRFChanHilbert[rfChan]->Draw("l");
       }
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform) {
-	grRFChan[rfChan]->Draw("l");
+	if(grRFChan[rfChan]->GetN())
+	  grRFChan[rfChan]->Draw("l");
 
 	if(fAutoScale) {
 	  TList *listy = gPad->GetListOfPrimitives();

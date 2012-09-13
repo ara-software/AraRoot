@@ -123,16 +123,14 @@ void AraEventCalibrator::setPedFile(char fileName[], AraStationId_t stationId)
 
   strncpy(IcrrPedFile[stationId],fileName,FILENAME_MAX);
   if(stationId==ARA_TESTBED){
-    fprintf(stdout, "AraEventCalibrator::setPedFile() setting TestBed IcrrPedFile to %s\n",  IcrrPedFile[stationId]);
-    gotIcrrPedFile[0]=1;
+    //    fprintf(stdout, "AraEventCalibrator::setPedFile() setting TestBed IcrrPedFile to %s\n",  IcrrPedFile[stationId]);
+    gotIcrrPedFile[0]=1; //Protects from loading the default pedestal File
   }
 
   if(stationId==ARA_STATION1){
-    fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 IcrrPedFile to %s\n", IcrrPedFile[stationId]);
-    gotIcrrPedFile[1]=1;
+    //    fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 IcrrPedFile to %s\n", IcrrPedFile[stationId]);
+    gotIcrrPedFile[1]=1; //Protects from loading the default pedestal File
   }
-
-  
   loadIcrrPedestals(stationId);
 }
 
@@ -195,6 +193,8 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
   //Now we load in the pedestals
   if(stationId==ARA_TESTBED){
     gzFile inPedTB = gzopen(IcrrPedFile[0],"r");
+    fprintf(stdout, "%s : loading IcrrPedFile TestBed %s\n", __FUNCTION__, IcrrPedFile[0]);//DEBUG
+
     if( !inPedTB ){
       fprintf(stderr,"ERROR - Failed to open pedestal file for TestBed %s.\n",IcrrPedFile[0]);
       return;
@@ -224,6 +224,7 @@ void AraEventCalibrator::loadIcrrPedestals(AraStationId_t stationId)
   }
   if(stationId==ARA_STATION1){
     gzFile inPedAra1 = gzopen(IcrrPedFile[1],"r");
+    fprintf(stdout, "%s : loading IcrrPedFile Station1 %s\n", __FUNCTION__, IcrrPedFile[1]);//DEBUG
     if( !inPedAra1 ){
       fprintf(stderr,"ERROR - Failed to open pedestal file for Station1 %s\n",IcrrPedFile[1]);
       return;
@@ -836,11 +837,15 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
 
 void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
-
-  //FIXME -- this is where we force the loading of the calib and pedestals
   AraStationId_t thisStationId = theEvent->stationId;
-  loadAtriCalib(thisStationId);
-  loadAtriPedestals(thisStationId);
+  Int_t calibIndex = AraGeomTool::getStationCalibIndex(thisStationId);
+  //Only load the pedestals / calib if they are not already loaded
+  if(fGotAtriCalibFile[calibIndex]==0){
+    loadAtriCalib(thisStationId);
+  }
+  if(fGotAtriPedFile[calibIndex]==0){
+    loadAtriPedestals(thisStationId);
+  }
 
   //Step one is loop over the blocks
 
@@ -1000,10 +1005,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 void AraEventCalibrator::setAtriPedFile(char *filename, AraStationId_t stationId)
 {
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
-  
   strncpy(fAtriPedFile[calibIndex],filename,FILENAME_MAX);
-  fGotAtriPedFile[calibIndex]=0; //This will ensure that we load this new pedFile -- This is in case we already have one loaded for this station
+  fGotAtriPedFile[calibIndex]=1; //Protects us from loading the default pedfile
   loadAtriPedestals(stationId);
+
 }
 
 void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
@@ -1011,41 +1016,40 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
   if(calibIndex==-1){
     fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- ERROR Unknown stationId %i\n", stationId);
-    return;
+    exit(0);
   }
 
-  //Check if we need to load the pedFile
-  if(fGotAtriPedFile[calibIndex]){
-    //    fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- Pedestal already loaded for station %i\n", stationId);//DEBUG
-    return;
-  }  
-  char *pedFileEnv = getenv( "ARA_ONE_PEDESTAL_FILE" ); //FIXME
-  if ( pedFileEnv == NULL ) {
-    char calibDir[FILENAME_MAX];
-    char *calibEnv=getenv("ARA_CALIB_DIR");
-    if(!calibEnv) {
-      char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
-      if(!utilEnv) {
-	sprintf(calibDir,"calib");
-	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ./calib]");
-      } else {
-	sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+  if(fGotAtriPedFile[calibIndex]==0){
+    char *pedFileEnv = getenv( "ARA_ATRI_PEDESTAL_FILE" ); //FIXME
+    if ( pedFileEnv == NULL ) {
+      char calibDir[FILENAME_MAX];
+      char *calibEnv=getenv("ARA_CALIB_DIR");
+      if(!calibEnv) {
+	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+	if(!utilEnv) {
+	  sprintf(calibDir,"calib");
+	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ./calib]");
+	} else {
+	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
+	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	}
       }
-    }
+      else {
+	strncpy(calibDir,calibEnv,FILENAME_MAX);
+	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
+      }
+      sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
+      fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
+    } // end of IF-block for pedestal file not specified by environment variable
     else {
-      strncpy(calibDir,calibEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
-    }
-    sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
-    fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
-  } // end of IF-block for pedestal file not specified by environment variable
-  else {
-    strncpy(fAtriPedFile[calibIndex],pedFileEnv,FILENAME_MAX);
-    fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAtriPedFile[calibIndex]);
-  } // end of IF-block for pedestal file specified by environment variable
-
+      strncpy(fAtriPedFile[calibIndex],pedFileEnv,FILENAME_MAX);
+      fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAtriPedFile[calibIndex]);
+    } // end of IF-block for pedestal file specified by environment variable
+  }
+  
   //Pedestal file
+  
+  fprintf(stdout, "%s : Loading fAtriPedFile - %s\n", __FUNCTION__, fAtriPedFile[calibIndex]);
   std::ifstream PedFile(fAtriPedFile[calibIndex]);
   Int_t dda,block,chan;
   UShort_t pedVal;
@@ -1065,6 +1069,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
       fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]=pedVal;
     }
   }  
+  
   
   //Now we set the gotPedFile flags to indicate which station we have in memory
   
@@ -1087,13 +1092,6 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     fprintf(stderr, "AraEventCalibrator::loadAtriCalib -- ERROR Unknown stationId %i\n", stationId);
     return;
   }
-
-  //Check if we need to load the calibFile -- Are the calib values already in memory?
-  if(fGotAtriCalibFile[calibIndex]){
-    //    fprintf(stderr, "AraEventCalibrator::loadAtriCalib -- Calib already loaded for stationId %i\n", stationId);//DEBUG
-    return;
-  }
-  //If we got here then we are either loading calib for the first time, or replacing the existing calib with that for this station
 
   char calibFile[FILENAME_MAX];
   char calibDir[FILENAME_MAX];
