@@ -47,8 +47,8 @@ class RawAtriStationBlock: public TObject
 
    int getDda() {return (channelMask&0x300)>>8;}
    int getBlock() {return irsBlockNumber&0x1ff;}
-   int getCapArray() { return (irsBlockNumber&0x4)>>2;}
-
+   //   int getCapArray() { return (irsBlockNumber&0x4)>>2;} // Event format version 1
+   int getCapArray() { return irsBlockNumber&0x1;} //Event Format version 2
 
   ClassDef(RawAtriStationBlock,1);
 };

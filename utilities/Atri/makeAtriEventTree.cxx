@@ -138,7 +138,8 @@ void process() {
   //  cout << "Here: "  << theEvent.eventNumber << endl;
   if(theEvent) delete theEvent;
   
-  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer);
+  //  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer);//BRENDAN -- this line makes an ATRI station event using the ARAAcqd produced stationId (encoded in the raw events in the dat file). The next line with additional argument (in this case 2) forces the station Id in the produced L0 events to be station (2)
+  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer, 2);//FIXME -- this forces the stationId to 2
   eventTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theEvent;

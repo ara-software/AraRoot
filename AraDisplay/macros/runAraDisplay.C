@@ -1,29 +1,11 @@
 gSystem->Reset();
 
-void runAraDisplay() {
+void runAraDisplay(int run) {
   
   char fileName[180];  
-
-  int run=399;
-
-  //  sprintf(fileName, "~/ara/data/miniATRI/root/run%i/event%i.root", run, run);
-  //JPD Testing TestBed
-  //sprintf(fileName, "~/ara/data/testing_for_trunk/root/TestBed/run12813/event12813.root");
-  //JPD Testing Station1
-  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/Station1/run10160/event10160.root");
-  //JPD Testing AraRootBranches3.2
-  //  sprintf(fileName, "~/ara/data/AraRoot_3-2/root/0808_2011/TestBed_2011_run005546.L0.root");
-  //JPD Testing TestBed vs branches/TestBed1
-  //  sprintf(fileName,"~/ara/data/testing_for_trunk/root/TestBed/run5546/event5546.root");
-  //JPD Testing ARA2 (an example of an ATRI station) -- miniATRI - one stack enabled
-  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run403/event403.root");
-  //JPD Testing ARA2 (an example of an ATRI station) -- ATRI run from 2011
-  //  sprintf(fileName, "~/ara/data/testing_for_trunk/root/ARA2/run768/event768.root");
-
-  //JPD TestBed Calibration file
-  sprintf(fileName, "~/ara/data/calibration/ICRR/TestBed/root/200MHz_At_158mV_trunk.root");
-
+  sprintf(fileName, "/unix/ara/data/miniATRI_ucl/eventFormat2/root/run%d/event%d.root", run, run);
   runAraDisplay(fileName);
+
 }
 
  
@@ -46,11 +28,10 @@ void runAraDisplay(char *eventFile) {
 
   TChain *fred=0; //Will this work?
 
-  //This is how to set a pedestal file manually - note that you cannot use relative paths, you must use the full path for the pedestal file
-  //  AraEventCalibrator::Instance()->setAtriPedFile("/Users/jdavies/ara/data/miniATRI/run_000402/pedTest.txt");
-  AraEventCalibrator::Instance()->setPedFile("/Users/jdavies/ara/data/calibration/ICRR/TestBed/pedestals/peds_1291239657.193855.dat", 0);
+  AraEventCalibrator::Instance()->setAtriPedFile("/unix/ara/data/miniATRI_ucl/eventFormat2/run_000283/pedestalValues.run000283.dat", 2); //BRENDAN -- this is how to set an ATRI pedestal file (second argument is the stationId)
 
-  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kLatestCalib);  
+  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);  
+  //  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
 
   magicPtr->startEventDisplay();
 }

@@ -109,3 +109,15 @@ RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *d
    if(uptoByte!=int(numStationBytes))    
      std::cerr << "Error assigned " << uptoByte <<  " bytes out of " << numStationBytes << "\n";
 }
+
+Int_t RawAtriStationEvent::getFirstCapArray(Int_t dda)
+{
+
+  for(int i=0;i<DDA_PER_ATRI;i++){
+    int this_dda = this->blockVec.at(i).getDda();
+    if(this_dda==dda) return this->blockVec.at(i).getCapArray();
+  }  
+  return -1;
+  
+
+}

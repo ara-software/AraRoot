@@ -63,6 +63,8 @@ class RawAtriStationEvent: public RawAraStationEvent
      return sample+(chan*SAMPLES_PER_BLOCK)+(block*RFCHAN_PER_DDA*SAMPLES_PER_BLOCK)+(dda*BLOCKS_PER_DDA*RFCHAN_PER_DDA*SAMPLES_PER_BLOCK);
    }
 
+   Int_t getFirstCapArray(Int_t dda); ///< Function for asking the block vector the capArray
+   
 
 
   ClassDef(RawAtriStationEvent,1);

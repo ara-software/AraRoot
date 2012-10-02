@@ -1028,22 +1028,22 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 	char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
 	if(!utilEnv) {
 	  sprintf(calibDir,"calib");
-	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ./calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ./calib]");
 	} else {
 	  sprintf(calibDir,"%s/share/araCalib",utilEnv);
-	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
+	  //	  fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
 	}
       }
       else {
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
-	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
+	//	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
       fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(fAtriPedFile[calibIndex],pedFileEnv,FILENAME_MAX);
-      fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAtriPedFile[calibIndex]);
+      //      fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAtriPedFile[calibIndex]);
     } // end of IF-block for pedestal file specified by environment variable
   }
   
@@ -1109,7 +1109,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
   int dda,chan,sample,capArray;
   sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
-  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
+  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
@@ -1142,6 +1142,18 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     }
     //    std::cout << "\n";
   }
+  SampleFile.close();
+  
+  char epsilonFileName[100];
+  sprintf(epsilonFileName,"%s/ATRI/araAtriStation%iEpsilon.txt",calibDir, stationId);
+  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
+  std::ifstream epsilonFile(epsilonFileName);
+  while(epsilonFile >> dda >> chan >> capArray){
+    epsilonFile >> value;
+    fAtriEpsilonTimes[dda][chan][capArray]=value;
+    //    printf("%s : dda %i channel %i capArray %f\n", __FUNCTION__, dda, chan, value);
+  }
+  epsilonFile.close();
 
   
   //Now we set the gotCalibFile flags to indicate which station we have in memory

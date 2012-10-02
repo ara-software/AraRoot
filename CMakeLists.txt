@@ -21,6 +21,6 @@ add_subdirectory(AraDisplay)
 add_subdirectory(AraWebPlotter)
 add_subdirectory(utilities/Atri)
 add_subdirectory(utilities/Icrr)
-
-add_subdirectory(analysis) #FIXME - Do we want to include this in CMake?
-add_subdirectory(AraVertex) #FIXME - Need to add build of L2 vertexing
+add_subdirectory(analysis)
+add_subdirectory(AraVertex)
+add_subdirectory(calibration/ATRI) #FIXME -- is this working?
