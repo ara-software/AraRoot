@@ -110,13 +110,13 @@ int L2::FillGeoTree() {
 	antenna.antType=araGeom->fStationInfo[station].fAntInfo[ant].antType; 
 	//antenna.antOrient=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
 
-	antenna.antOrient[0]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
-	antenna.antOrient[1]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
-	antenna.antOrient[2]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
+	// antenna.antOrient[0]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
+	// antenna.antOrient[1]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
+	// antenna.antOrient[2]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient;
 	
-//	antenna.antOrient[0]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[0];
-//	antenna.antOrient[1]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[1];
-//	antenna.antOrient[2]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[2]; 
+	antenna.antOrient[0]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[0];
+	antenna.antOrient[1]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[1];
+	antenna.antOrient[2]=araGeom->fStationInfo[station].fAntInfo[ant].antOrient[2]; 
 	antenna.averageNoiseFigure=araGeom->fStationInfo[station].fAntInfo[ant].avgNoiseFigure;       	     L2GeoTree->Fill();
 	
 
