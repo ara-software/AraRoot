@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 //Event Reader Includes
 #include "UsefulAtriStationEvent.h"
