@@ -15,6 +15,10 @@
 #include <sqlite3.h>
 #include <cstdlib>
 
+
+//sqlite includes
+#include <sqlite3.h>
+
 #include "TString.h"
 #include "TObjArray.h"
 #include "TObjString.h"
@@ -52,7 +56,22 @@ int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum,
   if(antNum<8 && antNum>=0)
     return fAntLookupTable[stationId][antPol][antNum];
   return -1;
+}
 
+
+AraAntPol::AraAntPol_t AraGeomTool::getPolByRFChan(int rfChan, AraStationId_t stationId)
+{
+  //RJN Should add a check here for safety
+  return fStationInfo[stationId].fAntInfo[rfChan].polType;
+ 
+
+}
+
+Int_t AraGeomTool::getAntNumByRFChan(int rfChan, AraStationId_t stationId)
+{
+  //RJN Should add a check here for safety
+  return fStationInfo[stationId].fAntInfo[rfChan].antPolNum;
+  
 }
 
 

@@ -57,6 +57,10 @@ class AraGeomTool
 
    //FIXME -- Only used by web-plotter. Should be fixed when the Web-Plotter is up and running
    int getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);//FIXME
+
+   AraAntPol::AraAntPol_t getPolByRFChan(int rfChan, AraStationId_t stationId);
+   Int_t getAntNumByRFChan(int rfChan, AraStationId_t stationId);
+
    
    Double_t calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Double_t phiWave, Double_t thetaWave);
    Double_t calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t phiWave, Double_t thetaWave,Double_t R);
