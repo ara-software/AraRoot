@@ -75,20 +75,20 @@ void makeHkTree(char *inputName, char *outFile) {
     gzFile infile = gzopen (fileName, "rb");    
     numBytes=gzread(infile, &theGenericHeader, sizeof(AtriGenericHeader_t));
 
-    fprintf(stderr, "read %i bytes\n", numBytes);
+    //    fprintf(stderr, "read %i bytes\n", numBytes);
 
-    fprintf(stderr, "verId %i subVerId %i\n", theGenericHeader.verId, theGenericHeader.subVerId);
+    //    fprintf(stderr, "verId %i subVerId %i\n", theGenericHeader.verId, theGenericHeader.subVerId);
     if(theGenericHeader.verId>2){
       newHkFormat=1;      
-      fprintf(stderr, "Use AraEventHk_t\n");
+      //      fprintf(stderr, "Use AraEventHk_t\n");
     }
     else if(theGenericHeader.verId==2 && theGenericHeader.subVerId >7){
       newHkFormat=1;      
-      fprintf(stderr, "Use AraEventHk_t\n");
+      //      fprintf(stderr, "Use AraEventHk_t\n");
     }
     else{
       newHkFormat=0;      
-      fprintf(stderr, "Use AraEventHk2_7_t\n");
+      //      fprintf(stderr, "Use AraEventHk2_7_t\n");
     }
 
     gzclose(infile);
