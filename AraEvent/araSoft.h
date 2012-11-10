@@ -38,13 +38,19 @@
 #define RFCHAN_PER_DDA 8
 #define TDA_PER_ATRI 4
 #define ANTS_PER_TDA 4
-#define L2_PER_TDA 4
+#define L2_PER_TDA 4 //Wrong?!
 #define THRESHOLDS_PER_ATRI TDA_PER_ATRI*ANTS_PER_TDA
 #define SAMPLES_PER_BLOCK 64
 #define MAX_TRIG_BLOCKS 4
 #define CHANNELS_PER_ATRI DDA_PER_ATRI*RFCHAN_PER_DDA
 
 
+//As per email from P.Alison 9th Nov 2012
+#define NUM_L1_SCALERS 32
+#define NUM_L2_SCALERS 32
+#define NUM_L3_SCALERS 16
+#define NUM_L4_SCALERS 8
+#define NUM_T1_SCALERS 8
 
 
 #define FIRST_BLOCK_FRAME_START 0x65  //'e'

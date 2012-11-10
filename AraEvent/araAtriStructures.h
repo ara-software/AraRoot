@@ -21,8 +21,8 @@
 
 #include "araSoft.h"
 
-#define ARA_SOFT_VERISON 2
-#define ARA_SOFT_SUB_VERISON 7
+#define ARA_SOFT_VERISON 3
+#define ARA_SOFT_SUB_VERISON 0
 
 
 
@@ -111,8 +111,10 @@ typedef struct {
 } AtriGenericHeader_t;
 
 
-//!  Part of AraEvent library. The ATRI housekeeping data structure.
+//!  Part of AraEvent library. The ATRI housekeeping data structure. 
 /*!
+  WARNING -- This is the structure for araSoft version 2_7 and below
+
   This is the N-byte structure that contains information about the various housekeeping values associated with the event readout.
 */
 typedef struct {
@@ -134,6 +136,38 @@ typedef struct {
   uint16_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
   uint16_t thresholdDac[TDA_PER_ATRI][ANTS_PER_TDA]; ///< Value the thresholds are set to
+  uint16_t surfaceThresholdDac[ANTS_PER_TDA]; ///< The surface thresholds
+  uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
+  uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
+  uint8_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
+  uint8_t reserved[DDA_PER_ATRI];
+} AraEventHk2_7_t;
+
+
+
+//!  Part of AraEvent library. The ATRI sensor housekeeping data structure.
+/*!
+  This is for araSoft version 3.0 and above
+  This is the N-byte structure that contains information about the various housekeeping values associated with the event readout.
+*/
+typedef struct {
+  AtriGenericHeader_t gHdr; ///< The generic header 
+  uint64_t unixTime; ///< Time in seconds (64-bits for future proofing)
+  uint32_t unixTimeUs; ///< Time in microseconds (32-bits)
+  uint32_t firmwareVersion; ///< Firmware version
+  uint16_t wilkinsonCounter[DDA_PER_ATRI]; ///< Wilkinson counter one per DDA
+  uint16_t wilkinsonDelay[DDA_PER_ATRI]; ///< Wilkinson delay?? one per DDA
+  uint32_t ppsCounter; ///< Pulse per second counter
+  uint32_t clockCounter; ///< Clock counter (which clock?)
+  uint16_t l1Scaler[NUM_L1_SCALERS]; ///< L1 scaler, am I correct in decoding this need to check mapping prescaled by 32
+  uint16_t l1ScalerSurface[ANTS_PER_TDA]; ///< The Surface L1 scaler
+  uint16_t l2Scaler[NUM_L2_SCALERS]; ///< L2 scaler not prescaled
+  uint16_t l3Scaler[NUM_L3_SCALERS]; ///< L3 scaler not prescaled
+  uint16_t l4Scaler[NUM_L4_SCALERS]; ///< L4 scaler not prescaled
+  uint16_t t1Scaler[NUM_T1_SCALERS]; ///< T1 scaler not prescaled
+  uint16_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
+  uint16_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
+  uint16_t thresholdDac[NUM_L1_SCALERS]; ///< Value the thresholds are set to
   uint16_t surfaceThresholdDac[ANTS_PER_TDA]; ///< The surface thresholds
   uint8_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
   uint8_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds

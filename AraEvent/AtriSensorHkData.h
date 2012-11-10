@@ -31,12 +31,14 @@ class AtriSensorHkData: public RawAraGenericHeader, public TObject
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
 
    
-   UChar_t atriVoltage; ///< ATRI Voltage (conversion?)
-   UChar_t atriCurrent; ///< ATRI Current (conversion?)
+   UChar_t atriVoltage; ///< ATRI Voltage (multiply by 0.065 to get Volts)
+   UChar_t atriCurrent; ///< ATRI Current (multiply by (0.151)/2. to get Amps)
    UShort_t ddaTemp[DDA_PER_ATRI]; ///< DDA Temperature conversion??
    UShort_t tdaTemp[TDA_PER_ATRI]; ///< TDA Temperature conversion??
    UInt_t ddaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
    UInt_t tdaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
+   Double_t getDdaVoltage(Int_t dda); ///< Unpack the dda voltage
+   Double_t getDdaCurrent(Int_t dda); ///< Unpack the dda voltage
    
 
    ClassDef(AtriSensorHkData,1);
