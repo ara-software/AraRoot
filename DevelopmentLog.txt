@@ -11,9 +11,6 @@ AraEvent/AraEventCalibrator needs to be able to handle multiple Atri stations
 	 ->Load the calibration only when asked
 	 ->ATRI - only have in memory the station's pedestal and calib values
 
-ATRI Event Format
-
-     Changes to the ATRI event format at firmware level could have an impact on AraRoot. This is to be assessed and will be dealt with ASAP
 
 utilities
 	utility script to update the geometry / antenna information sqlite3 table as per Hagar Landsman's email
@@ -23,6 +20,10 @@ utilities
 ################################################################################################
 ##  Changes made
 ################################################################################################
+
+ATRI Event Format
+
+     Changes to the ATRI event format at firmware level could have an impact on AraRoot. This is to be assessed and will be dealt with ASAP
 
 Documentation
 	Doxygen -- Now understand how to produce and update this

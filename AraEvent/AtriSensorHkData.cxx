@@ -41,22 +41,34 @@ AtriSensorHkData::AtriSensorHkData(AraSensorHk_t *theHk)
 
 
 Double_t AtriSensorHkData::getDdaVoltage(Int_t dda){
-  if(dda >= DDA_PER_ATRI || dda < 0) return -1;
-  //  UInt_t ddaVoltageADC = (ddaVoltageCurrent[dda] & 0xff0000) >> 12;
-  // //  printf("ddaVoltageADC %u\n", ddaVoltageADC);
-  // ddaVoltageADC = ddaVoltageADC | ((ddaVoltageCurrent[dda] & 0x0000f0) >> 4);
-  // //  printf("ddaVoltageADC %u\n", ddaVoltageADC);
-  // Double_t ddaVoltageVolts = ddaVoltageADC * (6.65/4096);
-  // return ddaVoltageVolts;
-  return 1.*(ddaVoltageCurrent[dda]>>16);
-  
-  
+  if(dda >= DDA_PER_ATRI || dda < 0) return -99;
+  uint32_t ddaVoltageADC = (ddaVoltageCurrent[dda] & 0xff) << 4;
+  ddaVoltageADC = ddaVoltageADC | (ddaVoltageCurrent[dda] & 0xf00000)>>20;
+  Double_t ddaVoltageVolts = (6.65/4096)*ddaVoltageADC;
+  return ddaVoltageVolts;
 }
 Double_t AtriSensorHkData::getDdaCurrent(Int_t dda){
-  if(dda >= DDA_PER_ATRI) return -1;
+  if(dda >= DDA_PER_ATRI) return -99;
   UInt_t ddaCurrentADC = (ddaVoltageCurrent[dda] & 0x00ff00) >> 4;
-  ddaCurrentADC = ddaCurrentADC | (ddaVoltageCurrent[dda] & 0x0000ff) ;
+  ddaCurrentADC = ddaCurrentADC | (ddaVoltageCurrent[dda] & 0x0f0000)>>16 ;
   Double_t ddaCurrentAmps = ddaCurrentADC * (0.10584/4096) / 0.1;
   return ddaCurrentAmps;
+
+}
+
+Double_t AtriSensorHkData::getTdaVoltage(Int_t tda){
+  if(tda >= TDA_PER_ATRI || tda < 0) return -99;
+  uint32_t tdaVoltageADC = (tdaVoltageCurrent[tda] & 0xff) << 4;
+  tdaVoltageADC = tdaVoltageADC | (tdaVoltageCurrent[tda] & 0xf00000)>>20;
+  Double_t tdaVoltageVolts = (6.65/4096)*tdaVoltageADC;
+  return tdaVoltageVolts;
+
+}
+Double_t AtriSensorHkData::getTdaCurrent(Int_t tda){
+  if(tda >= TDA_PER_ATRI) return -99;
+  UInt_t tdaCurrentADC = (tdaVoltageCurrent[tda] & 0x00ff00) >> 4;
+  tdaCurrentADC = tdaCurrentADC | (tdaVoltageCurrent[tda] & 0x0f0000)>>16 ;
+  Double_t tdaCurrentAmps = tdaCurrentADC * (0.10584/4096) / 0.1;
+  return tdaCurrentAmps;
 
 }
