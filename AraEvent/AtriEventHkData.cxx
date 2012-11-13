@@ -92,3 +92,11 @@ AtriEventHkData::AtriEventHkData(AraEventHk2_7_t *theHk)
 
 
 }
+
+
+Double_t AtriEventHkData::wilkinsonCounterNs(Int_t dda){
+  if(dda >= DDA_PER_ATRI) return -1;
+  Double_t wilkNs = wilkinsonCounter[dda]*(20.83/64.);
+  return wilkNs;
+
+}

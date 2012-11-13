@@ -49,7 +49,7 @@ Double_t AtriSensorHkData::getDdaVoltage(Int_t dda){
 }
 Double_t AtriSensorHkData::getDdaCurrent(Int_t dda){
   if(dda >= DDA_PER_ATRI) return -99;
-  UInt_t ddaCurrentADC = (ddaVoltageCurrent[dda] & 0x00ff00) >> 4;
+  uint32_t ddaCurrentADC = (ddaVoltageCurrent[dda] & 0x00ff00) >> 4;
   ddaCurrentADC = ddaCurrentADC | (ddaVoltageCurrent[dda] & 0x0f0000)>>16 ;
   Double_t ddaCurrentAmps = ddaCurrentADC * (0.10584/4096) / 0.1;
   return ddaCurrentAmps;
@@ -66,9 +66,9 @@ Double_t AtriSensorHkData::getTdaVoltage(Int_t tda){
 }
 Double_t AtriSensorHkData::getTdaCurrent(Int_t tda){
   if(tda >= TDA_PER_ATRI) return -99;
-  UInt_t tdaCurrentADC = (tdaVoltageCurrent[tda] & 0x00ff00) >> 4;
+  uint32_t tdaCurrentADC = (tdaVoltageCurrent[tda] & 0x00ff00) >> 4;
   tdaCurrentADC = tdaCurrentADC | (tdaVoltageCurrent[tda] & 0x0f0000)>>16 ;
-  Double_t tdaCurrentAmps = tdaCurrentADC * (0.10584/4096) / 0.1;
+  Double_t tdaCurrentAmps = tdaCurrentADC * (0.10584/4096) / 0.2;
   return tdaCurrentAmps;
 
 }

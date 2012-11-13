@@ -38,10 +38,10 @@ class AtriSensorHkData: public RawAraGenericHeader, public TObject
    UInt_t ddaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
    UInt_t tdaVoltageCurrent[DDA_PER_ATRI]; ///< 3 bytes only will work out better packing when I know what the numbers mean
 
-   Double_t getDdaVoltage(Int_t dda); ///< Unpack the dda voltage
-   Double_t getDdaCurrent(Int_t dda); ///< Unpack the dda voltage
-   Double_t getTdaVoltage(Int_t tda); ///< Unpack the tda voltage
-   Double_t getTdaCurrent(Int_t tda); ///< Unpack the tda voltage
+   Double_t getDdaVoltage(Int_t dda); ///< Unpack the dda voltage (Volts)
+   Double_t getDdaCurrent(Int_t dda); ///< Unpack the dda current (Amps)
+   Double_t getTdaVoltage(Int_t tda); ///< Unpack the tda voltage (Volts)
+   Double_t getTdaCurrent(Int_t tda); ///< Unpack the tda current (Amps)
    
 
    ClassDef(AtriSensorHkData,1);
