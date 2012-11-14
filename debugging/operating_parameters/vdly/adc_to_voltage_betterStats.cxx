@@ -17,6 +17,8 @@
 //ROOT Includes
 #include "TCanvas.h"
 #include "TTree.h"
+#include "TH1.h"
+#include "TLine.h"
 #include "TFile.h"
 #include "TGraph.h"
 #include "TGraphErrors.h"
@@ -27,54 +29,37 @@ Double_t getMax(TGraph*);
 Double_t getMin(TGraph*);
 TGraph *getBlockGraph(TGraph*, Int_t);
 TGraph* getHalfGraph(TGraph*, Int_t);
-Int_t process_run(char*, char*, Double_t, Int_t, Int_t, TH1F*, TH1F*, TH1F*);
-int adc_to_voltage(char*, char*);
+Int_t process_run(char*, char*, Int_t, Int_t, TH1D*);
+int adc_to_voltage(char*, char*, Double_t);
+Double_t getPercentageMean(TH1* hist, Double_t percentage, Int_t half);
 
 using namespace std;
 int main(int argc, char **argv)
 {
-  if(argc<3) {
-    std::cerr << "Usage: " << argv[0] << " <runList> <outFile> \n";
+  if(argc<4) {
+    std::cerr << "Usage: " << argv[0] << " <runList> <outFile> <percentage>\n";
     return 1;
   }
-  return adc_to_voltage(argv[1], argv[2]);
+  return adc_to_voltage(argv[1], argv[2], atof(argv[3]));
 }
 
-int adc_to_voltage(char *runDescriptionFileName, char *outFileName){
+int adc_to_voltage(char *runDescriptionFileName, char *outFileName, Double_t percentage){
 
-  TFile *outFile = new TFile(outFileName, "RECREATE");\
-  TGraphErrors *grMaxMin = 0;
-  TCanvas *can_max_min = 0;
   Int_t channel=0, dda=0;
   Double_t peakToPeakVoltage=0, peakToPeakError=0;
-  Double_t av_max_zm=0, av_min_zm=0;
-  Double_t av_max_error=0, av_min_error=0;
-  TTree *outTree = new TTree("voltage_to_adc", "voltage_to_adc");
-  outTree->Branch("peakToPeakVoltage", &peakToPeakVoltage, "peakToPeakVoltage/D");
-  outTree->Branch("peakToPeakError", &peakToPeakError, "peakToPeakError/D");
-  outTree->Branch("av_max_zm", &av_max_zm, "av_max_zm/D");
-  outTree->Branch("av_min_zm", &av_min_zm, "av_min_zm/D");
-  outTree->Branch("av_max_error", &av_max_error, "av_max_error/D");
-  outTree->Branch("av_min_error", &av_min_error, "av_min_error/D");
-
 
   std::fstream runDescriptionFile(runDescriptionFileName);
   char *runFileBaseName = new char[100];
   char *pedFileBaseName = new char[100];
   Int_t loop_number=0;
-  TH1F* hist_max_zm;
-  TH1F* hist_min_zm;
-  TH1F* hist_mean;
   Int_t runNumber=0, pedNumber=0;
-  Double_t x_av_max[30]={0};
-  Double_t y_av_max[30]={0};
-  Double_t xerr_av_max[30]={0};
-  Double_t yerr_av_max[30]={0};
-  Double_t x_av_min[30]={0};
-  Double_t y_av_min[30]={0};
-  Double_t xerr_av_min[30]={0};
-  Double_t yerr_av_min[30]={0};
   Int_t loopNumber=0;
+  char histName[100];
+  char canName[100];
+  Double_t posVoltage[20], posAdc[20];
+  Double_t negVoltage[20], negAdc[20];
+
+  TFile *outFile = new TFile(outFileName, "RECREATE");\
 
   runDescriptionFile >> runFileBaseName >> pedFileBaseName;
   while(runDescriptionFile >> runNumber >> pedNumber >> peakToPeakVoltage >> peakToPeakError >> channel >> dda){
@@ -82,35 +67,43 @@ int adc_to_voltage(char *runDescriptionFileName, char *outFileName){
     char runFileName[100], pedFileName[100];
     sprintf(runFileName, "%s/run%i/event%i.root", runFileBaseName, runNumber, runNumber);
     sprintf(pedFileName, "%s/run_000%i/pedestalValues.run000%i.dat", pedFileBaseName, pedNumber, pedNumber);
-
     printf("run %s ped %s\n", runFileName, pedFileName);
-    hist_max_zm = new TH1F("hist_max_zm", "hist_max_zm", 2000, 1, 2000);
-    hist_min_zm = new TH1F("hist_min_zm", "hist_min_zm", 2000, -2000, -1);
-    hist_mean = new TH1F("hist_mean", "hist_mean", 2001, -1000, 1000);
 
     fprintf(stderr, "run %i ped %i vpp %f vpperr %f chan % i dda %i\n", runNumber, pedNumber, peakToPeakVoltage, peakToPeakError, channel, dda);
 
-    process_run(runFileName, pedFileName, peakToPeakVoltage, dda, channel, hist_max_zm, hist_min_zm, hist_mean);
-    av_max_zm = hist_max_zm->GetMean();
-    av_min_zm = hist_min_zm->GetMean();
-    av_max_error = hist_max_zm->GetMeanError();
-    av_min_error = hist_min_zm->GetMeanError();
-    
-    y_av_max[loopNumber] = av_max_zm;
-    y_av_min[loopNumber] = av_min_zm;
-    yerr_av_max[loopNumber] = av_max_error;
-    yerr_av_min[loopNumber] = av_min_error;
-    
-    x_av_max[loopNumber] = peakToPeakVoltage/2;
-    x_av_min[loopNumber] = -1*(peakToPeakVoltage/2);
-    xerr_av_max[loopNumber] = peakToPeakError;
-    xerr_av_min[loopNumber] = peakToPeakError;
+    sprintf(histName, "histAdc%i", (int)peakToPeakVoltage);
+    sprintf(canName, "canAdc%i", (int)peakToPeakVoltage);
+    TH1D *hist = new TH1D(histName, histName, 4096, -2048, 2048);
+    process_run(runFileName, pedFileName, dda, channel, hist);
 
-    outTree->Fill();
-
-    delete hist_max_zm;
-    delete hist_min_zm;
-    delete hist_mean;
+    Double_t posMean = getPercentageMean(hist, percentage, +1);
+    Double_t negMean = getPercentageMean(hist, percentage, -1);
+    
+    TCanvas *can = new TCanvas(canName, canName);
+    can->cd();
+    TLine *linePos = new TLine(posMean, 0, posMean, hist->GetMaximum());
+    TLine *lineNeg = new TLine(negMean, 0, negMean, hist->GetMaximum());
+    linePos->SetLineColor(kRed);
+    lineNeg->SetLineColor(kRed);
+    //    linePos->SetLineSize(2);
+    //    lineNeg->SetLineSize(2);
+    hist->GetXaxis()->SetRangeUser(-500,+500);
+    hist->Draw();
+    lineNeg->Draw("SAME");
+    linePos->Draw("SAME");
+    printf("p2p %f histo %s posMean %f negMean %f\n", peakToPeakVoltage, histName, posMean, negMean);
+    posVoltage[loopNumber]=peakToPeakVoltage/2.;
+    negVoltage[loopNumber]=-1*peakToPeakVoltage/2.;
+    posAdc[loopNumber]=posMean;
+    negAdc[loopNumber]=negMean;
+    
+    outFile->cd();
+    can->Write();
+    hist->Write();
+    delete hist;
+    delete can;
+    delete linePos;
+    delete lineNeg;
     
     loopNumber++;
 
@@ -118,50 +111,21 @@ int adc_to_voltage(char *runDescriptionFileName, char *outFileName){
   runDescriptionFile.close();
   //make plots
 
-  Double_t  *x_av_max_min = new Double_t[2*loopNumber];
-  Double_t  *y_av_max_min = new Double_t[2*loopNumber];
-  Double_t  *xerr_av_max_min = new Double_t[2*loopNumber];
-  Double_t  *yerr_av_max_min = new Double_t[2*loopNumber];
-
-  for(int i=0; i<loopNumber;i++){
-    x_av_max_min[i] = x_av_min[i];
-    x_av_max_min[i+loopNumber] = x_av_max[i];
-    y_av_max_min[i] = y_av_min[i];
-    y_av_max_min[i+loopNumber] = y_av_max[i];
-    xerr_av_max_min[i] = xerr_av_min[i];
-    xerr_av_max_min[i+loopNumber] = xerr_av_max[i];
-    yerr_av_max_min[i] = yerr_av_min[i];
-    yerr_av_max_min[i+loopNumber] = yerr_av_max[i];
-    
-    
+  Double_t combinedAdc[40]={0};
+  Double_t combinedVoltage[40]={0};
+  for(int i=0;i<loopNumber;i++){
+    combinedVoltage[i]=negVoltage[i];
+    combinedVoltage[i+loopNumber]=posVoltage[i];
+    combinedAdc[i]=negAdc[i];
+    combinedAdc[i+loopNumber]=posAdc[i];
   }
-
-  grMaxMin = new TGraphErrors(2*loopNumber, x_av_max_min, y_av_max_min, xerr_av_max_min, yerr_av_max_min);
-  grMaxMin->SetName("gr_adc_voltage");
-  char title[200];
-  sprintf(title, "adc vs voltage dda %i channel %i", dda, channel);
-  grMaxMin->SetTitle(title);
-  grMaxMin->GetXaxis()->SetTitle("Peak input voltage (mV)");
-  grMaxMin->GetYaxis()->SetTitle("ADC (ped subbed)");
-  grMaxMin->Fit("pol1");
-  can_max_min = new TCanvas("can_max_min", "can_max_min");
-  grMaxMin->SetMarkerStyle(26);
-  grMaxMin->SetMarkerSize(0.8);
-  grMaxMin->SetMarkerColor(kBlue);
-  grMaxMin->Draw("AP");
-  char plotName[200];
-  sprintf(plotName, "%s.plot.eps", outFileName);
-  can_max_min->SaveAs(plotName);
-  sprintf(plotName, "%s.plot.pdf", outFileName);
-  can_max_min->SaveAs(plotName);
+  TGraph *grVoltAdc = new TGraph(2*loopNumber, combinedVoltage, combinedAdc);
+  grVoltAdc->SetName("grVoltAdc");
   outFile->cd();
-  //  grMaxMin->SetOptFit(1111);
-  //   gSystem->SetOptFit(1111);
-  //   gSystem->setOptStat(0);
-  grMaxMin->Write();
+  grVoltAdc->Write();
 
-  
-  
+
+
   outFile->Write();
   
   
@@ -271,7 +235,7 @@ TGraph *getHalfGraph(TGraph *fullGraph, Int_t half){
   
 }
 
-Int_t process_run(char* runName, char* pedName, Double_t peakToPeakVoltage, Int_t dda, Int_t channel, TH1F* hist_max_zm, TH1F* hist_min_zm, TH1F* hist_mean){
+Int_t process_run(char* runName, char* pedName, Int_t dda, Int_t channel, TH1D* histo_adc){
 
   Int_t chanIndex=channel+RFCHAN_PER_DDA*dda;
   char inName[180];
@@ -290,7 +254,10 @@ Int_t process_run(char* runName, char* pedName, Double_t peakToPeakVoltage, Int_
   RawAtriStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   Int_t numEntries = eventTree->GetEntries();
+  if(numEntries > 1000) numEntries=1000; //FIXME -- 
+  numEntries=500;//DEBUG
   Int_t starEvery = numEntries / 80;
+
 
   //Now set the pedfile
   Int_t stationId=0;
@@ -301,26 +268,26 @@ Int_t process_run(char* runName, char* pedName, Double_t peakToPeakVoltage, Int_
   calib->setAtriPedFile(pedName, stationId);
 
   UsefulAtriStationEvent *realEvPtr=0;
-    for(int entry=10;entry<numEntries;entry++){ 
+    for(int entry=100;entry<numEntries;entry++){ 
     if(entry%starEvery==0) std::cerr <<"*";
     eventTree->GetEntry(entry);
     realEvPtr =  new UsefulAtriStationEvent(evPtr, AraCalType::kJustPed);
     TGraph *gr = realEvPtr->getGraphFromElecChan(chanIndex);
-
-    Double_t temp_max_adc = getMax(gr);
-    Double_t temp_min_adc = getMin(gr);
-    Double_t temp_mean_adc = getMean(gr);
-
     TGraph *grZM = zeroMean(gr);
-    
-    Double_t temp_max_adc_zm = getMax(grZM);
-    Double_t temp_min_adc_zm = getMin(grZM);
-    Double_t temp_mean_adc_zm = getMean(grZM);
-    hist_mean->Fill(temp_mean_adc_zm);
-    hist_max_zm->Fill(temp_max_adc_zm);
-    hist_min_zm->Fill(temp_min_adc_zm);
+    Int_t numBlocks = grZM->GetN() / SAMPLES_PER_BLOCK;
+    for(int block=0;block<numBlocks;block++){
+      TGraph *grBlock = getBlockGraph(grZM, block);
+      
+      Int_t numSamples = grBlock->GetN();
+      Double_t *yVals = grBlock->GetY();
+      for(int sample=0;sample<numSamples;sample++){
+	histo_adc->Fill(yVals[sample]);	
+      }
 
+      delete grBlock;
+    }
     delete gr;
+    delete grZM;
     delete realEvPtr;
   }//entry  
   std::cerr << "\n";
@@ -329,4 +296,51 @@ Int_t process_run(char* runName, char* pedName, Double_t peakToPeakVoltage, Int_
 
   return 0;
 
+}
+
+
+Double_t getPercentageMean(TH1* hist, Double_t percentage, Int_t half){
+
+  Int_t numBins = hist->GetNbinsX(); //getsize returns noBins+overflow+underflow = noBins+2
+  hist->GetXaxis()->SetRange(1,numBins);
+  Int_t bin0 = hist->FindBin(0);
+  Double_t mean=0;
+  if(half==1){
+    hist->GetXaxis()->SetRange(bin0, numBins);
+    Int_t maxBin = hist->GetMaximumBin();
+    Double_t totalEntries = hist->Integral(bin0,numBins);
+    Double_t targetEntries = totalEntries*(percentage/100.);
+    for(Int_t bin=numBins;bin>=bin0;--bin){
+      Double_t integral = hist->Integral(bin,numBins);
+      if(integral<targetEntries){
+	mean+=hist->GetBinContent(bin)*hist->GetBinCenter(bin)/targetEntries;
+      }
+      else{
+	mean+=(integral-targetEntries)*hist->GetBinCenter(bin)/targetEntries;
+	break;
+      }
+    }
+  }//positive half
+  else if(half==-1){
+    hist->GetXaxis()->SetRange(1, bin0);
+    Int_t maxBin = hist->GetMaximumBin();
+    Double_t totalEntries = hist->Integral(1,bin0);
+    Double_t targetEntries = totalEntries*(percentage/100.);
+    for(Int_t bin=1;bin<=bin0;bin++){
+      Double_t integral = hist->Integral(1,bin);
+      if(integral<targetEntries){
+	mean+=hist->GetBinContent(bin)*hist->GetBinCenter(bin)/targetEntries;
+      }
+      else{
+	mean+=(integral-targetEntries)*hist->GetBinCenter(bin)/targetEntries;
+	break;
+      }
+    }
+  }//negative half
+  else{
+  }
+
+  hist->GetXaxis()->SetRange(1,numBins); //Return the axis to normal
+
+  return mean;
 }

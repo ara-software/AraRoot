@@ -1,0 +1,7 @@
+/path/to/base/dir/containing/root/files	/path/to/raw/data/dir/for/pedestal/loading
+
+runNo pedNo P2PVoltage VoltError Channel DDA
+runNo pedNo P2PVoltage VoltError Channel DDA
+runNo pedNo P2PVoltage VoltError Channel DDA
+runNo pedNo P2PVoltage VoltError Channel DDA
+etc...
