@@ -1,0 +1,8 @@
+/path/to/base/dir/of/root/event/files	/path/to/raw/data/files/for/the/pedestal	/output/file/name.root
+
+runNo pedNo Vadj Freq(GHz) channel dda
+runNo pedNo Vadj Freq(GHz) channel dda
+runNo pedNo Vadj Freq(GHz) channel dda
+runNo pedNo Vadj Freq(GHz) channel dda
+runNo pedNo Vadj Freq(GHz) channel dda
+etc...

@@ -72,3 +72,48 @@ Double_t AtriSensorHkData::getTdaCurrent(Int_t tda){
   return tdaCurrentAmps;
 
 }
+
+Double_t AtriSensorHkData::getDdaTemp(Int_t dda){
+  if(dda>= DDA_PER_ATRI) return -99;
+  //Two's complement
+
+  bool isNegative = false;
+  uint16_t msb = ddaTemp[dda] << 4;
+  uint16_t lsb = ddaTemp[dda] >> 12;
+
+  if(msb&0x0800) isNegative=true;
+
+  uint16_t tempADC = msb | lsb;
+
+  if(isNegative){
+    tempADC=~tempADC+1;
+    tempADC=tempADC&0x0fff;
+  }
+  Double_t temperature = tempADC * 0.0625;
+  if(isNegative) temperature = -1*temperature;
+
+  return  temperature;
+
+}
+
+Double_t AtriSensorHkData::getTdaTemp(Int_t tda){
+  if(tda>=TDA_PER_ATRI) return -99;
+
+  bool isNegative = false;
+  uint16_t msb = tdaTemp[tda] << 4;
+  uint16_t lsb = tdaTemp[tda] >> 12;
+
+  if(msb&0x0800) isNegative=true;
+
+  uint16_t tempADC = msb | lsb;
+
+  if(isNegative){
+    tempADC=~tempADC+1;
+    tempADC=tempADC&0x0fff;
+  }
+  Double_t temperature = tempADC * 0.0625;
+  if(isNegative) temperature=-1*temperature;
+
+  return  temperature;
+
+}

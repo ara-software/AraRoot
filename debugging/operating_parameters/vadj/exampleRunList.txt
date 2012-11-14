@@ -1,0 +1,18 @@
+/unix/ara/data/ntu2012/StationTwo/root	/unix/ara/data/ntu2012/StationTwo/raw_data	/unix/ara/data/ntu2012/StationTwo/calibration_output/vadj/sampling_speed_minus40.root
+
+187 189 17364 0.214 0 0
+188 189 17264 0.214 0 0
+191 189 17464 0.214 0 0
+
+187 189 17707 0.214 0 1
+188 189 17607 0.214 0 1
+191 189 17807 0.214 0 1
+
+187 189 17664 0.214 0 2
+188 189 17564 0.214 0 2
+191 189 17764 0.214 0 2
+
+187 189 17550 0.214 0 3
+188 189 17450 0.214 0 3
+191 189 17650 0.214 0 3
+
