@@ -27,3 +27,5 @@ add_subdirectory(calibration/ATRI) #FIXME -- is this working?
 
 add_subdirectory(debugging/sample_lines)
 add_subdirectory(debugging/data_lines)
+add_subdirectory(debugging/operating_parameters/vadj)
+add_subdirectory(debugging/operating_parameters/vdly)
