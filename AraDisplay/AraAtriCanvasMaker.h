@@ -15,6 +15,7 @@
 #include <TMath.h>
 #include <TH1.h>
 #include <TVector3.h>
+#include "araSoft.h"
 #include "AraDisplayConventions.h"
 #include "UsefulAtriStationEvent.h"
 #include "AraEventCalibrator.h"
@@ -44,8 +45,8 @@ class AraAtriCanvasMaker
   Double_t fThisMinTime; ///<The minimum time
   Double_t fThisMaxTime; ///< The maximum time
   
-  Double_t fMinVoltLimit; ///< The minimum voltage. 
-  Double_t fMaxVoltLimit; ///< The maximum voltage.
+  Double_t fMinVoltLimit[RFCHAN_PER_DDA]; ///< The minimum voltage. 
+  Double_t fMaxVoltLimit[RFCHAN_PER_DDA]; ///< The maximum voltage.
   Int_t fAutoScale; ///< Fixed or auto-scaling y-axis?
   Double_t fMinClockVoltLimit; ///< The minimum voltage in the clock channels.
   Double_t fMaxClockVoltLimit; ///< The maximum voltage in the clock channels.

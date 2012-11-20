@@ -1,15 +1,18 @@
 gSystem->Reset();
 
-void runAraDisplay(int run) {
+void runAraDisplay(int run, int ped) {
   
   char fileName[180];  
-  sprintf(fileName, "/unix/ara/data/miniATRI_ucl/eventFormat2/root/run%d/event%d.root", run, run);
-  runAraDisplay(fileName);
+  sprintf(fileName, "/Users/jdavies/ara/data/ntu2012/StationTwo/root/run%i/event%i.root", run, run);
+  char pedName[180];  
+  sprintf(pedName, "/Users/jdavies/ara/data/ntu2012/StationTwo/raw_data/run_%06d/pedestalValues.run%06d.dat", ped, ped);
+
+  runAraDisplay(fileName, pedName);
 
 }
 
  
-void runAraDisplay(char *eventFile) {
+void runAraDisplay(char *eventFile, char *pedFile) {
   gSystem->AddIncludePath("-I${ARA_UTIL_INSTALL_DIR}/include");
   //  gSystem->AddIncludePath("-I/sw/include");
   gSystem->SetDynamicPath(std::string(std::string(gSystem->GetDynamicPath())+":${ARA_UTIL_INSTALL_DIR}/lib").c_str());
@@ -28,7 +31,7 @@ void runAraDisplay(char *eventFile) {
 
   TChain *fred=0; //Will this work?
 
-  AraEventCalibrator::Instance()->setAtriPedFile("/unix/ara/data/miniATRI_ucl/eventFormat2/run_000283/pedestalValues.run000283.dat", 2); //BRENDAN -- this is how to set an ATRI pedestal file (second argument is the stationId)
+  AraEventCalibrator::Instance()->setAtriPedFile(pedFile,2);
 
   AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);  
   //  AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kNoCalib);  
