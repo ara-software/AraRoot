@@ -48,12 +48,13 @@ class RawAtriStationEvent: public RawAraStationEvent
    UInt_t ppsNumber; ///< For matching up with thresholds etc.
    UInt_t numStationBytes; ///<Bytes in station readout
    UInt_t timeStamp; ///< Timestamp
+   uint32_t timeStampGray; ///< Timestamp
+
    UInt_t eventId; ///< Event Id
    UShort_t versionId; ///< Version Id for event header
    UShort_t numReadoutBlocks; ///< Number of readout blocks which follow header
 
-   UShort_t triggerPattern[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
-   UShort_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
+   UInt_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
    UChar_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block the triggers occured in
 
    std::vector<RawAtriStationBlock> blockVec;

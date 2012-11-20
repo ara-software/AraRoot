@@ -27,18 +27,28 @@ RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *d
   :RawAraStationEvent(&(hdPtr->gHdr))
 {
   
+
    unixTime=hdPtr->unixTime;
    unixTimeUs=hdPtr->unixTimeUs;
    eventNumber=hdPtr->eventNumber;
    ppsNumber=hdPtr->ppsNumber;
    numStationBytes=hdPtr->numBytes;
-   //   std::cerr << eventNumber << "\t" << ppsNumber << "\t" << numStationBytes;
+   versionId=hdPtr->versionNumber;
    timeStamp=hdPtr->timeStamp;
+
+   timeStampGray = timeStamp;
+
+   timeStampGray ^= (timeStampGray >> 1);
+   timeStampGray ^= (timeStampGray >> 2);
+   timeStampGray ^= (timeStampGray >> 4);
+   timeStampGray ^= (timeStampGray >> 8);
+   timeStampGray ^= (timeStampGray >> 16);
+
    eventId=hdPtr->eventId;
+   //   std::cerr << eventNumber << "\t" << versionId << "\t" << ppsNumber << "\t" << timeStamp << "\t" << eventId << std::endl;
    numReadoutBlocks=hdPtr->numReadoutBlocks; 
    
    for(int trig=0;trig<MAX_TRIG_BLOCKS;trig++) {
-     triggerPattern[trig]=hdPtr->triggerPattern[trig];
      triggerInfo[trig]=hdPtr->triggerInfo[trig];
      triggerBlock[trig]=hdPtr->triggerBlock[trig];
    }
@@ -75,15 +85,24 @@ RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *d
   unixTime=hdPtr->unixTime;
   unixTimeUs=hdPtr->unixTimeUs;
   eventNumber=hdPtr->eventNumber;
+  versionId=hdPtr->versionNumber;
   ppsNumber=hdPtr->ppsNumber;
   numStationBytes=hdPtr->numBytes;
   //   std::cerr << eventNumber << "\t" << ppsNumber << "\t" << numStationBytes;
    timeStamp=hdPtr->timeStamp;
+   timeStampGray = timeStamp;
+
+   timeStampGray ^= (timeStampGray >> 1);
+   timeStampGray ^= (timeStampGray >> 2);
+   timeStampGray ^= (timeStampGray >> 4);
+   timeStampGray ^= (timeStampGray >> 8);
+   timeStampGray ^= (timeStampGray >> 16);
+
+
    eventId=hdPtr->eventId;
    numReadoutBlocks=hdPtr->numReadoutBlocks; 
    
    for(int trig=0;trig<MAX_TRIG_BLOCKS;trig++) {
-     triggerPattern[trig]=hdPtr->triggerPattern[trig];
      triggerInfo[trig]=hdPtr->triggerInfo[trig];
      triggerBlock[trig]=hdPtr->triggerBlock[trig];
    }

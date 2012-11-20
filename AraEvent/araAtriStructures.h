@@ -226,8 +226,7 @@ typedef struct {
   uint32_t eventId; ///< Event Id
   uint16_t versionNumber; ///<Event version number
   uint16_t numReadoutBlocks; ///< Number of readout blocks which follow header
-  uint16_t triggerPattern[MAX_TRIG_BLOCKS]; ///< The trigger type block, might do something more clever with this
-  uint16_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger type block, might do something more clever with this
+  uint32_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger type block, might do something more clever with this
   uint8_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block (starting from 0) di trigger occur in?
 } AraStationEventHeader_t;
   

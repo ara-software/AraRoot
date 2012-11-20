@@ -254,8 +254,8 @@ Int_t process_run(char* runName, char* pedName, Int_t dda, Int_t channel, TH1D* 
   RawAtriStationEvent *evPtr=0;
   eventTree->SetBranchAddress("event",&evPtr);
   Int_t numEntries = eventTree->GetEntries();
-  if(numEntries > 1000) numEntries=1000; //FIXME -- 
-  numEntries=500;//DEBUG
+  if(numEntries > 2000) numEntries=2000; //FIXME -- 
+  //  numEntries=500;//DEBUG
   Int_t starEvery = numEntries / 80;
 
 
