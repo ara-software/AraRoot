@@ -35,20 +35,11 @@ RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *d
    numStationBytes=hdPtr->numBytes;
    versionId=hdPtr->versionNumber;
    timeStamp=hdPtr->timeStamp;
-
-   timeStampGray = timeStamp;
-   timeStampGray ^= (timeStampGray >> 1);
-   timeStampGray ^= (timeStampGray >> 2);
-   timeStampGray ^= (timeStampGray >> 4);
-   timeStampGray ^= (timeStampGray >> 8);
-   timeStampGray ^= (timeStampGray >> 16);
-
-   timeStampRevGray = ((timeStamp&0xff) << 16) | ((timeStamp&0xff00) >> 16 );
-   timeStampRevGray ^= (timeStampRevGray >> 1);
-   timeStampRevGray ^= (timeStampRevGray >> 2);
-   timeStampRevGray ^= (timeStampRevGray >> 4);
-   timeStampRevGray ^= (timeStampRevGray >> 8);
-   timeStampRevGray ^= (timeStampRevGray >> 16);
+   timeStamp ^= (timeStamp >> 1);
+   timeStamp ^= (timeStamp >> 2);
+   timeStamp ^= (timeStamp >> 4);
+   timeStamp ^= (timeStamp >> 8);
+   timeStamp ^= (timeStamp >> 16);
 
 
    eventId=hdPtr->eventId;
@@ -97,20 +88,11 @@ RawAtriStationEvent::RawAtriStationEvent(AraStationEventHeader_t *hdPtr, char *d
   numStationBytes=hdPtr->numBytes;
   //   std::cerr << eventNumber << "\t" << ppsNumber << "\t" << numStationBytes;
    timeStamp=hdPtr->timeStamp;
-   timeStampGray = timeStamp;
-
-   timeStampGray ^= (timeStampGray >> 1);
-   timeStampGray ^= (timeStampGray >> 2);
-   timeStampGray ^= (timeStampGray >> 4);
-   timeStampGray ^= (timeStampGray >> 8);
-   timeStampGray ^= (timeStampGray >> 16);
-
-   timeStampRevGray = ((timeStamp&0xff) << 16) | ((timeStamp&0xff00) >> 16 );
-   timeStampRevGray ^= (timeStampRevGray >> 1);
-   timeStampRevGray ^= (timeStampRevGray >> 2);
-   timeStampRevGray ^= (timeStampRevGray >> 4);
-   timeStampRevGray ^= (timeStampRevGray >> 8);
-   timeStampRevGray ^= (timeStampRevGray >> 16);
+   timeStamp ^= (timeStamp >> 1);
+   timeStamp ^= (timeStamp >> 2);
+   timeStamp ^= (timeStamp >> 4);
+   timeStamp ^= (timeStamp >> 8);
+   timeStamp ^= (timeStamp >> 16);
 
 
 
