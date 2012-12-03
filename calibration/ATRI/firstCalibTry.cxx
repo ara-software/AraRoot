@@ -60,7 +60,7 @@ int firstCalibTry(int run,Double_t frequency,Int_t dda, Int_t chan, bool debug)
   Int_t chanIndex=chan+RFCHAN_PER_DDA*dda;
 
   char inName[180];
-  sprintf(inName,"/unix/ara/data/hawaii2011/root/run%d/event%d.root",run,run);
+  sprintf(inName,"/unix/ara/data/hawaii2012/StationOne/root/run%d/event%d.root",run,run);
 
 
 

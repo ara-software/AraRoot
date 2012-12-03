@@ -29,6 +29,12 @@ AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   unixTime=theHk->unixTime; ///< Time in seconds (64-bits for future proofing)
   unixTimeUs=theHk->unixTimeUs; ///< Time in microseconds (32-bits)
   firmwareVersion=theHk->firmwareVersion; ///< Firmware version
+  firmwareVersionMaj = (firmwareVersion & 0xf000) >> 12;
+  firmwareVersionMid = (firmwareVersion & 0xf00) >> 8;
+  firmwareVersionMin = (firmwareVersion & 0xff);
+
+
+
   memcpy(wilkinsonCounter,theHk->wilkinsonCounter,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson counter one per DDA
   memcpy(wilkinsonDelay,theHk->wilkinsonDelay,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson delay?? one per DDA
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
@@ -58,6 +64,11 @@ AtriEventHkData::AtriEventHkData(AraEventHk2_7_t *theHk)
   unixTime=theHk->unixTime; ///< Time in seconds (64-bits for future proofing)
   unixTimeUs=theHk->unixTimeUs; ///< Time in microseconds (32-bits)
   firmwareVersion=theHk->firmwareVersion; ///< Firmware version
+  firmwareVersion=theHk->firmwareVersion; ///< Firmware version
+  firmwareVersionMaj = (firmwareVersion & 0xf000) >> 12;
+  firmwareVersionMid = (firmwareVersion & 0xf00) >> 8;
+  firmwareVersionMin = (firmwareVersion & 0xff);
+
   memcpy(wilkinsonCounter,theHk->wilkinsonCounter,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson counter one per DDA
   memcpy(wilkinsonDelay,theHk->wilkinsonDelay,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson delay?? one per DDA
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
@@ -81,24 +92,29 @@ Double_t AtriEventHkData::wilkinsonCounterNs(Int_t dda){
 Double_t AtriEventHkData::getSingleChannelRateHz(Int_t tda, Int_t channel){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
   if(channel>= ANTS_PER_TDA || tda <0) return -1;
-  return 32.*l1Scaler[tda*ANTS_PER_TDA+channel];
+  uint8_t preScale=32;
+
+  return l1Scaler[tda*ANTS_PER_TDA+channel] * preScale;
   
 }
 Double_t AtriEventHkData::getOneOfFourRateHz(Int_t tda){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
-  return 32.*l2Scaler[tda*4];
+  uint8_t preScale=1;
+  if(firmwareVersionMaj > 0 || firmwareVersionMid > 9 || firmwareVersionMin >= 40) preScale=64; 
+
+  return l2Scaler[tda*4]*preScale;
 
 
 }
 Double_t AtriEventHkData::getTwoOfFourRateHz(Int_t tda){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
-  return 32.*l2Scaler[tda*4+1];
+  return l2Scaler[tda*4+1];
 
 
 }
 Double_t AtriEventHkData::getThreeOfFourRateHz(Int_t tda){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
-  return 32.*l2Scaler[tda*4+2];
+  return l2Scaler[tda*4+2];
 
 
 }

@@ -49,6 +49,7 @@ class RawAtriStationEvent: public RawAraStationEvent
    UInt_t numStationBytes; ///<Bytes in station readout
    UInt_t timeStamp; ///< Timestamp
    uint32_t timeStampGray; ///< Timestamp
+   uint32_t timeStampRevGray; ///< Timestamp
 
    UInt_t eventId; ///< Event Id
    UShort_t versionId; ///< Version Id for event header

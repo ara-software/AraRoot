@@ -258,19 +258,19 @@ TPad *AraAtriCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPa
      rightPave->AddText(textLabel); 
      sprintf(textLabel,"Blocks");
      rightPave->AddText(textLabel); 
-     sprintf(textLabel,"%d -- ",0);
+     sprintf(textLabel,"");
+     int count=0;
      for(int i=0;i<evPtr->numReadoutBlocks;i++) {
-       if(i>0 && i%4==0){
-	 if(i%8==0){
-	   rightPave->AddText(textLabel); 	 
-	   sprintf(textLabel,"%d -- ",i);	   
+       if(evPtr->blockVec[i].getDda()==0) {
+	 count++;
+	 if(count%8==0) {
+	   rightPave->AddText(textLabel);
+	   sprintf(textLabel,"%d",evPtr->blockVec[i].getBlock());
 	 }
-	 else{
-	   sprintf(textLabel,"\t%d -- ",i);	   
-	 }
+	 else sprintf(textLabel,"%s%d ",textLabel,evPtr->blockVec[i].getBlock());
 
-       }
-       sprintf(textLabel,"%s %d",textLabel,evPtr->blockVec[i].getBlock());
+       }	 
+       
      }
      rightPave->AddText(textLabel); 
 

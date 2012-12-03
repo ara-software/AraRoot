@@ -31,7 +31,11 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
 
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
-   UInt_t firmwareVersion; ///< Firmware version
+   UInt_t firmwareVersion; ///< Firmware version [31:28] ATRI version [27:24] month [23:16] day [15:12] vMajor [11:8] vMiddle [7:0] vMinor 
+   uint8_t firmwareVersionMaj; ///< Split up the firmware version into more inteligable parts
+   uint8_t firmwareVersionMid; ///< Split up the firmware version into more inteligable parts
+   uint8_t firmwareVersionMin; ///< Split up the firmware version into more inteligable parts
+
    UShort_t wilkinsonCounter[DDA_PER_ATRI]; ///< Wilkinson counter one per DDA
    UShort_t wilkinsonDelay[DDA_PER_ATRI]; ///< Wilkinson delay?? one per DDA
    UInt_t ppsCounter; ///< Pulse per second counter
@@ -55,6 +59,7 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    UShort_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
    UShort_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
 
+   
    Double_t getSingleChannelRateHz(Int_t tda, Int_t channel); ///< Gets the single channel rate in Hz for tda channel
    Double_t getOneOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of one of four channels on tda
    Double_t getTwoOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of two of four channels on tda
