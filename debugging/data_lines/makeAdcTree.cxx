@@ -11,6 +11,8 @@
 #include "UsefulAtriStationEvent.h"
 
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 TGraph *getBlockGraph(TGraph*, Int_t);
 

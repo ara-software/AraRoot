@@ -63,7 +63,7 @@ int main(int argc, char **argv)
      }
      
      eventTree->GetEntry(event);
-     timeStampGray=rawEvPtr->timeStampGray;
+     timeStampGray=rawEvPtr->timeStamp;
      eventNumber=rawEvPtr->eventNumber;
      ppsNumber=rawEvPtr->ppsNumber;
      unixTimeUs=rawEvPtr->unixTimeUs;

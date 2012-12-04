@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canonical targets will work.
+# Disable implicit rules so canoncical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -30,19 +30,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = "/Applications/CMake 2.8-8.app/Contents/bin/cmake"
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = "/Applications/CMake 2.8-8.app/Contents/bin/cmake" -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = "/Applications/CMake 2.8-8.app/Contents/bin/ccmake"
+CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jdavies/repositories/ara/AraRoot/trunk
+CMAKE_SOURCE_DIR = /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jdavies/repositories/ara/AraRoot/trunk
+CMAKE_BINARY_DIR = /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +50,7 @@ CMAKE_BINARY_DIR = /Users/jdavies/repositories/ara/AraRoot/trunk
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/ccmake" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,19 +60,19 @@ edit_cache/fast: edit_cache
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/cmake" -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/cmake" -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/cmake" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
@@ -82,7 +82,7 @@ install/local/fast: install/local
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/cmake" -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
@@ -101,7 +101,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	"/Applications/CMake 2.8-8.app/Contents/bin/cmake" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -110,14 +110,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(CMAKE_COMMAND) -E cmake_progress_start /Users/jdavies/repositories/ara/AraRoot/trunk/CMakeFiles /Users/jdavies/repositories/ara/AraRoot/trunk/AraWebPlotter/configLib/CMakeFiles/progress.marks
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jdavies/repositories/ara/AraRoot/trunk/CMakeFiles 0
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(CMAKE_COMMAND) -E cmake_progress_start /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6/CMakeFiles /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6/AraWebPlotter/configLib/CMakeFiles/progress.marks
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/clean
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/clean
 .PHONY : clean
 
 # The main clean target
@@ -126,22 +126,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/preinstall
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/preinstall
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/rule:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/rule
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/rule
 .PHONY : AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/rule
 
 # Convenience name for target.
@@ -150,15 +150,20 @@ AraConfig: AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/rule
 
 # fast build rule for target.
 AraConfig/fast:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build
 .PHONY : AraConfig/fast
+
+# Manual pre-install relink rule for target.
+AraConfig/preinstall:
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f CMakeFiles/Makefile2 AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/preinstall
+.PHONY : AraConfig/preinstall
 
 configError.o: configError.cxx.o
 .PHONY : configError.o
 
 # target to build an object file
 configError.cxx.o:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.o
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.o
 .PHONY : configError.cxx.o
 
 configError.i: configError.cxx.i
@@ -166,7 +171,7 @@ configError.i: configError.cxx.i
 
 # target to preprocess a source file
 configError.cxx.i:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.i
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.i
 .PHONY : configError.cxx.i
 
 configError.s: configError.cxx.s
@@ -174,7 +179,7 @@ configError.s: configError.cxx.s
 
 # target to generate assembly for a file
 configError.cxx.s:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.s
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configError.cxx.s
 .PHONY : configError.cxx.s
 
 configFileSpec.o: configFileSpec.cxx.o
@@ -182,7 +187,7 @@ configFileSpec.o: configFileSpec.cxx.o
 
 # target to build an object file
 configFileSpec.cxx.o:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.o
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.o
 .PHONY : configFileSpec.cxx.o
 
 configFileSpec.i: configFileSpec.cxx.i
@@ -190,7 +195,7 @@ configFileSpec.i: configFileSpec.cxx.i
 
 # target to preprocess a source file
 configFileSpec.cxx.i:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.i
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.i
 .PHONY : configFileSpec.cxx.i
 
 configFileSpec.s: configFileSpec.cxx.s
@@ -198,7 +203,7 @@ configFileSpec.s: configFileSpec.cxx.s
 
 # target to generate assembly for a file
 configFileSpec.cxx.s:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.s
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configFileSpec.cxx.s
 .PHONY : configFileSpec.cxx.s
 
 configLoad.o: configLoad.cxx.o
@@ -206,7 +211,7 @@ configLoad.o: configLoad.cxx.o
 
 # target to build an object file
 configLoad.cxx.o:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.o
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.o
 .PHONY : configLoad.cxx.o
 
 configLoad.i: configLoad.cxx.i
@@ -214,7 +219,7 @@ configLoad.i: configLoad.cxx.i
 
 # target to preprocess a source file
 configLoad.cxx.i:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.i
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.i
 .PHONY : configLoad.cxx.i
 
 configLoad.s: configLoad.cxx.s
@@ -222,7 +227,7 @@ configLoad.s: configLoad.cxx.s
 
 # target to generate assembly for a file
 configLoad.cxx.s:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.s
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configLoad.cxx.s
 .PHONY : configLoad.cxx.s
 
 configStore.o: configStore.cxx.o
@@ -230,7 +235,7 @@ configStore.o: configStore.cxx.o
 
 # target to build an object file
 configStore.cxx.o:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.o
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.o
 .PHONY : configStore.cxx.o
 
 configStore.i: configStore.cxx.i
@@ -238,7 +243,7 @@ configStore.i: configStore.cxx.i
 
 # target to preprocess a source file
 configStore.cxx.i:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.i
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.i
 .PHONY : configStore.cxx.i
 
 configStore.s: configStore.cxx.s
@@ -246,7 +251,7 @@ configStore.s: configStore.cxx.s
 
 # target to generate assembly for a file
 configStore.cxx.s:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.s
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(MAKE) -f AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/build.make AraWebPlotter/configLib/CMakeFiles/AraConfig.dir/configStore.cxx.s
 .PHONY : configStore.cxx.s
 
 # Help Target
@@ -285,6 +290,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/jdavies/repositories/ara/AraRoot/trunk && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/radio/ARA/StationOne_2012_2013/repositories/ara/AraRoot/branches/3.6 && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
