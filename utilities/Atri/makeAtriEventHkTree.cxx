@@ -74,25 +74,33 @@ void makeHkTree(char *inputName, char *outFile) {
     AtriGenericHeader_t theGenericHeader;
     gzFile infile = gzopen (fileName, "rb");    
     numBytes=gzread(infile, &theGenericHeader, sizeof(AtriGenericHeader_t));
+    // fprintf(stderr, "read %i bytes\n", numBytes);
+    // fprintf(stderr, "typeId %i verId %i subVerId %i\n", theGenericHeader.typeId, theGenericHeader.verId, theGenericHeader.subVerId);
+    // fprintf(stderr, "numBytes %i checksum %i\n", theGenericHeader.numBytes, theGenericHeader.checksum);
+    
 
-    //    fprintf(stderr, "read %i bytes\n", numBytes);
-
-    //    fprintf(stderr, "verId %i subVerId %i\n", theGenericHeader.verId, theGenericHeader.subVerId);
     if(theGenericHeader.verId>2){
       newHkFormat=1;      
-      //      fprintf(stderr, "Use AraEventHk_t\n");
     }
     else if(theGenericHeader.verId==2 && theGenericHeader.subVerId >7){
       newHkFormat=1;      
-      //      fprintf(stderr, "Use AraEventHk_t\n");
     }
     else{
       newHkFormat=0;      
-      //      fprintf(stderr, "Use AraEventHk2_7_t\n");
+    }
+    if(newHkFormat && theGenericHeader.numBytes == sizeof(AraEventHk2_7_t)){
+      fprintf(stderr, "error - wrong numBytes (%d) for newHkFormat\n", theGenericHeader.numBytes);
+      fprintf(stderr, "Forcing event format to AraEventHk2_7_t\n");
+      newHkFormat=0;
+    }
+    if(newHkFormat==0 && theGenericHeader.numBytes == sizeof(AraEventHk_t)){
+      fprintf(stderr, "error - wrong numBytes (%d) for oldHkFormat\n", theGenericHeader.numBytes);
+      fprintf(stderr, "Forcing event format to AraEventHk_t\n");
+      newHkFormat=1;
     }
 
+    
     gzclose(infile);
-
 
     infile = gzopen (fileName, "rb");    
     //    std::cout << "gzeof: " << gzeof(infile) << "\n";
@@ -102,6 +110,9 @@ void makeHkTree(char *inputName, char *outFile) {
 	//      cout << i << endl;
 	numBytes=gzread(infile,&theEventHkStruct,sizeof(AraEventHk_t));
 	//      std::cout << numBytes << "\n";
+	// fprintf(stderr, "read %i bytes\n", numBytes);
+	// fprintf(stderr, "verId %i subVerId %i\n", theEventHkStruct.gHdr.verId, theEventHkStruct.gHdr.subVerId);
+
 	if(numBytes==0) break;
 	if(numBytes!=sizeof(AraEventHk_t)) {
 	  if(numBytes)
@@ -109,7 +120,7 @@ void makeHkTree(char *inputName, char *outFile) {
 	error=1;
 	break;
 	}
-	//      cout << "Hk: " << theEventHkStruct.unixTime << endl;
+	//      cout << "Hk: " << theEventHkStruct.gHdr.unixTime << endl;
 	processHk(1);
       }
     }//newHkFormat
@@ -118,6 +129,11 @@ void makeHkTree(char *inputName, char *outFile) {
 	//      cout << i << endl;
 	numBytes=gzread(infile,&theEventHkStruct_2_7,sizeof(AraEventHk2_7_t));
 	//      std::cout << numBytes << "\n";
+	
+	// fprintf(stderr, "read %i bytes\n", numBytes);
+	// fprintf(stderr, "verId %i subVerId %i\n", theEventHkStruct_2_7.gHdr.verId, theEventHkStruct_2_7.gHdr.subVerId);
+	
+
 	if(numBytes==0) break;
 	if(numBytes!=sizeof(AraEventHk2_7_t)) {
 	  if(numBytes)
