@@ -1109,7 +1109,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
   int dda,chan,sample,capArray;
   sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
-  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
+  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
@@ -1146,7 +1146,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   
   char epsilonFileName[100];
   sprintf(epsilonFileName,"%s/ATRI/araAtriStation%iEpsilon.txt",calibDir, stationId);
-  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
+  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
   std::ifstream epsilonFile(epsilonFileName);
   while(epsilonFile >> dda >> chan >> capArray){
     epsilonFile >> value;
