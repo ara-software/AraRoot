@@ -29,8 +29,8 @@
 
 
 //Global Variables
-Double_t inter_sample_times[DDA_PER_ATRI][RFCHAN_PER_DDA][2][2][32]={{{{{0}}}}}; //[dda][chan][capArray][half][sample]
-Int_t inter_sample_index[DDA_PER_ATRI][RFCHAN_PER_DDA][2][2][32]={{{{{0}}}}}; //[dda][chan][capArray][half][sample]
+Double_t inter_sample_times[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]={{{{0}}}}; //[dda][chan][capArray][sample]
+Int_t inter_sample_index[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]={{{{0}}}}; //[dda][chan][capArray][sample]
 Double_t epsilon_times[DDA_PER_ATRI][RFCHAN_PER_DDA][2]={{{0}}}; //[dda][chan][capArray]
 
 
@@ -81,7 +81,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   char runFileName[FILENAME_MAX];
   char pedFileName[FILENAME_MAX];
   sprintf(runFileName, "%s/root/run%i/event%i.root", baseDirName, runNum, runNum);
-  sprintf(pedFileName, "%s/raw_data/run_%06i/pedestalWidths.run%06d.dat", baseDirName, pedNum, pedNum);
+  sprintf(pedFileName, "%s/raw_data/run_%06i/pedestalValues.run%06d.dat", baseDirName, pedNum, pedNum);
 
   // /unix/ara/data/ntu2012/StationTwo/raw_data/run_000464/pedestalWidths.run000464.dat 
   printf("runFileName %s\npedFileName %s\nfreq %f GHz\n", runFileName, pedFileName, freq);
@@ -110,7 +110,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   stationId= evPtr->stationId;
   if(debug)  std::cerr << "stationId " << stationId << "\n";
   AraEventCalibrator *calib = AraEventCalibrator::Instance();
-  calib->setAtriPedFile(pedFileName, stationId);
+  calib->setAtriPedFile(pedFileName, 2);
   
   //General output stuff
   char outFileName[FILENAME_MAX];
@@ -187,6 +187,17 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
     }
   }
 
+  Double_t time=0;
+  Int_t index=0;
+  TTree *binWidthsTree = new TTree("binWidthsTree", "binWidthsTree");
+  binWidthsTree->Branch("dda", &dda, "dda/I");
+  binWidthsTree->Branch("chan", &chan, "chan/I");
+  binWidthsTree->Branch("capArray", &capArray, "capArray/I");
+  binWidthsTree->Branch("sample", &sample, "sample/I");
+  binWidthsTree->Branch("time", &time, "time/D");
+  binWidthsTree->Branch("index", &index, "index/I");
+  binWidthsTree->Branch("epsilon", &epsilon, "epsilon/D");
+  
 
   //BinWidth Calibration
   for(int entry=0;entry<numEntries;entry++){
@@ -204,7 +215,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	Int_t numBlocks = numSamples/SAMPLES_PER_BLOCK;
 	
 	
-	for(block=1; block<numBlocks; block++){ //FIXME -- Only use blocks > 0
+	for(block=0; block<numBlocks; block++){ //FIXME -- Only use blocks > 0
 	  if(block%2) thisCapArray=1-capArray;
 	  else thisCapArray=capArray;
 	  TGraph *grBlock = getBlockGraph(grZeroMean, block);
@@ -256,12 +267,27 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
       for(capArray=0;capArray<2;capArray++){
 	for(half=0;half<2;half++){
+	  time=0;
+	  for(sample=0;sample<SAMPLES_PER_BLOCK/2;sample++){
+	    inter_sample_times[dda][chan][capArray][2*sample+half]=time;
+	    inter_sample_index[dda][chan][capArray][2*sample+half]=2*sample+half;
+	    time+=histBinWidth[dda][chan][capArray][half]->GetBinContent(sample+1);
+	    //	    if(debug&&dda==0&&chan==0) printf("capArray %i half %i sample %i time %f\n", capArray, half, sample, time);
+	    if(debug&&dda==0&&chan==0) printf("dda %i chan %i capArray %i index %i time %f\n", dda, chan, capArray, inter_sample_index[dda][chan][capArray][2*sample+half], inter_sample_times[dda][chan][capArray][2*sample+half]);
+	  }//sample
+	}//half
+      }//capArray
+    }//chan
+  }//dda
+  for(dda=0;dda<DDA_PER_ATRI;dda++){
+    for(chan=RFCHAN_PER_DDA;chan<RFCHAN_PER_DDA;chan++){
+      for(capArray=0;capArray<2;capArray++){
+	for(half=0;half<2;half++){
 	  Double_t time=0;
 	  for(sample=0;sample<SAMPLES_PER_BLOCK/2;sample++){
-	    time+=histBinWidth[dda][chan][capArray][half]->GetBinContent(sample);
-	    inter_sample_times[dda][chan][capArray][half][sample]=time;
-	    inter_sample_index[dda][chan][capArray][half][sample]=sample;
-	    if(debug) printf("capArray %i half %i sample %i time %f\n", capArray, half, sample, time);
+	    time=1./3.2*(sample*2+1);
+	    inter_sample_times[dda][chan][capArray][2*sample+half]=time;
+	    inter_sample_index[dda][chan][capArray][2*sample+half]=2*sample+half;
 	  }//sample
 	}//half
       }//capArray
@@ -269,7 +295,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   }//dda
 
   //Interleave Calibration
-  if(debug) numEntries=10;
+  //  if(debug) numEntries=10;
   for(int entry=0;entry<numEntries;entry++){
     if(entry%starEvery==0) std::cerr <<"*";
     eventTree->GetEntry(entry);
@@ -284,9 +310,10 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	Int_t numSamples = grZeroMean->GetN();
 	Int_t numBlocks = numSamples/SAMPLES_PER_BLOCK;
 	
-	for(block=1; block<numBlocks; block++){ //FIXME -- only use blocks>0
+	for(block=0; block<numBlocks; block++){ //FIXME -- only use blocks>0
 	  if(block%2) thisCapArray=1-capArray;
 	  else thisCapArray=capArray;
+	  //	  if(thisCapArray==1) continue;
 	  TGraph *grBlock = getBlockGraph(grZeroMean, block);
 	  TGraph *grBlockCalibrated = apply_bin_calibration(grBlock, thisCapArray, dda, chan);
 	  TGraph *grHalf0 = getHalfGraph(grBlockCalibrated, 0);
@@ -339,6 +366,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	// 	outFile->cd();
 	// 	lagHist[dda][chan][capArray]->Write();
 	lag[dda][chan][capArray] = lagHist[dda][chan][capArray]->GetMean(1);
+	//	printf("dda %i chan %i capArray %i lag %f\n", dda, chan, capArray ,lag[dda][chan][capArray]);	
       }//capArray
     }//chan
   }//dda
@@ -350,17 +378,21 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	for(half=0;half<2;half++){
 	  Double_t time=0;
 	  for(sample=0;sample<SAMPLES_PER_BLOCK/2;sample++){
-	    inter_sample_times[dda][chan][capArray][half][sample]=inter_sample_times[dda][chan][capArray][half][sample]+lag[dda][chan][capArray]*half;
-	    inter_sample_index[dda][chan][capArray][half][sample]=inter_sample_index[dda][chan][capArray][half][sample];
+	    inter_sample_times[dda][chan][capArray][2*sample+half]=inter_sample_times[dda][chan][capArray][2*sample+half]+lag[dda][chan][capArray]*half;
 	  }//sample
 	}//half
       }//capArray
     }//chan
   }//dda
 
-
-
-
+  //now sort the times
+  for(dda=0;dda<DDA_PER_ATRI;dda++){
+    for(chan=0;chan<RFCHAN_PER_DDA;chan++){
+      for(capArray=0;capArray<2;capArray++){
+	TMath::Sort(SAMPLES_PER_BLOCK,inter_sample_times[dda][chan][capArray],inter_sample_index[dda][chan][capArray],kFALSE);
+      }
+    }
+  }
 
  
   //Now calculate epsilon
@@ -380,7 +412,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	Int_t numSamples = grZeroMean->GetN();
 	Int_t numBlocks = numSamples/SAMPLES_PER_BLOCK;
 	
-	for(block=1; block<numBlocks-1; block++){ //FIXME -- only use blocks > 0
+	for(block=0; block<numBlocks-1; block++){ //FIXME -- only use blocks > 0
 	  if(block%2) thisCapArray=1-capArray;
 	  else thisCapArray=capArray;
 	  TGraph *grBlock0 = getBlockGraph(grZeroMean, block);
@@ -393,26 +425,24 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	  TGraph *grBlock1Half0 = getHalfGraph(grBlockCalibrated1, 0);
 	  TGraph *grBlock1Half1 = getHalfGraph(grBlockCalibrated1, 1);
 	  
-	  lastZCCount = findLastZC(grBlock0Half0, period, &lastZC);
+	  lastZCCount = findLastZC(grBlock0Half1, period, &lastZC);
 	  firstZCCount = findFirstZC(grBlock1Half0, period, &firstZC);
 	  half = 0;
 	  Double_t *tVals = grBlockCalibrated0->GetX();
 	  Double_t lastSample = tVals[SAMPLES_PER_BLOCK-1];
 	  epsilon = -firstZC+lastZC-lastSample+period;
-	  
-	  if(epsilon < -1*period) epsilon+=period;
-	  if(epsilon > +1*period) epsilon-=period;
-	  
+	  if(epsilon < -0.5*period) epsilon+=period;
+	  if(epsilon > +0.5*period) epsilon-=period;
+	  if(TMath::Abs(lastZCCount-firstZCCount)==0) histEpsilon[dda][chan][1-thisCapArray]->Fill(epsilon);	  
 	  epsilonTree->Fill();
-	  lastZCCount = findLastZC(grBlock0Half1, period, &lastZC);
-	  firstZCCount = findFirstZC(grBlock1Half1, period, &firstZC);
-	  half = 1;
-	  epsilon = -firstZC+lastZC-lastSample+period;
-	  
-	  if(epsilon < -1*period) epsilon+=period;
-	  if(epsilon > +1*period) epsilon-=period;
-	  epsilonTree->Fill();
-	  if(TMath::Abs(lastZCCount-firstZCCount)==0) histEpsilon[dda][chan][thisCapArray]->Fill(epsilon);
+	  // lastZCCount = findLastZC(grBlock0Half1, period, &lastZC);
+	  // firstZCCount = findFirstZC(grBlock1Half1, period, &firstZC);
+	  // half = 1;
+	  // epsilon = -firstZC+lastZC-lastSample+period;
+	  // if(epsilon < -1*period) epsilon+=period;
+	  // if(epsilon > +1*period) epsilon-=period;
+	  // epsilonTree->Fill();
+	  // if(TMath::Abs(lastZCCount-firstZCCount)==0) histEpsilon[dda][chan][thisCapArray]->Fill(epsilon);
 	  if(grBlock0Half0) delete grBlock0Half0;
 	  if(grBlock0Half1) delete grBlock0Half1;
 	  if(grBlock1Half0) delete grBlock1Half0;
@@ -439,9 +469,25 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
       }//capArray
     }//chan
   }//dda
+
   save_inter_sample_times(outFileName);
   save_epsilon_times(outFileName);
   
+  for(dda=0;dda<DDA_PER_ATRI;dda++){
+    for(chan=0;chan<RFCHAN_PER_DDA;chan++){
+      for(capArray=0;capArray<2;capArray++){
+	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++){
+	  time=inter_sample_times[dda][chan][capArray][sample];
+	  index=inter_sample_index[dda][chan][capArray][sample];
+	  epsilon=epsilon_times[dda][chan][capArray];
+	  binWidthsTree->Fill();
+	}//sample
+      }//capArray
+    }//chan
+  }//dda
+
+
+
   outFile->Write();
 
   return 0;
@@ -527,7 +573,7 @@ TGraph* apply_bin_calibration(TGraph* grBlock, Int_t capArray, Int_t dda, Int_t 
   Double_t *xVals = new Double_t[SAMPLES_PER_BLOCK];
   
   for(Int_t sample=0;sample<SAMPLES_PER_BLOCK;sample++){
-    xVals[sample] = inter_sample_times[dda][chan][capArray][sample%2][sample/2];
+    xVals[sample] = inter_sample_times[dda][chan][capArray][inter_sample_index[dda][chan][capArray][sample]];
   }//sample
   //FIXME -- need to take into account the ordering of samples
   //Maybe make a note in the calibration file name
@@ -550,19 +596,13 @@ Int_t save_inter_sample_times(char* name){
 	OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
 	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
 	  //Index values
-	  if(sample%2==0)
-	    OutFile << inter_sample_index[dda][chan][capArray][0][sample/2]*2 << " ";
-	  if(sample%2)
-	    OutFile << inter_sample_index[dda][chan][capArray][1][sample/2]*2+1 << " ";
+	  OutFile << inter_sample_index[dda][chan][capArray][sample] << " ";
 	}
 	OutFile << "\n";
 	OutFile << dda << "\t" << chan << "\t" << capArray << "\t";   
 	for(int sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
 	  //time values
-	  if(sample%2==0)
-	    OutFile << inter_sample_times[dda][chan][capArray][0][sample/2] << " ";
-	  if(sample%2)
-	    OutFile << inter_sample_times[dda][chan][capArray][1][sample/2] << " ";
+	    OutFile << inter_sample_times[dda][chan][capArray][sample] << " ";
 	}
 	OutFile << "\n";
       }
@@ -592,10 +632,11 @@ Int_t estimate_phase(TGraph *gr, Double_t period, Double_t *meanPhase, Int_t *to
       Double_t x1=xVals[sample]; 
       Double_t x2=xVals[sample+1]; 
       Double_t zc=((0-y1)/(y2-y1))*(x2-x1)+x1;
-      //      if(zc<0.6) printf("sample %i y1 %f y2 %f x1 %f x2 %f\n", sample, y1, y2, x1, x2);
+      //      if(zc<0.6) //printf("sample %i y1 %f y2 %f x1 %f x2 %f\n", sample, y1, y2, x1, x2);
       phase+=zc-numZCs*period;
-      //      printf("zc num %i val %f adjusted val %f\n", numZCs, zc, zc-numZCs*period);
+      //printf("zc num %i val %f adjusted val %f\n", numZCs, zc, zc-numZCs*period);
       numZCs++;
+      //return zc;
     }
   }//sample
 

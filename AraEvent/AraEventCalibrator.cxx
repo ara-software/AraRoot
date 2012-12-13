@@ -963,8 +963,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	}
 	samp++;
       }
-
-      for(samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
+      Int_t numSamples=0;
+      if(AraCalType::hasBinWidthCalib(calType)) numSamples=fAtriNumSamples[dda][chan][calType];
+      else numSamples=SAMPLES_PER_BLOCK;
+      for(samp=0;samp<numSamples;samp++) {
 	timeMapIt->second.push_back(tempTimes[samp]); ///<Filling with time
 	voltMapIt->second.push_back(tempVolts[voltIndex[samp]]); //Filling with volts
 	
@@ -1126,21 +1128,23 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
   Double_t value;
   Int_t index;
-  while(SampleFile >> dda >> chan >> capArray) {
-    //    std::cout <<  dda << "\t" << chan << "\t" << capArray << "\t";
-    for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+  while(SampleFile >> dda >> chan >> capArray){
+    SampleFile >> fAtriNumSamples[dda][chan][capArray];
+    //    std::cerr <<  dda << "\t" << chan << "\t" << capArray << "\t" << fAtriNumSamples[dda][chan][capArray] << "\t";
+    for(sample=0;sample<fAtriNumSamples[dda][chan][capArray];sample++) {
       SampleFile >> index;
       fAtriSampleIndex[dda][chan][capArray][sample]=index;
-      //      std::cout << fAtriSampleIndex[dda][chan][ << " ";    
+      //      std::cerr << fAtriSampleIndex[dda][chan][capArray][sample] << " ";    
     }
-
-    SampleFile >> dda >> chan >> capArray;
-    for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+    //    std::cerr << "\n";
+    SampleFile >> dda >> chan >> capArray >> fAtriNumSamples[dda][chan][capArray];
+    //    std::cerr <<  dda << "\t" << chan << "\t" << capArray << "\t" << fAtriNumSamples[dda][chan][capArray] << "\t";
+    for(sample=0;sample<fAtriNumSamples[dda][chan][capArray];sample++) {
       SampleFile >> value;
       fAtriSampleTimes[dda][chan][capArray][sample]=value;
-      //      std::cout << fAtriSampleTimes[dda][chan][capArray][sample] << " ";    
+      //      std::cerr << fAtriSampleTimes[dda][chan][capArray][sample] << " ";    
     }
-    //    std::cout << "\n";
+    //    std::cerr << "\n";
   }
   SampleFile.close();
   
