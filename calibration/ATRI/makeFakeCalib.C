@@ -11,7 +11,7 @@ void makeFakeCalib(){
     for(chan=0;chan<8;chan++){
       for(capArray=0;capArray<2;capArray++){
 	for(sample=0;sample<64;sample++){
-	  //	  if(sample%2==1) continue;
+	  if(sample%2==1) continue;
 	  sample_index_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample;
 	  sample_times_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample;
 	  numSamples[dda][chan][capArray]++;
@@ -30,8 +30,8 @@ void makeFakeCalib(){
   
 
 
-  save_inter_sample_times("araAtriStation2SampleTiming_fake.txt");
-  save_epsilon_times("araAtriStation2Epsilon_fake.txt");
+  save_inter_sample_times("araAtriStation2SampleTiming_fake_even.txt");
+  save_epsilon_times("araAtriStation2Epsilon_fake_even.txt");
 
 }
 Int_t save_inter_sample_times(char* outName){

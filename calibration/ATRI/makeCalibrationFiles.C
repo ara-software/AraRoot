@@ -8,6 +8,7 @@ Double_t sample_times_delta_out[4][8][2][64]={{{{0}}}};
 Int_t sample_index_out[4][8][2][64]={{{{0}}}};
 Double_t epsilon_times_out[4][8][2]={{{0}}};
 Int_t numSamples[4][8][2]={{{0}}};
+Int_t useSample[4][8][2][64]={{{{0}}}};
 
 
 void makeCalibrationFiles(char *inFileName){
@@ -38,11 +39,14 @@ void makeCalibrationFiles(char *inFileName){
     for(chan=0;chan<8;chan++){
       for(capArray=0;capArray<2;capArray++){
 	for(sample=0;sample<64;sample++){
-	  if(sample_index[dda][chan][capArray][sample]%2==1) continue;
-	  //	  if(sample_index[dda][chan][capArray][sample]>62) continue;
+	  if(sample_index[dda][chan][capArray][sample]%2==1){
+	    useSample[dda][chan][capArray][sample]=0;
+	  }
+	  //if(sample_index[dda][chan][capArray][sample]>62) continue;
 	  sample_index_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample_index[dda][chan][capArray][sample];
 	  sample_times_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample_times[dda][chan][capArray][sample];
 	  numSamples[dda][chan][capArray]++;
+	  useSample[dda][chan][capArray][sample]=1;
 	}
       }
     }

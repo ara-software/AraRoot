@@ -38,14 +38,28 @@ void calibPlots(char *calibFileName, char *outFileName){
   for(dda=0;dda<4;dda++){
     for(chan=0;chan<8;chan++){
       for(capArray=0;capArray<2;capArray++){
-	for(sample=0;sample<64;sample++){
-	  if(sample==0) deltaTime=1;
-	  else deltaTime=sample_times[dda][chan][capArray][sample]-sample_times[dda][chan][capArray][sample-1];
+	for(sample=0;sample<63;sample++){
+	  deltaTime=sample_times[dda][chan][capArray][sample+1]-sample_times[dda][chan][capArray][sample];
 	  time=sample_times[dda][chan][capArray][sample];
 	  index=sample_index[dda][chan][capArray][sample];
 	  epsilon=epsilon_times[dda][chan][capArray];
 	  outTree->Fill();
 	}
+	deltaTime=epsilon_times[dda][chan][1-capArray];
+	time=sample_times[dda][chan][capArray][63];
+	Double_t time63 = time;
+	index=sample_index[dda][chan][capArray][63];
+	epsilon=epsilon_times[dda][chan][capArray];
+	sample=63;
+	outTree->Fill();
+	for(sample=64;sample<127;sample++){
+	  deltaTime=sample_times[dda][chan][1-capArray][sample+1-64]-sample_times[dda][chan][1-capArray][sample-64];
+	  time=sample_times[dda][chan][1-capArray][sample-64]+time63+epsilon_times[dda][chan][1-capArray];
+	  index=sample_index[dda][chan][1-capArray][sample-64];
+	  epsilon=epsilon_times[dda][chan][capArray];
+	  outTree->Fill();
+	}
+
       }
     }
   }
