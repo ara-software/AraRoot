@@ -53,9 +53,15 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    uint16_t l1ScalerSurface[ANTS_PER_TDA]; ///< The Surface L1 scaler 
    uint16_t surfaceThresholdDac[ANTS_PER_TDA]; ///< The surface thresholds 
 
-   UChar_t deadTime[DDA_PER_ATRI]; ///< Dead time  8-bit measures of deadtime (multiply by 4096, divide by 1e6).
-   UChar_t avgOccupancy[DDA_PER_ATRI]; ///< Average occupancy over last 16 milliseconds
-   UChar_t maxOccupancy[DDA_PER_ATRI]; ///< Maximum occupancy in last second
+   uint8_t evReadoutError; ///< Error code from event readout processor
+   uint16_t evReadoutCountAvg; ///< Average number of Bytes available in event count fifo
+   uint16_t evReadoutCountMin; ///< Minimum number of Bytes available in event count fifo
+   uint16_t blockBuffCountAvg; ///< Average number of blocks available in block buffer
+   uint16_t blockBuffCountMax; ///< Maximum number of blocks available in block buffer
+   uint16_t digDeadTime; ///< Deadtime originating from digitisation in us, prescale 16
+   uint16_t buffDeadTime; ///< Deadtime originating from buffer full in us, prescale 16
+   uint16_t totalDeadTime; ///< Total deadtime in us, prescale 16
+
    UShort_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
    UShort_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
 

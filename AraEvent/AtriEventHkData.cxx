@@ -33,8 +33,6 @@ AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   firmwareVersionMid = (firmwareVersion & 0xf00) >> 8;
   firmwareVersionMin = (firmwareVersion & 0xff);
 
-
-
   memcpy(wilkinsonCounter,theHk->wilkinsonCounter,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson counter one per DDA
   memcpy(wilkinsonDelay,theHk->wilkinsonDelay,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson delay?? one per DDA
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
@@ -48,12 +46,29 @@ AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   memcpy(t1Scaler,theHk->t1Scaler,NUM_T1_SCALERS*sizeof(uint16_t)); ///< L2 scaler
   memcpy(thresholdDac,theHk->thresholdDac,NUM_L1_SCALERS*sizeof(uint16_t));
   memcpy(surfaceThresholdDac,theHk->surfaceThresholdDac,ANTS_PER_TDA*sizeof(uint16_t)); 
-
-  memcpy(deadTime,theHk->deadTime,DDA_PER_ATRI*sizeof(UChar_t));
-  memcpy(avgOccupancy,theHk->avgOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
-  memcpy(maxOccupancy,theHk->maxOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
   memcpy(vdlyDac,theHk->vdlyDac,DDA_PER_ATRI*sizeof(UShort_t));
   memcpy(vadjDac,theHk->vadjDac,DDA_PER_ATRI*sizeof(UShort_t));
+
+  if(firmwareVersionMaj > 0 || firmwareVersionMid > 10){
+    evReadoutError = theHk->evReadoutError;
+    evReadoutCountAvg = theHk->evReadoutCountAvg;
+    evReadoutCountMin = theHk->evReadoutCountMin;
+    blockBuffCountAvg = theHk->blockBuffCountAvg;
+    blockBuffCountMax = theHk->blockBuffCountMax;
+    digDeadTime = theHk->digDeadTime;
+    buffDeadTime = theHk->buffDeadTime;
+    totalDeadTime = theHk->totalDeadTime;
+  }
+  else{
+    evReadoutError=0;
+    evReadoutCountAvg=0;
+    evReadoutCountMin=0;
+    blockBuffCountAvg=0;
+    blockBuffCountMax=0;
+    digDeadTime=0;
+    buffDeadTime=0;
+    totalDeadTime=0;
+  }
 
 
 }
@@ -73,12 +88,19 @@ AtriEventHkData::AtriEventHkData(AraEventHk2_7_t *theHk)
   memcpy(wilkinsonDelay,theHk->wilkinsonDelay,DDA_PER_ATRI*sizeof(UShort_t)); ///< Wilkinson delay?? one per DDA
   ppsCounter=theHk->ppsCounter; ///< Pulse per second counter
   clockCounter=theHk->clockCounter; ///< Clock counter (which clock?)
-  memcpy(deadTime,theHk->deadTime,DDA_PER_ATRI*sizeof(UChar_t));
-  memcpy(avgOccupancy,theHk->avgOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
-  memcpy(maxOccupancy,theHk->maxOccupancy,DDA_PER_ATRI*sizeof(UChar_t));
+
   memcpy(vdlyDac,theHk->vdlyDac,DDA_PER_ATRI*sizeof(UShort_t));
   memcpy(vadjDac,theHk->vadjDac,DDA_PER_ATRI*sizeof(UShort_t));
  
+  evReadoutError=0;
+  evReadoutCountAvg=0;
+  evReadoutCountMin=0;
+  blockBuffCountAvg=0;
+  blockBuffCountMax=0;
+  digDeadTime=0;
+  buffDeadTime=0;
+  totalDeadTime=0;
+
 }
 
 Double_t AtriEventHkData::wilkinsonCounterNs(Int_t dda){

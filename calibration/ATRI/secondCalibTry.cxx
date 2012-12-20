@@ -114,7 +114,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   
   //General output stuff
   char outFileName[FILENAME_MAX];
-  sprintf(outFileName, "%s/root/run%i/binWidths.root", baseDirName, runNum);
+  sprintf(outFileName, "%s/root/run%i/calibSecondTry.root", baseDirName, runNum);
   TFile *outFile = new TFile(outFileName, "RECREATE");
   Int_t capArray=0,thisCapArray=0, block=0,half=0,sample=0;
   Int_t numEvents[DDA_PER_ATRI][RFCHAN_PER_DDA][2]={{{0}}};
