@@ -45,6 +45,9 @@ class AtriSensorHkData: public RawAraGenericHeader, public TObject
    
    Double_t getDdaTemp(Int_t dda); ///<Unpack the dda temperature (C)
    Double_t getTdaTemp(Int_t tda); ///<Unpack the tda temperature (C)
+   
+   Double_t getAtriVoltage() {return 0.065*atriVoltage;}
+   Double_t getAtriCurrent() {return (0.151/2)*atriCurrent;}
 
 
    ClassDef(AtriSensorHkData,1);
