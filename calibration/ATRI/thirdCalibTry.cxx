@@ -371,7 +371,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
       firstTime=inter_sample_times[dda][chan][1][0];
-      epsilon_times[dda][chan][0]=inter_sample_times[dda][chan][1][0]-inter_sample_times[dda][chan][0][SAMPLES_PER_BLOCK-1];
+      epsilon_times[dda][chan][1]=inter_sample_times[dda][chan][1][0]-inter_sample_times[dda][chan][0][SAMPLES_PER_BLOCK-1];
       for(sample=0;sample<SAMPLES_PER_BLOCK;sample++){
 	inter_sample_times[dda][chan][1][sample]=inter_sample_times[dda][chan][1][sample]-firstTime;
       }
@@ -414,8 +414,18 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	  half = 0;
 	  lastZCCount = findLastZC(grBlock0Half0, period, &lastZC);
 	  firstZCCount = findFirstZC(grBlock1Half0, period, &firstZC);
-	  Double_t *tVals = grBlockCalibrated0->GetX();
+	  Double_t *tVals = grBlockCalibrated0->GetX(); //FIXME -- is this really the last sample?
 	  Double_t lastSample = tVals[SAMPLES_PER_BLOCK-1];
+	  epsilon = -firstZC+lastZC-lastSample+period;
+	  if(epsilon < -0.5*period) epsilon+=period;
+	  if(epsilon > +0.5*period) epsilon-=period;
+	  if(TMath::Abs(lastZCCount-firstZCCount)==0) histEpsilon[dda][chan][half]->Fill(epsilon);	  
+	  epsilonTree->Fill();
+
+	  half = 1;
+	  lastZCCount = findLastZC(grBlock0Half1, period, &lastZC);
+	  firstZCCount = findFirstZC(grBlock1Half1, period, &firstZC);
+	  lastSample = tVals[SAMPLES_PER_BLOCK-1];
 	  epsilon = -firstZC+lastZC-lastSample+period;
 	  if(epsilon < -0.5*period) epsilon+=period;
 	  if(epsilon > +0.5*period) epsilon-=period;
@@ -443,14 +453,15 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   //zCalculate actual epsilon from Tree
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
-      for(capArray=0;capArray<2;capArray++){
-	Double_t deltaT=(inter_sample_times[dda][chan][1-capArray][inter_sample_index[dda][chan][1-capArray][63]]-inter_sample_times[dda][chan][1-capArray][inter_sample_index[dda][chan][1-capArray][62]]);
-	//	deltaT=0; //FIXME
-	epsilon_times[dda][chan][capArray] = histEpsilon[dda][chan][0]->GetMean(1)+deltaT;
+      //      for(capArray=0;capArray<2;capArray++){
+      //	Double_t deltaT=(inter_sample_times[dda][chan][1-capArray][inter_sample_index[dda][chan][1-capArray][63]]-inter_sample_times[dda][chan][1-capArray][inter_sample_index[dda][chan][1-capArray][62]]);
+	Double_t deltaT=(inter_sample_times[dda][chan][0][inter_sample_index[dda][chan][0][63]]-inter_sample_times[dda][chan][0][inter_sample_index[dda][chan][0][62]]);
+	deltaT=0; //FIXME
+	epsilon_times[dda][chan][0] = histEpsilon[dda][chan][0]->GetMean(1)+deltaT; //FIXME -- only using one half here
 	if((histEpsilon[dda][chan][0]->GetRMS())>0.1) printf("dda %i chan %i  half 0 rms %f\n", dda, chan, histEpsilon[dda][chan][0]->GetRMS());
 	if((histEpsilon[dda][chan][1]->GetRMS())>0.1) printf("dda %i chan %i  half 0 rms %f\n", dda, chan, histEpsilon[dda][chan][1]->GetRMS());
 
-      }//capArray
+	//      }//capArray
     }//chan
   }//dda
 
@@ -562,15 +573,21 @@ TGraph *getHalfGraphTwoBlocks(TGraph *fullGraph, Int_t half){
   Int_t numSamples = fullGraph->GetN();
   Double_t *xFull  = fullGraph->GetX();
   Double_t *yFull  = fullGraph->GetY();
-  Double_t *newX = new Double_t[numSamples];
-  Double_t *newY = new Double_t[numSamples];
 
-  for(Int_t sample=0;sample<numSamples*2;sample++){
+  if(numSamples != 2*SAMPLES_PER_BLOCK){
+    fprintf(stderr, "Wrong number of samples got %d expected %d\n", numSamples, SAMPLES_PER_BLOCK);
+    return NULL;
+  }
+
+  Double_t *newX = new Double_t[SAMPLES_PER_BLOCK];
+  Double_t *newY = new Double_t[SAMPLES_PER_BLOCK];
+
+  for(Int_t sample=0;sample<2*SAMPLES_PER_BLOCK;sample++){
     if(sample%2!=half) continue;
     newX[sample/2]=xFull[sample];
     newY[sample/2]=yFull[sample];
   }
-  TGraph *halfGraph = new TGraph(numSamples, newX, newY);
+  TGraph *halfGraph = new TGraph(SAMPLES_PER_BLOCK, newX, newY);
    
   delete newX;
   delete newY;
@@ -622,7 +639,7 @@ TGraph* apply_bin_calibration_two_blocks(TGraph* grBlock, Int_t capArray, Int_t 
     xVals[sample+SAMPLES_PER_BLOCK] = inter_sample_times[dda][chan][1-capArray][inter_sample_index[dda][chan][1-capArray][sample]];
   }//sample
   
-  TGraph *grBlockCalibrated = new TGraph(SAMPLES_PER_BLOCK, xVals, yVals);
+  TGraph *grBlockCalibrated = new TGraph(2*SAMPLES_PER_BLOCK, xVals, yVals);
   delete xVals;
 
   return grBlockCalibrated;
@@ -699,10 +716,6 @@ Int_t estimate_phase_two_blocks(TGraph *gr, Double_t period, Double_t *meanPhase
   Double_t *yVals = gr->GetY();
   Double_t *xVals = gr->GetX();
   Int_t numSamples = gr->GetN();
-  if(numSamples != SAMPLES_PER_BLOCK){
-    fprintf(stderr, "%s : Wrong number of samples %i expected %i\n", __FUNCTION__, numSamples, SAMPLES_PER_BLOCK);
-    return -1;
-  }
   Double_t phase=0;
   Int_t numZCs=0;
 

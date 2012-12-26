@@ -49,7 +49,7 @@ AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   memcpy(vdlyDac,theHk->vdlyDac,DDA_PER_ATRI*sizeof(UShort_t));
   memcpy(vadjDac,theHk->vadjDac,DDA_PER_ATRI*sizeof(UShort_t));
 
-  if(firmwareVersionMaj > 0 || firmwareVersionMid > 10){
+  if(firmwareVersionMaj > 0 || firmwareVersionMid >= 10){
     evReadoutError = theHk->evReadoutError;
     evReadoutCountAvg = theHk->evReadoutCountAvg;
     evReadoutCountMin = theHk->evReadoutCountMin;
