@@ -54,12 +54,90 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
   }
   
   TGraph *gr = new TGraph(fTimes[chanId].size(),&(fTimes[chanId][0]),&(fVolts[chanId][0]));
+
+  gr->Sort();
+  
   return gr;
 }
 
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 {
   return getGraphFromElecChan(chan);
-  std::cerr << "Error calling UsefulAtriStationEvent::getGraphFromRFChan()\n";
   return NULL;
 }
+
+
+TGraph *UsefulAtriStationEvent::getFFTForRFChan(int chan)
+{
+
+   //   static AraGeomTool *fGeomTool = AraGeomTool::Instance();
+   TGraph *gr = getGraphFromRFChan(chan);
+   if(!gr) return NULL;
+   Double_t newX[512],newY[512];
+   Double_t intSample=1;
+   Int_t maxSamps=256;
+   // if(fGeomTool->getNumLabChansForChan(chan)==2) {
+   intSample=0.5;
+   maxSamps=512;
+   //   }
+
+
+   TGraph *grInt = FFTtools::getInterpolatedGraph(gr,intSample);
+
+
+   Int_t numSamps  = grInt->GetN();
+   Double_t *xVals = grInt->GetX();
+   Double_t *yVals = grInt->GetY();
+   for(int i=0;i<maxSamps;i++) {
+      if(i<numSamps) {
+         newX[i]=xVals[i];
+         newY[i]=yVals[i];
+      }
+      else {
+         newX[i]=newX[i-1]+intSample;
+         newY[i]=0;
+      }
+  }
+   TGraph *grNew = new TGraph(maxSamps,newX,newY);
+   TGraph *grFFT = FFTtools::makePowerSpectrumMilliVoltsNanoSecondsdB(grNew);
+   delete gr;
+   delete grNew;
+   delete grInt;
+   return grFFT;
+}
+
+
+TH1D *UsefulAtriStationEvent::getFFTHistForRFChan(int chan)
+{
+
+   Int_t numBins=256;
+   Double_t minX=0.0;
+   Double_t maxX=1000.0;
+   minX = minX - ( (maxX-minX)/numBins/2.0 ); // adjust histogram edges so that the bin centers
+   maxX = maxX + ( (maxX-minX)/numBins/2.0 ); // of the histograms are aligned with graph [add bdf]
+   numBins++;
+   char histName[180];
+   sprintf(histName,"%s_ffthist",this->GetName());
+   TH1D *histFFT = new TH1D(histName,histName,numBins,minX,maxX);
+   if(fillFFTHistoForRFChan(chan,histFFT)==0)
+      return histFFT;
+   return NULL;
+
+}
+
+int UsefulAtriStationEvent::fillFFTHistoForRFChan(int chan, TH1D *histFFT)
+{
+
+   TGraph *grFFT =getFFTForRFChan(chan);
+   if(!grFFT) return -1;
+   Double_t *xVals=grFFT->GetX();
+   Double_t *yVals=grFFT->GetY();
+   Int_t numPoints=grFFT->GetN();
+   for(int i=0;i<numPoints;i++) {
+      histFFT->Fill(xVals[i],yVals[i]);
+   }
+   delete grFFT;
+   return 0;
+
+}
+

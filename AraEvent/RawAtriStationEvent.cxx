@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include "TMath.h"
 ClassImp(RawAtriStationEvent);
 
 RawAtriStationEvent::RawAtriStationEvent()   
@@ -136,4 +137,27 @@ Int_t RawAtriStationEvent::getFirstCapArray(Int_t dda)
   return -1;
   
 
+}
+
+
+
+bool RawAtriStationEvent::isCalpulserEvent(){
+  Int_t pulserTime=0;
+
+  if(stationId==ARA_STATION1B) pulserTime=254;
+  else if(stationId==ARA_STATION2) pulserTime=245;
+  else if(stationId==ARA_STATION3) pulserTime=245;
+  else return false;
+
+  if(TMath::Abs((Int_t)timeStamp-pulserTime)<1e4){
+    //    fprintf(stderr, "%s - stationId %d pulserTime %d timeStamp-pulserTime %d\n", __FUNCTION__, stationId, pulserTime, timeStamp-pulserTime);
+
+    return true;
+  }
+  else{
+    //    fprintf(stderr, "%s - stationId %d pulserTime %d timeStamp-pulserTime %d\n", __FUNCTION__, stationId, pulserTime, timeStamp-pulserTime);
+
+    return false;
+
+  }
 }

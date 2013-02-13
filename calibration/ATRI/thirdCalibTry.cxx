@@ -45,6 +45,9 @@ TGraph* apply_bin_calibration(TGraph*, Int_t, Int_t, Int_t);
 TGraph* apply_bin_calibration_two_blocks(TGraph*, Int_t, Int_t, Int_t);
 Int_t save_inter_sample_times(char*);
 Int_t save_epsilon_times(char*);
+Int_t save_inter_sample_times_even(char*);
+Int_t save_epsilon_times_even(char*);
+
 Int_t findLastZC(TGraph*, Double_t, Double_t*);
 Int_t findFirstZC(TGraph*, Double_t, Double_t*);
 
@@ -64,7 +67,7 @@ int main(int argc, char **argv)
     std::cerr << "Usage: " << argv[0] << " <baseDir> <runNum> <pedNum> <freq in GHz>\n";
     return 1;
   }
-  sprintf(baseName, argv[1]);
+
   runNum=atoi(argv[2]);
   pedNum=atoi(argv[3]);
   freq=atof(argv[4]);
@@ -72,7 +75,7 @@ int main(int argc, char **argv)
     if(atoi(argv[5])) debug=true;
   }
 
-  return calibrateDdaChan(baseName, runNum, pedNum, freq, debug);
+  return calibrateDdaChan(argv[1], runNum, pedNum, freq, debug);
 
 }
 
@@ -185,7 +188,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   }
 
 
-  Double_t time=0;
+  Double_t time=0, deltaTime=0;
   Int_t index=0;
   TTree *binWidthsTree = new TTree("binWidthsTree", "binWidthsTree");
   binWidthsTree->Branch("dda", &dda, "dda/I");
@@ -195,7 +198,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   binWidthsTree->Branch("time", &time, "time/D");
   binWidthsTree->Branch("index", &index, "index/I");
   binWidthsTree->Branch("epsilon", &epsilon, "epsilon/D");
-  
+  binWidthsTree->Branch("deltaTime", &deltaTime, "deltaTime/D");
 
   //BinWidth Calibration
   for(int entry=0;entry<numEntries;entry++){
@@ -266,11 +269,11 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	time=0;
 	for(capArray=0;capArray<2;capArray++){
 	  for(sample=0;sample<SAMPLES_PER_BLOCK/2;sample++){
+
 	    inter_sample_times[dda][chan][capArray][2*sample+half]=time;
 	    inter_sample_index[dda][chan][capArray][2*sample+half]=2*sample+half;
 	    time+=histBinWidth[dda][chan][half]->GetBinContent(sample+SAMPLES_PER_BLOCK/2*capArray+1);
-	    if(debug&&dda==0&&chan==0) printf("capArray %i half %i sample %i time %f\n", capArray, half, sample, time);
-	    //	  if(debug&&dda==0&&chan==0) printf("dda %i chan %i capArray %i index %i time %f\n", dda, chan, capArray, inter_sample_index[dda][chan][capArray][2*sample+half], inter_sample_times[dda][chan][capArray][2*sample+half]);
+	    if(debug&&dda==0&&chan==3) printf("capArray %i half %i sample %i index %d time %f\n", capArray, half, sample, inter_sample_index[dda][chan][capArray][2*sample+half], inter_sample_times[dda][chan][capArray][2*sample+half]);
 	  }//sample
 	}//capArray
       }//half
@@ -336,8 +339,8 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
       lag[dda][chan] = lagHist[dda][chan]->GetMean(1);
-      if((lagHist[dda][chan]->GetRMS())>0.1) printf("dda %i chan %i rms %f\n", dda, chan, lagHist[dda][chan]->GetRMS());
-	//	printf("dda %i chan %i capArray %i lag %f\n", dda, chan, capArray ,lag[dda][chan][capArray]);	
+      //      if((lagHist[dda][chan]->GetRMS())>0.1) printf("dda %i chan %i rms %f\n", dda, chan, lagHist[dda][chan]->GetRMS());
+      printf("dda %i chan %i capArray %i lag %f rms %f\n", dda, chan, capArray ,lag[dda][chan], lagHist[dda][chan]->GetRMS());	
     }//chan
   }//dda
   
@@ -348,9 +351,16 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 	for(half=0;half<2;half++){
 	  Double_t time=0;
 	  for(sample=0;sample<SAMPLES_PER_BLOCK/2;sample++){
+	    if(lag[dda][chan]>0){
+	      if(dda==0&&chan==3&&debug) printf("dda %d chan %d capArray %d half %d sample %d lag %f interSampleTime %f new %f\n", dda, chan, capArray, half, sample, lag[dda][chan], inter_sample_times[dda][chan][capArray][2*sample+half], inter_sample_times[dda][chan][capArray][2*sample+half]+(lag[dda][chan])*half);
+	      inter_sample_times[dda][chan][capArray][2*sample+half]=inter_sample_times[dda][chan][capArray][2*sample+half]+(lag[dda][chan])*half;
 
-	    if(lag[dda][chan]>0) inter_sample_times[dda][chan][capArray][2*sample+half]=inter_sample_times[dda][chan][capArray][2*sample+half]+(lag[dda][chan])*half;
-	    else inter_sample_times[dda][chan][capArray][2*sample+half]=inter_sample_times[dda][chan][capArray][2*sample+half]-(lag[dda][chan])*(1-half);
+	    }
+	    else {
+	      if(dda==0&&chan==3&&debug) printf("dda %d chan %d capArray %d half %d sample %d lag %f interSampleTime %f new %f\n", dda, chan, capArray, half, sample, lag[dda][chan], inter_sample_times[dda][chan][capArray][2*sample+half], inter_sample_times[dda][chan][capArray][2*sample+half]+(lag[dda][chan])*(half-1));
+	      inter_sample_times[dda][chan][capArray][2*sample+half]=inter_sample_times[dda][chan][capArray][2*sample+half]+(lag[dda][chan])*(half-1);
+
+	    }
 	  }//sample
 	}//half
       }//capArray
@@ -370,10 +380,13 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   Double_t firstTime=0;
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
-      firstTime=inter_sample_times[dda][chan][1][0];
-      epsilon_times[dda][chan][1]=inter_sample_times[dda][chan][1][0]-inter_sample_times[dda][chan][0][SAMPLES_PER_BLOCK-1];
+      firstTime=inter_sample_times[dda][chan][1][inter_sample_index[dda][chan][1][0]];
+      epsilon_times[dda][chan][1]=firstTime-inter_sample_times[dda][chan][0][inter_sample_index[dda][chan][0][SAMPLES_PER_BLOCK-1]];
+      if(dda==0&&chan==3&&debug) printf("dda %d chan %d firstTime %f epsilon_times %f\n", dda, chan, firstTime, epsilon_times[dda][chan][1]);
       for(sample=0;sample<SAMPLES_PER_BLOCK;sample++){
-	inter_sample_times[dda][chan][1][sample]=inter_sample_times[dda][chan][1][sample]-firstTime;
+	if(dda==0&&chan==3&&debug) printf("dda %d chan %d sample %d inter_sample_times %f new  %f\n", dda, chan,sample, inter_sample_times[dda][chan][1][inter_sample_index[dda][chan][1][sample]], inter_sample_times[dda][chan][1][inter_sample_index[dda][chan][1][sample]]-firstTime );
+	inter_sample_times[dda][chan][1][inter_sample_index[dda][chan][1][sample]]=inter_sample_times[dda][chan][1][inter_sample_index[dda][chan][1][sample]]-firstTime;
+	
       }
     }
   }
@@ -465,14 +478,20 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
     }//chan
   }//dda
 
+  save_inter_sample_times_even(outFileName);
+  save_epsilon_times_even(outFileName);
   save_inter_sample_times(outFileName);
   save_epsilon_times(outFileName);
-  
+
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
       for(capArray=0;capArray<2;capArray++){
 	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++){
 	  time=inter_sample_times[dda][chan][capArray][inter_sample_index[dda][chan][capArray][sample]];
+	  if(sample>0) deltaTime=time-inter_sample_times[dda][chan][capArray][inter_sample_index[dda][chan][capArray][sample-1]];
+	  else if(sample==63) deltaTime=epsilon_times[dda][chan][1-capArray];
+	  else deltaTime=99;
+
 	  index=inter_sample_index[dda][chan][capArray][sample];
 	  epsilon=epsilon_times[dda][chan][capArray];
 	  binWidthsTree->Fill();
@@ -837,4 +856,68 @@ Int_t save_epsilon_times(char* name){
  
   return 0;
  
+}
+Int_t save_epsilon_times_even(char* name){
+
+  char outName[180];
+  sprintf(outName, "%s_epsilon_timing_even.txt", name);
+  std::ofstream OutFile(outName);
+  Int_t capArray, sample;
+
+  for(Int_t dda=0;dda<DDA_PER_ATRI;dda++){
+    for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++){
+      for(int capArray=0;capArray<2;capArray++){
+	OutFile <<  dda << "\t"
+		<< chan << "\t" 
+		<< capArray << "\t";
+
+	if(chan<6){
+	  if(inter_sample_index[dda][chan][1-capArray][63]==63)
+	    OutFile << epsilon_times[dda][chan][capArray] + inter_sample_times[dda][chan][1-capArray][63] - inter_sample_times[dda][chan][1-capArray][62]<< "\n";
+	  else
+	    OutFile << epsilon_times[dda][chan][capArray] << "\n";
+	}
+	else{
+	  if(inter_sample_index[dda][5][1-capArray][63]==63)
+	    OutFile << epsilon_times[dda][5][capArray] + inter_sample_times[dda][5][1-capArray][63] - inter_sample_times[dda][5][1-capArray][62]<< "\n";
+	  else
+	    OutFile << epsilon_times[dda][5][capArray] << "\n";
+	}
+      }
+    }
+  }
+  OutFile.close();
+ 
+  return 0;
+ 
+}
+Int_t save_inter_sample_times_even(char* name){
+
+  char outName[180];
+  sprintf(outName, "%s_sample_timing_even.txt", name);
+  std::ofstream OutFile(outName);
+  Int_t capArray, sample;
+
+  for(int dda=0;dda<DDA_PER_ATRI;dda++){
+    for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
+      for(int capArray=0;capArray<2;capArray++) {
+	OutFile << dda << "\t" << chan << "\t" << capArray << "\t" << 32 << "\t";   
+	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+	  //Index values
+	  if(sample%2==0) OutFile << sample << " ";
+	}
+	OutFile << "\n";
+	OutFile << dda << "\t" << chan << "\t" << capArray << "\t" << 32 << "\t";   
+	for(int sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
+	  //time values
+	  if(sample%2==0&&chan<6) OutFile << inter_sample_times[dda][chan][capArray][sample] << " ";
+	  if(sample%2==0&&chan>=6) OutFile << inter_sample_times[dda][5][capArray][sample] << " ";
+	}
+	OutFile << "\n";
+      }
+    }
+  }
+  OutFile.close();
+
+  return 0;
 }

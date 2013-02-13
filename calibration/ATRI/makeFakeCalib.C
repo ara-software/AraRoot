@@ -13,7 +13,7 @@ void makeFakeCalib(){
 	for(sample=0;sample<64;sample++){
 	  if(sample%2==1) continue;
 	  sample_index_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample;
-	  sample_times_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample;
+	  sample_times_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample/1.6;
 	  numSamples[dda][chan][capArray]++;
 	}
       }
@@ -23,7 +23,7 @@ void makeFakeCalib(){
   for(dda=0;dda<4;dda++){
     for(chan=0;chan<8;chan++){
       for(capArray=0;capArray<2;capArray++){
-	epsilon_times_out[dda][chan][capArray]=1./3.2;
+	epsilon_times_out[dda][chan][capArray]=1./1.6;
       }
     }
   }
@@ -32,6 +32,33 @@ void makeFakeCalib(){
 
   save_inter_sample_times("araAtriStation2SampleTiming_fake_even.txt");
   save_epsilon_times("araAtriStation2Epsilon_fake_even.txt");
+
+  for(dda=0;dda<4;dda++){
+    for(chan=0;chan<8;chan++){
+      for(capArray=0;capArray<2;capArray++){
+	for(sample=0;sample<64;sample++){
+	  if(sample%2==0) continue;
+	  sample_index_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample;
+	  sample_times_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample/1.6;
+	  numSamples[dda][chan][capArray]+;
+	}
+      }
+    }
+  }
+
+  for(dda=0;dda<4;dda++){
+    for(chan=0;chan<8;chan++){
+      for(capArray=0;capArray<2;capArray++){
+	epsilon_times_out[dda][chan][capArray]=1./1.6;
+      }
+    }
+  }
+  
+
+
+  save_inter_sample_times("araAtriStation2SampleTiming_fake_odd.txt");
+  save_epsilon_times("araAtriStation2Epsilon_fake_odd.txt");
+
 
 }
 Int_t save_inter_sample_times(char* outName){

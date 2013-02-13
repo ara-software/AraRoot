@@ -138,7 +138,7 @@ void process() {
   //  cout << "Here: "  << theEvent.eventNumber << endl;
   if(theEvent) delete theEvent;
   
-  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer, 2);
+  theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer, 100);
   eventTree->Fill();  
   lastRunNumber=runNumber;
   //  delete theEvent;

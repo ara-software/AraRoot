@@ -187,10 +187,13 @@ TPad *AraAtriCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPa
      leftPave->SetFillColor(0);
      leftPave->SetTextAlign(13);
      //     if(runNumber) {
-       sprintf(textLabel,"Run: %d",runNumber);
-       TText *runText = leftPave->AddText(textLabel);
-       runText->SetTextColor(50);
-       //    }
+     sprintf(textLabel,"%s",AraGeomTool::getStationName(evPtr->stationId));
+     TText *stationIdText = leftPave->AddText(textLabel);
+     stationIdText->SetTextColor(50);
+     sprintf(textLabel,"Run: %d",runNumber);
+     TText *runText = leftPave->AddText(textLabel);
+     runText->SetTextColor(50);
+     //    }
      sprintf(textLabel,"Event: %d",evPtr->eventNumber);
      TText *eventText = leftPave->AddText(textLabel);
      eventText->SetTextColor(50);
@@ -228,8 +231,8 @@ TPad *AraAtriCanvasMaker::getEventInfoCanvas(UsefulAtriStationEvent *evPtr,  TPa
      sprintf(textLabel,"PPS Num %d",
 	     evPtr->ppsNumber);
      midRightPave->AddText(textLabel);
-     sprintf(textLabel,"Trig Time %d",
-	     evPtr->timeStamp);
+     sprintf(textLabel,"Trig Time %d ns",
+	     evPtr->timeStamp*10);
      midRightPave->AddText(textLabel);
      // sprintf(textLabel,"Trig Type %d%d%d",
      // 	     evPtr->isInTrigType(2),
@@ -377,6 +380,7 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
     //    if(grRFChanAveragedFFT[chan]) delete grRFChanAveragedFFT[chan];
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
+    
     if (!foundTimeRange && grTemp->GetN()) {
       foundTimeRange = 1;
       fThisMinTime=grTemp->GetX()[0];
@@ -548,13 +552,14 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
       fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
       foundTimeRange = 1;
     }
-
+    
     if (grTemp->GetN()) {
       if(grTemp->GetX()[0]<fThisMinTime) fThisMinTime=grTemp->GetX()[0];
       if(grTemp->GetX()[grTemp->GetN()-1]>fThisMaxTime) fThisMaxTime=grTemp->GetX()[grTemp->GetN()-1];
     }
     grRFChan[rfchan] = new AraWaveformGraph(grTemp->GetN(),grTemp->GetX(),grTemp->GetY());
     grRFChan[rfchan]->setRFChan(rfchan, evPtr->stationId);
+
       //      std::cout << evPtr->eventNumber << "\n";
       //      std::cout << surf << "\t" << chan << "\t" 
       //		<< grElec[chan]->GetRMS(2) << std::endl;
@@ -820,7 +825,7 @@ TPad *AraAtriCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
       paddy1->SetEditable(kTRUE);
       deleteTGraphsFromRFPad(paddy1,rfChan);
       paddy1->cd();
-     
+      
       grRFChan[rfChan]->Draw("l");
 
       if(fAutoScale) {

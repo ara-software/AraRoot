@@ -39,8 +39,13 @@ void makeCalibrationFiles(char *inFileName){
     for(chan=0;chan<8;chan++){
       for(capArray=0;capArray<2;capArray++){
 	for(sample=0;sample<64;sample++){
-	  if(sample_index[dda][chan][capArray][sample]%2==1){
+	  if(sample_times_delta[dda][chan][capArray][sample]<0.1){
 	    useSample[dda][chan][capArray][sample]=0;
+	    continue;
+	  }
+	  if(sample==63){
+	    useSample[dda][chan][capArray][sample]=0;
+	    continue;
 	  }
 	  //if(sample_index[dda][chan][capArray][sample]>62) continue;
 	  sample_index_out[dda][chan][capArray][numSamples[dda][chan][capArray]]=sample_index[dda][chan][capArray][sample];
@@ -61,13 +66,37 @@ void makeCalibrationFiles(char *inFileName){
     }
   }
   
-
-  save_inter_sample_times("araAtriStation2SampleTiming_evenOnly.txt");
-  save_epsilon_times("araAtriStation2EpsilonTiming_evenOnly.txt");
+  check_inter_sample_times();
+  save_inter_sample_times("araAtriStation1SampleTiming.txt");
+  save_epsilon_times("araAtriStation1EpsilonTiming.txt");
 
 
   
 }
+
+
+Int_t check_inter_sample_times(){
+
+  for(int dda=0;dda<4;dda++){
+    for(int chan=0;chan<8;chan++){
+      for(int capArray=0;capArray<2;capArray++) {
+	Double_t firstTime=sample_times_out[dda][chan][capArray][0];
+	//First take the firstTime from all samples in this capArray
+	printf("dda %i chan %i capArray %i firstTime %f\n", dda, chan, capArray, firstTime);
+	for(int samp=0;samp<numSamples[dda][chan][capArray];samp++){
+	  sample_times_out[dda][chan][capArray][samp]-=firstTime;
+	}
+	epsilon_times_out[dda][chan][capArray] -=firstTime;
+	//Then take the firstTime from epsilon for this capArray
+      }
+    }
+  }
+
+
+}
+
+
+
 
 Int_t save_inter_sample_times(char* outName){
 

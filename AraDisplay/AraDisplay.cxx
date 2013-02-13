@@ -231,7 +231,6 @@ AraDisplay::AraDisplay(char *baseDir, unsigned int time, AraCalType::AraCalType_
   fCurrentFileTime=time;
   strncpy(fCurrentBaseDir,baseDir,179);
   fCalType=calType;
-  
 }
 
 AraDisplay::AraDisplay(char *eventFile, AraCalType::AraCalType_t calType)
@@ -244,7 +243,6 @@ AraDisplay::AraDisplay(char *eventFile, AraCalType::AraCalType_t calType)
   //  strncpy(fCurrentBaseDir,gSystem->DirName(eventFile),FILENAME_MAX);
   fCalType=calType;
   loadEventTree(eventFile);
-  
 }
 
 
@@ -281,6 +279,9 @@ void AraDisplay::startEventDisplay()
 
 int AraDisplay::getEventEntry()
 {
+
+
+    
   if(!fEventTree) {
     if(loadEventTree()<0) {
       std::cout << "Couldn't open event file\n";
@@ -353,20 +354,18 @@ int AraDisplay::loadEventTree(char *eventFile)
     strncpy(eventName,eventFile,FILENAME_MAX);
   }
   
+
   if(fEventTree->GetEntries()<1) {
-    cout << "Couldn't open: " << eventName << "\n";
+    std::cerr << "Couldn't open: " << eventName << "\n";
     return -1;
   }
   //JPD - Use the RawStationEvent base class to interogate the tree
   //      and decide if this is a Icrr or Atri type station
 
+  fEventTree->ResetBranchAddresses();
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
-
-  //  fprintf(stderr, "loadEventTree -- stationId %i\n", fRawStationEventPtr->stationId);
-
   fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
-
 
   fEventTree->ResetBranchAddresses();
 

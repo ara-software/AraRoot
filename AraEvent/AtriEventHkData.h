@@ -44,7 +44,7 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    Double_t wilkinsonCounterNs(Int_t dda); ///< Convert wilkinsonCounter to ns
 
    //new scaler format
-   uint16_t l1Scaler[NUM_L1_SCALERS]; ///< L1 scaler, am I correct in decoding this need to check mapping prescaled by 32
+   uint16_t l1Scaler[NUM_L1_SCALERS]; ///< L1 scaler, pre-scale depends on revision of firmware -- check helper functions
    uint16_t l2Scaler[NUM_L2_SCALERS]; ///< L2 scaler not prescaled
    uint16_t l3Scaler[NUM_L3_SCALERS]; ///< L3 scaler not prescaled
    uint16_t l4Scaler[NUM_L4_SCALERS]; ///< L4 scaler not prescaled

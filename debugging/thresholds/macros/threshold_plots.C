@@ -37,7 +37,7 @@ TCanvas *getL1Canvas(Int_t tda){
   for(int chan=0;chan<4;chan++){
     canL1[tda]->cd(chan+1);
     sprintf(histName, "histL1ScalerTda%iChan%i", tda, chan);
-    sprintf(histExp, "l1Scaler[%i]:thresholdDac[%i]>>%s", tda*4+chan, tda*4+chan, histName);
+    sprintf(histExp, "eventHk.getSingleChannelRateHz(%i, %i):thresholdDac[%i]>>%s", tda, chan, tda*4+chan, histName);
     hkTree->Draw(histExp);
     histL1[tda][chan] = (TH1*) gDirectory->Get(histName);
     histL1[tda][chan]->SetName(histName);

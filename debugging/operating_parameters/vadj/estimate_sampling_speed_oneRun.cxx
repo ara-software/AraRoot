@@ -35,7 +35,20 @@ int main(int argc, char **argv)
     std::cerr << "Usage: " << argv[0] << " <runFile> <outFile> <pedFile> <freq in GHz> <dda> <chan>\n";
     return 1;
   }
-  return estimate_sampling_speed(argv[1], argv[2], argv[3], atof(argv[4]),atoi(argv[5]),atoi(argv[6]), atoi(argv[7]));
+  
+  // fprintf(stderr, "argv[%i] %s\n", 1, argv[1]);
+  // fprintf(stderr, "argv[%i] %s\n", 2, argv[2]);
+  // fprintf(stderr, "argv[%i] %s\n", 3, argv[3]);
+  // fprintf(stderr, "argv[%i] %s\n", 4, argv[4]);
+  // fprintf(stderr, "argv[%i] %s\n", 5, argv[5]);
+  // fprintf(stderr, "argv[%i] %s\n", 6, argv[6]);
+  int debug=0;
+  if(argc>7){
+    debug=atoi(argv[7]);
+    // fprintf(stderr, "argv[%i] %s\n", 7, argv[7]);
+  }
+
+  return estimate_sampling_speed(argv[1], argv[2], argv[3], atof(argv[4]),atoi(argv[5]),atoi(argv[6]), debug);
 }
 
 int estimate_sampling_speed(char *runFile, char *outFile, char *pedFile, Double_t frequency,Int_t dda, Int_t chan, bool debug)

@@ -5,7 +5,7 @@
 #include <libgen.h>     
 #include <cstdlib>
  
-using namespace std;
+
 
 #include "TTree.h"
 #include "TFile.h"
@@ -31,6 +31,7 @@ UInt_t realTime;
 Int_t runNumber;
 Int_t lastRunNumber;
 
+using namespace std;
 
 int main(int argc, char **argv) {
   dataBuffer = new char[200000];

@@ -52,13 +52,13 @@ void calibPlots(char *calibFileName, char *outFileName){
 	epsilon=epsilon_times[dda][chan][capArray];
 	sample=63;
 	outTree->Fill();
-	for(sample=64;sample<127;sample++){
-	  deltaTime=sample_times[dda][chan][1-capArray][sample+1-64]-sample_times[dda][chan][1-capArray][sample-64];
-	  time=sample_times[dda][chan][1-capArray][sample-64]+time63+epsilon_times[dda][chan][1-capArray];
-	  index=sample_index[dda][chan][1-capArray][sample-64];
-	  epsilon=epsilon_times[dda][chan][capArray];
-	  outTree->Fill();
-	}
+	// for(sample=64;sample<127;sample++){
+	//   deltaTime=sample_times[dda][chan][1-capArray][sample+1-64]-sample_times[dda][chan][1-capArray][sample-64];
+	//   time=sample_times[dda][chan][1-capArray][sample-64]+time63+epsilon_times[dda][chan][1-capArray];
+	//   index=sample_index[dda][chan][1-capArray][sample-64];
+	//   epsilon=epsilon_times[dda][chan][capArray];
+	//   outTree->Fill();
+	// }
 
       }
     }

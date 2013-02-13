@@ -563,7 +563,7 @@ Int_t AraGeomTool::getStationCalibIndex(AraStationId_t stationId){
   case ARA_STATION1:
     return 1;
     break;
-  case ARA_STATION1A:
+  case ARA_STATION1B:
     return 0;
     break;
   case ARA_STATION2:
@@ -690,8 +690,8 @@ void AraGeomTool::printStationName(AraStationId_t stationId){
   case ARA_STATION1:
     std::cout << "STATION1\n";
     break;
-  case ARA_STATION1A:
-    std::cout << "STATION1A\n";
+  case ARA_STATION1B:
+    std::cout << "STATION1B\n";
     break;
   case ARA_STATION2:
     std::cout << "STATION2\n";
@@ -817,8 +817,8 @@ char* AraGeomTool::getStationName(AraStationId_t stationId){
   case ARA_STATION1:
     return "STATION1";
     break;
-  case ARA_STATION1A:
-    return "STATION1A";
+  case ARA_STATION1B:
+    return "STATION1B";
     break;
   case ARA_STATION2:
     return "STATION2";

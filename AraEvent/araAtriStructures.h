@@ -45,17 +45,17 @@ typedef uint8_t AraDataStructureType_t;  ///< Ensure that it is just 8 bits
   Each data structure is going to have a one byte overhead saying where it came from
 */
 enum {
-  ARA_TESTBED=0x0, ///< Icrr TestBed probably won't chnage the testbed data yet
-  ARA_STATION1=0x1, ///< Icrr Station1 data
-  ARA_STATION1A=-1, ///< Placeholder for ATRI updated Station1
-  ARA_STATION2=0x2, ///< ATRI Station2 data
-  ARA_STATION3=0x3, ///< ATRI Station3 data
-  ARA_STATION4=0x4, ///< ATRI Station4 data
-  ARA_STATION5=0x5, ///< ATRI Station5 data
-  ARA_STATION6=0x6, ///< ATRI Station6 data
-  ARA_STATION7=0x7, ///< ATRI Station7 data
-  ARA_STATION8=0x8, ///< ATRI Station8 data
-  ARA_STATION9=0x9, ///< ATRI Station9 data
+  ARA_TESTBED=0, ///< Icrr TestBed probably won't chnage the testbed data yet
+  ARA_STATION1=1, ///< Icrr Station1 data
+  ARA_STATION1B=100, ///< Placeholder for ATRI updated Station1
+  ARA_STATION2=2, ///< ATRI Station2 data
+  ARA_STATION3=3, ///< ATRI Station3 data
+  ARA_STATION4=4, ///< ATRI Station4 data
+  ARA_STATION5=5, ///< ATRI Station5 data
+  ARA_STATION6=6, ///< ATRI Station6 data
+  ARA_STATION7=7, ///< ATRI Station7 data
+  ARA_STATION8=8, ///< ATRI Station8 data
+  ARA_STATION9=9, ///< ATRI Station9 data
 
   ARA_STATION10=10, ///< ATRI Station10 data
   ARA_STATION11=11, ///< ATRI Station11 data
@@ -177,7 +177,6 @@ typedef struct {
   uint16_t digDeadTime; ///< Deadtime originating from digitisation in us, prescale 16
   uint16_t buffDeadTime; ///< Deadtime originating from buffer full in us, prescale 16
   uint16_t totalDeadTime; ///< Total deadtime in us, prescale 16
-  uint8_t reserved; ///< Reserved
 } AraEventHk_t;
 
 

@@ -127,9 +127,14 @@ void AraEventCalibrator::setPedFile(char fileName[], AraStationId_t stationId)
     gotIcrrPedFile[0]=1; //Protects from loading the default pedestal File
   }
 
-  if(stationId==ARA_STATION1){
+  else  if(stationId==ARA_STATION1){
     //    fprintf(stdout, "AraEventCalibrator::setPedFile() setting Station1 IcrrPedFile to %s\n", IcrrPedFile[stationId]);
     gotIcrrPedFile[1]=1; //Protects from loading the default pedestal File
+  }
+  else {
+    
+    fprintf(stderr, "AraEventCalibrator::setPedFile() -- not ICRR station, stationId %d\n", stationId);
+    return;
   }
   loadIcrrPedestals(stationId);
 }
@@ -837,6 +842,7 @@ Double_t AraEventCalibrator::estimateClockPeriod(Int_t numPoints, Double_t &rms)
 
 void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType) 
 {
+  //  fprintf(stderr, "begin calibrating event\n");//FIXME
   AraStationId_t thisStationId = theEvent->stationId;
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(thisStationId);
   //Only load the pedestals / calib if they are not already loaded
@@ -917,13 +923,14 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
       Double_t tempVolts[SAMPLES_PER_BLOCK];
       Int_t voltIndex[SAMPLES_PER_BLOCK];
 
+    
       //Here is the Epsilon calibration
       if(AraCalType::hasBinWidthCalib(calType)) {
 	if(!firstTime) {
 	  //Add on the time between blocks
 	  time+=fAtriEpsilonTimes[dda][chan][capArray];
-	  //	  if(dda==1 && chan==1)
-	  //	    std::cout << "Block " << time << "\t" << fAtriEpsilonTimes[dda][chan][capArray] << "\n";
+	  // if(dda==1 && chan==1)
+	  //   std::cerr << "Block " << time << "\t" << fAtriEpsilonTimes[dda][chan][capArray] << "\n";
 
 	}
       }
@@ -940,10 +947,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  //Now get the time
 	  tempTimes[samp]=time+fAtriSampleTimes[dda][chan][capArray][samp];
 
-	  //	  if(dda==1 && chan==1) {
-	  //	  //	    std::cout << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
-	  //	    std::cout << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
-	  //	  }
+	  	  // if(dda==1 && chan==1) {
+		  //   std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
+	  	  //   std::cerr << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
+	  	  // }
 	  
 	}
 	else {
@@ -957,15 +964,16 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  tempVolts[samp]=(*shortIt); ///<Filling with ADC
 	else {
 	  tempVolts[samp]=(*shortIt)-(Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]; ///<Filling with ADC-Pedestal
-	  //	  if(dda==3 && samp<2) {
-	  //	    std::cout << (*shortIt)  << "\t" << (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
-	  //	  }
+	  // if(dda==3 && samp<2) {
+	  //   std::cerr << (*shortIt)  << "\t" << (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
+	  // }
 	}
 	samp++;
       }
       Int_t numSamples=0;
-      if(AraCalType::hasBinWidthCalib(calType)) numSamples=fAtriNumSamples[dda][chan][calType];
+      if(AraCalType::hasBinWidthCalib(calType)) numSamples=fAtriNumSamples[dda][chan][capArray];
       else numSamples=SAMPLES_PER_BLOCK;
+      //      std::cerr << "Pushing back " << numSamples << " samples dda " << dda << " channel " << chan << "\n";
       for(samp=0;samp<numSamples;samp++) {
 	timeMapIt->second.push_back(tempTimes[samp]); ///<Filling with time
 	voltMapIt->second.push_back(tempVolts[voltIndex[samp]]); //Filling with volts
@@ -1111,7 +1119,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
   int dda,chan,sample,capArray;
   sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
-  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
+  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
@@ -1134,7 +1142,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     for(sample=0;sample<fAtriNumSamples[dda][chan][capArray];sample++) {
       SampleFile >> index;
       fAtriSampleIndex[dda][chan][capArray][sample]=index;
-      //      std::cerr << fAtriSampleIndex[dda][chan][capArray][sample] << " ";    
+      //std::cerr << fAtriSampleIndex[dda][chan][capArray][sample] << " ";    
     }
     //    std::cerr << "\n";
     SampleFile >> dda >> chan >> capArray >> fAtriNumSamples[dda][chan][capArray];
@@ -1150,12 +1158,12 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   
   char epsilonFileName[100];
   sprintf(epsilonFileName,"%s/ATRI/araAtriStation%iEpsilon.txt",calibDir, stationId);
-  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
+  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
   std::ifstream epsilonFile(epsilonFileName);
   while(epsilonFile >> dda >> chan >> capArray){
     epsilonFile >> value;
     fAtriEpsilonTimes[dda][chan][capArray]=value;
-    //    printf("%s : dda %i channel %i capArray %f\n", __FUNCTION__, dda, chan, value);
+    //printf("%s : dda %i channel %i capArray %f\n", __FUNCTION__, dda, chan, value);
   }
   epsilonFile.close();
 
@@ -1169,6 +1177,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
       else fGotAtriCalibFile[calibIndex]=0;
     }
   }
+  //  fprintf(stderr, "finished loading calib\n");//FIXME
 
 }
 

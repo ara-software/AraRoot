@@ -64,6 +64,7 @@ class RawAtriStationEvent: public RawAraStationEvent
    }
 
    Int_t getFirstCapArray(Int_t dda); ///< Function for asking the block vector the capArray
+   bool isCalpulserEvent(); ///< Uses the timeStamp (from Rubidium clock) to decide whether an event is from a local in-ice calpulser
    
 
 

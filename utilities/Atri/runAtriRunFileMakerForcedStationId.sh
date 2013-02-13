@@ -43,7 +43,7 @@ do
 done
 
 if  test `cat ${EVENT_FILE_LIST} | wc -l` -gt 0 ; then
-    ${ARA_UTIL_INSTALL_DIR}/bin/makeAtriEventTreeForcedStationId ${EVENT_FILE_LIST} ${EVENT_FILE}
+    ${ARA_UTIL_INSTALL_DIR}/bin/makeAtriEventTreeForcedStationId ${EVENT_FILE_LIST} ${EVENT_FILE} ${RUN_NUM}
     #cat ${EVENT_FILE_LIST}
     rm ${EVENT_FILE_LIST}
     echo "Done Event File"
