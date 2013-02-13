@@ -49,7 +49,7 @@ namespace AraCalType {
   Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
   Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
   Bool_t hasUnDiplexing(AraCalType::AraCalType_t calType); ///<Does the calibration type perform un-diplexing
-
+  Bool_t hasZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform
 } 
 
 class UsefulAtriStationEvent;

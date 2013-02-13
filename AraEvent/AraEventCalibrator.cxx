@@ -19,6 +19,12 @@
 #include <zlib.h>
 #include <cstdlib>
 
+Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
+{
+  if(calType<=kVoltageTime) return kFALSE;
+  return kTRUE;
+  
+}
 
 Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
@@ -84,19 +90,17 @@ AraEventCalibrator::AraEventCalibrator()
 
   //Loop through and set the got ped / calib flags to zero. This assumes stationId's first n elements
   //are for ICRR stations and the remaining N-n are ATRI
-  for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
-    //    fprintf(stderr, "AraEventCalibrator::AraEventCalibrator()  -- station %i\n", station);
-    if(AraGeomTool::isIcrrStation(station)){
-      gotIcrrPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
-      gotIcrrCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
-    }
-    if(AraGeomTool::isAtriStation(station)){
-      fGotAtriPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
-      fGotAtriCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
-    }
-
-  }
-
+   for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
+      //    fprintf(stderr, "AraEventCalibrator::AraEventCalibrator()  -- station %i\n", station);
+      if(AraGeomTool::isIcrrStation(station)){
+	 gotIcrrPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
+	 gotIcrrCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
+      }
+      else if(AraGeomTool::isAtriStation(station)){
+	 fGotAtriPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
+	 fGotAtriCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
+      }      
+   }   
 }
 
 AraEventCalibrator::~AraEventCalibrator() {
@@ -844,7 +848,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 {
   //  fprintf(stderr, "begin calibrating event\n");//FIXME
   AraStationId_t thisStationId = theEvent->stationId;
+
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(thisStationId);
+  //RJN debug
+  //  std::cout << "Station Id fun: " << (int)thisStationId << "\t" << calibIndex << "\n";
   //Only load the pedestals / calib if they are not already loaded
   if(fGotAtriCalibFile[calibIndex]==0){
     loadAtriCalib(thisStationId);
@@ -887,7 +894,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
       Int_t block=blockIt->getBlock();
       Int_t capArray=blockIt->getCapArray();
       //      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
-      //      		<< dda << "\t" << block << "\t" << RawAtriStationEvent::getPedIndex(dda,block,chan,0) << "\n";
+      //		<< dda << "\t" << block << "\t" << RawAtriStationEvent::getPedIndex(dda,block,chan,0) << "\n";
       uptoChan++;
 
       //Step four is to check if we have already got this chanId
@@ -1003,9 +1010,31 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   	}
       }
     }
-
   }
-
+  
+  //RJN change 13-Feb-2013
+  //Now do zero mean,   
+  if(hasZeroMean(calType)) {
+    for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+      for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
+  	Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+  	voltMapIt=theEvent->fVolts.find(chanId);
+	if(voltMapIt!=theEvent->fVolts.end()) {
+	  Int_t numPoints=(voltMapIt->second).size();
+	  Double_t mean=0;
+	  for(int samp=0;samp<numPoints;samp++) {
+	    mean+=voltMapIt->second[samp];
+	  }
+	  mean/=numPoints;
+	  for(int samp=0;samp<numPoints;samp++) {
+	    voltMapIt->second[samp]-=mean;
+	  }
+	}	  	  	
+      }
+    }
+  }
+  
+  
   //  fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG
             
 }
@@ -1024,6 +1053,7 @@ void AraEventCalibrator::setAtriPedFile(char *filename, AraStationId_t stationId
 void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 {  
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+  Int_t stationNumber = AraGeomTool::getStationNumber(stationId);
   if(calibIndex==-1){
     fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- ERROR Unknown stationId %i\n", stationId);
     exit(0);
@@ -1048,7 +1078,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
 	//	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
-      sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
+      sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationNumber);
       fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
@@ -1074,6 +1104,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
   }
       
   while(PedFile >> dda >> block >> chan) {
+     //     std::cout << dda << "\t" << block << "\t" << chan << "\n";
     for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
       PedFile >> pedVal;
       fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]=pedVal;
@@ -1083,14 +1114,21 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
   
   //Now we set the gotPedFile flags to indicate which station we have in memory
   
-  for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
-    if(AraGeomTool::isAtriStation(station)){
-      calibIndex=AraGeomTool::getStationCalibIndex(station);
-      if(station==stationId) fGotAtriPedFile[calibIndex]=1;
-      else fGotAtriPedFile[calibIndex]=0;
-    }
-  }
 
+
+//   for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
+//     if(AraGeomTool::isAtriStation(station)){
+//       calibIndex=AraGeomTool::getStationCalibIndex(station);
+//       if(station==stationId) fGotAtriPedFile[calibIndex]=1;
+//       else fGotAtriPedFile[calibIndex]=0;
+//     }
+//   }
+
+
+  //RJN change 13-Feb-2013
+  memset(fGotAtriPedFile,ATRI_NO_STATIONS*sizeof(Int_t),0);
+  calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+  fGotAtriPedFile[calibIndex]=1;
 
 }
 
@@ -1098,6 +1136,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 {
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+  //  std::cout << "Loading calibration info for station: " << (int)stationId << "\t" << calibIndex << "\n";
   if(calibIndex==-1){
     fprintf(stderr, "AraEventCalibrator::loadAtriCalib -- ERROR Unknown stationId %i\n", stationId);
     return;
@@ -1119,9 +1158,10 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
   int dda,chan,sample,capArray;
   sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
-  //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
+  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
+  //Initialises to some default values
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
     for(chan=0;chan<RFCHAN_PER_DDA;chan++) {
       for(capArray=0;capArray<2;capArray++) {
@@ -1167,17 +1207,44 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   }
   epsilonFile.close();
 
+//   {
+//      double time=0;
+//      double lastTime=0;
+//      int index=0;
+//      for(int block=0;block<3;block++) {
+// 	int thisDda=0;
+// 	int thisChan=6;
+// 	int thisCapArray=block%2;
+// 	if(block!=0) time+=fAtriEpsilonTimes[thisDda][thisChan][thisCapArray];
+// 	for (int samp=0;samp<fAtriNumSamples[thisDda][thisChan][thisCapArray];samp++) {
+// 	   Double_t sampTime=time+fAtriSampleTimes[thisDda][thisChan][thisCapArray][samp];
+// 	   std::cout << index << "\t" << sampTime << "\t" << sampTime-lastTime << "\n";
+// 	   index++;
+// 	   lastTime=sampTime;
+// 	}
+// 	time=lastTime;
+//      }
+//   }   
+
   
   //Now we set the gotCalibFile flags to indicate which station we have in memory
   
-  for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
-    if(AraGeomTool::isAtriStation(station)){
-      calibIndex=AraGeomTool::getStationCalibIndex(station);
-      if(station==stationId) fGotAtriCalibFile[calibIndex]=1;
-      else fGotAtriCalibFile[calibIndex]=0;
-    }
-  }
+//   for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
+//     if(AraGeomTool::isAtriStation(station)){
+//       calibIndex=AraGeomTool::getStationCalibIndex(station);
+//       if(station==stationId) fGotAtriCalibFile[calibIndex]=1;
+//       else fGotAtriCalibFile[calibIndex]=0;
+//     }
+//   }
   //  fprintf(stderr, "finished loading calib\n");//FIXME
+
+
+
+  //RJN change 13-Feb-2013
+  memset(fGotAtriCalibFile,ATRI_NO_STATIONS*sizeof(Int_t),0);
+  calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+  fGotAtriCalibFile[calibIndex]=1;
+
 
 }
 

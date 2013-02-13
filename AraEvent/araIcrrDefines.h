@@ -51,7 +51,7 @@
 #define NUM_DIGITIZED_CHANNELS NUM_DIGITIZED_ICRR_CHANNELS 
 
 //To account for multiple ICRR type stations jd
-#define ICRR_NO_STATIONS 2
+#define ICRR_NO_STATIONS 2 //RJN unhack
 
 
 #endif // ARA_DEFINES_H
