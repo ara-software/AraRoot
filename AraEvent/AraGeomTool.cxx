@@ -962,7 +962,7 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
     if(!readStationInfoICRR[calibIndex]) {
-      fprintf(stderr, "readChannelMapDbIcrr\n");
+      //fprintf(stderr, "readChannelMapDbIcrr\n");
       readChannelMapDbIcrr(stationId);
       readStationInfoICRR[calibIndex]=1;
     }
@@ -971,7 +971,7 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
   }
   if(isAtriStation(stationId)) {
     if(!readStationInfoATRI[calibIndex]) {
-      fprintf(stderr, "readChannelMapDbAtri\n");
+      //fprintf(stderr, "readChannelMapDbAtri\n");
       readChannelMapDbAtri(stationId);
       readStationInfoATRI[calibIndex]=1;
     }
