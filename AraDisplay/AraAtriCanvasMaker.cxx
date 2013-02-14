@@ -991,16 +991,14 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 				       {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kSurface,AraAntPol::kSurface},
 				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
 				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal}};
-  int antPolNumMap[4][4]={{0,1,2,3},{4,5,0,1},{0,1,2,3},{4,5,6,7}};
+  //  int antPolNumMap[4][4]={{0,1,2,3},{4,5,0,1},{0,1,2,3},{4,5,6,7}}; //jpd 14-02-13
+  int antPolNumMap[4][4]={{0,1,2,3},{4,5,6,7},{0,1,2,3},{4,5,6,7}};
   
 
-
-  
   for(int row=0;row<4;row++) {
     for(int column=0;column<4;column++) {
       plotPad->cd();
       int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
-      //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       
       sprintf(padName,"antPad%d_%d",column,row);
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
@@ -1453,7 +1451,7 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
   for(int column=0;column<4;column++) {
-    sprintf(textLabel,"%d/%d",1+column,5+column);
+    sprintf(textLabel,"%d",1+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
     else
@@ -1461,10 +1459,10 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
   }
   texy.SetTextAlign(21);  
   texy.SetTextAngle(90);
-  texy.DrawTextNDC(left[0]-0.01,bottom[0]+0.1,"V");
-  texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"V/S");
-  texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"H");
-  texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"H");
+  texy.DrawTextNDC(left[0]-0.01,bottom[0]+0.1,"TV");
+  texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"BV");
+  texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"TH");
+  texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"BH");
 
  
   int count=0;

@@ -62,6 +62,8 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 {
+
+  //FIXME -- should probably fix this
   return getGraphFromElecChan(chan);
   return NULL;
 }

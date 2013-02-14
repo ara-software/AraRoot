@@ -59,8 +59,11 @@ AraGeomTool*  AraGeomTool::Instance()
 
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, AraStationId_t stationId)
 {
-  if(antNum<8 && antNum>=0)
-    return fAntLookupTable[stationId][antPol][antNum];
+  int calibIndex=getStationCalibIndex(stationId);
+
+  if(antNum<8 && antNum>=0 && getStationInfo(stationId))
+    return fAntLookupTable[calibIndex][antPol][antNum];
+  fprintf(stderr, "antPol %i antNum %i stationId %i\n", (int)antPol, antNum, (int)stationId);
   return -1;
 }
 
@@ -202,8 +205,9 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
     rc=sqlite3_step(stmt);
     if(rc==SQLITE_DONE) break;
     int nColumns=sqlite3_column_count(stmt);
-
-
+   
+     row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
+     printf("row number %i\n", row);
     for(int column=0;column<nColumns;column++){
 
       const char* temp;    
@@ -494,8 +498,6 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
       }//switch(column)
 
     }//column
-
-    row++;    
 
 
   }//while(1)
@@ -960,6 +962,7 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
     if(!readStationInfoICRR[calibIndex]) {
+      fprintf(stderr, "readChannelMapDbIcrr\n");
       readChannelMapDbIcrr(stationId);
       readStationInfoICRR[calibIndex]=1;
     }
@@ -968,6 +971,7 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
   }
   if(isAtriStation(stationId)) {
     if(!readStationInfoATRI[calibIndex]) {
+      fprintf(stderr, "readChannelMapDbAtri\n");
       readChannelMapDbAtri(stationId);
       readStationInfoATRI[calibIndex]=1;
     }
@@ -1035,7 +1039,8 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
     if(rc==SQLITE_DONE) break;
     int nColumns=sqlite3_column_count(stmt);
 
-
+    row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
+    //printf("row number %i\n", row);
     for(int column=0;column<nColumns;column++){
 
       const char* temp;    
@@ -1327,14 +1332,12 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
 
     }//column
 
-    row++;    
 
 
   }//while(1)
   //now insert the no of rfchannels
 
-
-  fStationInfoATRI[calibIndex].numberRFChans=ANTS_PER_ATRI;
+  fStationInfoATRI[calibIndex].numberRFChans=RFCHANS_PER_ATRI;
 
   //now need to destroy the sqls statement prepared earlier
   rc = sqlite3_finalize(stmt);
@@ -1348,27 +1351,27 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
 
   //Now check that we read it in OK
 
-  for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
-    fStationInfoATRI[calibIndex].fAntInfo[ant].printAntennaInfo();
-  }
+  //  for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
+    //    fStationInfoATRI[calibIndex].fAntInfo[ant].printAntennaInfo();
+    //  }
 
   //Now let's populate the antenna lookups
   //fAntLookUpTable[calibIndex][AraAntPol][antPolNum]=chanNum-1
 
   for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
-    //printf("ant %i\t", ant);//FIXME//DEBUG
+    //fprintf(stderr,"ant %i\t", ant);//FIXME//DEBUG
     switch(fStationInfoATRI[calibIndex].fAntInfo[ant].polType){
     case AraAntPol::kVertical:
-      fAntLookupTable[calibIndex][0][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kVertical\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
+      fAntLookupTable[calibIndex][0][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
+      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kVertical\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
       break;
     case AraAntPol::kHorizontal:
-      fAntLookupTable[calibIndex][1][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kHorizontal\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
+      fAntLookupTable[calibIndex][1][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
+      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kHorizontal\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
       break;
     case AraAntPol::kSurface:
-      fAntLookupTable[calibIndex][2][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kSurface\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
+      fAntLookupTable[calibIndex][2][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
+      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kSurface\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
       break;
     default:
       std::cerr << "Unknown AraPolType\n";
