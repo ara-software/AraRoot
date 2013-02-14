@@ -1011,10 +1011,13 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
   const char *query;
 
   //This is where we decide which table to access in the database
-  if(stationId==ARA_STATION1B) query = "select * from Station1";
-  if(stationId==ARA_STATION2) query = "select * from Station2";
-  if(stationId==ARA_STATION3) query = "select * from Station3";
-
+  if(stationId==ARA_STATION1B) query = "select * from ARA01";
+  else if(stationId==ARA_STATION2) query = "select * from ARA02";
+  else if(stationId==ARA_STATION3) query = "select * from ARA03";
+  else{
+    fprintf(stderr, "%s : stationId %i is not ARA1-3\n", __FUNCTION__, stationId);
+    return;
+  }
   //prepare an sql statment which will be used to obtain information from the data base
   //  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
   rc=sqlite3_prepare(db, query, strlen(query)+1, &stmt, NULL);
