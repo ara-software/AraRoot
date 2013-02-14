@@ -1333,8 +1333,8 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
   }//while(1)
   //now insert the no of rfchannels
 
-  if(stationId==ARA_TESTBED)  fStationInfoATRI[0].numberRFChans=RFCHANS_TESTBED;
-  if(stationId==ARA_STATION1)  fStationInfoATRI[1].numberRFChans=RFCHANS_STATION1;
+
+  fStationInfoATRI[calibIndex].numberRFChans=ANTS_PER_ATRI;
 
   //now need to destroy the sqls statement prepared earlier
   rc = sqlite3_finalize(stmt);
@@ -1349,7 +1349,7 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
   //Now check that we read it in OK
 
   for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
-    //    fStationInfoATRI[calibIndex].fAntInfo[ant].printAntennaInfo();
+    fStationInfoATRI[calibIndex].fAntInfo[ant].printAntennaInfo();
   }
 
   //Now let's populate the antenna lookups

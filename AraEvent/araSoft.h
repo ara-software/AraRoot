@@ -33,11 +33,12 @@
 
 
 ///Hardware descriptors
+#define ANTS_PER_ATRI 20
 #define DDA_PER_ATRI 4
 #define BLOCKS_PER_DDA 512
 #define RFCHAN_PER_DDA 8
 #define TDA_PER_ATRI 4
-#define ANTS_PER_TDA 4
+#define ANTS_PER_TDA 4 
 #define L2_PER_TDA 4 //Wrong?!
 #define THRESHOLDS_PER_ATRI TDA_PER_ATRI*ANTS_PER_TDA
 #define SAMPLES_PER_BLOCK 64

@@ -34,8 +34,8 @@ class AraStationInfo: public TObject
   
   AraAntennaInfo fAntInfo[20]; ///< One object per antenna
   Double_t stationLocation[3]; ///< array-centric co-ordinates of the station
-  int numberRFChans;
-  //  int numberAntennas;
+  int numberRFChans;  ///<This is the numebr of antennas on an ATRI
+
 
   ClassDef(AraStationInfo,1);
 };
