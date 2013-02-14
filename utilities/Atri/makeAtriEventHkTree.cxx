@@ -99,7 +99,7 @@ void makeHkTree(char *inputName, char *outFile) {
       // fprintf(stderr, "typeId %i verId %i subVerId %i\n", theGenericHeader.typeId, theGenericHeader.verId, theGenericHeader.subVerId);
       // fprintf(stderr, "numBytes %i checksum %i numBytes(2_7) %lu numBytes(new) %lu genericHeaderSize %lu\n", theGenericHeader.numBytes, theGenericHeader.checksum,sizeof(AraEventHk2_7_t), sizeof(AraEventHk_t), sizeof(AtriGenericHeader_t) );
       
-      if(theGenericHeader.numBytes = sizeof(AraEventHk2_7_t)){ 
+      if(theGenericHeader.numBytes == sizeof(AraEventHk2_7_t)){ 
 	newHkFormat=0;
 	fprintf(stderr, "Forcing event format to AraEventHk2_7_t\n");
       }
@@ -114,7 +114,7 @@ void makeHkTree(char *inputName, char *outFile) {
       // fprintf(stderr, "typeId %i verId %i subVerId %i\n", theGenericHeader.typeId, theGenericHeader.verId, theGenericHeader.subVerId);
       // fprintf(stderr, "numBytes %i checksum %i numBytes(2_7) %lu numBytes(new) %lu genericHeaderSize %lu\n", theGenericHeader.numBytes, theGenericHeader.checksum,sizeof(AraEventHk2_7_t), sizeof(AraEventHk_t), sizeof(AtriGenericHeader_t) );
 
-      if(theGenericHeader.numBytes = sizeof(AraEventHk_t)){
+      if(theGenericHeader.numBytes == sizeof(AraEventHk_t)){
 	newHkFormat=1;
 	fprintf(stderr, "Forcing event format to AraEventHk_t\n");
       }

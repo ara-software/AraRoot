@@ -28,10 +28,14 @@ class AraStationInfo: public TObject
   
   AraStationInfo(); ///< Default constructor
   ~AraStationInfo(); ////< Destructor
+
+  Double_t getCableDelay(int rfChanNum);
+  AraAntennaInfo *getAntennaInfo(int antNum);
   
   AraAntennaInfo fAntInfo[20]; ///< One object per antenna
   Double_t stationLocation[3]; ///< array-centric co-ordinates of the station
   int numberRFChans;
+  //  int numberAntennas;
 
   ClassDef(AraStationInfo,1);
 };

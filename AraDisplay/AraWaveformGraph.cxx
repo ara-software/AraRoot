@@ -106,7 +106,7 @@ void AraWaveformGraph::setRFChan(int rfChan, int stationId)
   sprintf(graphName,"grRFChan%d",rfChan);
   this->SetName(graphName);
   char graphTitle[180];
-  //  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->fStationInfo[stationId].fAntInfo[rfChan].designator);
+  //  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->getStationInfo(stationId)->getAntennaInfo(rfChan).designator);
   sprintf(graphTitle,"RF Channel %d (Ant %d)",rfChan+1,rfChan+1);//FIXME
   this->SetTitle(graphTitle);
 }
@@ -211,14 +211,23 @@ void AraWaveformGraph::DrawHilbert()
   //   printf("AraWaveformGraph::DrawFFT: not yet implemented\n");
 }
 
+#define MAX_SAMPLE_VALS 20*64
+
 TGraph *AraWaveformGraph::getFFT()
 {
-  Double_t newX[512],newY[512];
-  TGraph *grInt = FFTtools::getInterpolatedGraph(this,0.5);
+  Int_t numPoints=this->GetN();
+  Double_t deltaT=this->GetX()[numPoints-1]-this->GetX()[0];
+  deltaT/=(numPoints-1);
+
+  Double_t newX[MAX_SAMPLE_VALS];
+  Double_t newY[MAX_SAMPLE_VALS];
+
+
+  TGraph *grInt = FFTtools::getInterpolatedGraph(this,deltaT);
   Int_t numSamps=grInt->GetN();
   Double_t *xVals=grInt->GetX();
   Double_t *yVals=grInt->GetY();
-  for(int i=0;i<512;i++) {
+  for(int i=0;i<MAX_SAMPLE_VALS;i++) {
     if(i<numSamps) {
       newX[i]=xVals[i];
       newY[i]=yVals[i];
@@ -228,7 +237,7 @@ TGraph *AraWaveformGraph::getFFT()
       newY[i]=0;
     }      
   }
-  TGraph *grNew = new TGraph(512,newX,newY);
+  TGraph *grNew = new TGraph(MAX_SAMPLE_VALS,newX,newY);
   TGraph *grFFT = FFTtools::makePowerSpectrumMilliVoltsNanoSecondsdB(grNew);
   delete grNew;
   delete grInt;

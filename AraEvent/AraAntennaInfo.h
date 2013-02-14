@@ -34,7 +34,8 @@ namespace AraAntPol {
   typedef enum EAraAntPol {
     kVertical = 0,
     kHorizontal = 1,
-    kSurface = 2
+    kSurface = 2,
+    kNotAPol = 3
   } AraAntPol_t;
   const char *antPolAsString(AraAntPol::AraAntPol_t antPol); ///<Returns the antenna polarisation as a string
 }
@@ -86,6 +87,10 @@ class AraAntennaInfo: public TObject
 
    void printAntennaInfo();
    const char *getDaqBoxChan();
+   Double_t getCableDelay() {return cableDelay;}
+   
+
+
    Int_t chanNum;
    AraDaqChanType::AraDaqChanType_t daqChanType;
    Int_t daqChanNum;
@@ -97,6 +102,7 @@ class AraAntennaInfo: public TObject
    Int_t labChans[2]; ///<These will count from 0
    Int_t isDiplexed; ///< Depricated attempt at un-diplexing//FIXME
    Int_t diplexedChans[2]; ///< Depricated attempt at un-diplexing//FIXME
+   
 
 
    Int_t preAmpNum;

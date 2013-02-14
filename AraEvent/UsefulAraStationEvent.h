@@ -26,7 +26,7 @@ class UsefulAraStationEvent
 {
  public:
    UsefulAraStationEvent(); ///< Default constructor
-   ~UsefulAraStationEvent(); ///< Destructor
+   virtual ~UsefulAraStationEvent(); ///< Destructor
 
    virtual Int_t getNumElecChannels()=0; ///< Returns the number of electronics channels
    virtual Int_t getNumRFChannels()=0; ///< Returns the number of Antennae - this may not be the same as the number of electronics channels (interleaving / di-plexing)

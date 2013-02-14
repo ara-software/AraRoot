@@ -55,25 +55,25 @@ AraEventCorrelator*  AraEventCorrelator::Instance(Int_t numAnts, Int_t stationId
 void AraEventCorrelator::fillAntennaPositions()
 {AraGeomTool *araGeom=AraGeomTool::Instance();
   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {   
-    int antPolNum=araGeom->fStationInfo[fStationId].fAntInfo[ant].antPolNum; 
-    std::cerr << ant << "\t" << antPolNum << "\t" << araGeom->fStationInfo[fStationId].fAntInfo[ant].polType << "\n";
-    if(araGeom->fStationInfo[fStationId].fAntInfo[ant].polType==AraAntPol::kVertical) {
+    int antPolNum=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antPolNum; 
+    std::cerr << ant << "\t" << antPolNum << "\t" << araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType << "\n";
+    if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kVertical) {
       if(antPolNum<7) {
 	fRfChanVPol[antPolNum]=ant;
-	fVPolPos[antPolNum][0]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[0];
-	fVPolPos[antPolNum][1]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[1];
-	fVPolPos[antPolNum][2]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[2];
+	fVPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[0];
+	fVPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[1];
+	fVPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[2];
 	fVPolRho[antPolNum]=TMath::Sqrt(fVPolPos[antPolNum][0]*fVPolPos[antPolNum][0]+
 					fVPolPos[antPolNum][1]*fVPolPos[antPolNum][1]);
 	fVPolPhi[antPolNum]=TMath::ATan2(fVPolPos[antPolNum][1],fVPolPos[antPolNum][0]);
       }
     }
-    if(araGeom->fStationInfo[fStationId].fAntInfo[ant].polType==AraAntPol::kHorizontal) {
+    if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kHorizontal) {
       if(antPolNum<7) {
 	fRfChanHPol[antPolNum]=ant;
-	fHPolPos[antPolNum][0]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[0];
-	fHPolPos[antPolNum][1]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[1];
-	fHPolPos[antPolNum][2]=araGeom->fStationInfo[fStationId].fAntInfo[ant].antLocation[2];
+	fHPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[0];
+	fHPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[1];
+	fHPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[2];
 	fHPolRho[antPolNum]=TMath::Sqrt(fHPolPos[antPolNum][0]*fHPolPos[antPolNum][0]+
 					fHPolPos[antPolNum][1]*fHPolPos[antPolNum][1]);
 	fHPolPhi[antPolNum]=TMath::ATan2(fHPolPos[antPolNum][1],fHPolPos[antPolNum][0]);

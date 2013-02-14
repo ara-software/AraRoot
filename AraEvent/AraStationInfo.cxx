@@ -22,3 +22,18 @@ AraStationInfo::~AraStationInfo()
 {
 
 }
+
+Double_t AraStationInfo::getCableDelay(int rfChanNum) {
+  if(rfChanNum>=0 && rfChanNum<numberRFChans) {
+    return fAntInfo[rfChanNum].getCableDelay();
+  }
+  return 0;
+}
+
+AraAntennaInfo *AraStationInfo::getAntennaInfo(int antNum) {
+  if(antNum>=0 && antNum<numberRFChans) {
+    return &fAntInfo[antNum];
+  }
+  return NULL;
+}
+

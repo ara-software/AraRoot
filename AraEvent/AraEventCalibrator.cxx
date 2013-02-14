@@ -90,17 +90,11 @@ AraEventCalibrator::AraEventCalibrator()
 
   //Loop through and set the got ped / calib flags to zero. This assumes stationId's first n elements
   //are for ICRR stations and the remaining N-n are ATRI
-   for(AraStationId_t station=0;station<ICRR_NO_STATIONS+ATRI_NO_STATIONS;station++){
-      //    fprintf(stderr, "AraEventCalibrator::AraEventCalibrator()  -- station %i\n", station);
-      if(AraGeomTool::isIcrrStation(station)){
-	 gotIcrrPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
-	 gotIcrrCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
-      }
-      else if(AraGeomTool::isAtriStation(station)){
-	 fGotAtriPedFile[AraGeomTool::getStationCalibIndex(station)]=0;
-	 fGotAtriCalibFile[AraGeomTool::getStationCalibIndex(station)]=0;
-      }      
-   }   
+  memset(fGotAtriPedFile,sizeof(Int_t)*ATRI_NO_STATIONS,0);
+  memset(fGotAtriCalibFile,sizeof(Int_t)*ATRI_NO_STATIONS,0);
+  memset(gotIcrrPedFile,sizeof(Int_t)*ICRR_NO_STATIONS,0);
+  memset(gotIcrrCalibFile,sizeof(Int_t)*ICRR_NO_STATIONS,0);
+
 }
 
 AraEventCalibrator::~AraEventCalibrator() {
@@ -592,7 +586,7 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
     }//isDiplexed==1
    
     if(AraCalType::hasCableDelays(calType)) {
-      Double_t delay=tempGeom->fStationInfo[stationId].fAntInfo[rfchan].cableDelay;
+      Double_t delay=tempGeom->getStationInfo(stationId)->getCableDelay(rfchan);
       //      delay-=180; //Just an arbitrary offset
       for(int i=0;i<theEvent->fNumPointsRF[rfchan];i++) {
 	theEvent->fTimesRF[rfchan][i]-=delay;
