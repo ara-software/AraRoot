@@ -14,7 +14,11 @@ target_link_libraries(calibrateATRIThirdTry AraEvent ${ROOT_LIBRARIES} ${ZLIB_LI
 add_executable(calibrateATRISecondTrySingleChannel secondCalibTrySingleChannel.cxx)
 target_link_libraries(calibrateATRISecondTrySingleChannel AraEvent ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
+
+add_executable(calibrateATRIRjn rjnCalib.cxx)
+target_link_libraries(calibrateATRIRjn AraEvent ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
+
 #install the binaries
-install(TARGETS calibrateATRI calibrateATRISecondTry calibrateATRIThirdTry calibrateATRISecondTrySingleChannel DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS calibrateATRIRjn calibrateATRI calibrateATRISecondTry calibrateATRIThirdTry calibrateATRISecondTrySingleChannel DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 

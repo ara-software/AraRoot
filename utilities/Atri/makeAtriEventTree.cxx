@@ -13,6 +13,7 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
+#include "AraGeomTool.h"
 #include "araAtriStructures.h"
 #include "RawAtriStationEvent.h"  
 
@@ -20,6 +21,7 @@ void process();
 void makeTree(char *inputName, char *outDir);
 
 AraStationEventHeader_t theEventHeader;
+
 char *dataBuffer;
 TFile *theFile;
 TTree *eventTree;
@@ -27,8 +29,9 @@ RawAtriStationEvent *theEvent=0;
 char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
-Int_t lastRunNumber;
-
+//Int_t lastRunNumber;
+Int_t stationIdInt;
+AraStationId_t stationId;
 
 int main(int argc, char **argv) {
   dataBuffer = new char[200000];
@@ -38,7 +41,10 @@ int main(int argc, char **argv) {
     return -1;
   }
   if(argc==4) 
-    runNumber=atoi(argv[3]);
+     runNumber=atoi(argv[3]); //To override runNumber
+  if(argc==5) 
+     stationIdInt=atoi(argv[4]);  //To override station id
+  stationId=AraGeomTool::getAtriStationId(stationIdInt);
   makeTree(argv[1],argv[2]);
   delete [] dataBuffer;
   return 0;
@@ -83,6 +89,11 @@ void makeTree(char *inputName, char *outFile) {
 	error=1;
 	break;
       }
+      if(stationIdInt!=0)
+	 theEventHeader.gHdr.stationId=stationId;
+      
+      //      std::cout << (int)theEventHeader.gHdr.stationId << "\t" << (int)stationId << "\n";
+
       if(theEventHeader.gHdr.numBytes>0) {
 	//	std::cout << "Num bytes: " << theEventHeader.gHdr.numBytes << "\t" << theEventHeader.numBytes << "\n";
 	//	std::cout << "Event number: " << theEventHeader.eventNumber << "\t" << theEventHeader.unixTime << "\t" << theEventHeader.unixTimeUs << "\n";
@@ -140,6 +151,6 @@ void process() {
   
   theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer);
   eventTree->Fill();  
-  lastRunNumber=runNumber;
+  //  lastRunNumber=runNumber;
   //  delete theEvent;
 }

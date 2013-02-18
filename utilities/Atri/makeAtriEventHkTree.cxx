@@ -88,6 +88,7 @@ void makeHkTree(char *inputName, char *outFile) {
     else{
       newHkFormat=0;      
     }
+    
     while(newHkFormat && theGenericHeader.numBytes != sizeof(AraEventHk_t)){
       fprintf(stderr, "error - wrong numBytes (%d) for newHkFormat (%lu) oldFormat (%lu)\n", theGenericHeader.numBytes, sizeof(AraEventHk_t), sizeof(AraEventHk2_7_t));
       if(theGenericHeader.numBytes==0) theGenericHeader.numBytes=sizeof(AraEventHk2_7_t);
@@ -103,12 +104,11 @@ void makeHkTree(char *inputName, char *outFile) {
 	newHkFormat=0;
 	fprintf(stderr, "Forcing event format to AraEventHk2_7_t\n");
       }
-      //      newHkFormat=0;
-    }
+    }        
+    //      newHkFormat=0;    
     while(newHkFormat==0 && theGenericHeader.numBytes != sizeof(AraEventHk2_7_t)){
       fprintf(stderr, "error - wrong numBytes (%d) for oldHkFormat (%lu) new format (%lu)\n", theGenericHeader.numBytes, sizeof(AraEventHk2_7_t), sizeof(AraEventHk_t));
       if(theGenericHeader.numBytes==0) theGenericHeader.numBytes=sizeof(AraEventHk_t);
-
 
       numBytes = gzread(infile, &theEventHkStruct, theGenericHeader.numBytes-sizeof(AtriGenericHeader_t));
       numBytes = gzread(infile, &theGenericHeader, sizeof(AtriGenericHeader_t));
