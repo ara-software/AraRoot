@@ -49,23 +49,22 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
   timeMapIt=fTimes.find(chanId);
   if(timeMapIt==fTimes.end()) {
     // This channel doesn't exist. We don't return a null pointer,
-    // we return an empty graph.
+    // we return an empty graph. 
+    // RJN should fix this as it is a silly id
     return new TGraph;
   }
   
   TGraph *gr = new TGraph(fTimes[chanId].size(),&(fTimes[chanId][0]),&(fVolts[chanId][0]));
 
+  //Why do we need to sort the array. Shouldn't this be done in AraEventCalibrator??
   gr->Sort();
   
   return gr;
 }
 
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
-{
-
-  //FIXME -- should probably fix this
-  return getGraphFromElecChan(chan);
-  return NULL;
+{ 
+  return getGraphFromElecChan(AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId));
 }
 
 

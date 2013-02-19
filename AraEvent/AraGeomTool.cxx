@@ -59,12 +59,9 @@ AraGeomTool*  AraGeomTool::Instance()
 
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum, AraStationId_t stationId)
 {
-  int calibIndex=getStationCalibIndex(stationId);
-
-  if(antNum<8 && antNum>=0 && getStationInfo(stationId))
-    return fAntLookupTable[calibIndex][antPol][antNum];
-  fprintf(stderr, "antPol %i antNum %i stationId %i\n", (int)antPol, antNum, (int)stationId);
-  return -1;
+  
+  //  fprintf(stderr, "antPol %i antNum %i stationId %i\n", (int)antPol, antNum, (int)stationId);
+  return getStationInfo(stationId)->getRFChanByPolAndAnt(antNum,antPol);
 }
 
 
@@ -90,10 +87,7 @@ Int_t AraGeomTool::getAntNumByRFChan(int rfChan, AraStationId_t stationId)
 //return the testbed lookup stuff not station1
 int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
 {
-  
-  if(antNum<8 && antNum>=0)
-    return fAntLookupTable[0][antPol][antNum];
-  return -1;
+  return getRFChanByPolAndAnt(antPol,antNum,ARA_STATION1);
 }//FIXME -- this just loads the stuff for station1
 
 
@@ -208,6 +202,9 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
    
      row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
      printf("row number %i\n", row);
+     
+     AraAntennaInfo *thisAntInfo=fStationInfoICRR[calibIndex].getNewAntennaInfo(row);
+
     for(int column=0;column<nColumns;column++){
 
       const char* temp;    
@@ -221,272 +218,272 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
 	temp = (const char*)sqlite3_column_text(stmt, column);
 
         if(strcmp (temp,"kReceiver")==0){
-	  fStationInfoICRR[calibIndex].fAntInfo[row].antDir=AraAntDir::kReceiver; 
-	  //printf("fStationInfoICRR[%i].fAntInfo[%i].antDir %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antDir);
+	  thisAntInfo->antDir=AraAntDir::kReceiver; 
+	  //printf("fStationInfoICRR[%i].fAntInfo[%i].antDir %i\n", stationId, row, thisAntInfo->antDir);
 	}
 
 	break;
       case 2: //chanNum
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].chanNum=sqlite3_column_int(stmt, column);
+	thisAntInfo->chanNum=sqlite3_column_int(stmt, column);
 
 
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].chanNum %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].chanNum);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].chanNum %i\n", stationId, row, thisAntInfo->chanNum);
 	
 	break;
       case 3: //daqChanType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kDisconeChan")==0) fStationInfoICRR[calibIndex].fAntInfo[row].daqChanType=AraDaqChanType::kDisconeChan;
-        if(strcmp (temp,"kBatwingChan")==0) fStationInfoICRR[calibIndex].fAntInfo[row].daqChanType=AraDaqChanType::kBatwingChan;
+        if(strcmp (temp,"kDisconeChan")==0) thisAntInfo->daqChanType=AraDaqChanType::kDisconeChan;
+        if(strcmp (temp,"kBatwingChan")==0) thisAntInfo->daqChanType=AraDaqChanType::kBatwingChan;
 
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqChanType %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].daqChanType);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqChanType %i\n", stationId, row, thisAntInfo->daqChanType);
 
 	break;
       case 4: //daqChanNum
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].daqChanNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqChanNum %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].daqChanNum);
+	thisAntInfo->daqChanNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqChanNum %i\n", stationId, row, thisAntInfo->daqChanNum);
 	
 	break;
       case 5: //highPassFilterMhz
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].highPassFilterMhz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].highPassFilterMhz %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].highPassFilterMhz);
+	thisAntInfo->highPassFilterMhz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].highPassFilterMhz %f\n", stationId, row, thisAntInfo->highPassFilterMhz);
 
 	break;
       case 6: //lowPassFilterMhz
-	fStationInfoICRR[calibIndex].fAntInfo[row].lowPassFilterMhz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].lowPassFilterMhz %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].lowPassFilterMhz);
+	thisAntInfo->lowPassFilterMhz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].lowPassFilterMhz %f\n", stationId, row, thisAntInfo->lowPassFilterMhz);
 
 	break;
       case 7: //daqTrigChan
-	fStationInfoICRR[calibIndex].fAntInfo[row].daqTrigChan=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqTrigChan %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].daqTrigChan);
+	thisAntInfo->daqTrigChan=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqTrigChan %i\n", stationId, row, thisAntInfo->daqTrigChan);
 
 	break;
       case 8: //numLabChans
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].numLabChans=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].numLabChans %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].numLabChans);
+	thisAntInfo->numLabChans=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].numLabChans %i\n", stationId, row, thisAntInfo->numLabChans);
 
 	break;
       case 9: //labChip
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kA")==0) fStationInfoICRR[calibIndex].fAntInfo[row].labChip=AraLabChip::kA;
-        if(strcmp (temp,"kB")==0) fStationInfoICRR[calibIndex].fAntInfo[row].labChip=AraLabChip::kB;
-        if(strcmp (temp,"kC")==0) fStationInfoICRR[calibIndex].fAntInfo[row].labChip=AraLabChip::kC;
+        if(strcmp (temp,"kA")==0) thisAntInfo->labChip=AraLabChip::kA;
+        if(strcmp (temp,"kB")==0) thisAntInfo->labChip=AraLabChip::kB;
+        if(strcmp (temp,"kC")==0) thisAntInfo->labChip=AraLabChip::kC;
 
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChip %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].labChip);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChip %i\n", stationId, row, thisAntInfo->labChip);
 
 	break;
       case 10: //labChans[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].labChans[0]=sqlite3_column_int(stmt, column)-1;
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChans[0] %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].labChans[0]);
+	thisAntInfo->labChans[0]=sqlite3_column_int(stmt, column)-1;
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChans[0] %i\n", stationId, row, thisAntInfo->labChans[0]);
 
 	break;
       case 11: //labChans[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].labChans[1]=sqlite3_column_int(stmt, column)-1;
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChans[1] %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].labChans[1]);
+	thisAntInfo->labChans[1]=sqlite3_column_int(stmt, column)-1;
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].labChans[1] %i\n", stationId, row, thisAntInfo->labChans[1]);
 
 	break;
       case 12: //isDiplexed
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].isDiplexed=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].isDiplexed %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].isDiplexed);
+	thisAntInfo->isDiplexed=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].isDiplexed %i\n", stationId, row, thisAntInfo->isDiplexed);
 
 	break;
       case 13: //diplexedChans[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].diplexedChans[0]=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].diplexedChans[0] %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].diplexedChans[0]);
+	thisAntInfo->diplexedChans[0]=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].diplexedChans[0] %i\n", stationId, row, thisAntInfo->diplexedChans[0]);
 
 	break;
       case 14: //diplexedChans[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].diplexedChans[1]=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].diplexedChans[1] %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].diplexedChans[1]);
+	thisAntInfo->diplexedChans[1]=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].diplexedChans[1] %i\n", stationId, row, thisAntInfo->diplexedChans[1]);
 
 	break;
       case 15: //preAmpNum
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].preAmpNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].preAmpNum %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].preAmpNum);
+	thisAntInfo->preAmpNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].preAmpNum %i\n", stationId, row, thisAntInfo->preAmpNum);
 
 	break;
       case 16: //avgNoiseFigure
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].avgNoiseFigure=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].avgNoiseFigure %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].avgNoiseFigure);
+	thisAntInfo->avgNoiseFigure=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].avgNoiseFigure %f\n", stationId, row, thisAntInfo->avgNoiseFigure);
 
 	break;
       case 17: //rcvrNum
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].rcvrNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].rcvrNum %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].rcvrNum);
+	thisAntInfo->rcvrNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].rcvrNum %i\n", stationId, row, thisAntInfo->rcvrNum);
 
 	break;
       case 18: //designator
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-	strncpy(fStationInfoICRR[calibIndex].fAntInfo[row].designator, temp, 3);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].designator %s\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].designator);
+	strncpy(thisAntInfo->designator, temp, 3);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].designator %s\n", stationId, row, thisAntInfo->designator);
 
 	break;
       case 19: //antPolNum
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antPolNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antPolNum %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antPolNum);
+	thisAntInfo->antPolNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antPolNum %i\n", stationId, row, thisAntInfo->antPolNum);
 
 	break;
       case 20: //antType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kBicone")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kBicone;
-        if(strcmp (temp,"kBowtieSlot")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kBowtieSlot;
-        if(strcmp (temp,"kDiscone")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kDiscone;
-        if(strcmp (temp,"kBatwing")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kBatwing;
-        if(strcmp (temp,"kFatDipole")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kFatDipole;
-        if(strcmp (temp,"kQuadSlot")==0) fStationInfoICRR[calibIndex].fAntInfo[row].antType=AraAntType::kQuadSlot;
+        if(strcmp (temp,"kBicone")==0) thisAntInfo->antType=AraAntType::kBicone;
+        if(strcmp (temp,"kBowtieSlot")==0) thisAntInfo->antType=AraAntType::kBowtieSlot;
+        if(strcmp (temp,"kDiscone")==0) thisAntInfo->antType=AraAntType::kDiscone;
+        if(strcmp (temp,"kBatwing")==0) thisAntInfo->antType=AraAntType::kBatwing;
+        if(strcmp (temp,"kFatDipole")==0) thisAntInfo->antType=AraAntType::kFatDipole;
+        if(strcmp (temp,"kQuadSlot")==0) thisAntInfo->antType=AraAntType::kQuadSlot;
 
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antType %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antType);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antType %i\n", stationId, row, thisAntInfo->antType);
 
 	break;
       case 21: //polType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kVertical")==0) fStationInfoICRR[calibIndex].fAntInfo[row].polType=AraAntPol::kVertical;
-        if(strcmp (temp,"kHorizontal")==0) fStationInfoICRR[calibIndex].fAntInfo[row].polType=AraAntPol::kHorizontal;
-        if(strcmp (temp,"kSurface")==0) fStationInfoICRR[calibIndex].fAntInfo[row].polType=AraAntPol::kSurface;
+        if(strcmp (temp,"kVertical")==0) thisAntInfo->polType=AraAntPol::kVertical;
+        if(strcmp (temp,"kHorizontal")==0) thisAntInfo->polType=AraAntPol::kHorizontal;
+        if(strcmp (temp,"kSurface")==0) thisAntInfo->polType=AraAntPol::kSurface;
 
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].AraAntPol %i\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].polType);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].AraAntPol %i\n", stationId, row, thisAntInfo->polType);
 
 	break;
       case 22: //locationName
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-	strncpy(fStationInfoICRR[calibIndex].fAntInfo[row].locationName, temp, 4);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].locationName %s\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].locationName);
+	strncpy(thisAntInfo->locationName, temp, 4);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].locationName %s\n", stationId, row, thisAntInfo->locationName);
 
 
 	break;
       case 23: //antLocation[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[0] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[0]);
+	thisAntInfo->antLocation[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[0] %f\n", stationId, row, thisAntInfo->antLocation[0]);
 
 	break;
       case 24: //antLocation[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[1] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[1]);
+	thisAntInfo->antLocation[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[1] %f\n", stationId, row, thisAntInfo->antLocation[1]);
 
 	break;
       case 25: //antLocation[2]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[2] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antLocation[2]);
+	thisAntInfo->antLocation[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antLocation[2] %f\n", stationId, row, thisAntInfo->antLocation[2]);
 
 	break;
       case 26: //cableDelay
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].cableDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].cableDelay %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].cableDelay);
+	thisAntInfo->cableDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].cableDelay %f\n", stationId, row, thisAntInfo->cableDelay);
 
 	break;
       case 27: //debugHolePosition[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[0] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[0]);
+	thisAntInfo->debugHolePosition[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[0] %f\n", stationId, row, thisAntInfo->debugHolePosition[0]);
 
 	break;
       case 28: //debugHolePosition[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[1] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[1]);
+	thisAntInfo->debugHolePosition[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[1] %f\n", stationId, row, thisAntInfo->debugHolePosition[1]);
 
 	break;
       case 29: //debugHolePosition[2]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[2] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePosition[2]);
+	thisAntInfo->debugHolePosition[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePosition[2] %f\n", stationId, row, thisAntInfo->debugHolePosition[2]);
 
 	break;
       case 30: //debugPreAmpDz
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugPreAmpDz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugPreAmpDz %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugPreAmpDz);
+	thisAntInfo->debugPreAmpDz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugPreAmpDz %f\n", stationId, row, thisAntInfo->debugPreAmpDz);
 
 	break;
       case 31: //debugHolePositionZft
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePositionZft=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePositionZft %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePositionZft);
+	thisAntInfo->debugHolePositionZft=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePositionZft %f\n", stationId, row, thisAntInfo->debugHolePositionZft);
 
 	break;
       case 32: //debugHolePositionZm
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePositionZm=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePositionZm %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugHolePositionZm);
+	thisAntInfo->debugHolePositionZm=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugHolePositionZm %f\n", stationId, row, thisAntInfo->debugHolePositionZm);
 
 	break;
       case 33: //debugTrueAsBuiltPosition[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[0] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[0]);
+	thisAntInfo->debugTrueAsBuiltPositon[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[0] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[0]);
 
 	break;
       case 34: //debugTrueAsBuiltPosition[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[1] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[1]);
+	thisAntInfo->debugTrueAsBuiltPositon[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[1] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[1]);
 
 	break;
       case 35: //debugTrueAsBuiltPosition[2]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[2] %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[2]);
+	thisAntInfo->debugTrueAsBuiltPositon[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTrueAsBuiltPositon[2] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[2]);
 
 	break;
       case 36: //debugCableDelay2
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugCableDelay2=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugCableDelay2 %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugCableDelay2);
+	thisAntInfo->debugCableDelay2=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugCableDelay2 %f\n", stationId, row, thisAntInfo->debugCableDelay2);
 
 	break;
       case 37: //debugFeedPointDelay
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugFeedPointDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugFeedPointDelay %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugFeedPointDelay);
+	thisAntInfo->debugFeedPointDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugFeedPointDelay %f\n", stationId, row, thisAntInfo->debugFeedPointDelay);
 
 	break;
       case 38: //debugTotalCableDelay
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].debugTotalCableDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTotalCableDelay %f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].debugTotalCableDelay);
+	thisAntInfo->debugTotalCableDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].debugTotalCableDelay %f\n", stationId, row, thisAntInfo->debugTotalCableDelay);
 
 	break;
       case 40: //antOrient[0]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[0] %1.10f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[0]);
+	thisAntInfo->antOrient[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[0] %1.10f\n", stationId, row, thisAntInfo->antOrient[0]);
 
 	break;
 
       case 41: //antOrient[1]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[1] %1.10f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[1]);
+	thisAntInfo->antOrient[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[1] %1.10f\n", stationId, row, thisAntInfo->antOrient[1]);
 
 	break;
 
       case 42: //antOrient[2]
 
-	fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[2] %1.10f\n", stationId, row, fStationInfoICRR[calibIndex].fAntInfo[row].antOrient[2]);
+	thisAntInfo->antOrient[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoICRR[%i].fAntInfo[%i].antOrient[2] %1.10f\n", stationId, row, thisAntInfo->antOrient[2]);
 
 	break;
 
@@ -503,8 +500,14 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
   }//while(1)
   //now insert the no of rfchannels
 
-  if(stationId==ARA_TESTBED)  fStationInfoICRR[0].numberRFChans=RFCHANS_TESTBED;
-  if(stationId==ARA_STATION1)  fStationInfoICRR[1].numberRFChans=RFCHANS_STATION1;
+  // if(stationId==ARA_TESTBED)  {
+  //   fStationInfoICRR[0].setNumRFChans(RFCHANS_TESTBED);
+  //   fStationInfoICRR[0].setNumAnts(RFCHANS_TESTBED);
+  // }
+  // else if(stationId==ARA_STATION1)  {
+  //   fStationInfoICRR[1].setNumRFChans(RFCHANS_STATION1);
+  //   fStationInfoICRR[1].setNumAnts(RFCHANS_STATION1);
+  // }
 
   //now need to destroy the sqls statement prepared earlier
   rc = sqlite3_finalize(stmt);
@@ -515,38 +518,7 @@ void AraGeomTool::readChannelMapDbIcrr(AraStationId_t stationId){
   rc = sqlite3_close(db);
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
-
-  //Now check that we read it in OK
-
-  for(int ant=0;ant<fStationInfoICRR[calibIndex].numberRFChans;++ant){
-    //    fStationInfoICRR[calibIndex].fAntInfo[ant].printAntennaInfo();
-  }
-
-  //Now let's populate the antenna lookups
-  //fAntLookUpTable[calibIndex][AraAntPol][antPolNum]=chanNum-1
-
-  for(int ant=0;ant<fStationInfoICRR[calibIndex].numberRFChans;++ant){
-    //printf("ant %i\t", ant);//FIXME//DEBUG
-    switch(fStationInfoICRR[calibIndex].fAntInfo[ant].polType){
-    case AraAntPol::kVertical:
-      fAntLookupTable[calibIndex][0][fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kVertical\n", fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
-      break;
-    case AraAntPol::kHorizontal:
-      fAntLookupTable[calibIndex][1][fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kHorizontal\n", fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
-      break;
-    case AraAntPol::kSurface:
-      fAntLookupTable[calibIndex][2][fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1;
-      //printf("antPolNum %i\t chanNum %i\t kSurface\n", fStationInfoICRR[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoICRR[calibIndex].fAntInfo[ant].chanNum-1);//FIXME//DEBUG
-      break;
-    default:
-      std::cerr << "Unknown AraPolType\n";
-
-    }//switch polType
-  }//ant
-
-
+  fStationInfoICRR[calibIndex].fillAntIndexVec();
 
 }
 
@@ -912,6 +884,13 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
     sqlite3_close(db);
     return;
   }
+
+  //Insert hard coded number of antennas for now
+  //  fStationInfoATRI[calibIndex].setNumAnts(ANTS_PER_ATRI);
+  //  fStationInfoATRI[calibIndex].setNumRFChans(ANTS_PER_ATRI);  ///< Not sure wht value this should be
+
+
+
   int row=0;
   while(1){
     //printf("row number %i\n", row);
@@ -921,6 +900,8 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
 
     row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
     //printf("row number %i\n", row);
+    AraAntennaInfo *thisAntInfo=fStationInfoATRI[calibIndex].getNewAntennaInfo(row);
+
     for(int column=0;column<nColumns;column++){
 
       const char* temp;    
@@ -934,272 +915,272 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
 	temp = (const char*)sqlite3_column_text(stmt, column);
 
         if(strcmp (temp,"kReceiver")==0){
-	  fStationInfoATRI[calibIndex].fAntInfo[row].antDir=AraAntDir::kReceiver; 
-	  //printf("fStationInfoATRI[%i].fAntInfo[%i].antDir %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antDir);
+	  thisAntInfo->antDir=AraAntDir::kReceiver; 
+	  //printf("fStationInfoATRI[%i].fAntInfo[%i].antDir %i\n", stationId, row, thisAntInfo->antDir);
 	}
 
 	break;
       case 2: //chanNum
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].chanNum=sqlite3_column_int(stmt, column);
+	thisAntInfo->chanNum=sqlite3_column_int(stmt, column);
 
 
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].chanNum %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].chanNum);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].chanNum %i\n", stationId, row, thisAntInfo->chanNum);
 	
 	break;
       case 3: //daqChanType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kDisconeChan")==0) fStationInfoATRI[calibIndex].fAntInfo[row].daqChanType=AraDaqChanType::kDisconeChan;
-        if(strcmp (temp,"kBatwingChan")==0) fStationInfoATRI[calibIndex].fAntInfo[row].daqChanType=AraDaqChanType::kBatwingChan;
+        if(strcmp (temp,"kDisconeChan")==0) thisAntInfo->daqChanType=AraDaqChanType::kDisconeChan;
+        if(strcmp (temp,"kBatwingChan")==0) thisAntInfo->daqChanType=AraDaqChanType::kBatwingChan;
 
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqChanType %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].daqChanType);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqChanType %i\n", stationId, row, thisAntInfo->daqChanType);
 
 	break;
       case 4: //daqChanNum
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].daqChanNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqChanNum %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].daqChanNum);
+	thisAntInfo->daqChanNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqChanNum %i\n", stationId, row, thisAntInfo->daqChanNum);
 	
 	break;
       case 5: //highPassFilterMhz
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].highPassFilterMhz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].highPassFilterMhz %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].highPassFilterMhz);
+	thisAntInfo->highPassFilterMhz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].highPassFilterMhz %f\n", stationId, row, thisAntInfo->highPassFilterMhz);
 
 	break;
       case 6: //lowPassFilterMhz
-	fStationInfoATRI[calibIndex].fAntInfo[row].lowPassFilterMhz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].lowPassFilterMhz %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].lowPassFilterMhz);
+	thisAntInfo->lowPassFilterMhz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].lowPassFilterMhz %f\n", stationId, row, thisAntInfo->lowPassFilterMhz);
 
 	break;
       case 7: //daqTrigChan
-	fStationInfoATRI[calibIndex].fAntInfo[row].daqTrigChan=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqTrigChan %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].daqTrigChan);
+	thisAntInfo->daqTrigChan=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].daqTrigChan %i\n", stationId, row, thisAntInfo->daqTrigChan);
 
 	break;
       case 8: //numLabChans
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].numLabChans=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].numLabChans %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].numLabChans);
+	thisAntInfo->numLabChans=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].numLabChans %i\n", stationId, row, thisAntInfo->numLabChans);
 
 	break;
       case 9: //labChip
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kA")==0) fStationInfoATRI[calibIndex].fAntInfo[row].labChip=AraLabChip::kA;
-        if(strcmp (temp,"kB")==0) fStationInfoATRI[calibIndex].fAntInfo[row].labChip=AraLabChip::kB;
-        if(strcmp (temp,"kC")==0) fStationInfoATRI[calibIndex].fAntInfo[row].labChip=AraLabChip::kC;
+        if(strcmp (temp,"kA")==0) thisAntInfo->labChip=AraLabChip::kA;
+        if(strcmp (temp,"kB")==0) thisAntInfo->labChip=AraLabChip::kB;
+        if(strcmp (temp,"kC")==0) thisAntInfo->labChip=AraLabChip::kC;
 
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChip %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].labChip);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChip %i\n", stationId, row, thisAntInfo->labChip);
 
 	break;
       case 10: //labChans[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].labChans[0]=sqlite3_column_int(stmt, column)-1;
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChans[0] %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].labChans[0]);
+	thisAntInfo->labChans[0]=sqlite3_column_int(stmt, column)-1;
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChans[0] %i\n", stationId, row, thisAntInfo->labChans[0]);
 
 	break;
       case 11: //labChans[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].labChans[1]=sqlite3_column_int(stmt, column)-1;
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChans[1] %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].labChans[1]);
+	thisAntInfo->labChans[1]=sqlite3_column_int(stmt, column)-1;
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].labChans[1] %i\n", stationId, row, thisAntInfo->labChans[1]);
 
 	break;
       case 12: //isDiplexed
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].isDiplexed=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].isDiplexed %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].isDiplexed);
+	thisAntInfo->isDiplexed=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].isDiplexed %i\n", stationId, row, thisAntInfo->isDiplexed);
 
 	break;
       case 13: //diplexedChans[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].diplexedChans[0]=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].diplexedChans[0] %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].diplexedChans[0]);
+	thisAntInfo->diplexedChans[0]=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].diplexedChans[0] %i\n", stationId, row, thisAntInfo->diplexedChans[0]);
 
 	break;
       case 14: //diplexedChans[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].diplexedChans[1]=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].diplexedChans[1] %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].diplexedChans[1]);
+	thisAntInfo->diplexedChans[1]=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].diplexedChans[1] %i\n", stationId, row, thisAntInfo->diplexedChans[1]);
 
 	break;
       case 15: //preAmpNum
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].preAmpNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].preAmpNum %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].preAmpNum);
+	thisAntInfo->preAmpNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].preAmpNum %i\n", stationId, row, thisAntInfo->preAmpNum);
 
 	break;
       case 16: //avgNoiseFigure
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].avgNoiseFigure=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].avgNoiseFigure %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].avgNoiseFigure);
+	thisAntInfo->avgNoiseFigure=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].avgNoiseFigure %f\n", stationId, row, thisAntInfo->avgNoiseFigure);
 
 	break;
       case 17: //rcvrNum
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].rcvrNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].rcvrNum %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].rcvrNum);
+	thisAntInfo->rcvrNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].rcvrNum %i\n", stationId, row, thisAntInfo->rcvrNum);
 
 	break;
       case 18: //designator
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-	strncpy(fStationInfoATRI[calibIndex].fAntInfo[row].designator, temp, 3);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].designator %s\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].designator);
+	strncpy(thisAntInfo->designator, temp, 3);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].designator %s\n", stationId, row, thisAntInfo->designator);
 
 	break;
       case 19: //antPolNum
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antPolNum=sqlite3_column_int(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antPolNum %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antPolNum);
+	thisAntInfo->antPolNum=sqlite3_column_int(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antPolNum %i\n", stationId, row, thisAntInfo->antPolNum);
 
 	break;
       case 20: //antType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kBicone")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kBicone;
-        if(strcmp (temp,"kBowtieSlot")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kBowtieSlot;
-        if(strcmp (temp,"kDiscone")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kDiscone;
-        if(strcmp (temp,"kBatwing")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kBatwing;
-        if(strcmp (temp,"kFatDipole")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kFatDipole;
-        if(strcmp (temp,"kQuadSlot")==0) fStationInfoATRI[calibIndex].fAntInfo[row].antType=AraAntType::kQuadSlot;
+        if(strcmp (temp,"kBicone")==0) thisAntInfo->antType=AraAntType::kBicone;
+        if(strcmp (temp,"kBowtieSlot")==0) thisAntInfo->antType=AraAntType::kBowtieSlot;
+        if(strcmp (temp,"kDiscone")==0) thisAntInfo->antType=AraAntType::kDiscone;
+        if(strcmp (temp,"kBatwing")==0) thisAntInfo->antType=AraAntType::kBatwing;
+        if(strcmp (temp,"kFatDipole")==0) thisAntInfo->antType=AraAntType::kFatDipole;
+        if(strcmp (temp,"kQuadSlot")==0) thisAntInfo->antType=AraAntType::kQuadSlot;
 
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antType %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antType);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antType %i\n", stationId, row, thisAntInfo->antType);
 
 	break;
       case 21: //polType
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-        if(strcmp (temp,"kVertical")==0) fStationInfoATRI[calibIndex].fAntInfo[row].polType=AraAntPol::kVertical;
-        if(strcmp (temp,"kHorizontal")==0) fStationInfoATRI[calibIndex].fAntInfo[row].polType=AraAntPol::kHorizontal;
-        if(strcmp (temp,"kSurface")==0) fStationInfoATRI[calibIndex].fAntInfo[row].polType=AraAntPol::kSurface;
+        if(strcmp (temp,"kVertical")==0) thisAntInfo->polType=AraAntPol::kVertical;
+        if(strcmp (temp,"kHorizontal")==0) thisAntInfo->polType=AraAntPol::kHorizontal;
+        if(strcmp (temp,"kSurface")==0) thisAntInfo->polType=AraAntPol::kSurface;
 
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].AraAntPol %i\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].polType);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].AraAntPol %i\n", stationId, row, thisAntInfo->polType);
 
 	break;
       case 22: //locationName
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
-	strncpy(fStationInfoATRI[calibIndex].fAntInfo[row].locationName, temp, 4);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].locationName %s\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].locationName);
+	strncpy(thisAntInfo->locationName, temp, 4);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].locationName %s\n", stationId, row, thisAntInfo->locationName);
 
 
 	break;
       case 23: //antLocation[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[0] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[0]);
+	thisAntInfo->antLocation[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[0] %f\n", stationId, row, thisAntInfo->antLocation[0]);
 
 	break;
       case 24: //antLocation[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[1] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[1]);
+	thisAntInfo->antLocation[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[1] %f\n", stationId, row, thisAntInfo->antLocation[1]);
 
 	break;
       case 25: //antLocation[2]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[2] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antLocation[2]);
+	thisAntInfo->antLocation[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[2] %f\n", stationId, row, thisAntInfo->antLocation[2]);
 
 	break;
       case 26: //cableDelay
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].cableDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].cableDelay %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].cableDelay);
+	thisAntInfo->cableDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].cableDelay %f\n", stationId, row, thisAntInfo->cableDelay);
 
 	break;
       case 27: //debugHolePosition[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[0] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[0]);
+	thisAntInfo->debugHolePosition[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[0] %f\n", stationId, row, thisAntInfo->debugHolePosition[0]);
 
 	break;
       case 28: //debugHolePosition[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[1] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[1]);
+	thisAntInfo->debugHolePosition[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[1] %f\n", stationId, row, thisAntInfo->debugHolePosition[1]);
 
 	break;
       case 29: //debugHolePosition[2]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[2] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePosition[2]);
+	thisAntInfo->debugHolePosition[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePosition[2] %f\n", stationId, row, thisAntInfo->debugHolePosition[2]);
 
 	break;
       case 30: //debugPreAmpDz
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugPreAmpDz=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugPreAmpDz %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugPreAmpDz);
+	thisAntInfo->debugPreAmpDz=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugPreAmpDz %f\n", stationId, row, thisAntInfo->debugPreAmpDz);
 
 	break;
       case 31: //debugHolePositionZft
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePositionZft=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePositionZft %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePositionZft);
+	thisAntInfo->debugHolePositionZft=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePositionZft %f\n", stationId, row, thisAntInfo->debugHolePositionZft);
 
 	break;
       case 32: //debugHolePositionZm
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePositionZm=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePositionZm %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugHolePositionZm);
+	thisAntInfo->debugHolePositionZm=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugHolePositionZm %f\n", stationId, row, thisAntInfo->debugHolePositionZm);
 
 	break;
       case 33: //debugTrueAsBuiltPosition[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[0] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[0]);
+	thisAntInfo->debugTrueAsBuiltPositon[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[0] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[0]);
 
 	break;
       case 34: //debugTrueAsBuiltPosition[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[1] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[1]);
+	thisAntInfo->debugTrueAsBuiltPositon[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[1] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[1]);
 
 	break;
       case 35: //debugTrueAsBuiltPosition[2]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[2] %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugTrueAsBuiltPositon[2]);
+	thisAntInfo->debugTrueAsBuiltPositon[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTrueAsBuiltPositon[2] %f\n", stationId, row, thisAntInfo->debugTrueAsBuiltPositon[2]);
 
 	break;
       case 36: //debugCableDelay2
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugCableDelay2=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugCableDelay2 %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugCableDelay2);
+	thisAntInfo->debugCableDelay2=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugCableDelay2 %f\n", stationId, row, thisAntInfo->debugCableDelay2);
 
 	break;
       case 37: //debugFeedPointDelay
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugFeedPointDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugFeedPointDelay %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugFeedPointDelay);
+	thisAntInfo->debugFeedPointDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugFeedPointDelay %f\n", stationId, row, thisAntInfo->debugFeedPointDelay);
 
 	break;
       case 38: //debugTotalCableDelay
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].debugTotalCableDelay=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTotalCableDelay %f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].debugTotalCableDelay);
+	thisAntInfo->debugTotalCableDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].debugTotalCableDelay %f\n", stationId, row, thisAntInfo->debugTotalCableDelay);
 
 	break;
       case 40: //antOrient[0]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[0]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[0] %1.10f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[0]);
+	thisAntInfo->antOrient[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[0] %1.10f\n", stationId, row, thisAntInfo->antOrient[0]);
 
 	break;
 
       case 41: //antOrient[1]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[1]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[1] %1.10f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[1]);
+	thisAntInfo->antOrient[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[1] %1.10f\n", stationId, row, thisAntInfo->antOrient[1]);
 
 	break;
 
       case 42: //antOrient[2]
 
-	fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[2]=sqlite3_column_double(stmt, column);
-	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[2] %1.10f\n", stationId, row, fStationInfoATRI[calibIndex].fAntInfo[row].antOrient[2]);
+	thisAntInfo->antOrient[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antOrient[2] %1.10f\n", stationId, row, thisAntInfo->antOrient[2]);
 
 	break;
 
@@ -1211,13 +1192,8 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
       }//switch(column)
 
     }//column
-
-
-
   }//while(1)
   //now insert the no of rfchannels
-
-  fStationInfoATRI[calibIndex].numberRFChans=RFCHANS_PER_ATRI;
 
   //now need to destroy the sqls statement prepared earlier
   rc = sqlite3_finalize(stmt);
@@ -1228,38 +1204,7 @@ void AraGeomTool::readChannelMapDbAtri(AraStationId_t stationId){
   rc = sqlite3_close(db);
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
-
-  //Now check that we read it in OK
-
-  //  for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
-    //    fStationInfoATRI[calibIndex].fAntInfo[ant].printAntennaInfo();
-    //  }
-
-  //Now let's populate the antenna lookups
-  //fAntLookUpTable[calibIndex][AraAntPol][antPolNum]=chanNum-1
-
-  for(int ant=0;ant<fStationInfoATRI[calibIndex].numberRFChans;++ant){
-    //fprintf(stderr,"ant %i\t", ant);//FIXME//DEBUG
-    switch(fStationInfoATRI[calibIndex].fAntInfo[ant].polType){
-    case AraAntPol::kVertical:
-      fAntLookupTable[calibIndex][0][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
-      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kVertical\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
-      break;
-    case AraAntPol::kHorizontal:
-      fAntLookupTable[calibIndex][1][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
-      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kHorizontal\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
-      break;
-    case AraAntPol::kSurface:
-      fAntLookupTable[calibIndex][2][fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum]=fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum;
-      //fprintf(stderr,"antPolNum %i\t chanNum %i\t kSurface\n", fStationInfoATRI[calibIndex].fAntInfo[ant].antPolNum,  fStationInfoATRI[calibIndex].fAntInfo[ant].daqChanNum);//FIXME//DEBUG
-      break;
-    default:
-      std::cerr << "Unknown AraPolType\n";
-
-    }//switch polType
-  }//ant
-
-
+  fStationInfoATRI[calibIndex].fillAntIndexVec();
 
 }
 

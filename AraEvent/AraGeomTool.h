@@ -33,25 +33,26 @@ class AraGeomTool
 
    //   AraAntennaInfo *getAntByRfChan(int chan);//FIXME
    //   AraAntennaInfo *getAntByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum);//FIXME
+
    int getChanIndex(AraLabChip::AraLabChip_t chip, int chan) {return chip*CHANNELS_PER_LAB3 +chan;}
 
-   AraLabChip::AraLabChip_t getLabChipForChan(int chan, AraStationId_t stationId) {return getStationInfo(stationId)->fAntInfo[chan].labChip;}
+   AraLabChip::AraLabChip_t getLabChipForChan(int rfChan, AraStationId_t stationId) {return getStationInfo(stationId)->fAntInfo[rfChan].labChip;}
 
-   int getNumLabChansForChan(int chan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[chan].numLabChans;}
-   int getFirstLabChanForChan(int chan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[chan].labChans[0];}
-   int getSecondLabChanForChan(int chan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[chan].labChans[1];}
-
-
-   int getFirstLabChanIndexForChan(int chan, AraStationId_t stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getFirstLabChanForChan(chan, stationId));}
+   int getNumLabChansForChan(int rfChan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[rfChan].numLabChans;}
+   int getFirstLabChanForChan(int rfChan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[rfChan].labChans[0];}
+   int getSecondLabChanForChan(int rfChan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[rfChan].labChans[1];}
 
 
-   int getSecondLabChanIndexForChan(int chan, AraStationId_t stationId) { return getChanIndex(getLabChipForChan(chan, stationId),getSecondLabChanForChan(chan, stationId));}
+   int getFirstLabChanIndexForChan(int rfChan, AraStationId_t stationId) { return getChanIndex(getLabChipForChan(rfChan, stationId),getFirstLabChanForChan(rfChan, stationId));}
 
-   int isDiplexed(int chan, AraStationId_t stationId) {return getStationInfo(stationId)->fAntInfo[chan].isDiplexed;}
 
-   Double_t getLowPassFilter(int chan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[chan].lowPassFilterMhz; }
+   int getSecondLabChanIndexForChan(int rfChan, AraStationId_t stationId) { return getChanIndex(getLabChipForChan(rfChan, stationId),getSecondLabChanForChan(rfChan, stationId));}
 
-   Double_t getHighPassFilter(int chan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[chan].highPassFilterMhz; }
+   int isDiplexed(int rfChan, AraStationId_t stationId) {return getStationInfo(stationId)->fAntInfo[rfChan].isDiplexed;}
+
+   Double_t getLowPassFilter(int rfChan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[rfChan].lowPassFilterMhz; }
+
+   Double_t getHighPassFilter(int rfChan, AraStationId_t stationId) { return getStationInfo(stationId)->fAntInfo[rfChan].highPassFilterMhz; }
 
 
    //This is the new version this function
@@ -62,13 +63,14 @@ class AraGeomTool
 
    AraAntPol::AraAntPol_t getPolByRFChan(int rfChan, AraStationId_t stationId);
    Int_t getAntNumByRFChan(int rfChan, AraStationId_t stationId);
+   Int_t getElecChanFromRFChan(int rfChan, AraStationId_t stationId) {return getStationInfo(stationId)->getElecChanFromRFChan(rfChan);}
 
    
    Double_t calcDeltaTInfinity(Double_t ant1[3], Double_t ant2[3],Double_t phiWave, Double_t thetaWave);
    Double_t calcDeltaTR(Double_t ant1[3], Double_t ant2[3], Double_t phiWave, Double_t thetaWave,Double_t R);
    
-   Double_t calcDeltaTInfinity(Int_t chan1, Int_t chan2,Double_t phiWave, Double_t thetaWave, AraStationId_t stationId);
-   Double_t calcDeltaTR(Int_t chan1, Int_t chan2, Double_t phiWave, Double_t thetaWave,Double_t R, AraStationId_t stationId);
+   Double_t calcDeltaTInfinity(Int_t rfChan1, Int_t rfChan2,Double_t phiWave, Double_t thetaWave, AraStationId_t stationId);
+   Double_t calcDeltaTR(Int_t rfChan1, Int_t rfChan2, Double_t phiWave, Double_t thetaWave,Double_t R, AraStationId_t stationId);
 
    AraStationInfo *getStationInfo(AraStationId_t stationId); ///< Would like to make this const but for now this is fine
    
@@ -92,7 +94,7 @@ class AraGeomTool
    int readStationInfoATRI[ATRI_NO_STATIONS];
    AraStationInfo fStationInfoICRR[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
    AraStationInfo fStationInfoATRI[ATRI_NO_STATIONS]; //station info contains the antenna info and station information
-   int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
+   //   int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
    
    //Some variables to do with ice properties
    static Double_t nTopOfIce;

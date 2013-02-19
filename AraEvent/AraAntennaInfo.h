@@ -96,6 +96,8 @@ class AraAntennaInfo: public TObject
    Int_t daqChanNum;
    Double_t highPassFilterMhz;
    Double_t lowPassFilterMhz;
+
+   //ICRR Specific Numbers
    Int_t daqTrigChan;
    Int_t numLabChans;
    AraLabChip::AraLabChip_t labChip;
@@ -103,6 +105,9 @@ class AraAntennaInfo: public TObject
    Int_t isDiplexed; ///< Depricated attempt at un-diplexing//FIXME
    Int_t diplexedChans[2]; ///< Depricated attempt at un-diplexing//FIXME
    
+   //ATRI Specific Numbers
+   Int_t ddaNum; ///< Counting from 0;
+   Int_t ddaChanNum; //< Counting from 0
 
 
    Int_t preAmpNum;

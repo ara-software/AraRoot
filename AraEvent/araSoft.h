@@ -44,7 +44,6 @@
 #define SAMPLES_PER_BLOCK 64
 #define MAX_TRIG_BLOCKS 4
 #define CHANNELS_PER_ATRI DDA_PER_ATRI*RFCHAN_PER_DDA
-#define RFCHANS_PER_ATRI 20
 
 
 //As per email from P.Alison 9th Nov 2012

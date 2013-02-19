@@ -46,6 +46,12 @@ AraAtriCanvasMaker*  AraAtriCanvasMaker::fgInstance = 0;
 AraGeomTool *fACMGeomTool=0;
 
 
+#define RF_COLS 4
+#define RF_ROWS 5
+#define ANT_COLS 4
+#define ANT_ROWS 5
+
+
 
 
 AraWaveformGraph *grElec[CHANNELS_PER_ATRI]={0}; 
@@ -91,7 +97,7 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=2000;
+  fMaxTimeLimit=400;
   fThisMinTime=0;
   fThisMaxTime=100;
   if(AraCalType::hasCableDelays(calType)) {
@@ -116,11 +122,11 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   memset(grElecFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
   memset(grElecAveragedFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
 
-  memset(grRFChan,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanFiltered,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanHilbert,0,sizeof(AraWaveformGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);
-  memset(grRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*CHANNELS_PER_ATRI);  
+  memset(grRFChan,0,sizeof(AraWaveformGraph*)*ANTS_PER_ATRI);
+  memset(grRFChanFiltered,0,sizeof(AraWaveformGraph*)*ANTS_PER_ATRI);
+  memset(grRFChanHilbert,0,sizeof(AraWaveformGraph*)*ANTS_PER_ATRI);
+  memset(grRFChanFFT,0,sizeof(AraFFTGraph*)*ANTS_PER_ATRI);
+  memset(grRFChanAveragedFFT,0,sizeof(AraFFTGraph*)*ANTS_PER_ATRI);  
   switch(fCalType) {
   case AraCalType::kNoCalib:
     for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
@@ -370,7 +376,7 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
   }
 
   foundTimeRange = 0;
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
+  for(int rfchan=0;rfchan<ANTS_PER_ATRI;rfchan++) {
     if(grRFChan[rfchan]) delete grRFChan[rfchan];
     if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
     if(grRFChanHilbert[rfchan]) delete grRFChanHilbert[rfchan];
@@ -538,7 +544,7 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
   //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
   foundTimeRange = 0;
   
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
+  for(int rfchan=0;rfchan<ANTS_PER_ATRI;rfchan++) {
     if(grRFChan[rfchan]) delete grRFChan[rfchan];
     if(grRFChanFFT[rfchan]) delete grRFChanFFT[rfchan];
     if(grRFChanHilbert[rfchan]) delete grRFChanHilbert[rfchan];
@@ -547,6 +553,7 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
     grRFChanHilbert[rfchan]=0;
     //Need to work out how to do this
     TGraph *grTemp = evPtr->getGraphFromRFChan(rfchan);
+    //    std::cout << "getEventViewerCanvas(): " << rfchan << "\t" << grTemp << "\n";
     if (grTemp->GetN() && !foundTimeRange) {
       fThisMinTime = grTemp->GetX()[0];
       fThisMaxTime = grTemp->GetX()[grTemp->GetN()-1];
@@ -814,9 +821,10 @@ TPad *AraAtriCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
   //  5  6  7  8
   //  9 10 11 12
   // 13 14 15 16
+  // 17 18 19 20
 
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<RF_COLS;column++) {
+    for(int row=0;row<RF_ROWS;row++) {
       plotPad->cd();
       int rfChan=column+4*row;
 
@@ -890,8 +898,8 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 
 
   
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<RF_COLS;column++) {
+    for(int row=0;row<RF_ROWS;row++) {
       plotPad->cd();
       int rfChan=column+4*row;
       
@@ -953,7 +961,7 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 
 
 TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
-				       TPad *useCan)
+					   TPad *useCan)
 {
    //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
@@ -987,19 +995,20 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
   setupAntPadWithFrames(plotPad);
 
   //  int rfChanMap[4][4]={
-  AraAntPol::AraAntPol_t polMap[4][4]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
-				       {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kSurface,AraAntPol::kSurface},
-				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
-				       {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal}};
+  AraAntPol::AraAntPol_t polMap[ANT_ROWS][ANT_COLS]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
+						     {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
+						     {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
+						     {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
+						     {AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface}};
   //  int antPolNumMap[4][4]={{0,1,2,3},{4,5,0,1},{0,1,2,3},{4,5,6,7}}; //jpd 14-02-13
-  int antPolNumMap[4][4]={{0,1,2,3},{4,5,6,7},{0,1,2,3},{4,5,6,7}};
+  int antPolNumMap[ANT_ROWS][ANT_COLS]={{0,1,2,3},{4,5,6,7},{0,1,2,3},{4,5,6,7},{0,1,2,3}};
   
 
-  for(int row=0;row<4;row++) {
-    for(int column=0;column<4;column++) {
+  for(int row=0;row<ANT_ROWS;row++) {
+    for(int column=0;column<ANT_COLS;column++) {
       plotPad->cd();
       int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
-      
+      //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       sprintf(padName,"antPad%d_%d",column,row);
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
       paddy1->SetEditable(kTRUE);
@@ -1308,7 +1317,7 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 
   if(rfChanPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int rfChan=0;rfChan<CHANNELS_PER_ATRI;rfChan++) {
+    for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++) {
 	sprintf(padName,"rfChanPad%d",rfChan);
 	TPad *paddy = (TPad*) plotPad->FindObject(padName);
 	if(!paddy)
@@ -1324,14 +1333,14 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   
   Double_t left[4]={0.04,0.27,0.50,0.73};
   Double_t right[4]={0.27,0.50,0.73,0.96};
-  Double_t top[4]={0.95,0.72,0.49,0.26};
-  Double_t bottom[4]={0.72,0.49,0.26,0.03};
+  Double_t top[5]={0.95,0.77,0.59,0.41,0.23};
+  Double_t bottom[5]={0.77,0.59,0.41,0.23,0.05};
   
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<4;column++) {
+  for(int column=0;column<RF_COLS;column++) {
     sprintf(textLabel,"%d/%d",1+column,5+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
@@ -1344,6 +1353,7 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"5-8");
   texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"9-12");
   texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"13-16");
+  texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"17-20");
 
  
   int count=0;
@@ -1353,8 +1363,8 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
   //  9 10 11 12
   // 13 14 15 16
 
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<RF_COLS;column++) {
+    for(int row=0;row<RF_ROWS;row++) {
       plotPad->cd();
       //      int rfChan=column+4*row;
       sprintf(padName,"rfChanPad%d",column+4*row);
@@ -1425,8 +1435,8 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
 
   if(antPadsDone && !fRedoEventCanvas) {
     int errors=0;
-    for(int column=0;column<4;column++) {
-      for(int row=0;row<4;row++) {
+    for(int column=0;column<ANT_COLS;column++) {
+      for(int row=0;row<ANT_ROWS;row++) {
 	sprintf(padName,"antPad%d_%d",column,row);
 	TPad *paddy = (TPad*) plotPad->FindObject(padName);
 	if(!paddy)
@@ -1443,14 +1453,16 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
   
   Double_t left[4]={0.04,0.27,0.50,0.73};
   Double_t right[4]={0.27,0.50,0.73,0.96};
-  Double_t top[4]={0.95,0.72,0.49,0.26};
-  Double_t bottom[4]={0.72,0.49,0.26,0.03};
+  Double_t top[5]={0.95,0.77,0.59,0.41,0.23};
+  Double_t bottom[5]={0.77,0.59,0.41,0.23,0.05};
+  //  Double_t top[4]={0.95,0.72,0.49,0.26};
+  //  Double_t bottom[4]={0.72,0.49,0.26,0.03};
   
   //Now add some labels around the plot
   TLatex texy;
   texy.SetTextSize(0.03); 
   texy.SetTextAlign(12);  
-  for(int column=0;column<4;column++) {
+  for(int column=0;column<ANT_COLS;column++) {
     sprintf(textLabel,"%d",1+column);
     if(column==3)
       texy.DrawTextNDC(right[column]-0.12,0.97,textLabel);
@@ -1463,6 +1475,7 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
   texy.DrawTextNDC(left[0]-0.01,bottom[1]+0.1,"BV");
   texy.DrawTextNDC(left[0]-0.01,bottom[2]+0.1,"TH");
   texy.DrawTextNDC(left[0]-0.01,bottom[3]+0.1,"BH");
+  texy.DrawTextNDC(left[0]-0.01,bottom[4]+0.1,"SA");
 
  
   int count=0;
@@ -1470,8 +1483,8 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
 
 
   
-  for(int column=0;column<4;column++) {
-    for(int row=0;row<4;row++) {
+  for(int column=0;column<ANT_COLS;column++) {
+    for(int row=0;row<ANT_ROWS;row++) {
       plotPad->cd();
       sprintf(padName,"antPad%d_%d",column,row);
     
@@ -1553,7 +1566,7 @@ void AraAtriCanvasMaker::resetAverage()
       grElecAveragedFFT[chan]=0;
     }
   }
-  for(int rfchan=0;rfchan<CHANNELS_PER_ATRI;rfchan++) {
+  for(int rfchan=0;rfchan<ANTS_PER_ATRI;rfchan++) {
     if(grRFChanAveragedFFT[rfchan]) {
       delete grRFChanAveragedFFT[rfchan];
       grRFChanAveragedFFT[rfchan]=0;

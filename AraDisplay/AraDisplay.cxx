@@ -365,6 +365,7 @@ int AraDisplay::loadEventTree(char *eventFile)
   fEventTree->ResetBranchAddresses();
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
+  std::cout << "fRawStationEventPtr->stationId: " << (int)fRawStationEventPtr->stationId << "\n";
   fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
 
   fEventTree->ResetBranchAddresses();
