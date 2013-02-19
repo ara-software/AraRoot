@@ -40,9 +40,9 @@ int main(int argc, char **argv) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
-  if(argc==4) 
+  if(argc>=4) 
      runNumber=atoi(argv[3]); //To override runNumber
-  if(argc==5) 
+  if(argc>=5) 
      stationIdInt=atoi(argv[4]);  //To override station id
   stationId=AraGeomTool::getAtriStationId(stationIdInt);
   makeTree(argv[1],argv[2]);
