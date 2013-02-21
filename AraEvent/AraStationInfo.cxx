@@ -26,6 +26,7 @@ AraStationInfo::AraStationInfo()
 {
   numberRFChans=0;
   fNumberAntennas=0;
+  fNumberCalAntennas=0;
 
 }
 
@@ -36,12 +37,14 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId)
   fStationId=stationId;
   numberRFChans=0;
   fNumberAntennas=0;
+  fNumberCalAntennas=0;
   if(AraGeomTool::isIcrrStation(fStationId)) {
     readChannelMapDbIcrr();
   }
   else {
     readChannelMapDbAtri();
   }
+  readCalPulserDb();
 
 }
 
@@ -59,6 +62,13 @@ Double_t AraStationInfo::getCableDelay(int rfChanNum) {
   return 0;
 }
 
+AraCalAntennaInfo *AraStationInfo::getCalAntennaInfo(int calAntId) {
+  if(calAntId>=0 && calAntId<=fNumberCalAntennas) 
+    return &fCalAntInfo[calAntId];
+  return NULL;
+}
+
+
 AraAntennaInfo *AraStationInfo::getAntennaInfo(int antNum) {
   if(antNum>=0 && antNum<numberRFChans) {
     return &fAntInfo[antNum];
@@ -75,6 +85,17 @@ AraAntennaInfo *AraStationInfo::getNewAntennaInfo(int antNum){
   int temp=fAntInfo[antNum].chanNum;
   fAntInfo[antNum].chanNum=temp;
   return &fAntInfo[antNum];
+}
+
+
+AraCalAntennaInfo *AraStationInfo::getNewCalAntennaInfo(int calAntId){
+  //Assume this creates a new AraCalAntennaInfo; 
+  fNumberCalAntennas++;
+  //  std::cout << "getNewAntennaInfo(" << antNum << ") fNumberAntennas=" << fNumberAntennas << "\n";
+  //Magic lines below, may remove at some point
+  int temp=fCalAntInfo[calAntId].calAntId;
+  fCalAntInfo[calAntId].calAntId=temp;
+  return &fCalAntInfo[calAntId];
 }
 
 void AraStationInfo::fillAntIndexVec() {
@@ -857,5 +878,181 @@ void AraStationInfo::readChannelMapDbIcrr(){
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
   this->fillAntIndexVec();
+
+}
+
+
+// ----------------------------------------------------------------------
+
+
+void AraStationInfo::readCalPulserDb(){
+  sqlite3 *db;
+  char *zErrMsg = 0;
+  sqlite3_stmt *stmt;
+
+  char calibDir[FILENAME_MAX];
+  char fileName[FILENAME_MAX];
+  char *calibEnv=getenv("ARA_CALIB_DIR");
+  if(!calibEnv) {
+     char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+     if(!utilEnv)
+        sprintf(calibDir,"calib");
+     else
+        sprintf(calibDir,"%s/share/araCalib",utilEnv);
+  }
+  else {
+    strncpy(calibDir,calibEnv,FILENAME_MAX);
+  }  
+  sprintf(fileName, "%s/CalPulserInfo.sqlite", calibDir);
+
+  //open the database
+  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  int rc = sqlite3_open(fileName, &db);;
+  if(rc!=SQLITE_OK){
+    printf("AraStationInfo::readCalPulserDb() - Can't open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return;
+  }
+
+  const char *query;
+
+  //This is where we decide which table to access in the database
+  if(fStationId==ARA_STATION1B) query = "select * from ARA01";
+  else if(fStationId==ARA_STATION2) query = "select * from ARA02";
+  else if(fStationId==ARA_STATION3) query = "select * from ARA03";
+  else{
+    fprintf(stderr, "%s : fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
+    return;
+  }
+  //prepare an sql statment which will be used to obtain information from the data base
+  //  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
+  rc=sqlite3_prepare(db, query, strlen(query)+1, &stmt, NULL);
+
+  if(rc!=SQLITE_OK){
+    printf("statement not prepared OK\n");
+    //should close the data base and exit the function
+    sqlite3_close(db);
+    return;
+  }
+
+  int calAntId=0;
+  int row=0;
+  while(1){
+    //printf("row number %i\n", row);
+    rc=sqlite3_step(stmt);
+    if(rc==SQLITE_DONE) break;
+    int nColumns=sqlite3_column_count(stmt);
+
+    row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
+    //printf("row number %i\n", row);
+    AraCalAntennaInfo *thisAntInfo=NULL;
+
+    for(int column=0;column<nColumns;column++){
+
+      const char* temp;    
+
+      switch(column){  
+      case 0: //primary key - fStationId+labChip+channel
+	calAntId=sqlite3_column_int(stmt,column);
+	thisAntInfo=this->getNewCalAntennaInfo(calAntId);
+	break;
+      case 1: //locationName
+	temp = (const char*)sqlite3_column_text(stmt, column);
+	strncpy(thisAntInfo->locationName, temp, 4);       
+	break;
+      case 2: //antName
+	temp = (const char*)sqlite3_column_text(stmt, column);
+	strncpy(thisAntInfo->antName, temp, 4);	
+	break;
+      case 3: //pulserName
+	temp = (const char*)sqlite3_column_text(stmt, column);
+	strncpy(thisAntInfo->pulserName, temp, 4);       
+	break;
+      case 4: //antType
+	temp = (const char*)sqlite3_column_text(stmt, column);
+        if(strcmp (temp,"kBicone")==0) thisAntInfo->antType=AraAntType::kBicone;
+        if(strcmp (temp,"kBowtieSlot")==0) thisAntInfo->antType=AraAntType::kBowtieSlot;
+        if(strcmp (temp,"kDiscone")==0) thisAntInfo->antType=AraAntType::kDiscone;
+        if(strcmp (temp,"kBatwing")==0) thisAntInfo->antType=AraAntType::kBatwing;
+        if(strcmp (temp,"kFatDipole")==0) thisAntInfo->antType=AraAntType::kFatDipole;
+        if(strcmp (temp,"kQuadSlot")==0) thisAntInfo->antType=AraAntType::kQuadSlot;
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antType %i\n", fStationId, row, thisAntInfo->antType);
+	break;
+      case 5: //polType
+	temp = (const char*)sqlite3_column_text(stmt, column);
+        if(strcmp (temp,"kVertical")==0) thisAntInfo->polType=AraAntPol::kVertical;
+        if(strcmp (temp,"kHorizontal")==0) thisAntInfo->polType=AraAntPol::kHorizontal;
+        if(strcmp (temp,"kSurface")==0) thisAntInfo->polType=AraAntPol::kSurface;
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].AraAntPol %i\n", fStationId, row, thisAntInfo->polType);
+	break;
+      case 6: //antLocation[0]
+
+	thisAntInfo->antLocation[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[0] %f\n", fStationId, row, thisAntInfo->antLocation[0]);
+
+	break;
+      case 7: //antLocation[1]
+
+	thisAntInfo->antLocation[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[1] %f\n", fStationId, row, thisAntInfo->antLocation[1]);
+
+	break;
+      case 8: //antLocation[2]
+
+	thisAntInfo->antLocation[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocation[2] %f\n", fStationId, row, thisAntInfo->antLocation[2]);
+
+	break;
+      case 9: //cableDelay
+
+	thisAntInfo->cableDelay=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].cableDelay %f\n", fStationId, row, thisAntInfo->cableDelay);
+
+	break;
+
+
+      case 10: //antLocationCalib[0]
+
+	thisAntInfo->antLocationCalib[0]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocationCalib[0] %f\n", fStationId, row, thisAntInfo->antLocationCalib[0]);
+
+	break;
+      case 11: //antLocationCalib[1]
+
+	thisAntInfo->antLocationCalib[1]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocationCalib[1] %f\n", fStationId, row, thisAntInfo->antLocationCalib[1]);
+
+	break;
+      case 12: //antLocationCalib[2]
+
+	thisAntInfo->antLocationCalib[2]=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].antLocationCalib[2] %f\n", fStationId, row, thisAntInfo->antLocationCalib[2]);
+
+	break;
+      case 13: //cableDelayCalib
+
+	thisAntInfo->cableDelayCalib=sqlite3_column_double(stmt, column);
+	//printf("fStationInfoATRI[%i].fAntInfo[%i].cableDelay %f\n", fStationId, row, thisAntInfo->cableDelay);
+
+	break;
+
+
+      default:
+
+	break;
+
+      }//switch(column)
+
+    }//column
+  }//while(1)
+
+  //now need to destroy the sqls statement prepared earlier
+  rc = sqlite3_finalize(stmt);
+  if(rc!=SQLITE_OK) printf("error finlizing sql statement\n");
+  //  printf("sqlite3_finalize(stmt) = %i\n", rc);
+
+  //now close the connection to the database
+  rc = sqlite3_close(db);
+  if(rc!=SQLITE_OK) printf("error closing db\n");
 
 }
