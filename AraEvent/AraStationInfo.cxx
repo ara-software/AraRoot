@@ -22,7 +22,7 @@
 ClassImp(AraStationInfo);
 
 AraStationInfo::AraStationInfo()
-  :fAntInfo(ANTS_PER_ATRI)
+  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(4)
 {
   numberRFChans=0;
   fNumberAntennas=0;
@@ -32,7 +32,7 @@ AraStationInfo::AraStationInfo()
 
 
 AraStationInfo::AraStationInfo(AraStationId_t stationId)
-  :fAntInfo(ANTS_PER_ATRI)
+  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(4)
 {
   fStationId=stationId;
   numberRFChans=0;
@@ -91,7 +91,7 @@ AraAntennaInfo *AraStationInfo::getNewAntennaInfo(int antNum){
 AraCalAntennaInfo *AraStationInfo::getNewCalAntennaInfo(int calAntId){
   //Assume this creates a new AraCalAntennaInfo; 
   fNumberCalAntennas++;
-  //  std::cout << "getNewAntennaInfo(" << antNum << ") fNumberAntennas=" << fNumberAntennas << "\n";
+  //  std::cout << "getNewCalAntennaInfo(" << calAntId << ") fNumberCalAntennas=" << fNumberCalAntennas << "\n";
   //Magic lines below, may remove at some point
   int temp=fCalAntInfo[calAntId].calAntId;
   fCalAntInfo[calAntId].calAntId=temp;

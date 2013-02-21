@@ -32,6 +32,7 @@ class AraStationInfo: public TObject
   AraStationInfo(AraStationId_t stationId); ///< Assignment constructor
   ~AraStationInfo(); ////< Destructor
 
+  Int_t getNumCalAnts() {return fNumberCalAntennas;}
   Int_t getNumAnts() {return fNumberAntennas;}
   void setNumAnts(int numAnts) { fNumberAntennas=numAnts;}
 
