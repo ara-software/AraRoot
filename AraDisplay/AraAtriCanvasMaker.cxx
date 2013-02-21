@@ -42,14 +42,11 @@
 #include "FFTtools.h"
 
 
+#define VOLT_PADDING 20
+
 AraAtriCanvasMaker*  AraAtriCanvasMaker::fgInstance = 0;
 AraGeomTool *fACMGeomTool=0;
 
-
-#define RF_COLS 4
-#define RF_ROWS 5
-#define ANT_COLS 4
-#define ANT_ROWS 5
 
 
 
@@ -66,6 +63,29 @@ AraWaveformGraph *grRFChanHilbert[CHANNELS_PER_ATRI]={0};
 AraFFTGraph *grRFChanFFT[CHANNELS_PER_ATRI]={0};
 AraFFTGraph *grRFChanAveragedFFT[CHANNELS_PER_ATRI]={0};
 
+//Some globals for the antenna view
+
+
+AraAntPol::AraAntPol_t polMap[ANT_ROWS][ANT_COLS]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
+						   {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
+						   {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
+						   {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
+						   {AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface}};
+int antPolNumMap[ANT_ROWS][ANT_COLS]={{0,1,2,3},{4,5,6,7},{0,1,2,3},{4,5,6,7},{0,1,2,3}};
+int rfChanMap[ANT_ROWS][ANT_COLS]={{0}};
+int rfChanToAntRow[ANTS_PER_ATRI]={0};  ///< Which row is the antenna in?
+
+void fillRfChanMap(AraStationId_t stationId) {
+  for(int row=0;row<ANT_ROWS;row++) {
+    for(int column=0;column<ANT_COLS;column++) {
+      int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], stationId);
+      rfChanMap[row][column]=rfChan;
+      rfChanToAntRow[rfChan]=row;
+    }
+  }
+
+}
+
 
 TH1D *AraAtriCanvasMaker::getFFTHisto(int ant)
 {
@@ -80,6 +100,8 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
 {
   //Default constructor
   fACMGeomTool=AraGeomTool::Instance();
+  fLastStationId=ARA_STATION1B;
+  fillRfChanMap(fLastStationId);
   fNumAntsInMap=4;
   fWebPlotterMode=0;
   fPassBandFilter=0;
@@ -89,15 +111,21 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   fLowNotchEdge=235;
   fHighNotchEdge=500;
   for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
-    fMinVoltLimit[chan]=-60;
-    fMaxVoltLimit[chan]=60;
+    fMinVoltLimitElec[chan]=-200;
+    fMaxVoltLimitElec[chan]=200;
+  }
+  for(int row=0;row<RF_ROWS;row++) {
+    fMinVoltLimitRf[row]=-200;
+    fMaxVoltLimitRf[row]=+200;
+    fMinVoltLimitAnt[row]=-200;
+    fMaxVoltLimitAnt[row]=+200;
   }
   fPhiMax=0;
   fMinClockVoltLimit=-200;
   fMaxClockVoltLimit=200;
   fAutoScale=1;
   fMinTimeLimit=0;
-  fMaxTimeLimit=400;
+  fMaxTimeLimit=420;
   fThisMinTime=0;
   fThisMaxTime=100;
   if(AraCalType::hasCableDelays(calType)) {
@@ -130,9 +158,16 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   switch(fCalType) {
   case AraCalType::kNoCalib:
     for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
-      fMaxVoltLimit[chan]=3000;
-      fMinVoltLimit[chan]=1000;
+      fMaxVoltLimitElec[chan]=3000;
+      fMinVoltLimitElec[chan]=1000;
     }
+
+  for(int row=0;row<RF_ROWS;row++) {
+    fMinVoltLimitRf[row]=1000;
+    fMaxVoltLimitRf[row]=3000;
+    fMinVoltLimitAnt[row]=1000;
+    fMaxVoltLimitAnt[row]=3000;
+  }
     break;
   case AraCalType::kJustUnwrap:
     fMinTimeLimit=0;
@@ -303,8 +338,8 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
 
   if(fAutoScale) {
     for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
-      fMinVoltLimit[chan]=1e9;
-      fMaxVoltLimit[chan]=-1e9;
+      fMinVoltLimitElec[chan]=1e9;
+      fMaxVoltLimitElec[chan]=-1e9;
     }
     fMinClockVoltLimit=1e9;
     fMaxClockVoltLimit=-1e9;
@@ -365,10 +400,10 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
       Double_t *yVals=grTemp->GetY();
       	
       for(int i=0;i<numPoints;i++) {	
-	if(yVals[i]<fMinVoltLimit[chan%RFCHAN_PER_DDA])
-	  fMinVoltLimit[chan%RFCHAN_PER_DDA]=yVals[i];
-	if(yVals[i]>fMaxVoltLimit[chan%RFCHAN_PER_DDA])
-	  fMaxVoltLimit[chan%RFCHAN_PER_DDA]=yVals[i];	
+	if(yVals[i]<fMinVoltLimitElec[chan%RFCHAN_PER_DDA])
+	  fMinVoltLimitElec[chan%RFCHAN_PER_DDA]=yVals[i];
+	if(yVals[i]>fMaxVoltLimitElec[chan%RFCHAN_PER_DDA])
+	  fMaxVoltLimitElec[chan%RFCHAN_PER_DDA]=yVals[i];	
       }      
     }
 
@@ -421,10 +456,10 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
       Double_t *yVals=grTemp->GetY();
       	
       for(int i=0;i<numPoints;i++) {	
-	if(yVals[i]<fMinVoltLimit[rfchan%RFCHAN_PER_DDA])
-	  fMinVoltLimit[rfchan%RFCHAN_PER_DDA]=yVals[i];
-	if(yVals[i]>fMaxVoltLimit[rfchan%RFCHAN_PER_DDA])
-	  fMaxVoltLimit[rfchan%RFCHAN_PER_DDA]=yVals[i];	
+	if(yVals[i]<fMinVoltLimitElec[rfchan%RFCHAN_PER_DDA])
+	  fMinVoltLimitElec[rfchan%RFCHAN_PER_DDA]=yVals[i];
+	if(yVals[i]>fMaxVoltLimitElec[rfchan%RFCHAN_PER_DDA])
+	  fMaxVoltLimitElec[rfchan%RFCHAN_PER_DDA]=yVals[i];	
       }      
     }
     delete grTemp;
@@ -434,11 +469,11 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
   if(fAutoScale) {
     if(fCalType!=AraCalType::kNoCalib && fCalType!=AraCalType::kJustUnwrap) {
       for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
-	if(fMaxVoltLimit[chan]>-1*fMinVoltLimit[chan]) {
-	  fMinVoltLimit[chan]=-1*fMaxVoltLimit[chan];
+	if(fMaxVoltLimitElec[chan]>-1*fMinVoltLimitElec[chan]) {
+	  fMinVoltLimitElec[chan]=-1*fMaxVoltLimitElec[chan];
 	}
 	else {
-	  fMaxVoltLimit[chan]=-1*fMinVoltLimit[chan];
+	  fMaxVoltLimitElec[chan]=-1*fMinVoltLimitElec[chan];
 	}
       }//rfchan
     }
@@ -464,7 +499,7 @@ TPad *AraAtriCanvasMaker::quickGetEventViewerCanvasForWebPlottter(UsefulAtriStat
 }
 
 TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
-					   TPad *useCan)
+					       TPad *useCan)
 {
   TPad *retCan=0;
 
@@ -474,8 +509,14 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
 
   if(fAutoScale) {
     for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
-      fMinVoltLimit[chan]=1e9;
-      fMaxVoltLimit[chan]=-1e9;
+      fMinVoltLimitElec[chan]=1e9;
+      fMaxVoltLimitElec[chan]=-1e9;
+    }
+    for(int row=0;row<RF_ROWS;row++) {
+      fMinVoltLimitRf[row]=1e9;
+      fMaxVoltLimitRf[row]=-1e9;
+      fMinVoltLimitAnt[row]=1e9;
+      fMaxVoltLimitAnt[row]=-1e9;
     }
     fMinClockVoltLimit=0;
     fMaxClockVoltLimit=0;
@@ -531,17 +572,17 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
       }
       else{
 	for(int i=0;i<numPoints;i++) {	
-	  if(yVals[i]<fMinVoltLimit[chan%RFCHAN_PER_DDA])
-	    fMinVoltLimit[chan%RFCHAN_PER_DDA]=yVals[i];
-	  if(yVals[i]>fMaxVoltLimit[chan%RFCHAN_PER_DDA])
-	    fMaxVoltLimit[chan%RFCHAN_PER_DDA]=yVals[i];	
+	  if(yVals[i]<fMinVoltLimitElec[chan%RFCHAN_PER_DDA])
+	    fMinVoltLimitElec[chan%RFCHAN_PER_DDA]=yVals[i];
+	  if(yVals[i]>fMaxVoltLimitElec[chan%RFCHAN_PER_DDA])
+	    fMaxVoltLimitElec[chan%RFCHAN_PER_DDA]=yVals[i];	
 	}      
       }
     }
 
     delete grTemp;
   }
-  //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
+  //  std::cout << "Limits\t" << fMinVoltLimitElec << "\t" << fMaxVoltLimitElec << "\n";
   foundTimeRange = 0;
   
   for(int rfchan=0;rfchan<ANTS_PER_ATRI;rfchan++) {
@@ -591,10 +632,16 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
       Double_t *yVals=grTemp->GetY();
       	
       for(int i=0;i<numPoints;i++) {	
-	if(yVals[i]<fMinVoltLimit[rfchan%RFCHAN_PER_DDA])
-	  fMinVoltLimit[rfchan%RFCHAN_PER_DDA]=yVals[i];
-	if(yVals[i]>fMaxVoltLimit[rfchan%RFCHAN_PER_DDA])
-	  fMaxVoltLimit[rfchan%RFCHAN_PER_DDA]=yVals[i];	
+	//RF Channel View
+	if(yVals[i]<fMinVoltLimitRf[rfchan/RF_COLS])
+	  fMinVoltLimitRf[rfchan/RF_COLS]=yVals[i];
+	if(yVals[i]>fMaxVoltLimitRf[rfchan/RF_COLS])
+	  fMaxVoltLimitRf[rfchan/RF_COLS]=yVals[i];	
+	//Antenna View
+	if(yVals[i]<fMinVoltLimitAnt[rfChanToAntRow[rfchan]])
+	  fMinVoltLimitAnt[rfChanToAntRow[rfchan]]=yVals[i];
+	if(yVals[i]>fMaxVoltLimitAnt[rfChanToAntRow[rfchan]])
+	  fMaxVoltLimitAnt[rfChanToAntRow[rfchan]]=yVals[i];	
       }      
     }
     delete grTemp;
@@ -605,11 +652,11 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
     if(fCalType!=AraCalType::kNoCalib && fCalType!=AraCalType::kJustUnwrap) {
       for(int chan=0;chan<RFCHAN_PER_DDA;chan++){
 
-	if(fMaxVoltLimit[chan]>-1*fMinVoltLimit[chan]) {
-	  fMinVoltLimit[chan]=-1*fMaxVoltLimit[chan];
+	if(fMaxVoltLimitElec[chan]>-1*fMinVoltLimitElec[chan]) {
+	  fMinVoltLimitElec[chan]=-1*fMaxVoltLimitElec[chan];
 	}
 	else {
-	  fMaxVoltLimit[chan]=-1*fMinVoltLimit[chan];
+	  fMaxVoltLimitElec[chan]=-1*fMinVoltLimitElec[chan];
 	}
       }
       if(fMaxClockVoltLimit>-1*fMinClockVoltLimit) {
@@ -621,7 +668,7 @@ TPad *AraAtriCanvasMaker::getEventViewerCanvas(UsefulAtriStationEvent *evPtr,
     }
   }
     
-  //  std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
+  //  std::cout << "Limits\t" << fMinVoltLimitElec << "\t" << fMaxVoltLimitElec << "\n";
 
 
   fRedoEventCanvas=0;
@@ -753,7 +800,7 @@ TPad *AraAtriCanvasMaker::getElectronicsCanvas(UsefulAtriStationEvent *evPtr,TPa
 	    //	    std::cout << fThisMinTime << "\t" << fThisMaxTime << "\n";
 	    if(fAutoScale) {
 	      if(channel<7) {
-		tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit[chanIndex%RFCHAN_PER_DDA],fMaxVoltLimit[chanIndex%RFCHAN_PER_DDA]);
+		tempHist->GetYaxis()->SetRangeUser(fMinVoltLimitElec[chanIndex%RFCHAN_PER_DDA]-VOLT_PADDING,fMaxVoltLimitElec[chanIndex%RFCHAN_PER_DDA]+VOLT_PADDING);
 	      }
 	      else {
 		tempHist->GetYaxis()->SetRangeUser(fMinClockVoltLimit,fMaxClockVoltLimit);
@@ -826,7 +873,7 @@ TPad *AraAtriCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
   for(int column=0;column<RF_COLS;column++) {
     for(int row=0;row<RF_ROWS;row++) {
       plotPad->cd();
-      int rfChan=column+4*row;
+      int rfChan=column+RF_COLS*row;
 
       sprintf(padName,"rfChanPad%d",column+4*row);
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
@@ -842,7 +889,7 @@ TPad *AraAtriCanvasMaker::getCanvasForWebPlotter(UsefulAtriStationEvent *evPtr,
 	    TObject *fred = listy->At(i);
 	    TH1F *tempHist = (TH1F*) fred;
 	    if(tempHist->InheritsFrom("TH1")) {
-	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit[column],fMaxVoltLimit[column]);
+	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimitRf[row]-VOLT_PADDING,fMaxVoltLimitRf[row]+VOLT_PADDING);
 
 	    }
 	}
@@ -941,7 +988,7 @@ TPad *AraAtriCanvasMaker::getRFChannelCanvas(UsefulAtriStationEvent *evPtr,
 	    TObject *fred = listy->At(i);
 	    TH1F *tempHist = (TH1F*) fred;
 	    if(tempHist->InheritsFrom("TH1")) {
-	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit[column],fMaxVoltLimit[column]);
+	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimitRf[row]-VOLT_PADDING,fMaxVoltLimitRf[row]+VOLT_PADDING);
 	    }
 	  }
 	}
@@ -965,9 +1012,14 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 {
    //  gStyle->SetTitleH(0.1);
   gStyle->SetOptTitle(0); 
-
   if(!fACMGeomTool)
     fACMGeomTool=AraGeomTool::Instance();
+
+  if(fLastStationId!=evPtr->stationId) {
+    fLastStationId=evPtr->stationId;
+    fillRfChanMap(evPtr->stationId);
+  }
+
   char textLabel[180];
   char padName[180];
   TPad *canRFChan=0;
@@ -994,20 +1046,11 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
   plotPad->cd();
   setupAntPadWithFrames(plotPad);
 
-  //  int rfChanMap[4][4]={
-  AraAntPol::AraAntPol_t polMap[ANT_ROWS][ANT_COLS]={{AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
-						     {AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical,AraAntPol::kVertical},
-						     {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
-						     {AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal,AraAntPol::kHorizontal},
-						     {AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface,AraAntPol::kSurface}};
-  //  int antPolNumMap[4][4]={{0,1,2,3},{4,5,0,1},{0,1,2,3},{4,5,6,7}}; //jpd 14-02-13
-  int antPolNumMap[ANT_ROWS][ANT_COLS]={{0,1,2,3},{4,5,6,7},{0,1,2,3},{4,5,6,7},{0,1,2,3}};
-  
 
   for(int row=0;row<ANT_ROWS;row++) {
     for(int column=0;column<ANT_COLS;column++) {
       plotPad->cd();
-      int rfChan=fACMGeomTool->getRFChanByPolAndAnt(polMap[row][column],antPolNumMap[row][column], evPtr->stationId);
+      int rfChan=rfChanMap[row][column];
       //      std::cout << row << "\t" << column << "\t" << rfChan << "\n";
       sprintf(padName,"antPad%d_%d",column,row);
       TPad *paddy1 = (TPad*) plotPad->FindObject(padName);
@@ -1047,7 +1090,7 @@ TPad *AraAtriCanvasMaker::getAntennaCanvas(UsefulAtriStationEvent *evPtr,
 	    TObject *fred = listy->At(i);
 	    TH1F *tempHist = (TH1F*) fred;
 	    if(tempHist->InheritsFrom("TH1")) {
-	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimit[column],fMaxVoltLimit[column]);
+	      tempHist->GetYaxis()->SetRangeUser(fMinVoltLimitAnt[row]-VOLT_PADDING,fMaxVoltLimitAnt[row]+VOLT_PADDING);
 	    }
 	  }
 	}
@@ -1267,12 +1310,12 @@ void AraAtriCanvasMaker::setupElecPadWithFrames(TPad *plotPad)
       TH1F *framey=0;
       
 
-      //      std::cout << "Limits\t" << fMinVoltLimit << "\t" << fMaxVoltLimit << "\n";
+      //      std::cout << "Limits\t" << fMinVoltLimitElec << "\t" << fMaxVoltLimitElec << "\n";
   
 
       if(fWaveformOption==AraDisplayFormatOption::kWaveform || fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) 
-	//framey = (TH1F*) paddy1->DrawFrame(0,fMinVoltLimit,250,fMaxVoltLimit);
-	framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit[column],fMaxTimeLimit,fMaxVoltLimit[column]);
+	//framey = (TH1F*) paddy1->DrawFrame(0,fMinVoltLimitElec,250,fMaxVoltLimitElec);
+	framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimitElec[column],fMaxTimeLimit,fMaxVoltLimitElec[column]);
       else if(fWaveformOption==AraDisplayFormatOption::kFFT || fWaveformOption==AraDisplayFormatOption::kAveragedFFT)
 	framey = (TH1F*) paddy1->DrawFrame(fMinFreqLimit,fMinPowerLimit,fMaxFreqLimit,fMaxPowerLimit); 
 
@@ -1388,7 +1431,7 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(row<3) {
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit[column],fMaxTimeLimit,fMaxVoltLimit[column]);
+	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimitRf[row],fMaxTimeLimit,fMaxVoltLimitRf[row]);
 	}
 	else{
 	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinClockVoltLimit,fMaxTimeLimit,fMaxClockVoltLimit);
@@ -1508,7 +1551,7 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
       else if(fWaveformOption==AraDisplayFormatOption::kWaveform || 
 	      fWaveformOption==AraDisplayFormatOption::kHilbertEnvelope) {
 	if(row<3) {
-	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimit[column],fMaxTimeLimit,fMaxVoltLimit[column]);
+	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinVoltLimitAnt[row],fMaxTimeLimit,fMaxVoltLimitAnt[row]);
 	}
 	else{
 	  framey = (TH1F*) paddy1->DrawFrame(fMinTimeLimit,fMinClockVoltLimit,fMaxTimeLimit,fMaxClockVoltLimit);

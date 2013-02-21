@@ -72,6 +72,8 @@ class AraGeomTool
    Double_t calcDeltaTInfinity(Int_t rfChan1, Int_t rfChan2,Double_t phiWave, Double_t thetaWave, AraStationId_t stationId);
    Double_t calcDeltaTR(Int_t rfChan1, Int_t rfChan2, Double_t phiWave, Double_t thetaWave,Double_t R, AraStationId_t stationId);
 
+   Double_t calcDeltaTSimple(Double_t ant1[3], Double_t ant2[3], Double_t source[3]);
+
    AraStationInfo *getStationInfo(AraStationId_t stationId); ///< Would like to make this const but for now this is fine
    
 
@@ -89,12 +91,9 @@ class AraGeomTool
    //Instance generator
    static AraGeomTool*  Instance();
    
+   AraStationInfo *fStationInfoICRR[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
+   AraStationInfo *fStationInfoATRI[ATRI_NO_STATIONS]; //station info contains the antenna info and station information
 
-   int readStationInfoICRR[ICRR_NO_STATIONS];
-   int readStationInfoATRI[ATRI_NO_STATIONS];
-   AraStationInfo fStationInfoICRR[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
-   AraStationInfo fStationInfoATRI[ATRI_NO_STATIONS]; //station info contains the antenna info and station information
-   //   int fAntLookupTable[ICRR_NO_STATIONS][3][8]; //At some point should lose the magic numbers
    
    //Some variables to do with ice properties
    static Double_t nTopOfIce;
@@ -104,9 +103,6 @@ class AraGeomTool
    static AraGeomTool *fgInstance;  
    // protect against multiple instances
 
- private:
-   void readChannelMapDbIcrr(AraStationId_t stationId);
-   void readChannelMapDbAtri(AraStationId_t stationId);
 
 };
 

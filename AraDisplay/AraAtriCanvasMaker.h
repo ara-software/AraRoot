@@ -21,6 +21,15 @@
 #include "AraEventCalibrator.h"
 #include "AraEventCorrelator.h"
 
+//Useful defines
+#define RF_COLS 4
+#define RF_ROWS 5
+#define ANT_COLS RF_COLS
+#define ANT_ROWS RF_ROWS
+
+
+
+
 class TPad;
 class TFile;
 
@@ -45,8 +54,12 @@ class AraAtriCanvasMaker
   Double_t fThisMinTime; ///<The minimum time
   Double_t fThisMaxTime; ///< The maximum time
   
-  Double_t fMinVoltLimit[RFCHAN_PER_DDA]; ///< The minimum voltage. 
-  Double_t fMaxVoltLimit[RFCHAN_PER_DDA]; ///< The maximum voltage.
+  Double_t fMinVoltLimitElec[RFCHAN_PER_DDA]; ///< The minimum voltage. 
+  Double_t fMaxVoltLimitElec[RFCHAN_PER_DDA]; ///< The maximum voltage.
+  Double_t fMinVoltLimitRf[RF_ROWS]; ///< The minimum voltage. 
+  Double_t fMaxVoltLimitRf[RF_ROWS]; ///< The maximum voltage.
+  Double_t fMinVoltLimitAnt[ANT_ROWS]; ///< The minimum voltage. 
+  Double_t fMaxVoltLimitAnt[ANT_ROWS]; ///< The maximum voltage.
   Int_t fAutoScale; ///< Fixed or auto-scaling y-axis?
   Double_t fMinClockVoltLimit; ///< The minimum voltage in the clock channels.
   Double_t fMaxClockVoltLimit; ///< The maximum voltage in the clock channels.
@@ -136,7 +149,9 @@ class AraAtriCanvasMaker
    Double_t fLowPassEdge; ///< The lower edge of the pass band
    Double_t fHighPassEdge; ///< The higher edge of the pass band
    Double_t fLowNotchEdge; ///< The lower edge of the notch band
-   Double_t fHighNotchEdge; ///< The higher edge of the notch band
+   Double_t fHighNotchEdge; ///< The higher edge of the notch band   
+   AraStationId_t fLastStationId;
+
    //!  A worker function to draw the l canvas -- shouldn't be called directly.
    /*!
      /param evPtr Pointer to the event we want to draw

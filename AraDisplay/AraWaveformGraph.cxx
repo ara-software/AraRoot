@@ -106,8 +106,8 @@ void AraWaveformGraph::setRFChan(int rfChan, int stationId)
   sprintf(graphName,"grRFChan%d",rfChan);
   this->SetName(graphName);
   char graphTitle[180];
-  //  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->getStationInfo(stationId)->getAntennaInfo(rfChan).designator);
-  sprintf(graphTitle,"RF Channel %d (Ant %d)",rfChan+1,rfChan+1);//FIXME
+  sprintf(graphTitle,"RF Channel %d (Ant %s)",rfChan+1,AraGeomTool::Instance()->getStationInfo(stationId)->getAntennaInfo(rfChan)->designator);
+  //sprintf(graphTitle,"RF Channel %d (Ant %d)",rfChan+1,rfChan+1);//FIXME
   this->SetTitle(graphTitle);
 }
   

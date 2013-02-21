@@ -28,6 +28,7 @@ class AraStationInfo: public TObject
  public:
   
   AraStationInfo(); ///< Default constructor
+  AraStationInfo(AraStationId_t stationId); ///< Assignment constructor
   ~AraStationInfo(); ////< Destructor
 
   Int_t getNumAnts() {return fNumberAntennas;}
@@ -37,22 +38,34 @@ class AraStationInfo: public TObject
   void setNumRFChans(int numChans) { numberRFChans=numChans;}
 
   Double_t getCableDelay(int rfChanNum);
+  AraAntennaInfo *getAntennaInfo(int antNum, AraAntPol::AraAntPol_t polType) { return getAntennaInfo(getRFChanByPolAndAnt(antNum,polType));}
   AraAntennaInfo *getAntennaInfo(int rfChanNum);
-  AraAntennaInfo *getNewAntennaInfo(int rfChanNum);
+
 
   Int_t getRFChanByPolAndAnt(Int_t antNum, AraAntPol::AraAntPol_t polType);
   Int_t getElecChanFromRFChan(Int_t rfChan);
+  Int_t getNumAntennasByPol(AraAntPol::AraAntPol_t polType) {return fAntIndexVec[polType].size();}
 
-  void fillAntIndexVec();
 
   
   //At some point will make these private
+  AraStationId_t fStationId;
   std::vector<AraAntennaInfo> fAntInfo; ///< One object per antenna
-  Double_t stationLocation[3]; ///< array-centric co-ordinates of the station
-  int numberRFChans;  ///
+  Double_t fStationLocation[3]; ///< array-centric co-ordinates of the station
+  Double_t fRotationMatrix[3][3]; ///< Rotation matrix to convert from array centric to station centric
+
+  int numberRFChans;  ///< Currently a copy of fNumberAntennas
   int fNumberAntennas; ///<This is the numebr of antennas on an ATRI
   
   std::vector<int> fAntIndexVec[3]; ///<The antenna to logical channel index one vector per polarisation
+
+
+ private:
+  ///These are helper functions that should not be called
+  AraAntennaInfo *getNewAntennaInfo(int rfChanNum);
+  void fillAntIndexVec();
+  void readChannelMapDbAtri();
+  void readChannelMapDbIcrr();
 
   ClassDef(AraStationInfo,1);
 };
