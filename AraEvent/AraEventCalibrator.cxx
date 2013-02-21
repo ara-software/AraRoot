@@ -1072,7 +1072,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 	strncpy(calibDir,calibEnv,FILENAME_MAX);
 	//	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
-      sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationNumber);
+      sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
       fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
