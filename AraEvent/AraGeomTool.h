@@ -12,6 +12,8 @@
 //Includes
 #include <TObject.h>
 #include <TMath.h>
+#include <TRotation.h>
+#include <TVector3.h>
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
 #include "araAtriStructures.h"
@@ -86,14 +88,14 @@ class AraGeomTool
    static const char *getStationName(AraStationId_t stationId); ///< Return char* with the station Name from the stationId
    static AraStationId_t getAtriStationId(int stationNumber); ///< Simple utility function
 
-
+   TVector3 convertStationToArrayCoords(AraStationId_t stationId, TVector3 inputCoords);
+   TVector3 convertArrayToStationCoords(AraStationId_t stationId, TVector3 inputCoords);
+   TRotation *getStationToArrayRotation(AraStationId_t stationId);
+   TRotation *getArrayToStationRotation(AraStationId_t stationId);
+   TVector3 &getStationVector(AraStationId_t stationId);
 
    //Instance generator
    static AraGeomTool*  Instance();
-   
-   AraStationInfo *fStationInfoICRR[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
-   AraStationInfo *fStationInfoATRI[ATRI_NO_STATIONS]; //station info contains the antenna info and station information
-
    
    //Some variables to do with ice properties
    static Double_t nTopOfIce;
@@ -102,6 +104,30 @@ class AraGeomTool
  protected:
    static AraGeomTool *fgInstance;  
    // protect against multiple instances
+
+ private:
+
+   AraStationInfo *fStationInfoICRR[ICRR_NO_STATIONS]; //station info contains the antenna info and station information
+   AraStationInfo *fStationInfoATRI[ATRI_NO_STATIONS]; //station info contains the antenna info and station information
+   
+   //Here are the ARA station coordinates
+   Double_t fStationCoordsICRR[ICRR_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
+   Double_t fStationCoordsAtri[ATRI_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
+   Double_t fStationLocalCoordsICRR[ICRR_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
+   Double_t fStationLocalCoordsATRI[ICRR_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
+
+
+   TRotation *fArrayToStationRotationICRR[ICRR_NO_STATIONS]; ///< Really are rotation matrices
+   TRotation *fArrayToStationRotationATRI[ATRI_NO_STATIONS]; ///< Really are rotation matrices
+   TRotation *fStationToArrayRotationICRR[ICRR_NO_STATIONS]; ///< Really are rotation matrices
+   TRotation *fStationToArrayRotationATRI[ATRI_NO_STATIONS];///< Really are rotation matrices
+
+   TVector3 fStationVectorATRI[ATRI_NO_STATIONS]; ///< The vector position of the station origin in array coordinates
+   TVector3 fStationVectorICRR[ICRR_NO_STATIONS]; ///< The vector position of the station origin in array coordinates
+
+   void readAraArrayCoords();
+
+
 
 
 };

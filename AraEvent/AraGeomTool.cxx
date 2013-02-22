@@ -21,6 +21,7 @@
 #include "TString.h"
 #include "TObjArray.h"
 #include "TObjString.h"
+#include "TVector3.h"
 
 AraGeomTool * AraGeomTool::fgInstance=0;
 Double_t AraGeomTool::nTopOfIce=1.48;
@@ -33,12 +34,18 @@ AraGeomTool::AraGeomTool()
   // readChannelMapDbIcrr(ARA_TESTBED);
   // readChannelMapDbIcrr(ARA_STATION1);
   // readChannelMapDbAtri(ARA_STATION1B);
-  for(int i=0;i<ICRR_NO_STATIONS;i++) 
+  for(int i=0;i<ICRR_NO_STATIONS;i++) {
     fStationInfoICRR[i]=NULL;
-  for(int i=0;i<ATRI_NO_STATIONS;i++) 
+    fArrayToStationRotationICRR[i]=NULL;
+    fStationToArrayRotationICRR[i]=NULL;
+  }
+  for(int i=0;i<ATRI_NO_STATIONS;i++) {
     fStationInfoATRI[i]=0;
+    fArrayToStationRotationATRI[i]=NULL;
+    fStationToArrayRotationATRI[i]=NULL;
+  }
   
-
+  readAraArrayCoords();
 }
 
 AraGeomTool::~AraGeomTool() {
@@ -474,4 +481,202 @@ AraStationId_t AraGeomTool::getAtriStationId(int stationNumber) {
   ///< Simple utility function
   if(stationNumber==1) return ARA_STATION1B;
   return (AraStationId_t)stationNumber;
+}
+
+
+void AraGeomTool::readAraArrayCoords() {
+  sqlite3 *db;
+  char *zErrMsg = 0;
+  sqlite3_stmt *stmt;
+
+  char calibDir[FILENAME_MAX];
+  char fileName[FILENAME_MAX];
+  char *calibEnv=getenv("ARA_CALIB_DIR");
+  if(!calibEnv) {
+     char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+     if(!utilEnv)
+        sprintf(calibDir,"calib");
+     else
+        sprintf(calibDir,"%s/share/araCalib",utilEnv);
+  }
+  else {
+    strncpy(calibDir,calibEnv,FILENAME_MAX);
+  }  
+  sprintf(fileName, "%s/AraArrayCoords.sqlite", calibDir);
+
+  //open the database
+  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  int rc = sqlite3_open(fileName, &db);;
+  if(rc!=SQLITE_OK){
+    printf("AraGeomTool::readAraArrayCoords() - Can't open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+    return;
+  }
+
+  //All the station coordinate information is stored in the ARA table (one row per station)
+  const char *query = "select * from ARA";
+
+  //prepare an sql statment which will be used to obtain information from the data base
+  //  rc=sqlite3_prepare_v2(db, query, strlen(query)+1, &stmt, NULL);
+  rc=sqlite3_prepare(db, query, strlen(query)+1, &stmt, NULL);
+
+  if(rc!=SQLITE_OK){
+    printf("statement not prepared OK\n");
+    //should close the data base and exit the function
+    sqlite3_close(db);
+    return;
+  }
+
+  AraStationId_t thisStationId;
+  int calibIndex=0;
+  int row=0;
+
+  while(1){  //This loop is over station
+    //printf("row number %i\n", row);
+    rc=sqlite3_step(stmt);
+    if(rc==SQLITE_DONE) break;
+    int nColumns=sqlite3_column_count(stmt);
+
+    row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
+    //printf("row number %i\n", row);
+
+    int column=0;
+    
+    const char* temp;    
+    double tempVal;
+
+    //primary key - stationId
+    thisStationId=sqlite3_column_int(stmt,column);
+    calibIndex=getStationCalibIndex(thisStationId);
+
+    column++;  //station name
+    temp = (const char*)sqlite3_column_text(stmt, column);
+    //Ignore for now
+    
+    column++; //2: //electronics tupe
+    temp = (const char*)sqlite3_column_text(stmt, column);
+    //Ignore for now
+    
+    //Station Coords
+    for(int i=0;i<3;i++) {
+      column++;
+      tempVal=sqlite3_column_double(stmt, column);
+      if(isIcrrStation(thisStationId)) {
+	fStationCoordsICRR[calibIndex][i]=tempVal;
+      }
+      else {
+	fStationCoordsAtri[calibIndex][i]=tempVal;
+      }
+    }
+    if(isIcrrStation(thisStationId)) {
+      fStationVectorICRR[calibIndex].SetXYZ(fStationCoordsICRR[calibIndex][0],fStationCoordsICRR[calibIndex][1],fStationCoordsICRR[calibIndex][2]);
+    }
+    else {
+      fStationVectorATRI[calibIndex].SetXYZ(fStationCoordsAtri[calibIndex][0],fStationCoordsAtri[calibIndex][1],fStationCoordsAtri[calibIndex][2]);
+    }
+
+    //Station Local Coordinates
+    for(int i=0;i<3;i++) {
+      for(int j=0;j<3;j++) {	
+	column++;
+	tempVal=sqlite3_column_double(stmt, column);
+	if(isIcrrStation(thisStationId)) {
+	  fStationLocalCoordsICRR[calibIndex][i][j]=tempVal;
+	}
+	else {
+	  fStationLocalCoordsATRI[calibIndex][i][j]=tempVal;
+	}
+      }
+    } 
+
+    if(isIcrrStation(thisStationId)) {
+      fStationToArrayRotationICRR[calibIndex] = new TRotation();      
+      TVector3 localx(fStationLocalCoordsICRR[calibIndex][0]);
+      TVector3 globale(1,0,0);
+      Double_t angleRotate=globale.Angle(localx);
+      TVector3 axisRotate=globale.Cross(localx);
+      fStationToArrayRotationICRR[calibIndex]->Rotate(angleRotate,axisRotate);
+      fArrayToStationRotationICRR[calibIndex]=new TRotation(fStationToArrayRotationICRR[calibIndex]->Inverse());
+
+    }
+    else {
+      fStationToArrayRotationATRI[calibIndex] = new TRotation();     
+      //In the end this remarkably simple bit of code is all we need to define the matrix rotations necessary to switch
+      // between array centric and station centric coordinates 
+      // The basic idea is simply:
+      // a) Find the angle between the array centric easting(x) and the station centric x
+      // b) Find the vector that is perpendiculat to both of them using a cross product
+      // c) Create a rotation matrix by rotating the identity matrix by this angle about this axis
+      // d) Create the invere rotation to go the other way
+      // e) Remember we also need to translate to actually convert between station and array and vice-versa
+      TVector3 localx(fStationLocalCoordsATRI[calibIndex][0]);
+      TVector3 globale(1,0,0);
+      Double_t angleRotate=globale.Angle(localx);
+      TVector3 axisRotate=globale.Cross(localx);
+      fStationToArrayRotationATRI[calibIndex]->Rotate(angleRotate,axisRotate);
+      fArrayToStationRotationATRI[calibIndex]=new TRotation(fStationToArrayRotationATRI[calibIndex]->Inverse());
+    }
+    
+
+  }//while(1)
+
+  //now need to destroy the sqls statement prepared earlier
+  rc = sqlite3_finalize(stmt);
+  if(rc!=SQLITE_OK) printf("error finlizing sql statement\n");
+  //  printf("sqlite3_finalize(stmt) = %i\n", rc);
+
+  //now close the connection to the database
+  rc = sqlite3_close(db);
+  if(rc!=SQLITE_OK) printf("error closing db\n");
+
+}
+
+
+TVector3 AraGeomTool::convertStationToArrayCoords(AraStationId_t stationId, TVector3 inputCoords) {
+  TVector3 output=inputCoords;
+  TRotation *mPtr = getStationToArrayRotation(stationId);
+  output.Transform(*mPtr);
+  output+=getStationVector(stationId);
+  return TVector3(output); 
+}
+
+TVector3 AraGeomTool::convertArrayToStationCoords(AraStationId_t stationId, TVector3 inputCoords) {
+  TVector3 output=inputCoords;
+  //  std::cout << "Station Vector: " << getStationVector(stationId).x() << "\t" << getStationVector(stationId).y() << "\t" << getStationVector(stationId).z() << "\n";
+  output-=getStationVector(stationId);
+  //  output.Print();
+  TRotation *mPtr = getArrayToStationRotation(stationId);
+  output.Transform(*mPtr);
+  return TVector3(output); 
+}
+
+
+TRotation *AraGeomTool::getStationToArrayRotation(AraStationId_t stationId)
+{
+  int calibIndex=getStationCalibIndex(stationId);
+  if(isIcrrStation(stationId)) {
+    return fStationToArrayRotationICRR[calibIndex];
+  }
+  return fStationToArrayRotationATRI[calibIndex];
+}
+
+TRotation *AraGeomTool::getArrayToStationRotation(AraStationId_t stationId)
+{
+  int calibIndex=getStationCalibIndex(stationId);
+  if(isIcrrStation(stationId)) {
+    return fArrayToStationRotationICRR[calibIndex];
+  }
+  return fArrayToStationRotationATRI[calibIndex];
+}
+
+
+TVector3 &AraGeomTool::getStationVector(AraStationId_t stationId)
+{
+  int calibIndex=getStationCalibIndex(stationId);
+  if(isIcrrStation(stationId)) {
+    return fStationVectorICRR[calibIndex];
+  }
+
+  return fStationVectorATRI[calibIndex];
+
 }
