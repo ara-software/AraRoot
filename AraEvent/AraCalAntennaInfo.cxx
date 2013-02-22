@@ -7,6 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "AraCalAntennaInfo.h"
+#include "AraGeomTool.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -32,4 +33,13 @@ void AraCalAntennaInfo::printAntennaInfo()
   std::cout << "Delay " << cableDelay << " ns\n";
   std::cout << "*************************************************************\n";
 
+}
+
+
+void AraCalAntennaInfo::fillArrayCoords()
+{
+  AraGeomTool *fGeomTool=AraGeomTool::Instance();
+  fGeomTool->convertStationToArrayCoords(fStationId,antLocation,antLocationArray);
+  fGeomTool->convertStationToArrayCoords(fStationId,antLocationCalib,antLocationArrayCalib);
+ 
 }

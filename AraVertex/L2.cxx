@@ -99,9 +99,9 @@ int L2::FillGeoTree() {
       for(int ant=0;ant<ANTS_PER_ICRR;ant++) {   
 	antenna.stationId=station;
 	antenna.channelId=ant;
-	antenna.Location[0]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->antLocation[0];
-	antenna.Location[1]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->antLocation[1];
-	antenna.Location[2]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->antLocation[2];
+	antenna.Location[0]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->getLocationXYZ()[0];
+	antenna.Location[1]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->getLocationXYZ()[1];
+	antenna.Location[2]=araGeom->getStationInfo(station)->getAntennaInfo(ant)->getLocationXYZ()[2];
 	antenna.HighPassFilter=araGeom->getStationInfo(station)->getAntennaInfo(ant)->highPassFilterMhz;
 	antenna.LowPassFilter=araGeom->getStationInfo(station)->getAntennaInfo(ant)->lowPassFilterMhz;
 	antenna.cableDelay=araGeom->getStationInfo(station)->getAntennaInfo(ant)->cableDelay;
@@ -204,7 +204,7 @@ int L2::FillEvent(UsefulIcrrStationEvent *event0) {
 
   
   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {   
-    double z=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->antLocation[2];
+    double z=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->getLocationXYZ()[2];
     double p=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->polType; 
     if (p ==0 && z < -5 && ant<8) {InIceV.push_back(ant);}
     if (p ==1 && z < -5 && ant<8) {InIceH.push_back(ant);}
@@ -212,9 +212,9 @@ int L2::FillEvent(UsefulIcrrStationEvent *event0) {
     //if (p ==1 && z < -5) {InIceH.push_back(ant);}
     if ((p ==1 || p ==0) && z<-5 ) {
       InIceAll.push_back(ant);
-      Station_COG_X+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->antLocation[0];
-      Station_COG_Y+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->antLocation[1];
-      Station_COG_Z+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->antLocation[2];      
+      Station_COG_X+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->getLocationXYZ()[0];
+      Station_COG_Y+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->getLocationXYZ()[1];
+      Station_COG_Z+=araGeom->getStationInfo(Station)->getAntennaInfo(ant)->getLocationXYZ()[2];      
     }
     // cout<<"ch:"<<ant<<"  trig="<<(event->trig.isInTrigPattern(ant))<<endl;
     if (z<-5 && (event->trig.isInTrigPattern(ant)==1)   ) {InIceTrig.push_back(ant); cout<<"In!\n";} 
@@ -369,12 +369,12 @@ RECOOUT  L2::DoReconstruction(vector<Int_t> chList, Int_t method, Int_t minMetho
       dt=0;
       //cout<<"get diff \n";
       dt=getTimeDiff(chList[i1],chList[i2],method);
-      double x1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[0];
-      double y1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[1];
-      double z1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[2];
-      double x2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[0];
-      double y2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[1];
-      double z2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[2];
+      double x1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[0];
+      double y1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[1];
+      double z1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[2];
+      double x2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[0];
+      double y2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[1];
+      double z2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[2];
       //	printf ("%d.%d Adding Pair (%d %d) dt=%f [%f,%f,%f]  [%f,%f,%f] \n",i1,i2,ch1,ch2,dt,x1,y1,z1,x2,y2,z2);
       if (dt!=-999 ) 	Reco->addPair(dt,x1,y1,z1,x2,y2,z2);   // leak not here
     }
@@ -403,12 +403,12 @@ void  L2::FilldTPairs(vector<Int_t> chList, Int_t method) {
       dt=0;
       //cout<<"get diff \n";
       dt=getTimeDiff(chList[i1],chList[i2],method);
-      double x1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[0];
-      double y1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[1];
-      double z1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->antLocation[2];
-      double x2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[0];
-      double y2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[1];
-      double z2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->antLocation[2];
+      double x1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[0];
+      double y1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[1];
+      double z1=araGeom->getStationInfo(Station)->getAntennaInfo(ch1)->getLocationXYZ()[2];
+      double x2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[0];
+      double y2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[1];
+      double z2=araGeom->getStationInfo(Station)->getAntennaInfo(ch2)->getLocationXYZ()[2];
       //	printf ("%d.%d Adding Pair (%d %d) dt=%f [%f,%f,%f]  [%f,%f,%f] \n",i1,i2,ch1,ch2,dt,x1,y1,z1,x2,y2,z2);
       if (dt!=-999 ) 	Reco->addPair(dt,x1,y1,z1,x2,y2,z2);   // leak not here
     }

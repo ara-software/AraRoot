@@ -60,9 +60,9 @@ void AraEventCorrelator::fillAntennaPositions()
     if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kVertical) {
       if(antPolNum<7) {
 	fRfChanVPol[antPolNum]=ant;
-	fVPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[0];
-	fVPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[1];
-	fVPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[2];
+	fVPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
+	fVPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
+	fVPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[2];
 	fVPolRho[antPolNum]=TMath::Sqrt(fVPolPos[antPolNum][0]*fVPolPos[antPolNum][0]+
 					fVPolPos[antPolNum][1]*fVPolPos[antPolNum][1]);
 	fVPolPhi[antPolNum]=TMath::ATan2(fVPolPos[antPolNum][1],fVPolPos[antPolNum][0]);
@@ -71,9 +71,9 @@ void AraEventCorrelator::fillAntennaPositions()
     if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kHorizontal) {
       if(antPolNum<7) {
 	fRfChanHPol[antPolNum]=ant;
-	fHPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[0];
-	fHPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[1];
-	fHPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antLocation[2];
+	fHPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
+	fHPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
+	fHPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[2];
 	fHPolRho[antPolNum]=TMath::Sqrt(fHPolPos[antPolNum][0]*fHPolPos[antPolNum][0]+
 					fHPolPos[antPolNum][1]*fHPolPos[antPolNum][1]);
 	fHPolPhi[antPolNum]=TMath::ATan2(fHPolPos[antPolNum][1],fHPolPos[antPolNum][0]);

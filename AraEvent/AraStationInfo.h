@@ -75,8 +75,6 @@ class AraStationInfo: public TObject
   std::vector<AraAntennaInfo> fAntInfo; ///< One object per antenna
   std::vector<AraCalAntennaInfo> fCalAntInfo; ///< Vector of local station Calibration Pulsers
 
-  Double_t fStationLocation[3]; ///< array-centric co-ordinates of the station
-  Double_t fRotationMatrix[3][3]; ///< Rotation matrix to convert from array centric to station centric
 
   int numberRFChans;  ///< Currently a copy of fNumberAntennas
   int fNumberAntennas; ///<This is the number of antennas on an ATRI

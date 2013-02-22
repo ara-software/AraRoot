@@ -84,6 +84,7 @@ AraAntennaInfo *AraStationInfo::getNewAntennaInfo(int antNum){
   //Magic lines below, may remove at some point
   int temp=fAntInfo[antNum].chanNum;
   fAntInfo[antNum].chanNum=temp;
+  fAntInfo[antNum].fStationId=fStationId;
   return &fAntInfo[antNum];
 }
 
@@ -93,8 +94,9 @@ AraCalAntennaInfo *AraStationInfo::getNewCalAntennaInfo(int calAntId){
   fNumberCalAntennas++;
   //  std::cout << "getNewCalAntennaInfo(" << calAntId << ") fNumberCalAntennas=" << fNumberCalAntennas << "\n";
   //Magic lines below, may remove at some point
-  int temp=fCalAntInfo[calAntId].calAntId;
-  fCalAntInfo[calAntId].calAntId=temp;
+  //  int temp=fCalAntInfo[calAntId].calAntId;
+  fCalAntInfo[calAntId].calAntId=calAntId;
+  fCalAntInfo[calAntId].fStationId=fStationId;
   return &fCalAntInfo[calAntId];
 }
 
@@ -488,6 +490,8 @@ void AraStationInfo::readChannelMapDbAtri(){
       }//switch(column)
 
     }//column
+    thisAntInfo->fillArrayCoords(); ///< Fill the array-centric coordintes
+
   }//while(1)
 
   //now need to destroy the sqls statement prepared earlier
@@ -1044,6 +1048,7 @@ void AraStationInfo::readCalPulserDb(){
       }//switch(column)
 
     }//column
+    thisAntInfo->fillArrayCoords();
   }//while(1)
 
   //now need to destroy the sqls statement prepared earlier

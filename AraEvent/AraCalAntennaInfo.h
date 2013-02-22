@@ -31,11 +31,14 @@ class AraCalAntennaInfo: public TObject
    AraCalAntennaInfo(); ///< Default constructor
    ~AraCalAntennaInfo(); ///< Destructor
 
-   void printAntennaInfo();
-   Double_t getCableDelay() {return cableDelayCalib;}
-   Double_t *getLocationXYZ() {return antLocationCalib;}
+   void printAntennaInfo();  ///< Printssome information about the antenna
+   Double_t getCableDelay() {return cableDelayCalib;}   ///< Returns the calibrated cableDelay
+   Double_t *getLocationXYZ() {return antLocationCalib;}  ///< Returns the calibrated station-centric coordinates
+   Double_t *getLocationENU() { return antLocationArrayCalib;}
+   void fillArrayCoords();
 
 
+   AraStationId_t fStationId;
    Int_t calAntId; ///< Just a logical antenna numbering
    AraAntType::AraAntType_t antType; ///< What kind of antenna is it
    AraAntPol::AraAntPol_t polType; ///< What is the polarisation
@@ -43,8 +46,10 @@ class AraCalAntennaInfo: public TObject
    char antName[4]; ///< Simple antenna name e.g. CH1
    char pulserName[4]; ///< Simple pulser name e.g. P1
    Double_t antLocation[3]; ///< Default x,y,z in m
-   Double_t cableDelay; ///< Default cable delay in ns
    Double_t antLocationCalib[3]; ///< Calibrated x,y,z in m
+   Double_t antLocationArray[3]; ///< Default x,y,z in m
+   Double_t antLocationArrayCalib[3]; ///< Calibrated x,y,z in m
+   Double_t cableDelay; ///< Default cable delay in ns
    Double_t cableDelayCalib; ///< Calibrated cable delay in ns
     
 

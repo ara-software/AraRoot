@@ -87,9 +87,12 @@ class AraAntennaInfo: public TObject
 
    void printAntennaInfo();
    const char *getDaqBoxChan();
-   Double_t getCableDelay() {return cableDelay;}
-   
+   Double_t getCableDelay() {return cableDelay;}  
+   Double_t *getLocationXYZ() {return antLocation;}  ///< Returns the calibrated station-centric coordinates
+   Double_t *getLocationENU() { return antLocationArray;}
+   void fillArrayCoords();
 
+   AraStationId_t fStationId;
 
    Int_t chanNum;
    AraDaqChanType::AraDaqChanType_t daqChanType;
@@ -118,7 +121,8 @@ class AraAntennaInfo: public TObject
    AraAntType::AraAntType_t antType;
    AraAntPol::AraAntPol_t polType;
    char locationName[4];
-   Double_t antLocation[3]; ///< x,y,z in m
+   Double_t antLocation[3]; ///< Station-centric antenna location x,y,z in m
+   Double_t antLocationArray[3]; ///< Array-centric antenna location x,y,z in m
    Double_t cableDelay; ///< In ns
    AraAntDir::AraAntDir_t antDir;
    // JPD depricated - now using an array of doubles

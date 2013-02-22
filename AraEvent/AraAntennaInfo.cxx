@@ -7,6 +7,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "AraAntennaInfo.h"
+#include "AraGeomTool.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -89,3 +91,11 @@ const char *AraAntennaInfo::getDaqBoxChan()
   return boxChan;
 }
 
+
+void AraAntennaInfo::fillArrayCoords()
+{
+  AraGeomTool *fGeomTool=AraGeomTool::Instance();
+  fGeomTool->convertStationToArrayCoords(fStationId,antLocation,antLocationArray);
+  //  fGeomTool->convertStationToArrayCoords(fStationId,antLocationCalib,antLocationArrayCalib);
+ 
+}
