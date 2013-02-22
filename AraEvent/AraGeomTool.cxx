@@ -95,12 +95,12 @@ Int_t AraGeomTool::getAntNumByRFChan(int rfChan, AraStationId_t stationId)
 }
 
 
-//FIXME //jpd this is most definitely a hack to make AraCanvasMaker work -> this will only
-//return the testbed lookup stuff not station1
-int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
-{
-  return getRFChanByPolAndAnt(antPol,antNum,ARA_STATION1);
-}//FIXME -- this just loads the stuff for station1
+// //FIXME //jpd this is most definitely a hack to make AraCanvasMaker work -> this will only
+// //return the testbed lookup stuff not station1
+// int AraGeomTool::getRFChanByPolAndAnt(AraAntPol::AraAntPol_t antPol, int antNum)
+// {
+//   return getRFChanByPolAndAnt(antPol,antNum,ARA_STATION1);
+// }//FIXME -- this just loads the stuff for station1
 
 Double_t AraGeomTool::calcDeltaTSimple(Double_t ant1[3], Double_t ant2[3], Double_t source[3]) {
   Double_t d1=TMath::Sqrt(TMath::Power(ant1[0]-source[0],2)+TMath::Power(ant1[1]-source[1],2)+TMath::Power(ant1[2]-source[2],2));

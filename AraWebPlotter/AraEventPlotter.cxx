@@ -608,7 +608,7 @@ void AraEventPlotter::makePlots()
     
       TGraph *grWaveformRMS[16]={0};
       for(int i=0;i<16;i++) {
-	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i]);
+	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i],ARA_TESTBED);
 	 grWaveformRMS[i]= fWaveformRMSHisto[chan]->getTimeGraph(plotTime);
       }
     
@@ -650,7 +650,7 @@ void AraEventPlotter::makePlots()
     
       TGraph *grWaveformSNR[16]={0};
       for(int i=0;i<16;i++) {
-	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i]);
+	int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i],ARA_TESTBED);
 	 grWaveformSNR[i]= fWaveformSNRHisto[chan]->getTimeGraph(plotTime);
       }
     
@@ -1221,7 +1221,7 @@ void AraEventPlotter::makeLatestRunPlots()
     
       TGraph *grWaveformRMS[16]={0};
       for(int i=0;i<16;i++) {
-	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i]);
+	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i],ARA_TESTBED);
 	 grWaveformRMS[i]= fWaveformRMSHisto[chan]->getTimeGraph(fEarliestTime,fLatestTime);
       }
     
@@ -1259,7 +1259,7 @@ void AraEventPlotter::makeLatestRunPlots()
     
       TGraph *grWaveformSNR[16]={0};
       for(int i=0;i<16;i++) {
-	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i]);
+	 int chan=fGeomTool->getRFChanByPolAndAnt(polMap[i],antPolNumMap[i],ARA_TESTBED);
 	 grWaveformSNR[i]= fWaveformSNRHisto[chan]->getTimeGraph(fEarliestTime,fLatestTime);
       }
     

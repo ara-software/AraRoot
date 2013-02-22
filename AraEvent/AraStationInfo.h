@@ -49,6 +49,25 @@ class AraStationInfo: public TObject
   Int_t getElecChanFromRFChan(Int_t rfChan);
   Int_t getNumAntennasByPol(AraAntPol::AraAntPol_t polType) {return fAntIndexVec[polType].size();}
 
+  //Should add some error checking at some point
+   Double_t getLowPassFilter(int rfChan) { return fAntInfo[rfChan].lowPassFilterMhz; }
+   Double_t getHighPassFilter(int rfChan) { return fAntInfo[rfChan].highPassFilterMhz; }
+
+
+  //Below are just for ICRR station
+   //Maybe they should live elsewhere?
+  int getIcrrChanIndex(AraLabChip::AraLabChip_t chip, int chan) {return chip*CHANNELS_PER_LAB3 +chan;}
+  AraLabChip::AraLabChip_t getLabChipForChan(int rfChan) {return fAntInfo[rfChan].labChip;}
+  int getNumLabChansForChan(int rfChan) { return fAntInfo[rfChan].numLabChans;}
+  int getFirstLabChanForChan(int rfChan) { return fAntInfo[rfChan].labChans[0];}
+  int getSecondLabChanForChan(int rfChan) { return fAntInfo[rfChan].labChans[1];}
+  int getFirstLabChanIndexForChan(int rfChan) { return getIcrrChanIndex(getLabChipForChan(rfChan),getFirstLabChanForChan(rfChan));}
+  int getSecondLabChanIndexForChan(int rfChan) { return getIcrrChanIndex(getLabChipForChan(rfChan),getSecondLabChanForChan(rfChan));}
+  int isDiplexed(int rfChan) {return fAntInfo[rfChan].isDiplexed;}
+
+
+
+
 
   
   //At some point will make these private

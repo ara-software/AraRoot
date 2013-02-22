@@ -455,16 +455,16 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
     memset(theEvent->fTimesRF[rfchan],0,sizeof(Double_t)*2*MAX_NUMBER_SAMPLES_LAB3);
 
 
-    if(tempGeom->getNumLabChansForChan(rfchan, stationId)==2) {
+    if(tempGeom->getStationInfo(stationId)->getNumLabChansForChan(rfchan)==2) {
       //      printf("interleaved channel\n");
       // std::cout << rfchan << "\t"
-     	//	<< tempGeom->getFirstLabChanIndexForChan(rfchan, stationId) << "\t"
-	//     		<< tempGeom->getSecondLabChanIndexForChan(rfchan, stationId) << "\n";
+     	//	<< tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan) << "\t"
+	//     		<< tempGeom->getStationInfo(stationId)->getSecondLabChanIndexForChan(rfchan) << "\n";
 
-      //printf("rfchan %i stationId %i labChip %i FirstLabChan %i SecondLabChan %i numLabChans %i labChans[0] %i labChans[1] %i\n", rfchan, stationId, tempGeom->getLabChipForChan(rfchan, stationId), tempGeom->getFirstLabChanForChan(rfchan, stationId), tempGeom->getSecondLabChanForChan(rfchan, stationId),tempGeom->getNumLabChansForChan(rfchan, stationId), tempGeom->getFirstLabChanIndexForChan(rfchan, stationId), tempGeom->getSecondLabChanIndexForChan(rfchan, stationId));
+      //printf("rfchan %i stationId %i labChip %i FirstLabChan %i SecondLabChan %i numLabChans %i labChans[0] %i labChans[1] %i\n", rfchan, tempGeom->getStationInfo(stationId)->getLabChipForChan(rfchan), tempGeom->getStationInfo(stationId)->getFirstLabChanForChan(rfchan), tempGeom->getStationInfo(stationId)->getSecondLabChanForChan(rfchan),tempGeom->getStationInfo(stationId)->getNumLabChansForChan(rfchan), tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan), tempGeom->getStationInfo(stationId)->getSecondLabChanIndexForChan(rfchan));
 
-      int ci1=tempGeom->getFirstLabChanIndexForChan(rfchan, stationId);
-      int ci2=tempGeom->getSecondLabChanIndexForChan(rfchan, stationId);
+      int ci1=tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan);
+      int ci2=tempGeom->getStationInfo(stationId)->getSecondLabChanIndexForChan(rfchan);
       theEvent->fNumPointsRF[rfchan]=theEvent->fNumPoints[ci1]+theEvent->fNumPoints[ci2];
       //Need to zero mean, maybe should do this in each half seperately?
       //RJN hack 13/01/11
@@ -537,11 +537,11 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
     }//numLabChans==2
     
     //Perform undiplexing of channels (ARA1 has surface antennae diplexed in to HPOL channels)
-    else if(tempGeom->isDiplexed(rfchan, stationId)==0||!(AraCalType::hasUnDiplexing(calType))){
+    else if(tempGeom->getStationInfo(stationId)->isDiplexed(rfchan)==0||!(AraCalType::hasUnDiplexing(calType))){
       //    printf("non-interleaved non-diplexed channel\n");
       //      std::cout << rfchan << "\t"
-      //      << tempGeom->getFirstLabChanIndexForChan(rfchan) << "\n";
-      int ci=tempGeom->getFirstLabChanIndexForChan(rfchan, stationId);
+      //      << tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan) << "\n";
+      int ci=tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan);
       theEvent->fNumPointsRF[rfchan]=theEvent->fNumPoints[ci];   
 
       //Need to zero mean the data
@@ -558,14 +558,14 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
       }
     }//numLabChannels!=2&&isDiplexed==0
     
-    else if(tempGeom->isDiplexed(rfchan, stationId)==1&&(AraCalType::hasUnDiplexing(calType))){
+    else if(tempGeom->getStationInfo(stationId)->isDiplexed(rfchan)==1&&(AraCalType::hasUnDiplexing(calType))){
       //  printf("non-interleaved diplexed channel\n");
       //now need to work out how to do a diplexed channel
       //find lab channel from which to derived rfchan
-      int ci=tempGeom->getFirstLabChanIndexForChan(rfchan,stationId);
+      int ci=tempGeom->getStationInfo(stationId)->getFirstLabChanIndexForChan(rfchan);
       int noPoints=theEvent->fNumPoints[ci];
-      Double_t lowPassFreq=tempGeom->getLowPassFilter(rfchan,stationId);
-      Double_t highPassFreq=tempGeom->getHighPassFilter(rfchan,stationId);
+      Double_t lowPassFreq=tempGeom->getStationInfo(stationId)->getLowPassFilter(rfchan);
+      Double_t highPassFreq=tempGeom->getStationInfo(stationId)->getHighPassFilter(rfchan);
 
       TGraph *gUnfiltered = new TGraph(noPoints, theEvent->fTimes[ci], theEvent->fVolts[ci]);
   
