@@ -16,12 +16,9 @@ target_link_libraries(avWaveformCalPulser AraEvent ${ROOT_LIBRARIES})
 add_executable(avWaveformICLPulser avWaveformICLPulser.cxx)
 target_link_libraries(avWaveformICLPulser AraEvent ${ROOT_LIBRARIES})
 
-add_executable(eventRate eventRate.cxx)
-target_link_libraries(eventRate AraEvent ${ROOT_LIBRARIES})
-
 
 #install the binaries
-install(TARGETS eventRate avWaveformCalPulser avWaveformICLPulser deltaTPulses maxAmplitude exampleLoop DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS  avWaveformCalPulser avWaveformICLPulser deltaTPulses maxAmplitude exampleLoop DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 
 ##JPD --- This is an example for adding your own bins
