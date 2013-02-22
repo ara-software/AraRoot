@@ -88,6 +88,9 @@ class AraGeomTool
    static const char *getStationName(AraStationId_t stationId); ///< Return char* with the station Name from the stationId
    static AraStationId_t getAtriStationId(int stationNumber); ///< Simple utility function
 
+   void convertStationToArrayCoords(AraStationId_t stationId, Double_t inputCoords[3], Double_t outputCoords[3] );
+   void convertArrayToStationCoords(AraStationId_t stationId, Double_t inputCoords[3], Double_t outputCoords[3] );
+
    TVector3 convertStationToArrayCoords(AraStationId_t stationId, TVector3 inputCoords);
    TVector3 convertArrayToStationCoords(AraStationId_t stationId, TVector3 inputCoords);
    TRotation *getStationToArrayRotation(AraStationId_t stationId);

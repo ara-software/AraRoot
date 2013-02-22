@@ -680,3 +680,26 @@ TVector3 &AraGeomTool::getStationVector(AraStationId_t stationId)
   return fStationVectorATRI[calibIndex];
 
 }
+
+
+
+void AraGeomTool::convertStationToArrayCoords(AraStationId_t stationId, Double_t inputCoords[3], Double_t outputCoords[3] )
+{
+  TVector3 input(inputCoords);
+  TVector3 output=convertStationToArrayCoords(stationId,input);
+  outputCoords[0]=output.x();
+  outputCoords[1]=output.y();
+  outputCoords[2]=output.z();
+
+}
+void AraGeomTool::convertArrayToStationCoords(AraStationId_t stationId, Double_t inputCoords[3], Double_t outputCoords[3] )
+{
+
+  TVector3 input(inputCoords);
+  TVector3 output=convertArrayToStationCoords(stationId,input);
+  outputCoords[0]=output.x();
+  outputCoords[1]=output.y();
+  outputCoords[2]=output.z();
+
+
+}
