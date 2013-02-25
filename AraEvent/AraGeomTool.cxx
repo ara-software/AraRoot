@@ -25,6 +25,47 @@
 
 AraGeomTool * AraGeomTool::fgInstance=0;
 Double_t AraGeomTool::nTopOfIce=1.48;
+const Double_t fFtInm=0.3048;
+
+//Some locations in ARA global coordinates
+Double_t fSouthPole2010_11[3]={27344.05*fFtInm,-3395.14*fFtInm,-35.63*fFtInm};
+Double_t fSouthPole2011_12[3]={27322.88*fFtInm,-3369.89*fFtInm,-36.02*fFtInm};
+Double_t fSouthPoleTelescope[3]={24774.18*fFtInm,-871.35*fFtInm,-30*fFtInm};  ///< Made up the u-number
+Double_t fICL2011_12[4][3]={{24011.58*fFtInm,-1702.53*fFtInm,0},
+			    {24060.51*fFtInm,-1723.09*fFtInm,0},
+			    {24049.7*fFtInm,-1749.02*fFtInm,0},
+			    {24000.78*fFtInm,-1728.47*fFtInm,0}};
+
+Double_t fWindTurbine2011_12[3][3]={{46166.49*fFtInm,52159.43*fFtInm,0},
+				    {22546.95*fFtInm,-2594.03*fFtInm,0},
+				    {18662.31*fFtInm,-3552.64*fFtInm,0}};
+
+
+
+Double_t *AraGeomTool::getSouthPole2010_11()
+{
+  return fSouthPole2010_11;
+}
+
+Double_t *AraGeomTool::getSouthPole2011_12()
+{
+  return fSouthPole2011_12;
+}
+
+Double_t *AraGeomTool::getSouthPoleTelescope()
+{
+  return fSouthPoleTelescope;
+}
+
+Double_t *AraGeomTool::getICLCorner(int corner)  ///< Corner is 0,1,2 or 3
+{
+  return fICL2011_12[corner];
+}
+
+Double_t *AraGeomTool::getWindTurbine(int tbNumber) ///< TB number is 1, 2 or 3
+{
+  return fWindTurbine2011_12[tbNumber-1];
+}
 
 AraGeomTool::AraGeomTool() 
 {

@@ -66,6 +66,15 @@ class AraGeomTool
    TRotation *getArrayToStationRotation(AraStationId_t stationId); ///< The rotation matrix used in converting from array-centric to station-centric coordinates
    TVector3 &getStationVector(AraStationId_t stationId);  ///< The lcoordinates of the origin of the station-centric system in array-centric coordinates
 
+
+   //Non-station locations in array centric corrdinates
+   Double_t *getSouthPole2010_11();
+   Double_t *getSouthPole2011_12();
+   Double_t *getSouthPoleTelescope();
+   Double_t *getICLCorner(int corner); ///< Corner is 0,1,2 or 3
+   Double_t *getWindTurbine(int tbNumber); ///< TB number is 1, 2 or 3
+
+
    //Instance generator
    static AraGeomTool*  Instance();
    
