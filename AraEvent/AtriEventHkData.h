@@ -29,6 +29,26 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
 
    ~AtriEventHkData(); ///< Destructor
 
+   UInt_t getPpsCounter() {return ppsCounter;}
+   UInt_t getClockCounter() {return clockCounter;}
+   //DDA specific quantities 
+   Double_t wilkinsonCounterNs(Int_t dda); ///< Convert wilkinsonCounter to ns
+   Double_t getWilkinsonCounterNs(Int_t dda) {return wilkinsonCounterNs(dda);} ///< Convert wilkinsonCounter to ns
+   UShort_t getWilkinsonDelay(Int_t dda) {return wilkinsonDelay[dda];} ///< Don't know what this is even?
+   UShort_t getVdlyDac(Int_t dda) { return vdlyDac[dda];}
+   UShort_t getVadjDac(Int_t dda) { return vadjDac[dda];}
+
+
+   //TDA specific quantities
+   Double_t getSingleChannelRateHz(Int_t tda, Int_t channel); ///< Gets the single channel rate in Hz for tda channel
+   UInt_t getSingleChannelThreshold(Int_t tda, Int_t channel); ///< Gets the single channel rate in Hz for tda channel
+   Double_t getOneOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of one of four channels on tda
+   Double_t getTwoOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of two of four channels on tda
+   Double_t getThreeOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of three of four channels on tda
+   Double_t getThreeOfEightRateHz(Int_t tda_pair); ///< Gets the rate in Hz of three of eight channels on tda_pair (0 is stack 1 and 2, 0 is stack 3 and 4)
+   Double_t getL4RateHz(Int_t index) { return l4Scaler[index];}
+
+
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)
    UInt_t unixTimeUs; ///< Time in microseconds (32-bits)
    UInt_t firmwareVersion; ///< Firmware version [31:28] ATRI version [27:24] month [23:16] day [15:12] vMajor [11:8] vMiddle [7:0] vMinor 
@@ -41,7 +61,6 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    UInt_t ppsCounter; ///< Pulse per second counter
    UInt_t clockCounter; ///< Clock counter (which clock?)
 
-   Double_t wilkinsonCounterNs(Int_t dda); ///< Convert wilkinsonCounter to ns
 
    //new scaler format
    uint16_t l1Scaler[NUM_L1_SCALERS]; ///< L1 scaler, pre-scale depends on revision of firmware -- check helper functions
@@ -65,12 +84,6 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    UShort_t vdlyDac[DDA_PER_ATRI]; ///< Value the vdly is set to
    UShort_t vadjDac[DDA_PER_ATRI]; ///< Value the vdly is set to
 
-   
-   Double_t getSingleChannelRateHz(Int_t tda, Int_t channel); ///< Gets the single channel rate in Hz for tda channel
-   Double_t getOneOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of one of four channels on tda
-   Double_t getTwoOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of two of four channels on tda
-   Double_t getThreeOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of three of four channels on tda
-   Double_t getThreeOfEightRateHz(Int_t tda_pair); ///< Gets the rate in Hz of three of eight channels on tda_pair (0 is stack 1 and 2, 0 is stack 3 and 4)
    
 
    ClassDef(AtriEventHkData,3);

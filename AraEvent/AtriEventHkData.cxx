@@ -15,13 +15,13 @@ ClassImp(AtriEventHkData);
 
 AtriEventHkData::AtriEventHkData() 
 {
-   //Default Constructor
+  //Default Constructor
 }
 
 AtriEventHkData::~AtriEventHkData() {
-   //Default Destructor
+  //Default Destructor
 }
-
+ 
 
 AtriEventHkData::AtriEventHkData(AraEventHk_t *theHk)
   :RawAraGenericHeader(&(theHk->gHdr))
@@ -144,4 +144,14 @@ Double_t AtriEventHkData::getThreeOfEightRateHz(Int_t tda_pair){
   if(tda_pair > 1 || tda_pair <0) return -1;
   return l3Scaler[tda_pair];
 
+}
+  
+UInt_t AtriEventHkData::getSingleChannelThreshold(Int_t tda, Int_t channel)
+{
+  ///< Gets the single channel rate in Hz for tda channel
+ 
+  if(tda >= TDA_PER_ATRI || tda < 0) return -1;
+  if(channel>= ANTS_PER_TDA || tda <0) return -1;
+  return thresholdDac[channel+(tda*ANTS_PER_TDA)];
+       
 }
