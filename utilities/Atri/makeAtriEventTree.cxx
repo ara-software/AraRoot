@@ -42,9 +42,12 @@ int main(int argc, char **argv) {
   }
   if(argc>=4) 
      runNumber=atoi(argv[3]); //To override runNumber
-  if(argc>=5) 
-     stationIdInt=atoi(argv[4]);  //To override station id
-  stationId=AraGeomTool::getAtriStationId(stationIdInt);
+  if(argc>=5) {
+    stationIdInt=atoi(argv[4]);  //To override station id
+    stationId=AraGeomTool::getAtriStationId(stationIdInt);
+  }
+  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
+
   makeTree(argv[1],argv[2]);
   delete [] dataBuffer;
   return 0;

@@ -13,6 +13,7 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
+#include "AraGeomTool.h"
 #include "araAtriStructures.h"
 #include "AtriSensorHkData.h"  
 
@@ -27,6 +28,8 @@ char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
 Int_t lastRunNumber;
+Int_t stationIdInt;
+AraStationId_t stationId;
 
 
 int main(int argc, char **argv) {
@@ -34,8 +37,12 @@ int main(int argc, char **argv) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
-  if(argc==4) 
+  if(argc>=4) 
     runNumber=atoi(argv[3]);
+  if(argc>=5) {
+    stationIdInt=atoi(argv[4]);  //To override station id
+    stationId=AraGeomTool::getAtriStationId(stationIdInt);
+  }
   makeHkTree(argv[1],argv[2]);
   return 0;
 }
@@ -72,6 +79,12 @@ void makeHkTree(char *inputName, char *outFile) {
       //      cout << i << endl;
       numBytes=gzread(infile,&theSensorHkStruct,sizeof(AraSensorHk_t));
       //      std::cout << numBytes << "\n";
+
+
+	if(stationIdInt!=0)
+	   theSensorHkStruct.gHdr.stationId=stationId;
+
+
       if(numBytes==0) break;
       if(numBytes!=sizeof(AraSensorHk_t)) {
 	if(numBytes)

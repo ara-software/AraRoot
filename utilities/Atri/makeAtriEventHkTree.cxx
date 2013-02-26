@@ -13,6 +13,7 @@ using namespace std;
 
 #define HACK_FOR_ROOT
 
+#include "AraGeomTool.h"
 #include "araAtriStructures.h"
 #include "AtriEventHkData.h"  
 
@@ -28,6 +29,8 @@ char outName[FILENAME_MAX];
 UInt_t realTime;
 Int_t runNumber;
 Int_t lastRunNumber;
+Int_t stationIdInt;
+AraStationId_t stationId;
 
 Int_t newHkFormat=0;
 
@@ -36,8 +39,13 @@ int main(int argc, char **argv) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
-  if(argc==4) 
+  if(argc>=4) 
     runNumber=atoi(argv[3]);
+  if(argc>=5) {
+    stationIdInt=atoi(argv[4]);  //To override station id
+    stationId=AraGeomTool::getAtriStationId(stationIdInt);
+  }
+  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
   makeHkTree(argv[1],argv[2]);
   return 0;
 }
@@ -150,6 +158,9 @@ void makeHkTree(char *inputName, char *outFile) {
 	// fprintf(stderr, "read %i bytes\n", numBytes);
 	//	fprintf(stderr, "verId %i subVerId %i\n", theEventHkStruct.gHdr.verId, theEventHkStruct.gHdr.subVerId);
 
+	if(stationIdInt!=0)
+	   theEventHkStruct.gHdr.stationId=stationId;
+
 	if(numBytes==0) break;
 	if(numBytes!=sizeof(AraEventHk_t)) {
 	  if(numBytes)
@@ -170,6 +181,8 @@ void makeHkTree(char *inputName, char *outFile) {
 	// fprintf(stderr, "read %i bytes\n", numBytes);
 	//	fprintf(stderr, "verId %i subVerId %i\n", theEventHkStruct_2_7.gHdr.verId, theEventHkStruct_2_7.gHdr.subVerId);
 	
+	if(stationIdInt!=0)
+	   theEventHkStruct.gHdr.stationId=stationId;
 
 	if(numBytes==0) break;
 	if(numBytes!=sizeof(AraEventHk2_7_t)) {
