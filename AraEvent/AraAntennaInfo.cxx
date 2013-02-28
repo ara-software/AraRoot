@@ -60,7 +60,7 @@ AraAntennaInfo::~AraAntennaInfo() {
    //Default Destructor
 }
 
-void AraAntennaInfo::printAntennaInfo()
+void AraAntennaInfo::printAntennaInfoIcrr()
 {
   std::cout << "*************************************************************\n";
   std::cout << "Antenna Info for Channel " << chanNum << "\n";
@@ -80,6 +80,23 @@ void AraAntennaInfo::printAntennaInfo()
 
 }
 
+void AraAntennaInfo::printAntennaInfoAtri(){
+  
+  std::cout << "*************************************************************\n";
+  std::cout << "Antenna Info for RFChannel " << chanNum << " daqChanNum " << daqChanNum << " daqTrigChan " <<  daqTrigChan << " antPolNum " << antPolNum << "\n";
+  std::cout << "Antenna hole+name " << getRFChanName() << "\n";
+  std::cout << AraAntType::antTypeAsString(antType) << "\t" << AraAntPol::antPolAsString(polType) << " polarisation\n";
+  std::cout << "antLocation " << antLocation[0] << "," << antLocation[1] << "," << antLocation[2] << " m\n";
+  std::cout << "delay " << cableDelay << " ns\n";
+  std::cout << "calibAntLocation " << calibAntLocation[0] << "," << calibAntLocation[1] << "," << calibAntLocation[2] << " m\n";
+  std::cout << "calibDelay " << calibCableDelay << " ns\n";
+  std::cout << "Average Noise Figure " << avgNoiseFigure << " K\n";
+  std::cout << "Filters " << highPassFilterMhz << "-" << lowPassFilterMhz << " MHz\n";
+  std::cout << "foamId " << foamId << " foamChanNum " << foamChanNum << "\n";
+    
+  std::cout << "*************************************************************\n";
+  
+}
 
 const char *AraAntennaInfo::getDaqBoxChan()
 {
@@ -90,6 +107,16 @@ const char *AraAntennaInfo::getDaqBoxChan()
     sprintf(boxChan,"Bat%d",daqChanNum);
   return boxChan;
 }
+
+
+const char *AraAntennaInfo::getRFChanName()
+{
+  static char rfChanName[8];
+  sprintf(rfChanName, "%s%s", holeName, antName);
+
+  return rfChanName;
+}
+
 
 
 void AraAntennaInfo::fillArrayCoords()

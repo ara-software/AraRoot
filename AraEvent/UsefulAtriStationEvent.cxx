@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-/////  UsefulAtriStationEvent.cxx        ARA header reading class                  /////
+/////  UsefulAtriStationEvent.cxx        ARA header reading class        /////
 /////                                                                    /////
 /////  Description:                                                      /////
-/////     A simple class that reads in useful ARA headers and produces     ///// 
+/////     A simple class that reads in useful ARA headers and produces   ///// 
 /////   calibrated time and voltage stuff                                /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,12 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 { 
-  return getGraphFromElecChan(AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId));
+  Int_t rfChan = AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId);
+  if(rfChan < 0){
+    return NULL;
+  }
+
+  return getGraphFromElecChan(rfChan);
 }
 
 

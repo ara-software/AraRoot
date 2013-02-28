@@ -369,15 +369,14 @@ int AraDisplay::loadEventTree(char *eventFile)
   fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
 
   fEventTree->ResetBranchAddresses();
-
   if(fIcrrData) 
     fEventTree->SetBranchAddress("event",&fIcrrRawEventPtr);  
   else
     fEventTree->SetBranchAddress("event",&fAtriRawEventPtr);  
+
   fEventTree->SetBranchAddress("run",&fCurrentRun);  
   fEventEntry=0;
 
-  //jdp this is where we will build the tree index on
   fEventTree->BuildIndex("event.head.eventNumber");
   fEventIndex = (TTreeIndex*) fEventTree->GetTreeIndex();
 

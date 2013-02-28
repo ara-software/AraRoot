@@ -146,9 +146,9 @@ class AraDisplay
    TPad *fAraEventInfoPad; ///< The event display info pad.
 
    UsefulIcrrStationEvent *fIcrrUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulIcrrStationEvent *fIcrrRawEventPtr; ///< Pointer to the raw event.
+   RawIcrrStationEvent *fIcrrRawEventPtr; ///< Pointer to the raw event.
    UsefulAtriStationEvent *fAtriUsefulEventPtr; ///< Pointer to the calibrated event.
-   UsefulAtriStationEvent *fAtriRawEventPtr; ///< Pointer to the raw event.
+   RawAtriStationEvent *fAtriRawEventPtr; ///< Pointer to the raw event.
    Int_t fCurrentRun; ///<Run number
    RawAraStationEvent *fRawStationEventPtr; ///< Pointer to raw event base class - used to identify the electronics type (Atri vs. Icrr)
 

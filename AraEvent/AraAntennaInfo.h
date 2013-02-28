@@ -85,8 +85,12 @@ class AraAntennaInfo: public TObject
    AraAntennaInfo(); ///< Default constructor
    ~AraAntennaInfo(); ///< Destructor
 
-   void printAntennaInfo();
+   void printAntennaInfoIcrr();
+   void printAntennaInfoAtri();
    const char *getDaqBoxChan();
+
+   const char *getRFChanName();
+
    Double_t getCableDelay() {return cableDelay;}  
    Double_t *getLocationXYZ() {return antLocation;}  ///< Returns the calibrated station-centric coordinates
    Double_t *getLocationENU() { return antLocationArray;}
@@ -94,40 +98,27 @@ class AraAntennaInfo: public TObject
 
    AraStationId_t fStationId;
 
+   //ICRR Specific Numbers
    Int_t chanNum;
    AraDaqChanType::AraDaqChanType_t daqChanType;
-   Int_t daqChanNum;
-   Double_t highPassFilterMhz;
-   Double_t lowPassFilterMhz;
-
-   //ICRR Specific Numbers
-   Int_t daqTrigChan;
    Int_t numLabChans;
    AraLabChip::AraLabChip_t labChip;
    Int_t labChans[2]; ///<These will count from 0
    Int_t isDiplexed; ///< Depricated attempt at un-diplexing//FIXME
    Int_t diplexedChans[2]; ///< Depricated attempt at un-diplexing//FIXME
-   
-   //ATRI Specific Numbers
-   Int_t ddaNum; ///< Counting from 0;
-   Int_t ddaChanNum; //< Counting from 0
-
-
    Int_t preAmpNum;
-   Double_t avgNoiseFigure;
+
    Int_t rcvrNum;
-   char designator[3];
-   Int_t antPolNum;
-   AraAntType::AraAntType_t antType;
-   AraAntPol::AraAntPol_t polType;
+
+   char designator[3]; ///< Depricated -- use antName and holeName
+
    char locationName[4];
-   Double_t antLocation[3]; ///< Station-centric antenna location x,y,z in m
+
    Double_t antLocationArray[3]; ///< Array-centric antenna location x,y,z in m
-   Double_t cableDelay; ///< In ns
-   AraAntDir::AraAntDir_t antDir;
-   // JPD depricated - now using an array of doubles
-   //   AraSurfaceOrientation::AraSurfaceOrientation_t antOrient; ///<Only for surface antennas 
-   Double_t antOrient[3];
+
+
+
+   AraAntDir::AraAntDir_t antDir; 
 
    Double_t debugHolePosition[3]; ////< x,y,z in m
    Double_t debugPreAmpDz; ///< in m
@@ -138,7 +129,46 @@ class AraAntennaInfo: public TObject
    Double_t debugFeedPointDelay; //in ns
    Double_t debugTotalCableDelay; //in ns
      
-       
+
+
+
+   //ATRI & ICRR -- Common data types
+
+   AraAntPol::AraAntPol_t polType; ///< Polarisation of antenna (vertical, horizontal, surface);
+   Int_t antPolNum; ///< The antenna number for this polarisation (0-7 for HPol, 0-7 for VPol and 0-3 for Surface)
+
+   Int_t daqChanNum; ///< The electronics channel number for this antenna (0-7 DDA1, 8-15 DDA2, 16-23 DDA3, 24-31 DDA4)
+   Int_t daqTrigChan; ///< The trigger channel number
+   Int_t foamId; ///< ID of the Fibre Optic Amplification Module (FOAM) for this channel
+   Int_t foamChanNum; ///< FOAM channel for this antenna
+   AraAntType::AraAntType_t antType; ///< Type of antenna used
+
+   Double_t antLocation[3]; ///< x,y,z in m
+   Double_t calibAntLocation[3]; //< x,y,z in m from calibration
+   Double_t cableDelay; ///< In ns
+   Double_t calibCableDelay; ///< In ns from calibration
+
+
+   Double_t antOrient[3]; ///< The orientation of surface antennas
+
+   Double_t highPassFilterMhz; ///< High Pass filter in the DAQ box signal chain
+   Double_t lowPassFilterMhz; ///< Low pass filter in the DAQ box signal chain
+
+
+
+   Double_t avgNoiseFigure; ///< Some measure of signal chain average noise figure
+
+   //ATRI -- new data
+   char holeName[6];
+   char antName[6];
+   
+
+
+   //More information 
+   
+   
+
+
 
   ClassDef(AraAntennaInfo,1);
 };

@@ -89,7 +89,10 @@ class AraStationInfo: public TObject
   AraCalAntennaInfo *getNewCalAntennaInfo(int antCalId);
   void fillAntIndexVec();
   void readChannelMapDbAtri();
+  void readChannelMapDbAtri_2();
   void readChannelMapDbIcrr();
+
+
   void readCalPulserDb();
 
   ClassDef(AraStationInfo,1);

@@ -150,14 +150,9 @@ bool RawAtriStationEvent::isCalpulserEvent(){
   else return false;
 
   if(TMath::Abs((Int_t)timeStamp-pulserTime)<1e4){
-    //    fprintf(stderr, "%s - stationId %d pulserTime %d timeStamp-pulserTime %d\n", __FUNCTION__, stationId, pulserTime, timeStamp-pulserTime);
-
     return true;
   }
   else{
-    //    fprintf(stderr, "%s - stationId %d pulserTime %d timeStamp-pulserTime %d\n", __FUNCTION__, stationId, pulserTime, timeStamp-pulserTime);
-
     return false;
-
   }
 }
