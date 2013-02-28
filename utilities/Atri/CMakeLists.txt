@@ -44,13 +44,13 @@ add_executable(makeAtriCalibratedEventTree makeAtriCalibratedEventTree.cxx)
 target_link_libraries(makeAtriCalibratedEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
 
-add_executable(quickL1EventFilter quickL1EventFilter.cxx util.c)
+add_executable(quickL1EventFilter quickL1EventFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickL1EventFilter AraEvent)
 
-add_executable(quickOneInTenFilter quickOneInTenFilter.cxx util.c)
+add_executable(quickOneInTenFilter quickOneInTenFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickOneInTenFilter AraEvent)
 
-add_executable(quickL1CalpulserFilter quickL1CalpulserFilter.cxx util.c)
+add_executable(quickL1CalpulserFilter quickL1CalpulserFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickL1CalpulserFilter AraEvent)
 
 

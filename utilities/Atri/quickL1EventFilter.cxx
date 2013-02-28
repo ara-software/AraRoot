@@ -17,7 +17,7 @@
 
 
 extern "C" {
-   #include "util.h"
+   #include "fileWriterUtil.h"
    #include "syslog.h"
 }
 

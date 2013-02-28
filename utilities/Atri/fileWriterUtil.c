@@ -17,7 +17,7 @@
 #include <string.h>
 
 #include "araSoft.h"
-#include "util.h"
+#include "fileWriterUtil.h"
 
 void initWriter(ARAWriterStruct_t* writer, 
                 int runNumber,
