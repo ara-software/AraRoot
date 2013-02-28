@@ -2,48 +2,38 @@ Set(INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/AraDisplay ${CMAKE_SOURCE_DIR}/AraCo
 
 include_directories( ${INCLUDE_DIRECTORIES} )
 
-
+#All the make Tree programs
 add_executable(makeAtriSensorHkTree makeAtriSensorHkTree.cxx)
 
 target_link_libraries(makeAtriSensorHkTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
-
-
 
 add_executable(makeAtriEventHkTree makeAtriEventHkTree.cxx)
 
 target_link_libraries(makeAtriEventHkTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-
-
 add_executable(makeSimpleAtriEventTree makeSimpleAtriEventTree.cxx)
 
 target_link_libraries(makeSimpleAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
-
 
 add_executable(makeAtriEventTree makeAtriEventTree.cxx)
 
 target_link_libraries(makeAtriEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-
-
 add_executable(makeAtriEventTreeForcedStationId makeAtriEventTreeForceStationId.cxx)
 
 target_link_libraries(makeAtriEventTreeForcedStationId AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-
-
 add_executable(makeAtriEventTreeStation1 makeAtriEventTreeStation1.cxx)
 target_link_libraries(makeAtriEventTreeStation1 AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
-
 add_executable(makeAtriEventTreeStation3 makeAtriEventTreeStation3.cxx)
 target_link_libraries(makeAtriEventTreeStation3 AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
-
 
 add_executable(makeAtriCalibratedEventTree makeAtriCalibratedEventTree.cxx)
 target_link_libraries(makeAtriCalibratedEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
 
+#All the filters
 add_executable(quickL1EventFilter quickL1EventFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickL1EventFilter AraEvent)
 
@@ -52,6 +42,12 @@ target_link_libraries(quickOneInTenFilter AraEvent)
 
 add_executable(quickL1CalpulserFilter quickL1CalpulserFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickL1CalpulserFilter AraEvent)
+
+
+#runInformation
+add_executable(getRunStatistics getRunStatistics.cxx)
+target_link_libraries(getRunStatistics AraEvent)
+
 
 
 #install the binaries
