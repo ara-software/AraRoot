@@ -116,7 +116,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   stationId= evPtr->stationId;
   if(debug)  std::cerr << "stationId " << stationId << "\n";
   AraEventCalibrator *calib = AraEventCalibrator::Instance();
-  calib->setAtriPedFile(pedFileName, 2);
+  calib->setAtriPedFile(pedFileName, stationId);
   
   //General output stuff
   char outFileName[FILENAME_MAX];
@@ -332,10 +332,12 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   }//entry
   std::cerr << "\n";
 
+
+  //Now calculate the lag
   char varexp[100];
   char selection[100];
   char name[100];
-  //Now calculate the lag
+
   for(dda=0;dda<DDA_PER_ATRI;dda++){
     for(chan=0;chan<RFCHAN_PER_DDA;chan++){
       lag[dda][chan] = lagHist[dda][chan]->GetMean(1);
@@ -480,6 +482,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
 
   save_inter_sample_times_even(outFileName);
   save_epsilon_times_even(outFileName);
+
   save_inter_sample_times(outFileName);
   save_epsilon_times(outFileName);
 

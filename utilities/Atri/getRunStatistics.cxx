@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     stationIdInt=atoi(argv[4]);  //To override station id
     stationId=AraGeomTool::getAtriStationId(stationIdInt);
   }
-  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
+  //  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
 
   processFileList(argv[1],argv[2]);
   delete [] dataBuffer;
@@ -136,12 +136,12 @@ void processFileList(char *inputName, char *outFile) {
     eventRate = 0;
 
   printf("Run statistics ****\n\n");
-  printf("unixTimeStart\t%ui\tunixTimeEnd\t%ui\n", unixTimeStart, unixTimeEnd);
-  printf("numEvents\t%i\n", numEvents);
+  printf("unixTimeStart\t%u\tunixTimeEnd\t%u\n", unixTimeStart, unixTimeEnd);
+  printf("numEvents\t\t%i\n", numEvents);
   printf("numEvents_CPU\t%i\n", numEvents_CPU);
   printf("numEvents_RF0\t%i\n", numEvents_RF0);
   printf("numEvents_CALPULSER\t%i\n", numEvents_CALPULSER);
-  printf("eventRate\t%f\n", eventRate);
+  printf("eventRate\t\t%f\n", eventRate);
 
 }
 
