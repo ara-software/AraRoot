@@ -28,3 +28,9 @@ install(TARGETS  avWaveformCalPulser avWaveformICLPulser deltaTPulses maxAmplitu
 #install the binaries
 # install(TARGETS exampleLoop DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
+#getAtriRunStatistics
+add_executable(getAtriRunStatistics getAtriRunStatistics.cxx)
+target_link_libraries(getAtriRunStatistics AraEvent)
+
+install(TARGETS getAtriRunStatistics  DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(FILES  runGetAtriRunStatistics.sh DESTINATION ${ARAROOT_INSTALL_PATH}/scripts)

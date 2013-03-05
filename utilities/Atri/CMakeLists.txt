@@ -43,15 +43,8 @@ target_link_libraries(quickOneInTenFilter AraEvent)
 add_executable(quickL1CalpulserFilter quickL1CalpulserFilter.cxx fileWriterUtil.c)
 target_link_libraries(quickL1CalpulserFilter AraEvent)
 
-
-#runInformation
-add_executable(getRunStatistics getRunStatistics.cxx)
-target_link_libraries(getRunStatistics AraEvent)
-
-
-
 #install the binaries
-install(TARGETS makeAtriSensorHkTree makeAtriEventHkTree makeSimpleAtriEventTree  makeAtriEventTree makeAtriCalibratedEventTree makeAtriEventTreeForcedStationId makeAtriEventTreeStation1 makeAtriEventTreeStation3  quickL1EventFilter quickOneInTenFilter quickL1CalpulserFilter getRunStatistics DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS makeAtriSensorHkTree makeAtriEventHkTree makeSimpleAtriEventTree  makeAtriEventTree makeAtriCalibratedEventTree makeAtriEventTreeForcedStationId makeAtriEventTreeStation1 makeAtriEventTreeStation3  quickL1EventFilter quickOneInTenFilter quickL1CalpulserFilter DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 #install the scripts
-install(FILES runAtriRunFileMaker.sh runAtriRunFileMakerForcedStationId.sh runQuickL1Filter.sh runQuickOneInTenFilter.sh runGetRunStats.sh DESTINATION ${ARAROOT_INSTALL_PATH}/scripts)
+install(FILES runAtriRunFileMaker.sh runAtriRunFileMakerForcedStationId.sh runQuickL1Filter.sh runQuickOneInTenFilter.sh DESTINATION ${ARAROOT_INSTALL_PATH}/scripts)
