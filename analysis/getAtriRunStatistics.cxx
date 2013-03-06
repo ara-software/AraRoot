@@ -17,7 +17,7 @@ using namespace std;
 #include "araAtriStructures.h"
 #include "RawAtriStationEvent.h"  
 
-void process(int lastTime);
+void process();
 void processFileList(char *inputName, char *outDir);
 
 AraStationEventHeader_t theEventHeader;
@@ -53,7 +53,7 @@ UInt_t thisUnixTime=0;
 Double_t calPulserRate=0;
 Double_t RF0Rate=0;
 Double_t CPURate=0;
-
+Int_t lastTime=0;
 
 
 int main(int argc, char **argv) {
@@ -63,13 +63,6 @@ int main(int argc, char **argv) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
-  if(argc>=4) 
-     runNumber=atoi(argv[3]); //To override runNumber
-  if(argc>=5) {
-    stationIdInt=atoi(argv[4]);  //To override station id
-    stationId=AraGeomTool::getAtriStationId(stationIdInt);
-  }
-  //  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
 
   processFileList(argv[1],argv[2]);
   delete [] dataBuffer;
@@ -98,9 +91,7 @@ void processFileList(char *inputName, char *outFileName) {
   outTree->Branch("numEvents_RF0", &numEvents_RF0, "numEvents_RF0/I");
   outTree->Branch("numEvents_CPU", &numEvents_CPU, "numEvents_CPU/I");
   outTree->Branch("stationId", &stationId, "stationId/I");
-  
-
-
+  outTree->Branch("lastTime", &lastTime, "lastTime/I");
 
   int numBytes=0;
   char fileName[180];
@@ -145,7 +136,7 @@ void processFileList(char *inputName, char *outFileName) {
 	  error=1;
 	  break;
 	}
-	process(0);
+	process();
      	//	exit(0);
       }
       else {
@@ -173,14 +164,14 @@ void processFileList(char *inputName, char *outFileName) {
 //   printf("numEvents_CALPULSER\t%i\n", numEvents_CALPULSER);
 //   printf("eventRate\t\t%f\n", eventRate);
 
-  process(1);
+  process();
 
   outFile->Write();
 
 }
 
 
-void process(int lastTime) {
+void process() {
   static int doneInit=0;
   static int firstTime=1;
   if(!doneInit) {
