@@ -56,6 +56,8 @@ class RawAtriStationEvent: public RawAraStationEvent
    UInt_t triggerInfo[MAX_TRIG_BLOCKS]; ///< The trigger pattern for the future
    UChar_t triggerBlock[MAX_TRIG_BLOCKS]; ///< Which block the triggers occured in
 
+   UChar_t filterInfo; ///< Will contain the filter information
+
    std::vector<RawAtriStationBlock> blockVec;
    
    inline static int getPedIndex(int dda, int block, int chan, int sample)
