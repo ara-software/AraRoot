@@ -1,0 +1,4 @@
+use the following commands:
+
+
+sqlite3 dbname.db < makeAntInfoATRI.sql
