@@ -18,7 +18,7 @@ using namespace std;
 #include "RawAtriStationEvent.h"  
 
 void process();
-void processFileList(char *inputName, char *outDir);
+void processFileList(char *inputName, char *outDir, int run);
 
 AraStationEventHeader_t theEventHeader;
 
@@ -39,7 +39,6 @@ Int_t numEvents_CPU=0;
 Int_t numEvents_RF0=0;
 Int_t numEvents_CALPULSER=0;
 Double_t eventRate=0;
-UInt_t unixTimeStart=0;
 
 Int_t lastNumEvents=0;
 Int_t lastNumEvents_CPU=0;
@@ -54,23 +53,24 @@ Double_t calPulserRate=0;
 Double_t RF0Rate=0;
 Double_t CPURate=0;
 Int_t lastTime=0;
+Int_t firstTime=0;
 
 
 int main(int argc, char **argv) {
   dataBuffer = new char[200000];
   theEvent=0;
-  if(argc<3) {
+  if(argc<4) {
     std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
     return -1;
   }
 
-  processFileList(argv[1],argv[2]);
+  processFileList(argv[1],argv[2], atoi(argv[3]));
   delete [] dataBuffer;
   return 0;
 }
   
 
-void processFileList(char *inputName, char *outFileName) {
+void processFileList(char *inputName, char *outFileName, int run) {
   cout << inputName << "\t" << outFileName << endl;
 
   theEvent = new RawAtriStationEvent();
@@ -85,14 +85,19 @@ void processFileList(char *inputName, char *outFileName) {
   outTree->Branch("CPURate", &CPURate, "CPURate/D");
 
   outTree->Branch("eventRate", &eventRate, "eventRate/D");
-  outTree->Branch("unixTimeStart", &unixTimeStart, "unixTimeStart/i");
   outTree->Branch("numEvents", &numEvents, "numEvents/I");
   outTree->Branch("numEvents_CALPULSER", &numEvents_CALPULSER, "numEvents_CALPULSER/I");
   outTree->Branch("numEvents_RF0", &numEvents_RF0, "numEvents_RF0/I");
   outTree->Branch("numEvents_CPU", &numEvents_CPU, "numEvents_CPU/I");
   outTree->Branch("stationId", &stationId, "stationId/I");
   outTree->Branch("lastTime", &lastTime, "lastTime/I");
+  outTree->Branch("firstTime", &firstTime, "firstTime/I");
+  outTree->Branch("runNumber", &runNumber, "runNumber/I");
 
+  runNumber = run;
+
+
+  firstTime=1;
   int numBytes=0;
   char fileName[180];
   int error=0;
@@ -116,10 +121,6 @@ void processFileList(char *inputName, char *outFileName) {
 	error=1;
 	break;
       }
-      if(stationIdInt!=0)
-	 theEventHeader.gHdr.stationId=stationId;
-      
-      //      std::cout << (int)theEventHeader.gHdr.stationId << "\t" << (int)stationId << "\n";
 
       if(theEventHeader.gHdr.numBytes>0) {
 	//	std::cout << "Num bytes: " << theEventHeader.gHdr.numBytes << "\t" << theEventHeader.numBytes << "\n";
@@ -136,6 +137,8 @@ void processFileList(char *inputName, char *outFileName) {
 	  error=1;
 	  break;
 	}
+	stationId = theEventHeader.gHdr.stationId;
+
 	process();
      	//	exit(0);
       }
@@ -150,20 +153,7 @@ void processFileList(char *inputName, char *outFileName) {
     gzclose(infile);
     //	if(error) break;
   }
-//   //Do something with stats
-//   if(numEvents > 0 && thisUnixTime > unixTimeStart)
-//     eventRate = (1.*numEvents) / (thisUnixTime - unixTimeStart);
-//   else
-//     eventRate = 0;
-
-//   printf("Run statistics ****\n\n");
-//   printf("unixTimeStart\t%u\tthisUnixTime\t%u\n", unixTimeStart, thisUnixTime);
-//   printf("numEvents\t\t%i\n", numEvents);
-//   printf("numEvents_CPU\t%i\n", numEvents_CPU);
-//   printf("numEvents_RF0\t%i\n", numEvents_RF0);
-//   printf("numEvents_CALPULSER\t%i\n", numEvents_CALPULSER);
-//   printf("eventRate\t\t%f\n", eventRate);
-
+  lastTime=1;
   process();
 
   outFile->Write();
@@ -173,7 +163,6 @@ void processFileList(char *inputName, char *outFileName) {
 
 void process() {
   static int doneInit=0;
-  static int firstTime=1;
   if(!doneInit) {
     doneInit=1;
   }  
@@ -184,8 +173,9 @@ void process() {
 
   //Create stats
   if(firstTime){
-    unixTimeStart=theEvent->unixTime;
-    lastUnixTime=unixTimeStart;
+    lastUnixTime=theEvent->unixTime;
+    thisUnixTime=lastUnixTime;
+    outTree->Fill();
     firstTime=0;
   }
   thisUnixTime=theEvent->unixTime;
@@ -213,8 +203,6 @@ void process() {
     lastNumEvents_CPU=numEvents_CPU;
     lastNumEvents_RF0=numEvents_RF0;
     lastNumEvents_CALPULSER=numEvents_CALPULSER;
-
-
   }
 
 

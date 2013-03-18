@@ -1,7 +1,7 @@
 #/bin/bash
 if [ "$1" = "" ]
 then
-   echo "usage: `basename $0` <run num>" 1>&2
+   echo "usage: `basename $0` <run num> <out File>" 1>&2
    exit 1
 fi
 
@@ -9,7 +9,7 @@ RAW_BASE_DIR=$ARA01_2013_DATA
 
 RUN_NUM=$1
 RUN_WITH_ZEROES=`printf %06d $RUN_NUM`
-OUT_FILE=~/scripts/monitoring/ARA01_run$1_info.root
+OUT_FILE=$2
 RAW_DIR=${RAW_BASE_DIR}/run_${RUN_WITH_ZEROES}
 
 
