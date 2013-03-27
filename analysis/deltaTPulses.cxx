@@ -14,8 +14,11 @@
 #include "RawAtriStationEvent.h"
 #include "UsefulAraStationEvent.h"
 #include "UsefulAtriStationEvent.h"
+#include "AraGeomTool.h"
+#include "AraStationInfo.h"
+#include "AraAntennaInfo.h"
+#include "AraCalAntennaInfo.h"
 
-//Include FFTtools.h if you want to ask the correlation, etc. tools
 
 #include "FFTtools.h"
 
@@ -28,42 +31,40 @@
 
 RawAtriStationEvent *rawAtriEvPtr;
 UsefulAtriStationEvent *realAtriEvPtr;
-
+Double_t interSample=0.1;
 Double_t getMaxX(TGraph *gr);
 
 int main(int argc, char **argv)
 {
 
-  if(argc<8) {
-    std::cout << "Usage\n" << argv[0] << " <input file> <ped file> <output file> <channel 1> <channel 2> <trigTime> <useTrigTime>\n";
+  if(argc<3) {
+    std::cout << "Usage\n" << argv[0] << " <input file>  <output file>\n";
     return 0;
   }
-  Int_t chan1 = atoi(argv[4]);
-  Int_t chan2 = atoi(argv[5]);
-  UInt_t trigTime = atoi(argv[6]);
-  Int_t useTrigTime = atoi(argv[7]);
 
   printf("------------------------------------------------------------------------------------------------------------------------------------------\n");
-  printf("\t\t%s\n", argv[0]);
+  printf("\t%s\n", argv[0]);
   printf("------------------------------------------------------------------------------------------------------------------------------------------\n");
 
   printf("input file %s\n", argv[1]);
-  printf("ped file %s\n", argv[2]);
-  printf("out file %s\n", argv[3]);
-  printf("channel1 %d channel2 %d trigTime %d useTrigTime\n", chan1, chan2, trigTime, useTrigTime);
-  
-  
+  printf("out file %s\n", argv[2]);
 
-  TFile *fpOut = new TFile(argv[3], "RECREATE");
+  TFile *fpOut = new TFile(argv[2], "RECREATE");
 
   TTree *outTree = new TTree("tDeltaT", "tree of cross correlations");
   Double_t deltaT=0;
   UInt_t thisTimeStamp=0, pps=0;
-  
+  Int_t chan1=0, chan2=0;
+  AraAntennaInfo *antInfo1=0, *antInfo2=0;
 
   outTree->Branch("deltaT", &deltaT, "deltaT/D");
   outTree->Branch("timeStamp", &thisTimeStamp, "thisTimeStamp/I");
   outTree->Branch("pps", &pps, "pps/I");
+  outTree->Branch("chan1", &chan1, "chan1/I");
+  outTree->Branch("chan2", &chan2, "chan2/I");
+  outTree->Branch("antInfo1","AraAntennaInfo",&antInfo1);
+  outTree->Branch("antInfo2","AraAntennaInfo",&antInfo2);
+
 
   TFile *fp = TFile::Open(argv[1]);
   if(!fp) {
@@ -87,13 +88,13 @@ int main(int argc, char **argv)
    TGraph *grChan2Int;
    TGraph * grCorr;
 
+
+
    eventTree->GetEntry(0);
    
    Int_t stationId = rawAtriEvPtr->stationId;
-
-   AraEventCalibrator::Instance()->setAtriPedFile(argv[2],stationId);
-
-
+   AraStationInfo *tempStationInfo = new AraStationInfo(stationId);
+   
    for(Long64_t event=0;event<numEntries;event++) {
      if(event%starEvery==0) {
        std::cerr << "*";       
@@ -104,35 +105,40 @@ int main(int argc, char **argv)
 
      thisTimeStamp = rawAtriEvPtr->timeStamp;
      pps = rawAtriEvPtr->ppsNumber;
-     //     printf("timeStamp %d timeStamp*10 - trigTime %d countinue ? %i\n", thisTimeStamp, thisTimeStamp*10-trigTime, TMath::Abs(Int_t(thisTimeStamp*10-trigTime))>1000);
 
-     //     if((TMath::Abs(Int_t(thisTimeStamp*10-trigTime))>10000)&&useTrigTime) continue;
-          
-     realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kFirstCalib);
+     if(!(rawAtriEvPtr->isCalpulserEvent())) continue;
 
-     grChan1 = realAtriEvPtr->getGraphFromElecChan(chan1);
-     grChan2 = realAtriEvPtr->getGraphFromElecChan(chan2);
-
-     grChan1Int=FFTtools::getInterpolatedGraph(grChan1,0.5);
-
-     grChan2Int=FFTtools::getInterpolatedGraph(grChan2,0.5);
+     realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kFirstCalibPlusCables);
      
-     grCorr = FFTtools::getInterpolatedCorrelationGraph(grChan1Int,grChan2Int,0.5);
-     //     grCorr=FFTtools::getCorrelationGraph(grChan1Int,grChan2Int);      
+     for(chan1=0;chan1<ANTS_PER_ATRI;chan1++){
+       antInfo1 = tempStationInfo->getAntennaInfo(chan1);
 
+       for(chan2=chan1+1;chan2<ANTS_PER_ATRI;chan2++){
+	 
+	 antInfo2 = tempStationInfo->getAntennaInfo(chan2);
 
-     deltaT = getMaxX(grCorr);
+	 grChan1 = realAtriEvPtr->getGraphFromRFChan(chan1);
+	 grChan2 = realAtriEvPtr->getGraphFromRFChan(chan2);
+
+	 grChan1Int=FFTtools::getInterpolatedGraph(grChan1,interSample);
+	 
+	 grChan2Int=FFTtools::getInterpolatedGraph(grChan2,interSample);
+	 
+	 grCorr = FFTtools::getInterpolatedCorrelationGraph(grChan1Int,grChan2Int,interSample);
+	 //     grCorr=FFTtools::getCorrelationGraph(grChan1Int,grChan2Int);      
+	 
+	 
+	 deltaT = getMaxX(grCorr);
+	 
+	 outTree->Fill();
      
-
-     outTree->Fill();
-     
-
-     delete grChan1Int;
-     delete grChan2Int;
-     delete grCorr;
-     delete grChan1;
-     delete grChan2;
-
+	 delete grChan1Int;
+	 delete grChan2Int;
+	 delete grCorr;
+	 delete grChan1;
+	 delete grChan2;
+       }
+     }
      delete realAtriEvPtr;
      
    }

@@ -52,7 +52,9 @@ class AraEventCorrelator : public TObject
    
    TH2D *getInterferometricMap(UsefulIcrrStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
    TH2D *getInterferometricMap(UsefulAtriStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
-   void fillAntennaPositions();
+   void fillAntennaPositions(Int_t stationId);
+   void fillAntennaPositionsAtri();
+   void fillAntennaPositionsIcrr();
    void fillDeltaTArrays(AraCorrelatorType::AraCorrelatorType_t corType);
    void setupDeltaTInfinity();
    void setupDeltaT40m();

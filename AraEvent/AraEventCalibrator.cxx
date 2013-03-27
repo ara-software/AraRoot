@@ -1027,7 +1027,23 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
       }
     }
   }
-  
+  //jpd change 25-03-13
+  //now subtract off the cable delays
+  if(hasCableDelays(calType)){
+    for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
+      AraGeomTool* tempGeom = new AraGeomTool();
+      Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
+      int chanId = tempGeom->getElecChanFromRFChan(rfChan, thisStationId);
+      timeMapIt=theEvent->fTimes.find(chanId);
+      if(timeMapIt!=theEvent->fTimes.end()) {
+	Int_t numPoints = (timeMapIt->second).size();
+	for(int samp=0;samp<numPoints;samp++){
+	  timeMapIt->second[samp]-=delay;
+	}
+      }
+    }
+  }
+    
   
   //  fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG
             

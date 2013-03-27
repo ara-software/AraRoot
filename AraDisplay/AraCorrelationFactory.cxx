@@ -73,17 +73,15 @@ void AraCorrelationFactory::addWaveformToCorrelation(AraWaveformGraph *inputWave
     fGrWave[1]=inputWave;
     //Now we can correlate
     TGraph *grCor = FFTtools::getInterpolatedCorrelationGraph(fGrWave[0],fGrWave[1],fDeltaT);
-    //    if(fGrWave[0]->fChan!=8) {
-      //      sprintf(graphTitle,"Correlation Ant %d %c -%d %c",fGrWave[0]->fAnt,
-      //	      AnitaPol::polAsChar(fGrWave[0]->fPol),fGrWave[1]->fAnt,
-      //	      AnitaPol::polAsChar(fGrWave[1]->fPol));
-    //    }
-    //    else {
-      //      sprintf(graphTitle,"Correlation SURF %d Chan %d - SURF %d Chan %d",
-      //	      fGrWave[0]->fSurf+1,fGrWave[0]->fChan+1,
-      //	      fGrWave[1]->fSurf+1,fGrWave[1]->fChan+1);
-    //    }    
+    if(((fGrWave[0]->fElecChan)<0)&&((fGrWave[1]->fElecChan)<0)){
+      sprintf(graphTitle, "Correlation Ant %d - %d", fGrWave[0]->fRFChan, fGrWave[1]->fRFChan);      
+    }
+    else if(((fGrWave[0]->fRFChan)<0)&&((fGrWave[1]->fRFChan)<0)){
+      sprintf(graphTitle, "Correlation Elec Chan %d - %d", fGrWave[0]->fElecChan, fGrWave[1]->fElecChan);      
+    }
+      
     new TCanvas();
+    gStyle->SetOptTitle(1);//jpd fix the title
     grCor->SetTitle(graphTitle);
     grCor->Draw("al");
     fGrWave[0]=0;

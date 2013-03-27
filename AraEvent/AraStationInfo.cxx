@@ -22,7 +22,7 @@
 ClassImp(AraStationInfo);
 
 AraStationInfo::AraStationInfo()
-  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(4)
+  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(CAL_ANTS_PER_ATRI)
 {
   numberRFChans=0;
   fNumberAntennas=0;
@@ -32,7 +32,7 @@ AraStationInfo::AraStationInfo()
 
 
 AraStationInfo::AraStationInfo(AraStationId_t stationId)
-  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(4)
+  :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(CAL_ANTS_PER_ATRI)
 {
   fStationId=stationId;
   numberRFChans=0;
@@ -42,8 +42,8 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId)
     readChannelMapDbIcrr();
   }
   else {
-    //readChannelMapDbAtri_2();
-    readChannelMapDbAtri();
+    readChannelMapDbAtri_2();
+    //    readChannelMapDbAtri();
   }
   readCalPulserDb();
 
@@ -572,7 +572,7 @@ void AraStationInfo::readChannelMapDbIcrr(){
     int nColumns=sqlite3_column_count(stmt);
    
      row=sqlite3_column_int(stmt, 2)-1;//forcing the row to be correct
-     printf("row number %i\n", row);
+     //printf("row number %i\n", row);
      
      AraAntennaInfo *thisAntInfo=this->getNewAntennaInfo(row);
 
@@ -933,7 +933,7 @@ void AraStationInfo::readCalPulserDb(){
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
   else if(fStationId==ARA_STATION3) query = "select * from ARA03";
   else{
-    fprintf(stderr, "%s : fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
+    fprintf(stderr, "%s : Not loading calpulser information - fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
     return;
   }
   //prepare an sql statment which will be used to obtain information from the data base
@@ -1246,6 +1246,7 @@ void AraStationInfo::readChannelMapDbAtri_2(){
       }//switch(column)
 
     }//column
+    sprintf(thisAntInfo->designator, "%s", thisAntInfo->getRFChanName());
   }//while(1)
 
   rc = sqlite3_finalize(stmt);

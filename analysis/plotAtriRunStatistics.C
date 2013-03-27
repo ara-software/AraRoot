@@ -18,20 +18,19 @@ TMultiGraph *grTotalRate;
 TMultiGraph *grAllRate;
 Int_t stationId;
 
-void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh, Int_t stationIdForced){
+void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh, Int_t year, Int_t month, Int_t day){
   chain = new TChain("runStatsTree");
   char fileName[256];
   for(Int_t runNo=runLow;runNo<=runHigh;runNo++){
-    sprintf(fileName, "%s_run%i_info.root", runDir, runNo);
+    sprintf(fileName, "%s_run%i_runInfo.root", runDir, runNo);
     printf("Adding %s\n", fileName);
     chain->Add(fileName);
   }
   
   chain->SetBranchAddress("stationId", &stationId);
   chain->GetEntry(0);
-  stationId=stationIdForced;
   getGraphs();
-  makePlots();
+  makePlots(year, month, day);
   
 
 }
@@ -39,7 +38,7 @@ void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh){
   chain = new TChain("runStatsTree");
   char fileName[256];
   for(Int_t runNo=runLow;runNo<=runHigh;runNo++){
-    sprintf(fileName, "%s_run%i_info.root", runDir, runNo);
+    sprintf(fileName, "%s_run%i_runInfo.root", runDir, runNo);
     printf("Adding %s\n", fileName);
     chain->Add(fileName);
   }
@@ -65,7 +64,8 @@ void getGraphs(){
   TCanvas *can = new TCanvas();
 
   //Event Rate
-  chain->Draw("eventRate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  //  chain->Draw("eventRate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  chain->Draw("eventRate:thisUnixTime", "firstTime==0&&lastTime==0");
   grTemp = (TGraph*)gPad->GetPrimitive("Graph");
   grEventRate = (TGraph*)grTemp->Clone();
   grEventRate->SetName("grEventRate");
@@ -80,7 +80,8 @@ void getGraphs(){
   grEventRate->SetMarkerStyle(26);
 
   //CalPulser
-  chain->Draw("calPulserRate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  //  chain->Draw("calPulserRate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  chain->Draw("calPulserRate:thisUnixTime", "firstTime==0&&lastTime==0");
   grTemp = (TGraph*)gPad->GetPrimitive("Graph");
   grCalPulserRate = (TGraph*)grTemp->Clone();
   grCalPulserRate->SetName("grCalPulserRate");
@@ -95,7 +96,8 @@ void getGraphs(){
   grCalPulserRate->SetMarkerStyle(26);
 
   //RF0
-  chain->Draw("RF0Rate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  //  chain->Draw("RF0Rate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  chain->Draw("RF0Rate:thisUnixTime", "firstTime==0&&lastTime==0");
   grTemp = (TGraph*)gPad->GetPrimitive("Graph");
   grRF0Rate = (TGraph*)grTemp->Clone();
   grRF0Rate->SetName("grRF0Rate");
@@ -110,7 +112,8 @@ void getGraphs(){
   grRF0Rate->SetMarkerStyle(24);
 
   //CPU
-  chain->Draw("CPURate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  //  chain->Draw("CPURate:thisUnixTime", "thisUnixTime-lastUnixTime>=60*30");
+  chain->Draw("CPURate:thisUnixTime", "firstTime==0&&lastTime==0");
   grTemp = (TGraph*)gPad->GetPrimitive("Graph");
   grCPURate = (TGraph*)grTemp->Clone();
   grCPURate->SetName("grCPURate");
@@ -129,8 +132,11 @@ void getGraphs(){
 
 }
 
-void makePlots(){
+void makePlots(Int_t year, Int_t month, Int_t day){
   
+  TTimeStamp *timeThen = new TTimeStamp(year, month, day,0,0,0);
+  TTimeStamp *timeNow = new TTimeStamp();
+
   //Calibration Pulser and Forced trigger rate
 
   canCalForceRate = new TCanvas("canCalForceRate");
@@ -144,8 +150,10 @@ void makePlots(){
   grCalForceRate->Add(grCalPulserRate, "l");
   grCalForceRate->Draw("a");
   grCalForceRate->GetXaxis()->SetTitle("Time");
+  grCalForceRate->GetXaxis()->SetRangeUser(timeThen->GetSec(), timeNow->GetSec());
   grCalForceRate->GetXaxis()->SetTimeDisplay(1);
-  grCalForceRate->GetXaxis()->SetTimeFormat("%Hh-%d");
+  grCalForceRate->GetXaxis()->SetTimeFormat("%d %B %F1970-01-01");
+
   grCalForceRate->GetYaxis()->SetTitle("Rate (Hz)");
 
   legCalForceRate = new TLegend(0.85,0.75,1,0.9);
@@ -168,8 +176,9 @@ void makePlots(){
   grTotalRate->Add(grRF0Rate, "l");
   grTotalRate->Draw("a");
   grTotalRate->GetXaxis()->SetTitle("Time");
+  grTotalRate->GetXaxis()->SetRangeUser(timeThen->GetSec(), timeNow->GetSec());
   grTotalRate->GetXaxis()->SetTimeDisplay(1);
-  grTotalRate->GetXaxis()->SetTimeFormat("%Hh-%d");
+  grTotalRate->GetXaxis()->SetTimeFormat("%d %B %F1970-01-01");
   grTotalRate->GetYaxis()->SetTitle("Rate (Hz)");
 
   legTotalRate = new TLegend(0.85,0.75,1,0.9);
@@ -194,8 +203,9 @@ void makePlots(){
   //  grAllRate->Add(grCPURate, "l");
   grAllRate->Draw("a");
   grAllRate->GetXaxis()->SetTitle("Time");
+  grAllRate->GetXaxis()->SetRangeUser(timeThen->GetSec(), timeNow->GetSec());
   grAllRate->GetXaxis()->SetTimeDisplay(1);
-  grAllRate->GetXaxis()->SetTimeFormat("%d %B %Y %F1970-01-01");
+  grAllRate->GetXaxis()->SetTimeFormat("%d %B %F1970-01-01");
   grAllRate->GetYaxis()->SetTitle("Rate (Hz)");
 
   legAllRate = new TLegend(0.85,0.75,1,0.9);

@@ -99,7 +99,7 @@ class AraAntennaInfo: public TObject
    AraStationId_t fStationId;
 
    //ICRR Specific Numbers
-   Int_t chanNum;
+
    AraDaqChanType::AraDaqChanType_t daqChanType;
    Int_t numLabChans;
    AraLabChip::AraLabChip_t labChip;
@@ -107,17 +107,10 @@ class AraAntennaInfo: public TObject
    Int_t isDiplexed; ///< Depricated attempt at un-diplexing//FIXME
    Int_t diplexedChans[2]; ///< Depricated attempt at un-diplexing//FIXME
    Int_t preAmpNum;
-
    Int_t rcvrNum;
 
-   char designator[3]; ///< Depricated -- use antName and holeName
-
    char locationName[4];
-
    Double_t antLocationArray[3]; ///< Array-centric antenna location x,y,z in m
-
-
-
    AraAntDir::AraAntDir_t antDir; 
 
    Double_t debugHolePosition[3]; ////< x,y,z in m
@@ -133,12 +126,12 @@ class AraAntennaInfo: public TObject
 
 
    //ATRI & ICRR -- Common data types
-
+   Int_t chanNum; ///< RFChannel number - 0-3 TV 4-7 BV 8-11 TH 12-15 BH 16-19 Surface 
    AraAntPol::AraAntPol_t polType; ///< Polarisation of antenna (vertical, horizontal, surface);
    Int_t antPolNum; ///< The antenna number for this polarisation (0-7 for HPol, 0-7 for VPol and 0-3 for Surface)
 
    Int_t daqChanNum; ///< The electronics channel number for this antenna (0-7 DDA1, 8-15 DDA2, 16-23 DDA3, 24-31 DDA4)
-   Int_t daqTrigChan; ///< The trigger channel number
+   Int_t daqTrigChan; ///< The trigger channel number -- Need to confirm should be (daqChanNum % 8 ) + (daqChanNum / 8 )
    Int_t foamId; ///< ID of the Fibre Optic Amplification Module (FOAM) for this channel
    Int_t foamChanNum; ///< FOAM channel for this antenna
    AraAntType::AraAntType_t antType; ///< Type of antenna used
@@ -154,9 +147,8 @@ class AraAntennaInfo: public TObject
    Double_t highPassFilterMhz; ///< High Pass filter in the DAQ box signal chain
    Double_t lowPassFilterMhz; ///< Low pass filter in the DAQ box signal chain
 
-
-
    Double_t avgNoiseFigure; ///< Some measure of signal chain average noise figure
+   char designator[3]; ///< Hole+Antenna (e.g. BH2TVPol)
 
    //ATRI -- new data
    char holeName[6];

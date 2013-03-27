@@ -102,7 +102,7 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   fACMGeomTool=AraGeomTool::Instance();
   fLastStationId=ARA_STATION1B;
   fillRfChanMap(fLastStationId);
-  fNumAntsInMap=4;
+  fNumAntsInMap=7;//FIXME
   fWebPlotterMode=0;
   fPassBandFilter=0;
   fNotchFilter=0;
@@ -129,8 +129,8 @@ AraAtriCanvasMaker::AraAtriCanvasMaker(AraCalType::AraCalType_t calType)
   fThisMinTime=0;
   fThisMaxTime=100;
   if(AraCalType::hasCableDelays(calType)) {
-    fMinTimeLimit=-200;
-    fMaxTimeLimit=150;
+    fMinTimeLimit=-100;
+    fMaxTimeLimit=500;
   }
   fMinPowerLimit=-60;
   fMaxPowerLimit=60;
@@ -1160,6 +1160,7 @@ TPad *AraAtriCanvasMaker::getIntMapCanvas(UsefulAtriStationEvent *evPtr,
   plotPad->Clear();
   AraEventCorrelator *araCorPtr = AraEventCorrelator::Instance(fNumAntsInMap, evPtr->stationId);
 
+
   static TH2D* histMapH=0;  
   static TH2D* histMapV=0;  
   plotPad->Divide(1,2);
@@ -1420,7 +1421,7 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3)
+      if(row==4)
 	paddy1->SetBottomMargin(0.1);
       paddy1->Draw();
       paddy1->cd();
@@ -1441,7 +1442,7 @@ void AraAtriCanvasMaker::setupRFChanPadWithFrames(TPad *plotPad)
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==3) {
+      if(row==4) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);
@@ -1540,7 +1541,7 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
 	paddy1->SetRightMargin(0.01);
       if(column==0)
 	paddy1->SetLeftMargin(0.1);
-      if(row==3)
+      if(row==4)
 	paddy1->SetBottomMargin(0.1);
       paddy1->Draw();
       paddy1->cd();
@@ -1561,7 +1562,7 @@ void AraAtriCanvasMaker::setupAntPadWithFrames(TPad *plotPad)
       framey->GetYaxis()->SetLabelSize(0.1);
       framey->GetYaxis()->SetTitleSize(0.1);
       framey->GetYaxis()->SetTitleOffset(0.5);
-      if(row==3) {
+      if(row==4) {
 	framey->GetXaxis()->SetLabelSize(0.09);
 	framey->GetXaxis()->SetTitleSize(0.09);
 	framey->GetYaxis()->SetLabelSize(0.09);

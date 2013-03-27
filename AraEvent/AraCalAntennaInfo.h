@@ -42,9 +42,9 @@ class AraCalAntennaInfo: public TObject
    Int_t calAntId; ///< Just a logical antenna numbering
    AraAntType::AraAntType_t antType; ///< What kind of antenna is it
    AraAntPol::AraAntPol_t polType; ///< What is the polarisation
-   char locationName[4];  ///< Which hole e.g. BH5 or BH6
-   char antName[4]; ///< Simple antenna name e.g. CH1
-   char pulserName[4]; ///< Simple pulser name e.g. P1
+   char locationName[CAL_ANTS_PER_ATRI];  ///< Which hole e.g. BH5 or BH6
+   char antName[CAL_ANTS_PER_ATRI]; ///< Simple antenna name e.g. CH1
+   char pulserName[CAL_ANTS_PER_ATRI]; ///< Simple pulser name e.g. P1
    Double_t antLocation[3]; ///< Default x,y,z in m
    Double_t antLocationCalib[3]; ///< Calibrated x,y,z in m
    Double_t antLocationArray[3]; ///< Default x,y,z in m

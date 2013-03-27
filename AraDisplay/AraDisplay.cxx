@@ -5,11 +5,11 @@
 /////     The main Ara Display class displaying data                     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
-/*! \mainpage Ara ROOT v3.3 Software
+/*! \mainpage Ara ROOT v3.8 Software
  *
  * \section intro_sec Introduction
  *
- * Here is some Doxygen generated documentation for the ARA ROOT v3.3  software which is based on the ANITA software. 
+ * Here is some Doxygen generated documentation for the ARA ROOT v3.8  software which is based on the ANITA software. 
  *
  * \section prereq_sec Prerequisites
  *
@@ -93,24 +93,24 @@
  *\section UW_Systems UW Systems
 
  *There is a common installation of AraRoot on the UW systems, an example analysis area and setup scripts for users
- *The installation files are in /home/jdavies/repositories/install/AraRoot/branches/3.3/
+ *The installation files are in /home/jdavies/repositories/install/AraRoot/branches/3.8/
  *The setup scripts are in /home/jdavies/repositories/setupScripts
- *The example analysis area is in /home/jdavies/analysis/AraRoot/branches/3.3\n\n
+ *The example analysis area is in /home/jdavies/analysis/AraRoot/branches/3.8\n\n
  *
  *Steps to build your own analysis \n\n
  *-Copy the analysis area to your own user area
- *<PRE> cp /home/jdavies/analysis/AraRoot/branches/3.3 ~/analysis/AraRoot/branches/3.3</PRE>\n
- *-Copy accross the AraRoot 3.3 setup script
- *<PRE> cp /home/jdavies/repositories/setupScripts/AraRoot_v3.3.sh ~/setupScripts/</PRE>\n
- *-Edit the CMakeLists.txt file in ~/analysis/AraRoot/branches/3.3
+ *<PRE> cp /home/jdavies/analysis/AraRoot/branches/3.8 ~/analysis/AraRoot/branches/3.8</PRE>\n
+ *-Copy accross the AraRoot 3.8 setup script
+ *<PRE> cp /home/jdavies/repositories/setupScripts/AraRoot_v3.8.sh ~/setupScripts/</PRE>\n
+ *-Edit the CMakeLists.txt file in ~/analysis/AraRoot/branches/3.8
  *-Ammend the lines building exampleLoop to your own analysis code name\n
  *<PRE> add_executable(exampleLoop exampleLoop.cxx)</PRE>
  *<PRE> target_link_libraries(exampleLoop ${ARAEVENT_LIBRARIES} ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})</PRE>\n
  *-Source the setup script
- *<PRE> source ~/setupScripts/AraRoot_v3.3.sh</PRE>\n
+ *<PRE> source ~/setupScripts/AraRoot_v3.8.sh</PRE>\n
  *-Build the binary using the INSTALL.sh script
  *<PRE> bash INSTALL.sh < 0 for re-build or 1 for force rebuild></PRE>
- *-The binary will be in /analysis/AraRoot/branches/3.3/bin
+ *-The binary will be in /analysis/AraRoot/branches/3.8/bin
 
  *\section trouble_sec Troubleshooting
 
@@ -365,7 +365,7 @@ int AraDisplay::loadEventTree(char *eventFile)
   fEventTree->ResetBranchAddresses();
   fEventTree->SetBranchAddress("event",&fRawStationEventPtr);  
   fEventTree->GetEntry(1);
-  std::cout << "fRawStationEventPtr->stationId: " << (int)fRawStationEventPtr->stationId << "\n";
+  //std::cout << "fRawStationEventPtr->stationId: " << (int)fRawStationEventPtr->stationId << "\n";
   fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
 
   fEventTree->ResetBranchAddresses();

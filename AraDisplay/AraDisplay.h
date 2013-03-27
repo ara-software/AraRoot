@@ -141,38 +141,39 @@ class AraDisplay
 
   AraControlPanel *fControlPanel;
 
-   TCanvas *fAraCanvas; ///< The main event display canvas.
-   TPad *fAraMainPad; ///< The main event display pad.
-   TPad *fAraEventInfoPad; ///< The event display info pad.
+  TCanvas *fAraCanvas; ///< The main event display canvas.
+  TPad *fAraMainPad; ///< The main event display pad.
+  TPad *fAraEventInfoPad; ///< The event display info pad.
+  
+  UsefulIcrrStationEvent *fIcrrUsefulEventPtr; ///< Pointer to the calibrated event.
+  RawIcrrStationEvent *fIcrrRawEventPtr; ///< Pointer to the raw event.
+  UsefulAtriStationEvent *fAtriUsefulEventPtr; ///< Pointer to the calibrated event.
+  RawAtriStationEvent *fAtriRawEventPtr; ///< Pointer to the raw event.
+  Int_t fCurrentRun; ///<Run number
+  RawAraStationEvent *fRawStationEventPtr; ///< Pointer to raw event base class - used to identify the electronics type (Atri vs. Icrr)
+  
+  
+  TButton *fElecViewButton; ///< The vertical polarisation button.
+  TButton *fRFViewButton; ///< The horizontal polarisation button.
+  TButton *fAntViewButton; ///< The both polarisations button.
+  TButton *fMapViewButton; ///< The Map view button.
+  //TButton *fPayloadButton; ///< The payload view button.
+  
+  TButton *fWaveformButton; ///< The waveform view button.
+  TButton *fPowerButton; ///< The FFT view button.
+  TButton *fHilbertButton; ///< The Hilbert envelope view button.
+  TButton *fAverageFFTButton; ///< The average FFT button.
+  //   TButton *fTimeEntryButton; ///< The button that toggles between events and times
+  
+  
+  Int_t fInEventPlayMode; ///< Flag that indicates playback mode
+  Int_t fEventPlaySleepMs; ///< Length of sleep between events in playback mode.
+  Int_t fIcrrData;
+  Int_t fApplyEventCut; ///< Apply an event cut
+  TEventList *fCutEventList; ///<The cut eventlist
+  
 
-   UsefulIcrrStationEvent *fIcrrUsefulEventPtr; ///< Pointer to the calibrated event.
-   RawIcrrStationEvent *fIcrrRawEventPtr; ///< Pointer to the raw event.
-   UsefulAtriStationEvent *fAtriUsefulEventPtr; ///< Pointer to the calibrated event.
-   RawAtriStationEvent *fAtriRawEventPtr; ///< Pointer to the raw event.
-   Int_t fCurrentRun; ///<Run number
-   RawAraStationEvent *fRawStationEventPtr; ///< Pointer to raw event base class - used to identify the electronics type (Atri vs. Icrr)
-
-      
-   TButton *fElecViewButton; ///< The vertical polarisation button.
-   TButton *fRFViewButton; ///< The horizontal polarisation button.
-   TButton *fAntViewButton; ///< The both polarisations button.
-   TButton *fMapViewButton; ///< The Map view button.
-   //TButton *fPayloadButton; ///< The payload view button.
-
-   TButton *fWaveformButton; ///< The waveform view button.
-   TButton *fPowerButton; ///< The FFT view button.
-   TButton *fHilbertButton; ///< The Hilbert envelope view button.
-   TButton *fAverageFFTButton; ///< The average FFT button.
-   //   TButton *fTimeEntryButton; ///< The button that toggles between events and times
-
-
-   Int_t fInEventPlayMode; ///< Flag that indicates playback mode
-   Int_t fEventPlaySleepMs; ///< Length of sleep between events in playback mode.
-   Int_t fIcrrData;
-   Int_t fApplyEventCut; ///< Apply an event cut
-   TEventList *fCutEventList; ///<The cut eventlist
-   
-   AraCalType::AraCalType_t fCalType; ///< The waveform calibration type.
+  AraCalType::AraCalType_t fCalType; ///< The waveform calibration type.
 
 };
 

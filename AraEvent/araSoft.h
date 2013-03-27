@@ -34,6 +34,7 @@
 
 ///Hardware descriptors
 #define ANTS_PER_ATRI 20
+#define CAL_ANTS_PER_ATRI 4
 #define DDA_PER_ATRI 4
 #define BLOCKS_PER_DDA 512
 #define RFCHAN_PER_DDA 8

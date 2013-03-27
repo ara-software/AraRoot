@@ -17,7 +17,7 @@ AraEventCorrelator * AraEventCorrelator::fgInstance=0;
 AraEventCorrelator::AraEventCorrelator(Int_t numAnts, Int_t stationId)
 {
   //Default constructor
-  fNumAnts=numAnts;
+    fNumAnts=numAnts;
   fNumPairs=0;
   fStationId=stationId;
   for(int first=0;first<(fNumAnts-1);first++) {
@@ -28,9 +28,8 @@ AraEventCorrelator::AraEventCorrelator(Int_t numAnts, Int_t stationId)
     }
   }
 
-
   //  fillDeltaTArrays();
-  fillAntennaPositions();
+  fillAntennaPositions(stationId);
   setupDeltaTInfinity();
   setupDeltaT40m();
 }
@@ -52,8 +51,68 @@ AraEventCorrelator*  AraEventCorrelator::Instance(Int_t numAnts, Int_t stationId
   return fgInstance;
 }
 
-void AraEventCorrelator::fillAntennaPositions()
-{AraGeomTool *araGeom=AraGeomTool::Instance();
+void AraEventCorrelator::fillAntennaPositions(Int_t stationId){
+  if(AraGeomTool::isAtriStation(stationId)) fillAntennaPositionsAtri();
+  else if(AraGeomTool::isIcrrStation(stationId)) fillAntennaPositionsIcrr();
+  else fprintf(stderr, "%s station %i is neither ATRI nor ICRR\n", __FUNCTION__, (int)stationId);
+
+}
+
+void AraEventCorrelator::fillAntennaPositionsAtri()
+{
+  AraGeomTool *araGeom=AraGeomTool::Instance();  
+  for(int ant=0;ant<ANTS_PER_ATRI;ant++){
+    int antPolNum=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antPolNum; 
+    if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kVertical) {
+      if(antPolNum<8) {
+	fRfChanVPol[antPolNum]=ant;
+	fVPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
+	fVPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
+	fVPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[2];
+	fVPolRho[antPolNum]=TMath::Sqrt(fVPolPos[antPolNum][0]*fVPolPos[antPolNum][0]+
+					fVPolPos[antPolNum][1]*fVPolPos[antPolNum][1]);
+	fVPolPhi[antPolNum]=TMath::ATan2(fVPolPos[antPolNum][1],fVPolPos[antPolNum][0]);
+      }
+    }
+    if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kHorizontal) {
+      if(antPolNum<8) {
+	fRfChanHPol[antPolNum]=ant;
+	fHPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
+	fHPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
+	fHPolPos[antPolNum][2]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[2];
+	fHPolRho[antPolNum]=TMath::Sqrt(fHPolPos[antPolNum][0]*fHPolPos[antPolNum][0]+
+					fHPolPos[antPolNum][1]*fHPolPos[antPolNum][1]);
+	fHPolPhi[antPolNum]=TMath::ATan2(fHPolPos[antPolNum][1],fHPolPos[antPolNum][0]);
+      }
+    }
+  }
+  std::cout << "\n";
+  for(int i=0;i<8;i++) {
+    std::cout << "V\t" << i << "\t" << fVPolPos[i][0] << "\t" << fVPolPos[i][1] << "\t" << fVPolPos[i][2] << "\n";
+  }
+  for(int i=0;i<8;i++) {
+    std::cout << "H\t" << i << "\t" << fHPolPos[i][0] << "\t" << fHPolPos[i][1] << "\t" << fHPolPos[i][2] << "\n";
+  }
+    std::cout << "\n";
+  //Now fill the arrays with angles
+  Double_t deltaPhi=360./NUM_PHI_BINS;
+  Double_t deltaTheta=180./NUM_THETA_BINS;
+  
+  for(int i=0;i<NUM_PHI_BINS;i++) {
+    fPhiWaveDeg[i]=-180+0.5*deltaPhi+deltaPhi*i;
+    fPhiWave[i]=fPhiWaveDeg[i]*TMath::DegToRad();
+  }
+  for(int i=0;i<NUM_THETA_BINS;i++) {
+    fThetaWaveDeg[i]=-90+0.5*deltaTheta+deltaTheta*i;
+    fThetaWave[i]=fThetaWaveDeg[i]*TMath::DegToRad();
+  }
+  
+}
+
+void AraEventCorrelator::fillAntennaPositionsIcrr()
+{
+  AraGeomTool *araGeom=AraGeomTool::Instance();
+  
   for(int ant=0;ant<ANTS_PER_ICRR;ant++) {   
     int antPolNum=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antPolNum; 
     std::cerr << ant << "\t" << antPolNum << "\t" << araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType << "\n";
@@ -80,12 +139,14 @@ void AraEventCorrelator::fillAntennaPositions()
       }
     }
   }
+  std::cout << "\n";
   for(int i=0;i<7;i++) {
     std::cout << "V\t" << i << "\t" << fVPolPos[i][0] << "\t" << fVPolPos[i][1] << "\t" << fVPolPos[i][2] << "\n";
   }
   for(int i=0;i<7;i++) {
     std::cout << "H\t" << i << "\t" << fHPolPos[i][0] << "\t" << fHPolPos[i][1] << "\t" << fHPolPos[i][2] << "\n";
   }
+  std::cout << "\n";
 
  //Now fill the arrays with angles
   Double_t deltaPhi=360./NUM_PHI_BINS;
@@ -130,6 +191,7 @@ void AraEventCorrelator::setupDeltaTInfinity()
 void AraEventCorrelator::setupDeltaT40m() 
 {
   Double_t R=41.8;
+
  
   for(int pair=0;pair<fNumPairs;pair++) {
     int ind1=0;
@@ -370,18 +432,18 @@ TH2D *AraEventCorrelator::getInterferometricMap(UsefulAtriStationEvent *evPtr, A
 
   if(polType==AraAntPol::kVertical) {
     for(int ind=0;ind<fNumAnts;ind++) {
-      //      std::cerr << ind << "\t" << fRfChanVPol[ind] << "\n";
+      std::cerr << ind << "\t" << fRfChanVPol[ind] << "\n";
       grRaw[ind]=evPtr->getGraphFromRFChan(fRfChanVPol[ind]);
       grInt[ind]=FFTtools::getInterpolatedGraph(grRaw[ind],0.5);
       grNorm[ind]=getNormalisedGraph(grInt[ind]);
     }
-    //    std::cerr << "Got graphs and made int maps\n";
+    std::cerr << "Got graphs and made int maps\n";
 
     for(int pair=0;pair<fNumPairs;pair++) {
       int ind1=0;
       int ind2=0;
       getPairIndices(pair,ind1,ind2);
-      //      std::cerr << pair << "\t" << ind1 << "\t" << ind2 << "\n";
+      std::cerr << pair << "\t" << ind1 << "\t" << ind2 << "\n";
 
       grCor[pair]=FFTtools::getCorrelationGraph(grNorm[ind1],grNorm[ind2]);      
       for(int phiBin=0;phiBin<NUM_PHI_BINS;phiBin++) {

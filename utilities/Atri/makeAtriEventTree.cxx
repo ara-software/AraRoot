@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     stationIdInt=atoi(argv[4]);  //To override station id
     stationId=AraGeomTool::getAtriStationId(stationIdInt);
   }
-  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
+  //  std::cout << argc << "\t" << stationIdInt << "\t" << (int)stationId << "\n";
 
   makeTree(argv[1],argv[2]);
   delete [] dataBuffer;
