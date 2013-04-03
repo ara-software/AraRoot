@@ -39,7 +39,7 @@ class UsefulAtriStationEvent: public RawAtriStationEvent, public UsefulAraStatio
 
 
    Int_t getNumElecChannels() {return fNumChannels;} ///< Returns the number of electronics channels
-   Int_t getNumRFChannels() {return fNumChannels;} ///< Returns the number of RF channels - NB this may differ from the number of electronics channels
+   Int_t getNumRFChannels(); ///< Returns the number of RF channels - NB this may differ from the number of electronics channels
    TGraph *getGraphFromElecChan(int chanId); ///< Returns the voltages-time graph for the appropriate electronics channel
    TGraph *getGraphFromRFChan(int chanId); ///< Returns the voltage-time graph for the appropriate rf channel
    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns - the returned TGraph is from FFTtools::makePowerSpectrumMilliVoltsNanoS$

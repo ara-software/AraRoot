@@ -147,3 +147,10 @@ int UsefulAtriStationEvent::fillFFTHistoForRFChan(int chan, TH1D *histFFT)
 
 }
 
+
+
+Int_t UsefulAtriStationEvent::getNumRFChannels() 
+{
+  return AraGeomTool::Instance()->getStationInfo(stationId)->getNumRFChans();
+
+}
