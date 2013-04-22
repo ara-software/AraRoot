@@ -1,4 +1,0 @@
-<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
-<ul>
-<li>Last Event -- <!--#flastmod virtual="/monitor/lastEvent"--></li>
-</ul>

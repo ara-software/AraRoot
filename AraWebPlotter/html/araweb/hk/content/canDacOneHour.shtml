@@ -1,5 +1,0 @@
-<h3>Current Time -- <!--#echo var="DATE_LOCAL"--></h3>
-<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
-<h3>Last Hk Packet -- <!--#flastmod virtual="/monitor/lastHk"--></h3>
-<a name="canDac"><h3>DAC</h3></a>
-<img style="border:outset" src="canDacOneHour.png" alt="canDac" />

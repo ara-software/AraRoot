@@ -1,5 +1,0 @@
-<h3>Current Time -- <!--#echo var="DATE_LOCAL"--></h3>
-<h3>Current Time -- <!--#echo var="DATE_GMT" --></h3>
-<h3>Last Event Packet -- <!--#flastmod virtual="/monitor/lastEvent"--></h3>
-<a name="canEventRate"><h3>Event Rate</h3></a>
-<img style="border:outset" src="canEventRateSixHours.png" alt="canEventRate" />
