@@ -202,23 +202,7 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
   binWidthsTree->Branch("time", &time, "time/D");
   binWidthsTree->Branch("index", &index, "index/I");
   binWidthsTree->Branch("epsilon", &epsilon, "epsilon/D");
- 
- 
-  Int_t zcNum;
-  Double_t zcEst;
-  Double_t zcMeas;
-  TTree *zcTree = new TTree("zcTree", "zcTree");
-  zcTree->Branch("dda", &dda, "dda/I");
-  zcTree->Branch("chan", &chan, "chan/I");
-  zcTree->Branch("capArray", &capArray, "capArray/I");
-  zcTree->Branch("sample", &sample, "sample/I");
-  zcTree->Branch("zcNum", &zcNum, "zcNum/I");
-  zcTree->Branch("zcEst",&zcEst,"zcEst/D");
-  zcTree->Branch("zcFirst",&zcFirst,"zcFirst/D");
-  zcTree->Branch("zcMeas",&zcMeas,"zcMeas/D");
   
-  
-
 
   //BinWidth Calibration
   for(int entry=0;entry<numEntries;entry++){
@@ -300,11 +284,6 @@ Int_t calibrateDdaChan(char* baseDirName, Int_t runNum, Int_t pedNum, Double_t f
       }//half
     }//chan
   }//dda
-
-
-
-
-
 
   //Interleave Calibration
   //if(debug) numEntries=10;

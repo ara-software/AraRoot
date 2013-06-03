@@ -57,6 +57,7 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
   TGraph *gr = new TGraph(fTimes[chanId].size(),&(fTimes[chanId][0]),&(fVolts[chanId][0]));
 
   //Why do we need to sort the array. Shouldn't this be done in AraEventCalibrator??
+  //FIXME -- jpd - this is my dumb idea
   gr->Sort();
   
   return gr;

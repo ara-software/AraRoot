@@ -18,11 +18,11 @@ TMultiGraph *grTotalRate;
 TMultiGraph *grAllRate;
 Int_t stationId;
 
-void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh, Int_t year, Int_t month, Int_t day){
+void plotAtriRunStatistics(char *baseName, Int_t runLow, Int_t runHigh, Int_t numWeeks){
   chain = new TChain("runStatsTree");
   char fileName[256];
   for(Int_t runNo=runLow;runNo<=runHigh;runNo++){
-    sprintf(fileName, "%s_run%i_runInfo.root", runDir, runNo);
+    sprintf(fileName, "%s_run%i.root", baseName, runNo);
     printf("Adding %s\n", fileName);
     chain->Add(fileName);
   }
@@ -30,15 +30,20 @@ void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh, Int_t year
   chain->SetBranchAddress("stationId", &stationId);
   chain->GetEntry(0);
   getGraphs();
-  makePlots(year, month, day);
-  
-
+  TTimeStamp *timeThen = new TTimeStamp();
+  timeThen->Add(-7*24*60*60*numWeeks);
+  makePlots(timeThen->GetSec());
 }
-void plotAtriRunStatistics(char *runDir, Int_t runLow, Int_t runHigh){
+
+
+
+
+
+void plotAtriRunStatistics(char *baseName, Int_t runLow, Int_t runHigh){
   chain = new TChain("runStatsTree");
   char fileName[256];
   for(Int_t runNo=runLow;runNo<=runHigh;runNo++){
-    sprintf(fileName, "%s_run%i_runInfo.root", runDir, runNo);
+    sprintf(fileName, "%s_run%i.root", baseName, runNo);
     printf("Adding %s\n", fileName);
     chain->Add(fileName);
   }
@@ -132,9 +137,10 @@ void getGraphs(){
 
 }
 
-void makePlots(Int_t year, Int_t month, Int_t day){
+void makePlots(time_t then){
   
-  TTimeStamp *timeThen = new TTimeStamp(year, month, day,0,0,0);
+
+  TTimeStamp *timeThen = new TTimeStamp(then);
   TTimeStamp *timeNow = new TTimeStamp();
 
   //Calibration Pulser and Forced trigger rate

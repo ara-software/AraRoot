@@ -4,22 +4,21 @@
 ##  Changes to make
 ################################################################################################
 
-AraEvent/AraEventCalibrator needs to be able to handle multiple Atri stations
-	 Replicate the Icrr multiple pedestal / multiple calibrations format
 
-	 ->Long Term / Next release
-	 ->Load the calibration only when asked
-	 ->ATRI - only have in memory the station's pedestal and calib values
+Fix output from makeAtriEventHkTree.cxx
 
+Remove 0 length error in makeAtriEventHkTree.cxx
 
-utilities
-	utility script to update the geometry / antenna information sqlite3 table as per Hagar Landsman's email
-	This should be a web app
 
 
 ################################################################################################
 ##  Changes made
 ################################################################################################
+
+ARA 2 and ARA3 channel mapping
+
+ARA2 and ARA3 geometry information
+     What is where for receive and transmit antennas
 
 ATRI Event Format
 

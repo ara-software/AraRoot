@@ -23,7 +23,8 @@ add_subdirectory(utilities/Atri)
 add_subdirectory(utilities/Icrr)
 add_subdirectory(analysis)
 add_subdirectory(AraVertex)
-add_subdirectory(calibration/ATRI) #FIXME -- is this working?
+add_subdirectory(calibration/ATRI) 
+add_subdirectory(calibration/ATRI/voltageCalib) 
 
 add_subdirectory(debugging/sample_lines)
 add_subdirectory(debugging/data_lines)

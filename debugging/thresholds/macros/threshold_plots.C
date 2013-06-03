@@ -6,7 +6,8 @@ TCanvas *canL2[4];
 TCanvas *canL3;
 TCanvas *canL4;
 TCanvas *canT1;
-TH1* histL1[4][4];
+TGraph *grL1[4][4];
+TGraph *tempGr;
 TH1* histL2[4][4];
 TH1* histL3[2];
 TH1* histL4[4];
@@ -29,19 +30,57 @@ TCanvas *getL1Canvas(Int_t tda){
   char canName[100];
   char histExp[100];
   char histCut[100];
-  char histName[100];
+  char grName[100];
   sprintf(canName, "canL1Tda%i", tda);
 
   canL1[tda] = new TCanvas(canName, canName);
   canL1[tda]->Divide(2,2);
   for(int chan=0;chan<4;chan++){
-    canL1[tda]->cd(chan+1);
-    sprintf(histName, "histL1ScalerTda%iChan%i", tda, chan);
-    sprintf(histExp, "eventHk.getSingleChannelRateHz(%i, %i):thresholdDac[%i]>>%s", tda, chan, tda*4+chan, histName);
+    if(grL1[tda][chan]) delete grL1[tda][chan];
+
+    TCanvas *tempCan = new TCanvas();
+    sprintf(grName, "grL1ScalerTda%iChan%i", tda, chan);
+    sprintf(histExp, "eventHk.getSingleChannelRateHz(%i, %i):thresholdDac[%i]", tda, chan, tda*4+chan);
     hkTree->Draw(histExp);
-    histL1[tda][chan] = (TH1*) gDirectory->Get(histName);
-    histL1[tda][chan]->SetName(histName);
-    histL1[tda][chan]->SetTitle(histName);
+    tempGr = (TGraph*) tempCan->GetPrimitive("Graph");
+    grL1[tda][chan] = (TGraph*)tempGr->Clone(grName);
+    grL1[tda][chan]->SetTitle(grName);
+    delete tempCan;
+    canL1[tda]->cd(chan+1);
+    grL1[tda][chan]->Draw("AP");
+
+  }
+
+    
+}
+TCanvas *getL1Canvas(Int_t tda,char *variable){
+  if(canL1[tda]) delete canL1[tda];
+  for(int i=0;i++;i<4){
+    if(histL1[tda][i]) delete histL1[tda][i];
+  }
+
+  char canName[100];
+  char histExp[100];
+  char histCut[100];
+  char grName[100];
+  sprintf(canName, "canL1Tda%i", tda);
+
+  canL1[tda] = new TCanvas(canName, canName);
+  canL1[tda]->Divide(2,2);
+  for(int chan=0;chan<4;chan++){
+    if(grL1[tda][chan]) delete grL1[tda][chan];
+
+    TCanvas *tempCan = new TCanvas();
+    sprintf(grName, "grL1ScalerTda%iChan%i", tda, chan);
+    sprintf(histExp, "l1Scaler[%i]:%s", tda*4+chan, variable);
+    hkTree->Draw(histExp);
+    tempGr = (TGraph*) tempCan->GetPrimitive("Graph");
+    grL1[tda][chan] = (TGraph*)tempGr->Clone(grName);
+    grL1[tda][chan]->SetTitle(grName);
+    delete tempCan;
+    canL1[tda]->cd(chan+1);
+    grL1[tda][chan]->Draw("AP");
+
   }
 
     
@@ -49,9 +88,6 @@ TCanvas *getL1Canvas(Int_t tda){
 
 TCanvas *getL2Canvas(Int_t tda){
   if(canL2[tda]) delete canL2[tda];
-  for(int i=0;i++;i<4){
-    if(histL2[tda][i]) delete histL2[tda][i];
-  }
 
   char canName[100];
   char histExp[100];

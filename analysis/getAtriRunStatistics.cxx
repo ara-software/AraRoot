@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
   dataBuffer = new char[200000];
   theEvent=0;
   if(argc<4) {
-    std::cout << "Usage: " << basename(argv[0]) << " <file list> <out dir>" << std::endl;
+    std::cout << "Usage: " << basename(argv[0]) << " <file list> <outFileName> <run>" << std::endl;
     return -1;
   }
 
