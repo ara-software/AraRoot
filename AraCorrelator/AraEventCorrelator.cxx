@@ -117,7 +117,7 @@ void AraEventCorrelator::fillAntennaPositionsIcrr()
     int antPolNum=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->antPolNum; 
     std::cerr << ant << "\t" << antPolNum << "\t" << araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType << "\n";
     if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kVertical) {
-      if(antPolNum<7) {
+      if(antPolNum<MAX_NUM_ANTS) {
 	fRfChanVPol[antPolNum]=ant;
 	fVPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
 	fVPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
@@ -128,7 +128,7 @@ void AraEventCorrelator::fillAntennaPositionsIcrr()
       }
     }
     if(araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->polType==AraAntPol::kHorizontal) {
-      if(antPolNum<7) {
+      if(antPolNum<MAX_NUM_ANTS) {
 	fRfChanHPol[antPolNum]=ant;
 	fHPolPos[antPolNum][0]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[0];
 	fHPolPos[antPolNum][1]=araGeom->getStationInfo(fStationId)->getAntennaInfo(ant)->getLocationXYZ()[1];
@@ -140,10 +140,10 @@ void AraEventCorrelator::fillAntennaPositionsIcrr()
     }
   }
   std::cout << "\n";
-  for(int i=0;i<7;i++) {
+  for(int i=0;i<MAX_NUM_ANTS;i++) {
     std::cout << "V\t" << i << "\t" << fVPolPos[i][0] << "\t" << fVPolPos[i][1] << "\t" << fVPolPos[i][2] << "\n";
   }
-  for(int i=0;i<7;i++) {
+  for(int i=0;i<MAX_NUM_ANTS;i++) {
     std::cout << "H\t" << i << "\t" << fHPolPos[i][0] << "\t" << fHPolPos[i][1] << "\t" << fHPolPos[i][2] << "\n";
   }
   std::cout << "\n";

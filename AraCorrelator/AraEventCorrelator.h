@@ -18,6 +18,9 @@
 #define NUM_PHI_BINS 360
 #define NUM_THETA_BINS 180
 
+#define MAX_NUM_ANTS 8
+#define MAX_NUM_PAIRS 28
+//28 = 7+1 + 6+2 + 5+3 + 4 = max num pairs for 8 antennas 
 
 
 class UsefulIcrrStationEvent;
@@ -81,26 +84,26 @@ class AraEventCorrelator : public TObject
    Double_t fThetaWaveDeg[NUM_PHI_BINS];
    Double_t fPhiWave[NUM_PHI_BINS];
    Double_t fThetaWave[NUM_PHI_BINS];
-   //21 is the maximum if you use 7 antennas in each pol
+
    Int_t fStationId;
    Int_t fNumAnts;
    Int_t fNumPairs;
-   Int_t fFirstAnt[21];
-   Int_t fSecondAnt[21];
-   Double_t fVPolDeltaT[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Double_t fHPolDeltaT[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Double_t fVPolDeltaTInfinity[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Double_t fHPolDeltaTInfinity[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Double_t fVPolDeltaT40m[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Double_t fHPolDeltaT40m[21][NUM_PHI_BINS][NUM_THETA_BINS];
-   Int_t fRfChanVPol[7];
-   Int_t fRfChanHPol[7];
-   Double_t fVPolPos[7][3];
-   Double_t fHPolPos[7][3];
-   Double_t fVPolRho[7];
-   Double_t fHPolRho[7];
-   Double_t fVPolPhi[7];
-   Double_t fHPolPhi[7];
+   Int_t fFirstAnt[MAX_NUM_PAIRS];
+   Int_t fSecondAnt[MAX_NUM_PAIRS];
+   Double_t fVPolDeltaT[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Double_t fHPolDeltaT[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Double_t fVPolDeltaTInfinity[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Double_t fHPolDeltaTInfinity[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Double_t fVPolDeltaT40m[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Double_t fHPolDeltaT40m[MAX_NUM_PAIRS][NUM_PHI_BINS][NUM_THETA_BINS];
+   Int_t fRfChanVPol[MAX_NUM_ANTS];
+   Int_t fRfChanHPol[MAX_NUM_ANTS];
+   Double_t fVPolPos[MAX_NUM_ANTS][3];
+   Double_t fHPolPos[MAX_NUM_ANTS][3];
+   Double_t fVPolRho[MAX_NUM_ANTS];
+   Double_t fHPolRho[MAX_NUM_ANTS];
+   Double_t fVPolPhi[MAX_NUM_ANTS];
+   Double_t fHPolPhi[MAX_NUM_ANTS];
    
 
 
