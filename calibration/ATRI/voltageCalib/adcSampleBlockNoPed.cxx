@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     std::cerr << "Usage: " << argv[0] << " <baseDir> <runNum> <pedNum> <voltage> \n";
     return 1;
   }
-  sprintf(baseName, argv[1]);
+  strncpy(baseName, argv[1],FILENAME_MAX);
   runNum=atoi(argv[2]);
   pedNum=atoi(argv[3]);
   Double_t voltage = atof(argv[4]);

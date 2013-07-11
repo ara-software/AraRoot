@@ -24,8 +24,8 @@ int main(int argc, char **argv)
     std::cerr << "Usage: " << argv[0] << " <inFile> <outFile>  \n";
     return 1;
   }
-  sprintf(inFileName, argv[1]);
-  sprintf(outFileName, argv[1]);
+  strncpy(inFileName, argv[1],FILENAME_MAX);
+  strncpy(outFileName, argv[1],FILENAME_MAX);
 
   calibrationFitter(inFileName, outFileName);
   return 0;

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     std::cerr << "Usage: " << argv[0] << " <baseDir> <runLow> <runHigh> <block>  \n";
     return 1;
   }
-  sprintf(baseName, argv[1]);
+  strncpy(baseName, argv[1],FILENAME_MAX);
   runLow=atoi(argv[2]);
   runHigh=atoi(argv[3]);
   block=atoi(argv[4]);
