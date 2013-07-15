@@ -18,6 +18,35 @@ TMultiGraph *grTotalRate;
 TMultiGraph *grAllRate;
 Int_t stationId;
 
+void plotAtriRunStatistics(char *baseName, Int_t runLow, Int_t runHigh, Int_t numWeeks);
+void plotAtriRunStatistics(char *baseName, Int_t runLow, Int_t runHigh);
+void plotAtriRunStatistics(char *fileName);
+void plotAtriRunStatistics(Int_t station, Int_t runLow, Int_t runHigh, Int_t numWeeks);
+
+void plotAtriRunStatistics(Int_t station, Int_t runLow, Int_t runHigh, Int_t numWeeks)
+{
+  char baseName[100];
+  
+  if(station==2){
+    sprintf(baseName, "/Users/jdavies/ara/fromPole/monitoring/data/ARA02/runInfo_ARA02");
+    plotAtriRunStatistics(baseName, runLow, runHigh, numWeeks);
+    
+  }
+  else if(station==3){
+    sprintf(baseName, "/Users/jdavies/ara/fromPole/monitoring/data/ARA03/runInfo_ARA03");
+    plotAtriRunStatistics(baseName, runLow, runHigh, numWeeks);
+    
+  }
+  else{
+    fprintf(stderr, "Wrong station ID %i - must be 2 or 3\n", station);
+    
+  }
+  
+  
+  
+
+}
+
 void plotAtriRunStatistics(char *baseName, Int_t runLow, Int_t runHigh, Int_t numWeeks){
   chain = new TChain("runStatsTree");
   char fileName[256];

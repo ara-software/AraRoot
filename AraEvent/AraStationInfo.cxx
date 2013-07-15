@@ -1091,8 +1091,7 @@ void AraStationInfo::readChannelMapDbAtri_2(){
   else {
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
-  sprintf(fileName, "%s/AntennaInfo_test.sqlite", calibDir);
-
+  sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
   //open the database
   int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){

@@ -17,9 +17,14 @@ AraEventCorrelator * AraEventCorrelator::fgInstance=0;
 AraEventCorrelator::AraEventCorrelator(Int_t numAnts, Int_t stationId)
 {
   //Default constructor
-    fNumAnts=numAnts;
+  fNumAnts=numAnts;
   fNumPairs=0;
   fStationId=stationId;
+  
+  if(numAnts > MAX_NUM_ANTS){
+    fprintf(stderr, "%s -- numAnts %i larger than the maximum %i!\n", __FUNCTION__, numAnts, MAX_NUM_ANTS);
+  }
+
   for(int first=0;first<(fNumAnts-1);first++) {
     for(int second=first+1;second<fNumAnts;second++) {      
       fFirstAnt[fNumPairs]=first;
