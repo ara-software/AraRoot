@@ -1068,9 +1068,19 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
     fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- ERROR Unknown stationId %i\n", stationId);
     exit(0);
   }
+  if(fGotAtriPedFile[calibIndex]==1){
+    if(!fileExists(fAtriPedFile[calibIndex])){
+      fGotAtriPedFile[calibIndex]=0;
+      fprintf(stderr, "%s -- pedFile does not exist!\n", __FUNCTION__);
+    }
+    else if(numberOfPedestalValsInFile(fAtriPedFile[calibIndex]) != RFCHAN_PER_DDA*DDA_PER_ATRI*BLOCKS_PER_DDA*SAMPLES_PER_BLOCK){
+      fGotAtriPedFile[calibIndex]=0;
+      fprintf(stderr, "%s -- pedFile has too few values!\n", __FUNCTION__);
+    }
+  }
 
   if(fGotAtriPedFile[calibIndex]==0){
-    char *pedFileEnv = getenv( "ARA_ATRI_PEDESTAL_FILE" ); //FIXME
+    char *pedFileEnv = getenv( "ARA_ATRI_PEDESTAL_FILE" );
     if ( pedFileEnv == NULL ) {
       char calibDir[FILENAME_MAX];
       char *calibEnv=getenv("ARA_CALIB_DIR");
@@ -1089,7 +1099,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 	//	fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
       }
       sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
-      fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
+      //      fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
     } // end of IF-block for pedestal file not specified by environment variable
     else {
       strncpy(fAtriPedFile[calibIndex],pedFileEnv,FILENAME_MAX);
@@ -1258,3 +1268,31 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
 
 }
 
+
+Bool_t AraEventCalibrator::fileExists(char *fileName){
+  std::ifstream theFile(fileName);  
+  if(!theFile){
+    theFile.close();
+    return kFALSE;
+  }
+  else{
+    theFile.close();
+    return kTRUE;
+  }
+
+}
+
+
+Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
+  std::ifstream theFile(fileName);
+  Int_t numPedVals=0;
+  Double_t temp=0;
+  while(theFile >> temp >> temp >> temp) {
+    for(Int_t sample=0;sample<SAMPLES_PER_BLOCK;sample++){
+      theFile >> temp;
+      numPedVals++;
+    }
+  }
+  theFile.close();
+  return numPedVals;
+}

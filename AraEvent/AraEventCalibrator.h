@@ -119,6 +119,9 @@ class AraEventCalibrator : public TObject
    void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
    void loadAtriCalib(AraStationId_t stationId); ///< Internally used fuction that loads the calibration values into memory.
    
+   Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
+   Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
+
  protected:
    static AraEventCalibrator *fgInstance;  ///< protect against multiple instances
 

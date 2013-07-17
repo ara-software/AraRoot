@@ -929,7 +929,8 @@ void AraStationInfo::readCalPulserDb(){
   const char *query;
 
   //This is where we decide which table to access in the database
-  if(fStationId==ARA_STATION1B) query = "select * from ARA01";
+  if(fStationId==ARA_TESTBED) query = "select * from TESTBED";
+  else if(fStationId==ARA_STATION1B) query = "select * from ARA01";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
   else if(fStationId==ARA_STATION3) query = "select * from ARA03";
   else{
