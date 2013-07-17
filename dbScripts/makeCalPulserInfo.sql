@@ -1,6 +1,4 @@
 CREATE TABLE TESTBED(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
-
-
 CREATE TABLE ARA01(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
 
 CREATE TABLE ARA02(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
@@ -27,14 +25,17 @@ insert into TESTBED VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 25.86,15.31,-29.26,0,
 25.86,15.31,-29.26,0
 );
-Insert into TESTBED VALUES(4,"BH7","CH3","P3","kQuadSlot","kHorizontal",
--26.81,13.2,-0.4,0,
--26.81,13.2,-0.4,0
-);
-insert into TESTBED VALUES(5,"BH7","CV3","P3","kBicone","kVertical",
--26.45,14.75,-0.4,0,
--26.45,14.75,-0.4,0
-);
+--Stick with only the 4 calibration pulsers since the other two aren't 
+--And the AraStationInfo code needs fixing to handle more
+
+--Insert into TESTBED VALUES(4,"BH7","CH3","P3","kQuadSlot","kHorizontal",
+---26.81,13.2,-0.4,0,
+---26.81,13.2,-0.4,0
+--);
+--insert into TESTBED VALUES(5,"BH7","CV3","P3","kBicone","kVertical",
+---26.45,14.75,-0.4,0,
+---26.45,14.75,-0.4,0
+--);
 
 
 
