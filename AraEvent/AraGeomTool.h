@@ -95,7 +95,7 @@ class AraGeomTool
    Double_t fStationCoordsICRR[ICRR_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
    Double_t fStationCoordsAtri[ATRI_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
    Double_t fStationLocalCoordsICRR[ICRR_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
-   Double_t fStationLocalCoordsATRI[ICRR_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
+   Double_t fStationLocalCoordsATRI[ATRI_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
 
 
    TRotation *fArrayToStationRotationICRR[ICRR_NO_STATIONS]; ///< Really are rotation matrices

@@ -590,6 +590,7 @@ void AraGeomTool::readAraArrayCoords() {
     thisStationId=sqlite3_column_int(stmt,column);
     calibIndex=getStationCalibIndex(thisStationId);
 
+
     column++;  //station name
     temp = (const char*)sqlite3_column_text(stmt, column);
     //Ignore for now
@@ -616,6 +617,7 @@ void AraGeomTool::readAraArrayCoords() {
       fStationVectorATRI[calibIndex].SetXYZ(fStationCoordsAtri[calibIndex][0],fStationCoordsAtri[calibIndex][1],fStationCoordsAtri[calibIndex][2]);
     }
 
+
     //Station Local Coordinates
     for(int i=0;i<3;i++) {
       for(int j=0;j<3;j++) {	
@@ -630,6 +632,7 @@ void AraGeomTool::readAraArrayCoords() {
       }
     } 
 
+
     if(isIcrrStation(thisStationId)) {
       fStationToArrayRotationICRR[calibIndex] = new TRotation();      
       TVector3 localx(fStationLocalCoordsICRR[calibIndex][0]);
@@ -642,6 +645,7 @@ void AraGeomTool::readAraArrayCoords() {
     }
     else {
       fStationToArrayRotationATRI[calibIndex] = new TRotation();     
+
       //In the end this remarkably simple bit of code is all we need to define the matrix rotations necessary to switch
       // between array centric and station centric coordinates 
       // The basic idea is simply:
@@ -655,9 +659,13 @@ void AraGeomTool::readAraArrayCoords() {
       Double_t angleRotate=globale.Angle(localx);
       TVector3 axisRotate=globale.Cross(localx);
       fStationToArrayRotationATRI[calibIndex]->Rotate(angleRotate,axisRotate);
+
       fArrayToStationRotationATRI[calibIndex]=new TRotation(fStationToArrayRotationATRI[calibIndex]->Inverse());
+
+      //      fArrayToStationRotationATRI[calibIndex]->Dump();
     }
     
+
 
   }//while(1)
 
@@ -683,7 +691,7 @@ TVector3 AraGeomTool::convertStationToArrayCoords(AraStationId_t stationId, TVec
 
 TVector3 AraGeomTool::convertArrayToStationCoords(AraStationId_t stationId, TVector3 inputCoords) {
   TVector3 output=inputCoords;
-  //  std::cout << "Station Vector: " << getStationVector(stationId).x() << "\t" << getStationVector(stationId).y() << "\t" << getStationVector(stationId).z() << "\n";
+  //std::cout << "Station Vector: " << getStationVector(stationId).x() << "\t" << getStationVector(stationId).y() << "\t" << getStationVector(stationId).z() << "\n";
   output-=getStationVector(stationId);
   //  output.Print();
   TRotation *mPtr = getArrayToStationRotation(stationId);
