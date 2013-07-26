@@ -1137,17 +1137,18 @@ void AraStationInfo::readChannelMapDbAtri_2(){
 	antId=sqlite3_column_int(stmt,column);
 	thisAntInfo=this->getNewAntennaInfo(antId);
 	thisAntInfo->chanNum=antId;
-	//printf("\n\nthisAntInfo->chanNum=antId %i\n", thisAntInfo->chanNum=antId);
+	//	printf("\n\nthisAntInfo->chanNum=antId %i\n", thisAntInfo->chanNum=antId);
 	break;
       case 1://holeName
 	temp = (const char*)sqlite3_column_text(stmt, column);
 	strncpy(thisAntInfo->holeName, temp, 6);
-	//printf("thisAntInfo->holeName %s\n", thisAntInfo->holeName, temp);
+	//	printf("thisAntInfo->holeName %s\n", thisAntInfo->holeName, temp);
 	break;
       case 2://antName
 	temp = (const char*)sqlite3_column_text(stmt, column);
 	strncpy(thisAntInfo->antName, temp, 6);
-	//printf("thisAntInfo->antName %s\n", thisAntInfo->antName, temp);
+	//	printf("thisAntInfo->holeName %s\n", thisAntInfo->holeName, temp);
+	//	printf("thisAntInfo->antName %s\n", thisAntInfo->antName, temp);
 	break;
       case 3://polType
 	temp = (const char*)sqlite3_column_text(stmt, column);
@@ -1246,7 +1247,8 @@ void AraStationInfo::readChannelMapDbAtri_2(){
       }//switch(column)
 
     }//column
-    sprintf(thisAntInfo->designator, "%s", thisAntInfo->getRFChanName());
+    //RJN fixed string copying bug
+    strncpy(thisAntInfo->designator, thisAntInfo->getRFChanName(),12);
   }//while(1)
 
   rc = sqlite3_finalize(stmt);

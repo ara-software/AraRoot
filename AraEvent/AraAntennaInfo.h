@@ -148,7 +148,9 @@ class AraAntennaInfo: public TObject
    Double_t lowPassFilterMhz; ///< Low pass filter in the DAQ box signal chain
 
    Double_t avgNoiseFigure; ///< Some measure of signal chain average noise figure
-   char designator[3]; ///< Hole+Antenna (e.g. BH2TVPol)
+
+   //RJN change to fix bug
+   char designator[12]; ///< Hole+Antenna (e.g. BH2TVPol)
 
    //ATRI -- new data
    char holeName[6];

@@ -50,7 +50,7 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
   if(timeMapIt==fTimes.end()) {
     // This channel doesn't exist. We don't return a null pointer,
     // we return an empty graph. 
-    // RJN should fix this as it is a silly id
+    // RJN should fix this as it is a silly idea
     return new TGraph;
   }
   
@@ -65,12 +65,12 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 { 
-  Int_t rfChan = AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId);
+  Int_t elecChan = AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId);
   if(rfChan < 0){
     return NULL;
   }
 
-  return getGraphFromElecChan(rfChan);
+  return getGraphFromElecChan(elecChan);
 }
 
 
