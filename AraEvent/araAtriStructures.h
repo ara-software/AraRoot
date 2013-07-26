@@ -106,7 +106,7 @@ typedef struct {
   uint8_t subVerId;
   uint32_t numBytes;
   uint16_t checksum;
-  uint16_t reserved;
+  uint16_t reserved; ///< This is now used as the filterFlag
   uint32_t alsoReserved;
 } AtriGenericHeader_t;
 

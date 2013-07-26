@@ -7,10 +7,8 @@ fi
 
 
 #Only need to edit these two lines to point to the local directories 
-RAW_BASE_DIR=~/temp/AraRootFilterTest/raw_data
-ROOT_BASE_DIR=~/temp/AraRootFilterTest/root
-OUT_DIR=~/temp/AraRootFilterTest/raw_data_filtered_one_in_ten
-
+RAW_BASE_DIR=~/ara/data/fromWisconsin2013/ARA02/raw_data/
+OUT_DIR=~/ara/data/fromWisconsin2013/ARA02/raw_data/filtered/
 
 
 RUN_NUM=$1
@@ -18,18 +16,8 @@ RUN_WITH_ZEROES=`printf %06d $RUN_NUM`
 echo $RUN_NUM $RUN_WITH_ZEROES
 
 RAW_DIR=${RAW_BASE_DIR}/run_${RUN_WITH_ZEROES}
-ROOT_DIR=${ROOT_BASE_DIR}/run${RUN_NUM}
-EVENT_FILE=${ROOT_DIR}/event${RUN_NUM}.root
-SENSOR_HK_FILE=${ROOT_DIR}/sensorHk${RUN_NUM}.root
-EVENT_HK_FILE=${ROOT_DIR}/eventHk${RUN_NUM}.root
 #exit 1
 #echo ${RAW_DIR}
-
-if [[ -d $ROOT_DIR ]]; then
-    echo "Output dir exists"
-else
-    mkdir ${ROOT_DIR}
-fi
 
 echo "Starting Event File"
 EVENT_FILE_LIST=`mktemp event.XXXX`

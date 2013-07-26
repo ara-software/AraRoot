@@ -22,6 +22,7 @@
   This class is a base class that contains header information common to all Raw and Useful event types. 
   \ingroup rootclasses
 */
+
 class RawAraGenericHeader
 {
  public:
@@ -39,11 +40,38 @@ class RawAraGenericHeader
    UChar_t verId;        //< Version of AraRoot
    UChar_t subVerId;
    AraStationId_t stationId; //< stationID 0x0 TestBed, 0x01 Station1...
-   UShort_t reserved;
+   UShort_t reserved; ///< Now used as the filterFlag -- see getFilterFlag()
    UInt_t numBytes;
    UShort_t checksum;
 
-  ClassDef(RawAraGenericHeader,1);
+   UShort_t getFilterFlag(){return reserved;} ///< returns the filterFlag. See class member documentation for details.
+   /*!
+     filterFlag useses reserved as 16 bits to store filter information. From LSB to MSB
+
+     bit 0 - filter on?
+
+     bit 1-5 - filterVersion
+
+     bit 6-15 filter flags - one bit per filter
+
+     filterFlags
+
+     bit 0 - Random Filter
+
+     bit 1 - Min-Bias
+
+     bit 2 - Time Sequence Filter
+
+     bit 3 - Track Engine filter
+
+     bit 4 - 9 - Reserved for future filters
+   */
+
+   Int_t getFilterVersion();
+   Int_t hasFilterFlag();
+   Int_t hasBitSetInFilterFlag(Int_t bit);
+
+  ClassDef(RawAraGenericHeader,2);
 };
 
 
