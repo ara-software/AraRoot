@@ -82,7 +82,6 @@ Int_t RawAraGenericHeader::hasFilterFlag(){
 }
 Int_t RawAraGenericHeader::hasBitSetInFilterFlag(Int_t bit){
   if(bit > 9 || hasFilterFlag()==0){
-    fprintf(stderr, "%s -- error - bit greater than 9\n", __FUNCTION__);
     return -1;
   }
   UShort_t filterFlag = getFilterFlag();
