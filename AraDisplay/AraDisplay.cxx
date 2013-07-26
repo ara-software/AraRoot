@@ -5,11 +5,11 @@
 /////     The main Ara Display class displaying data                     /////
 /////  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)                           /////
 //////////////////////////////////////////////////////////////////////////////
-/*! \mainpage Ara ROOT v3.11 Software
+/*! \mainpage Ara ROOT v3.12 Software
  *
  * \section intro_sec Introduction
  *
- * Here is some Doxygen generated documentation for the ARA ROOT v3.11  software which is based on the ANITA software. 
+ * Here is some Doxygen generated documentation for the ARA ROOT v3.12  software which is based on the ANITA software. 
  *
  * \section prereq_sec Prerequisites
  *
@@ -93,24 +93,24 @@
  *\section UW_Systems UW Systems
 
  *There is a common installation of AraRoot on the UW systems, an example analysis area and setup scripts for users
- *The installation files are in /home/jdavies/repositories/install/AraRoot/branches/3.11/
+ *The installation files are in /home/jdavies/repositories/install/AraRoot/branches/3.12/
  *The setup scripts are in /home/jdavies/repositories/setupScripts
- *The example analysis area is in /home/jdavies/analysis/AraRoot/branches/3.11\n\n
+ *The example analysis area is in /home/jdavies/analysis/AraRoot/branches/3.12\n\n
  *
  *Steps to build your own analysis \n\n
  *-Copy the analysis area to your own user area
- *<PRE> cp /home/jdavies/analysis/AraRoot/branches/3.11 ~/analysis/AraRoot/branches/3.11</PRE>\n
- *-Copy accross the AraRoot 3.11 setup script
- *<PRE> cp /home/jdavies/repositories/setupScripts/AraRoot_v3.11.sh ~/setupScripts/</PRE>\n
- *-Edit the CMakeLists.txt file in ~/analysis/AraRoot/branches/3.11
+ *<PRE> cp /home/jdavies/analysis/AraRoot/branches/3.12 ~/analysis/AraRoot/branches/3.12</PRE>\n
+ *-Copy accross the AraRoot 3.12 setup script
+ *<PRE> cp /home/jdavies/repositories/setupScripts/AraRoot_v3.12.sh ~/setupScripts/</PRE>\n
+ *-Edit the CMakeLists.txt file in ~/analysis/AraRoot/branches/3.12
  *-Ammend the lines building exampleLoop to your own analysis code name\n
  *<PRE> add_executable(exampleLoop exampleLoop.cxx)</PRE>
  *<PRE> target_link_libraries(exampleLoop ${ARAEVENT_LIBRARIES} ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})</PRE>\n
  *-Source the setup script
- *<PRE> source ~/setupScripts/AraRoot_v3.11.sh</PRE>\n
+ *<PRE> source ~/setupScripts/AraRoot_v3.12.sh</PRE>\n
  *-Build the binary using the INSTALL.sh script
  *<PRE> bash INSTALL.sh < 0 for re-build or 1 for force rebuild></PRE>
- *-The binary will be in /analysis/AraRoot/branches/3.11/bin
+ *-The binary will be in /analysis/AraRoot/branches/3.12/bin
 
  *\section trouble_sec Troubleshooting
 
