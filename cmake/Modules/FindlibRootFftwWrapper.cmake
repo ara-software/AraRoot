@@ -32,3 +32,4 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LibRootFftwWrapper DEFAULT_MSG
   LIBROOTFFTWWRAPPER_LIBRARY LIBROOTFFTWWRAPPER_INCLUDE_DIR)
 mark_as_advanced(LIBROOT_FFTWWRAPPER_INCLUDE_DIR LIBROOT_FFTWWRAPPER_LIBRARY)
+

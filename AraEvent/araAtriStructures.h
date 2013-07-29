@@ -21,8 +21,8 @@
 
 #include "araSoft.h"
 
-#define ARA_SOFT_VERISON 3
-#define ARA_SOFT_SUB_VERISON 0
+#define ARA_SOFT_VERISON 4
+#define ARA_SOFT_SUB_VERISON 2
 
 
 

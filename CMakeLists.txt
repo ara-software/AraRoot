@@ -10,7 +10,7 @@ set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 project(AraRoot)
 find_package(ROOT REQUIRED COMPONENTS MathMore Gui)
 find_package(libRootFftwWrapper REQUIRED)
-find_package(FFTW REQUIRED)
+#find_package(FFTW REQUIRED)
 find_package(sqlite3 REQUIRED)
 find_package(zlib REQUIRED)
 

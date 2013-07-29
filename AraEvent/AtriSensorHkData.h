@@ -46,11 +46,11 @@ class AtriSensorHkData: public RawAraGenericHeader, public TObject
    Double_t getDdaTemp(Int_t dda); ///<Unpack the dda temperature (C)
    Double_t getTdaTemp(Int_t tda); ///<Unpack the tda temperature (C)
    
-   Double_t getAtriVoltage() {return 0.065*atriVoltage;}
-   Double_t getAtriCurrent() {return (0.151/2)*atriCurrent;}
+   Double_t getAtriVoltage(); ///< PSA Voltage should be ADC value (8 bits, 0-256) times 0.0605 (to get it in volts).
+   Double_t getAtriCurrent(); ///< Current should be ADC value times 0.0755 (to get it in amps).
 
 
-   ClassDef(AtriSensorHkData,1);
+   ClassDef(AtriSensorHkData,2);
 };
 
 
