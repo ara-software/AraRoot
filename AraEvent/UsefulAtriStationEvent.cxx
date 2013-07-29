@@ -66,7 +66,7 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
 { 
   Int_t elecChan = AraGeomTool::Instance()->getElecChanFromRFChan(chan,stationId);
-  if(rfChan < 0){
+  if(elecChan < 0){
     return NULL;
   }
 
