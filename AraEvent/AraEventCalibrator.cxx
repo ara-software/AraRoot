@@ -90,10 +90,10 @@ AraEventCalibrator::AraEventCalibrator()
 
   //Loop through and set the got ped / calib flags to zero. This assumes stationId's first n elements
   //are for ICRR stations and the remaining N-n are ATRI
-  memset(fGotAtriPedFile,sizeof(Int_t)*ATRI_NO_STATIONS,0);
-  memset(fGotAtriCalibFile,sizeof(Int_t)*ATRI_NO_STATIONS,0);
-  memset(gotIcrrPedFile,sizeof(Int_t)*ICRR_NO_STATIONS,0);
-  memset(gotIcrrCalibFile,sizeof(Int_t)*ICRR_NO_STATIONS,0);
+  memset(fGotAtriPedFile,0,sizeof(Int_t)*ATRI_NO_STATIONS);
+  memset(fGotAtriCalibFile,0,sizeof(Int_t)*ATRI_NO_STATIONS);
+  memset(gotIcrrPedFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
+  memset(gotIcrrCalibFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
 
 }
 
