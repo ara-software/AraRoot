@@ -1273,6 +1273,9 @@ void AraStationInfo::readChannelMapDbAtri_2(){
     }//column
     //RJN fixed string copying bug
     strncpy(thisAntInfo->designator, thisAntInfo->getRFChanName(),12);
+     
+    thisAntInfo->fillArrayCoords();
+  
   }//while(1)
 
   rc = sqlite3_finalize(stmt);
@@ -1282,6 +1285,7 @@ void AraStationInfo::readChannelMapDbAtri_2(){
 
   this->fillAntIndexVec();
   this->fillTrigChanVec();
+
 
 }
 
