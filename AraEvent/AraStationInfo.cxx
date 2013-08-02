@@ -1292,7 +1292,7 @@ const char *AraStationInfo::getAtriSingleChannelLabel(Int_t tda, Int_t channel)
 {
    AraAntennaInfo *antInfo = getAntennaInfoForTrigChan(getTrigChan(tda,channel));
    if(antInfo) 
-      antInfo->getRFChanName();
+      return antInfo->getRFChanName();
    return NULL;
 
 }
