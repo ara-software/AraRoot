@@ -40,6 +40,13 @@ void AraCalAntennaInfo::fillArrayCoords()
 {
   AraGeomTool *fGeomTool=AraGeomTool::Instance();
   fGeomTool->convertStationToArrayCoords(fStationId,antLocation,antLocationArray);
-  fGeomTool->convertStationToArrayCoords(fStationId,antLocationCalib,antLocationArrayCalib);
- 
+  fGeomTool->convertStationToArrayCoords(fStationId,antLocationCalib,antLocationArrayCalib); 
+}
+
+
+const char *AraCalAntennaInfo::getCalAntName()
+{
+  static char calName[20];
+  sprintf(calName, "%s %s", locationName, antPolAsString(polType));
+  return calName;
 }

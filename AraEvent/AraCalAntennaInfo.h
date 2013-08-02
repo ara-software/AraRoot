@@ -31,6 +31,8 @@ class AraCalAntennaInfo: public TObject
    AraCalAntennaInfo(); ///< Default constructor
    ~AraCalAntennaInfo(); ///< Destructor
 
+
+   const char *getCalAntName();
    void printAntennaInfo();  ///< Printssome information about the antenna
    Double_t getCableDelay() {return cableDelayCalib;}   ///< Returns the calibrated cableDelay
    Double_t *getLocationXYZ() {return antLocationCalib;}  ///< Returns the calibrated station-centric coordinates
