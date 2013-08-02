@@ -15,6 +15,7 @@
 #include "araIcrrDefines.h"
 #include "AraAntennaInfo.h"
 #include "AraCalAntennaInfo.h"
+#include "araSoft.h"
 
 #include <vector>
 //!  Part of the AraEvent library. Stores information about the station's location and the antenna information. Populated by AraGeomTool
@@ -40,6 +41,7 @@ class AraStationInfo: public TObject
   void setNumRFChans(int numChans) { numberRFChans=numChans;}
 
   Double_t getCableDelay(int rfChanNum);
+  AraAntennaInfo *getAntennaInfoForTrigChan(int trigChan);
   AraAntennaInfo *getAntennaInfo(int antNum, AraAntPol::AraAntPol_t polType) { return getAntennaInfo(getRFChanByPolAndAnt(antNum,polType));}
   AraAntennaInfo *getAntennaInfo(int rfChanNum);
   AraCalAntennaInfo *getCalAntennaInfo(int calAntId); ///< Simple 0-3 numeric id
@@ -50,8 +52,8 @@ class AraStationInfo: public TObject
   Int_t getNumAntennasByPol(AraAntPol::AraAntPol_t polType) {return fAntIndexVec[polType].size();}
 
   //Should add some error checking at some point
-   Double_t getLowPassFilter(int rfChan) { return fAntInfo[rfChan].lowPassFilterMhz; }
-   Double_t getHighPassFilter(int rfChan) { return fAntInfo[rfChan].highPassFilterMhz; }
+  Double_t getLowPassFilter(int rfChan) { return fAntInfo[rfChan].lowPassFilterMhz; }
+  Double_t getHighPassFilter(int rfChan) { return fAntInfo[rfChan].highPassFilterMhz; }
 
 
   //Below are just for ICRR station
@@ -64,9 +66,17 @@ class AraStationInfo: public TObject
   int getFirstLabChanIndexForChan(int rfChan) { return getIcrrChanIndex(getLabChipForChan(rfChan),getFirstLabChanForChan(rfChan));}
   int getSecondLabChanIndexForChan(int rfChan) { return getIcrrChanIndex(getLabChipForChan(rfChan),getSecondLabChanForChan(rfChan));}
   int isDiplexed(int rfChan) {return fAntInfo[rfChan].isDiplexed;}
-
-
-
+  
+  
+  //Labelling for TDA channels just for the ATRI stations
+  const char *getAtriSingleChannelLabel(Int_t tda, Int_t channel);
+  const char *getAtriL2Label(Int_t index);
+  const char *getAtriL3Label(Int_t index);
+  const char *getAtriL4Label(Int_t index);
+  static Int_t getTrigChan(Int_t tda, Int_t channel) {
+     return channel + ANTS_PER_TDA*tda;
+  }
+  
 
 
   
@@ -81,6 +91,7 @@ class AraStationInfo: public TObject
   int fNumberCalAntennas; ///< Number of calibration antennas
   
   std::vector<int> fAntIndexVec[3]; ///<The antenna to logical channel index one vector per polarisation
+  std::vector<int> fTrigChanVec; ///< The index that converts trigger channel to
 
 
  private:
@@ -88,6 +99,7 @@ class AraStationInfo: public TObject
   AraAntennaInfo *getNewAntennaInfo(int rfChanNum);
   AraCalAntennaInfo *getNewCalAntennaInfo(int antCalId);
   void fillAntIndexVec();
+  void fillTrigChanVec();
   void readChannelMapDbAtri();
   void readChannelMapDbAtri_2();
   void readChannelMapDbIcrr();

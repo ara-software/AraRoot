@@ -96,6 +96,9 @@ class AraAntennaInfo: public TObject
    Double_t *getLocationENU() { return antLocationArray;}
    void fillArrayCoords();
 
+   Int_t getTrigChan() { return daqTrigChan;}
+
+
    AraStationId_t fStationId;
 
    //ICRR Specific Numbers

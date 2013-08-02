@@ -70,7 +70,7 @@ class RawAtriStationEvent: public RawAraStationEvent
    
 
 
-  ClassDef(RawAtriStationEvent,1);
+  ClassDef(RawAtriStationEvent,2);
 };
 
 

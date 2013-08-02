@@ -1031,7 +1031,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   //now subtract off the cable delays
   if(hasCableDelays(calType)){
     for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
-      AraGeomTool *tempGeom = AraGeomTool::Instance();
+      AraGeomTool* tempGeom = AraGeomTool::Instance();
       Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
       int chanId = tempGeom->getElecChanFromRFChan(rfChan, thisStationId);
       timeMapIt=theEvent->fTimes.find(chanId);

@@ -12,6 +12,8 @@
 //Includes
 #include <TObject.h>
 #include "RawAraGenericHeader.h"
+#include "AraGeomTool.h"
+#include "AraStationInfo.h"
 #include "araIcrrStructures.h"
 
 
@@ -47,6 +49,20 @@ class AtriEventHkData: public RawAraGenericHeader, public TObject
    Double_t getThreeOfFourRateHz(Int_t tda); ///< Gets the rate in Hz of three of four channels on tda
    Double_t getThreeOfEightRateHz(Int_t tda_pair); ///< Gets the rate in Hz of three of eight channels on tda_pair (0 is stack 1 and 2, 0 is stack 3 and 4)
    Double_t getL4RateHz(Int_t index) { return l4Scaler[index];}
+
+   const char *getSingleChannelLabel(Int_t tda, Int_t channel) {
+      return AraGeomTool::Instance()->getStationInfo(stationId)->getAtriSingleChannelLabel(tda,channel);
+   }
+   const char *getL2Label(Int_t index) {
+      return AraGeomTool::Instance()->getStationInfo(stationId)->getAtriL2Label(index);
+   }
+   const char *getL3Label(Int_t index) {
+      return AraGeomTool::Instance()->getStationInfo(stationId)->getAtriL3Label(index);
+   }
+   const char *getL4Label(Int_t index) {
+      return AraGeomTool::Instance()->getStationInfo(stationId)->getAtriL4Label(index);
+   }
+
 
 
    ULong64_t unixTime; ///< Time in seconds (64-bits for future proofing)

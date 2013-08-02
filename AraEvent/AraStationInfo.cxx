@@ -69,6 +69,14 @@ AraCalAntennaInfo *AraStationInfo::getCalAntennaInfo(int calAntId) {
   return NULL;
 }
 
+AraAntennaInfo *AraStationInfo::getAntennaInfoForTrigChan(int trigChan) {
+
+   if(trigChan>=0 && trigChan<fTrigChanVec.size()) {
+      return &fAntInfo[fTrigChanVec[trigChan]];
+   }
+   return NULL;
+}
+
 
 AraAntennaInfo *AraStationInfo::getAntennaInfo(int antNum) {
   if(antNum>=0 && antNum<numberRFChans) {
@@ -99,6 +107,20 @@ AraCalAntennaInfo *AraStationInfo::getNewCalAntennaInfo(int calAntId){
   fCalAntInfo[calAntId].calAntId=calAntId;
   fCalAntInfo[calAntId].fStationId=fStationId;
   return &fCalAntInfo[calAntId];
+}
+
+void AraStationInfo::fillTrigChanVec() {
+   fTrigChanVec.resize(fNumberAntennas);
+   for(int ant=0;ant<fNumberAntennas;++ant){
+      int trigChan=fAntInfo[ant].getTrigChan();
+      if(trigChan<=fNumberAntennas) {
+	 fTrigChanVec[trigChan]=ant;
+      }
+      else {
+	 std::cerr << "Got trigger channel: " << trigChan << " but only have " << fNumberAntennas << " antennas";
+      }
+      
+   }
 }
 
 void AraStationInfo::fillAntIndexVec() {
@@ -512,6 +534,7 @@ void AraStationInfo::readChannelMapDbAtri(){
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
   this->fillAntIndexVec();
+  this->fillTrigChanVec();
 
 }
 
@@ -890,6 +913,7 @@ void AraStationInfo::readChannelMapDbIcrr(){
   if(rc!=SQLITE_OK) printf("error closing db\n");
 
   this->fillAntIndexVec();
+  this->fillTrigChanVec();
 
 }
 
@@ -1257,5 +1281,53 @@ void AraStationInfo::readChannelMapDbAtri_2(){
   if(rc!=SQLITE_OK) fprintf(stderr, "%s : error closing db\n", __FUNCTION__);
 
   this->fillAntIndexVec();
+  this->fillTrigChanVec();
+
+}
+
+
+
+//Labelling for TDA channels just for the ATRI stations
+const char *AraStationInfo::getAtriSingleChannelLabel(Int_t tda, Int_t channel)
+{
+   AraAntennaInfo *antInfo = getAntennaInfoForTrigChan(getTrigChan(tda,channel));
+   if(antInfo) 
+      antInfo->getRFChanName();
+   return NULL;
+
+}
+
+const char *AraStationInfo::getAtriL2Label(Int_t index)
+{
+   switch(index) {
+   case 0: return "S1/2 VPol";
+   case 1: return "S3/4 VPol";
+   case 2: return "S1/2 HPol";
+   case 3: return "S3/4 HPol";
+   default: return "Unknown";
+   }
+
+}
+
+const char *AraStationInfo::getAtriL3Label(Int_t index)
+{
+   switch(index) {
+   case 0: return "VPol";
+   case 1: return "HPol";
+   default: return "Unknown";
+   } 
+
+}
+
+const char *AraStationInfo::getAtriL4Label(Int_t index)
+{
+
+   switch(index) {
+   case 0: return "Deep";
+   case 1: return "Surface";
+   case 2: return "Software";
+   case 3: return "Timed";
+   default: return "Unknown";
+   } 
 
 }

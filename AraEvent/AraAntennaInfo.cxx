@@ -111,8 +111,8 @@ const char *AraAntennaInfo::getDaqBoxChan()
 
 const char *AraAntennaInfo::getRFChanName()
 {
-  static char rfChanName[8];
-  sprintf(rfChanName, "%s%s", holeName, antName);
+  static char rfChanName[10];
+  sprintf(rfChanName, "%s %s", holeName, antName);
 
   return rfChanName;
 }
