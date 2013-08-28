@@ -156,3 +156,32 @@ bool RawAtriStationEvent::isCalpulserEvent(){
     return false;
   }
 }
+
+
+Bool_t RawAtriStationEvent::isTrigType(Int_t bit){
+  if(bit >= MAX_TRIG_BLOCKS ){
+    fprintf(stderr, "%s -- bit %i too high!\n", __FUNCTION__, bit);
+    return kFALSE;
+  }
+  if(triggerInfo[bit]) return kTRUE;
+  else return kFALSE;
+
+
+}
+
+Bool_t RawAtriStationEvent::isTriggerChanHigh(Int_t bit){
+  if(!isRFTrigger() || bit >= 16) return kFALSE;
+  if(triggerInfo[0] & (1<<bit)) return kTRUE;
+  else return kFALSE;
+  
+}
+
+Int_t RawAtriStationEvent::numTriggerChansHigh(){
+
+  Int_t numChans=0;
+  for(Int_t i=0;i<16;i++){
+    if(isTriggerChanHigh(i)) numChans++;
+  }
+  return numChans;
+
+}

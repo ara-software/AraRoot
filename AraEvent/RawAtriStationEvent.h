@@ -68,9 +68,15 @@ class RawAtriStationEvent: public RawAraStationEvent
    Int_t getFirstCapArray(Int_t dda); ///< Function for asking the block vector the capArray
    bool isCalpulserEvent(); ///< Uses the timeStamp (from Rubidium clock) to decide whether an event is from a local in-ice calpulser
    
+   Bool_t isTrigType(Int_t bit); ///< Was this trigger bit set? bit0 - RF0 Trigger (Deep Antennas), bit1 - RF1 Trigger (Surface Antennas), bit2 - Software trigger
+
+   Bool_t isRFTrigger(){return isTrigType(0);}; ///< Is this an RF trigger event?
+   Bool_t isSoftwareTrigger(){return isTrigType(2);}; ///< Is this an Software trigger event?
+   Bool_t isTriggerChanHigh(Int_t bit); ///<Is a particular trigger channel high in RF trigger?
+   Int_t numTriggerChansHigh(); ///< Number of trigger channels contributing to this trigger
 
 
-  ClassDef(RawAtriStationEvent,2);
+  ClassDef(RawAtriStationEvent,3);
 };
 
 
