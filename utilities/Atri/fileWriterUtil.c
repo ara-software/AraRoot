@@ -5,6 +5,7 @@
    ped@m2-consult.com
 */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
