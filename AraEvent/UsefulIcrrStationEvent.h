@@ -65,7 +65,7 @@ class UsefulIcrrStationEvent: public RawIcrrStationEvent, public UsefulAraStatio
 
    AraEventCalibrator *fCalibrator; ///< Pointer to the AraEventCalibrator
 
-  ClassDef(UsefulIcrrStationEvent,1);
+  ClassDef(UsefulIcrrStationEvent,2);
 };
 
 

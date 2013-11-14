@@ -15,8 +15,13 @@ add_executable(makeIcrrCalibratedEventTree makeIcrrCalibratedEventTree.cxx)
 
 target_link_libraries(makeIcrrCalibratedEventTree AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
+add_executable(makeIcrrEventTreeFromAraSim makeIcrrEventTreeFromAraSim.cxx)
+
+target_link_libraries(makeIcrrEventTreeFromAraSim AraEvent  ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
+
+
 #Install the binaries
-install(TARGETS makeIcrrEventTree makeIcrrHkTree makeIcrrCalibratedEventTree DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS makeIcrrEventTree makeIcrrHkTree makeIcrrCalibratedEventTree makeIcrrEventTreeFromAraSim DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 #install the scripts
 install(FILES runAraOneEventFileMaker.sh runAraOneRunFileMaker.sh runAraOneTimeFileMaker.sh runTestBedEventFileMaker.sh runTestBedRunFileMaker.sh runTestBedTimeFileMaker.sh  DESTINATION ${ARAROOT_INSTALL_PATH}/scripts)

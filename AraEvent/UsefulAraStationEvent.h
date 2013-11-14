@@ -36,7 +36,7 @@ class UsefulAraStationEvent
 
 
 
-  ClassDef(UsefulAraStationEvent,1);
+  ClassDef(UsefulAraStationEvent,2);
 };
 
 

@@ -194,7 +194,7 @@ void AraDisplay::zeroPointers()
   fAtriUsefulEventPtr=0;
   fAtriRawEventPtr=0;
   fIcrrData=0;
-
+  fIsUsefulEvent=0;
 
   fAraCanvas=0;
   fAraEventInfoPad=0;
@@ -296,14 +296,14 @@ int AraDisplay::getEventEntry()
   }
   
   
-  if(fIcrrData) {
+  if(fIcrrData && !fIsUsefulEvent) {
     if(fIcrrUsefulEventPtr)
-    delete fIcrrUsefulEventPtr;
+      delete fIcrrUsefulEventPtr;
     fIcrrUsefulEventPtr = new UsefulIcrrStationEvent(fIcrrRawEventPtr,fCalType);
   }
-  else {
+  if(!fIcrrData && !fIsUsefulEvent){
     if(fAtriUsefulEventPtr)
-    delete fAtriUsefulEventPtr;
+      delete fAtriUsefulEventPtr;
     fAtriUsefulEventPtr = new UsefulAtriStationEvent(fAtriRawEventPtr,fCalType);
   }
   
@@ -369,11 +369,20 @@ int AraDisplay::loadEventTree(char *eventFile)
   fIcrrData=AraGeomTool::isIcrrStation(fRawStationEventPtr->stationId);
 
   fEventTree->ResetBranchAddresses();
-  if(fIcrrData) 
-    fEventTree->SetBranchAddress("event",&fIcrrRawEventPtr);  
-  else
-    fEventTree->SetBranchAddress("event",&fAtriRawEventPtr);  
+  if(fIcrrData){
+    std::string className(fEventTree->GetBranch("event")->GetClassName());
+    if(className == "UsefulIcrrStationEvent") fIsUsefulEvent=1;
 
+    if(fIsUsefulEvent) fEventTree->SetBranchAddress("event",&fIcrrUsefulEventPtr);  
+    else fEventTree->SetBranchAddress("event",&fIcrrRawEventPtr);  
+  }
+  else{
+    std::string className(fEventTree->GetBranch("event")->GetClassName());
+    if(className == "UsefulAtriStationEvent") fIsUsefulEvent=1;
+
+    if(fIsUsefulEvent) fEventTree->SetBranchAddress("event",&fAtriUsefulEventPtr);  
+    else fEventTree->SetBranchAddress("event",&fAtriRawEventPtr);  
+  }
   fEventTree->SetBranchAddress("run",&fCurrentRun);  
   fEventEntry=0;
 

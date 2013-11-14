@@ -168,7 +168,8 @@ class AraDisplay
   
   Int_t fInEventPlayMode; ///< Flag that indicates playback mode
   Int_t fEventPlaySleepMs; ///< Length of sleep between events in playback mode.
-  Int_t fIcrrData;
+  Int_t fIcrrData; ///< Are the events Icrr events or not
+  Int_t fIsUsefulEvent; ///< Are the events already useful events
   Int_t fApplyEventCut; ///< Apply an event cut
   TEventList *fCutEventList; ///<The cut eventlist
   
