@@ -15,8 +15,13 @@
 #ifndef ATRI_STRUCTURES_H
 #define ATRI_STRUCTURES_H
 
-#if !defined(__CINT__) || defined(__MAKECINT__)
+#ifndef __CINT__
 #include <stdint.h>
+#else
+typedef UChar_t uint8_t;
+typedef UShort_t uint16_t;
+typedef UInt_t uint32_t;
+typedef ULong_t uint64_t;
 #endif
 
 #include "araSoft.h"
