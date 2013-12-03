@@ -413,6 +413,10 @@ TH2D *AraEventCorrelator::getInterferometricMap(UsefulIcrrStationEvent *evPtr, A
   }
   //Moved the scaling to earlier for optimisation reasons
   //  histMap->Scale(scale);
+
+  //Set the Zaxis scale;
+  //  histMap->GetZaxis()->SetRangeUser(-1,1);
+
   return histMap;
 }
 

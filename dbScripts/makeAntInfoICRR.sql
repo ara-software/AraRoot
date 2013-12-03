@@ -137,69 +137,68 @@ insert into Testbed VALUES(
 
 
 ---This is Carl and Amy's version (will be better)
-UPDATE Testbed
-SET  antLocation0=-8.4193682,	antLocation1=-4.4039331, antLocation2=-20.498074
-WHERE chanId='0A1';
+--UPDATE Testbed
+--SET  antLocation0=-8.4193682,	antLocation1=-4.4039331, antLocation2=-20.498074
+--WHERE chanId='0A1';
 
-UPDATE Testbed
-SET antLocation0= 3.02253691,	antLocation1=10.4088892, antLocation2=-30.558942
-WHERE chanId='0A2';
+--UPDATE Testbed
+--SET antLocation0= 3.02253691,	antLocation1=10.4088892, antLocation2=-30.558942
+--WHERE chanId='0A2';
 
-UPDATE Testbed
-SET antLocation0=-0.4232361,	antLocation1=-11.12648,	antLocation2=-22.507315
-WHERE chanId='0A3';
+--UPDATE Testbed
+--SET antLocation0=-0.4232361,	antLocation1=-11.12648,	antLocation2=-22.507315
+--WHERE chanId='0A3';
 
-UPDATE Testbed
-SET antLocation0=-8.4193377,	antLocation1=-4.4039331, antLocation2=-25.498074
-WHERE chanId='0A4';
+--UPDATE Testbed
+--SET antLocation0=-8.4193377,	antLocation1=-4.4039331, antLocation2=-25.498074
+--WHERE chanId='0A4';
 
 
 
-UPDATE Testbed
-SET antLocation0=9.22196754, antLocation1=-6.152022, antLocation2=-27.72924
-WHERE chanId='0B1';
+--UPDATE Testbed
+--SET antLocation0=9.22196754, antLocation1=-6.152022, antLocation2=-27.72924
+--WHERE chanId='0B1';
 
-UPDATE Testbed
-SET antLocation0=-0.4232148, antLocation1=-11.12648, antLocation2=-27.507315
+--UPDATE Testbed
+--SET antLocation0=-0.4232148, antLocation1=-11.12648, antLocation2=-27.507315
+--WHERE chanId='0B2';
 
-WHERE chanId='0B2';
-UPDATE Testbed
+--UPDATE Testbed
+--SET antLocation0=3.02251558, antLocation1=10.4089197, antLocation2=-25.55879
+--WHERE chanId='0B3';
 
-SET antLocation0=3.02251558, antLocation1=10.4089197, antLocation2=-25.55879
-WHERE chanId='0B3';
+--UPDATE Testbed
+--SET antLocation0=9.22196754, antLocation1=-6.152022, antLocation2=-22.72924
+--WHERE chanId='0B4';
 
-UPDATE Testbed
-SET antLocation0=9.22196754, antLocation1=-6.152022, antLocation2=-22.72924
-WHERE chanId='0B4';
+--UPDATE Testbed
+--SET antLocation0=-2.4813127, antLocation1=-1.7493112, antLocation2=-1.2148352
+--WHERE chanId='0C1';
 
-UPDATE Testbed
-SET antLocation0=-2.4813127, antLocation1=-1.7493112, antLocation2=-1.2148352
-WHERE chanId='0C1';
+--UPDATE Testbed
+--SET antLocation0=4.3936309, antLocation1=-2.4089745, antLocation2=-1.1910242
+--WHERE chanId='0C2';
 
-UPDATE Testbed
-SET antLocation0=4.3936309, antLocation1=-2.4089745, antLocation2=-1.1910242
-WHERE chanId='0C2';
+--UPDATE Testbed
+--SET antLocation0=1.58057997, antLocation1=3.80024628, antLocation2=-1.1910242
+--WHERE chanId='0C3';
 
-UPDATE Testbed
-SET antLocation0=1.58057997, antLocation1=3.80024628, antLocation2=-1.1910242
-WHERE chanId='0C3';
+--UPDATE Testbed
+--SET antLocation0=-2.4813097, antLocation1=-1.7493142, antLocation2=-2.2148352
+--WHERE chanId='0C4';
 
-UPDATE Testbed
-SET antLocation0=-2.4813097, antLocation1=-1.7493142, antLocation2=-2.2148352
-WHERE chanId='0C4';
+--UPDATE Testbed
+--SET antLocation0=-9.074932, antLocation1=3.8573658, antLocation2=-26.411072
+--WHERE chanId='0C5';
 
-UPDATE Testbed
-SET antLocation0=-9.074932, antLocation1=3.8573658, antLocation2=-26.411072
-WHERE chanId='0C5';
+--UPDATE Testbed
+--SET antLocation0=-9.074932, antLocation1=3.8573658, antLocation2=-30.411053
+--WHERE chanId='0C6';
 
-UPDATE Testbed
-SET antLocation0=-9.074932, antLocation1=3.8573658, antLocation2=-30.411053
-WHERE chanId='0C6';
+--UPDATE Testbed
+--SET antLocation0=0, antLocation1=0, antLocation2=0
+--WHERE chanId='0C7';
 
-UPDATE Testbed
-SET antLocation0=0, antLocation1=0, antLocation2=0
-WHERE chanId='0C7';
-
-UPDATE Testbed
-SET antLocation0=0, antLocation1=0, antLocation2=0
-WHERE chanId='0C8';
+--UPDATE Testbed
+--SET antLocation0=0, antLocation1=0, antLocation2=0
+--WHERE chanId='0C8';

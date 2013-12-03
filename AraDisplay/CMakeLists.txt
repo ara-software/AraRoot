@@ -2,7 +2,9 @@ Set(libname AraDisplay)
 # ROOT is included in the template.
 Set(LinkDef ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h)
 Set(Dictionary ${CMAKE_CURRENT_BINARY_DIR}/G__${libname}.cxx)
+
 Set(INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/AraEvent ${CMAKE_SOURCE_DIR}/AraCorrelator ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS})
+
 Set(DICTIONARY_INCLUDE_DIRECTORIES ${DICTIONARY_INCLUDE_DIRECTORIES}  ${CMAKE_SOURCE_DIR}/AraEvent ${CMAKE_SOURCE_DIR}/AraCorrelator ${CMAKE_SOURCE_DIR}/AraDisplay ${CMAKE_SOURCE_DIR}/AraWebPlotter)
 
 File(GLOB ${libname}Headers AraAtriCanvasMaker.h        AraCorrelationFactory.h AraDisplayConventions.h AraIcrrCanvasMaker.h
@@ -23,7 +25,7 @@ Add_Library(${libname} SHARED ${${libname}Source} ${Dictionary})
 
 SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 
-target_link_libraries(AraDisplay AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
+target_link_libraries(AraDisplay ${ARACSW_LIBRARIES} AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
 
 #Install the libraries and headers
 install(TARGETS AraDisplay DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
