@@ -25,7 +25,7 @@ Add_Library(${libname} SHARED ${${libname}Source} ${Dictionary})
 
 SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 
-target_link_libraries(AraDisplay ${ARACSW_LIBRARIES} AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
+target_link_libraries(AraDisplay AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
 
 #Install the libraries and headers
 install(TARGETS AraDisplay DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
