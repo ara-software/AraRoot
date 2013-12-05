@@ -675,7 +675,7 @@ void AraEventCalibrator::calcClockAlignVals(UsefulIcrrStationEvent *theEvent, Ar
     int chanIndex=ICRR1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip; 
     grClock[chip]=theEvent->getGraphFromElecChan(chanIndex);
     lag[chip]=estimateClockLag(grClock[chip]);
-    clockLagVals[chip]=lag[chip];
+    clockLagVals[stationId][chip]=lag[chip];
     delete grClock[chip];
 
     if(chip>0) {
@@ -683,13 +683,13 @@ void AraEventCalibrator::calcClockAlignVals(UsefulIcrrStationEvent *theEvent, Ar
       clockAlignVals[stationId][chip]=lag[0]-lag[chip];
       //The below fudge factors were "tuned" using pulser data 
       // to try and remove period ambiguities resulting from wrong cycle lag
-      if(lag[chip]<8 && lag[0]>9) 
+      // jpd -- updated the fudge factors to remove 1e-3 failures in 
+      if(lag[chip]<8.5 && lag[0]>8.5) 
 	clockAlignVals[stationId][chip]-=25;
-      if(lag[chip]>9 && lag[0]<7) 
+      if(lag[chip]>8.5 && lag[0]<8.5) 
 	clockAlignVals[stationId][chip]+=25;
       //      std::cout << "clockAlignVals[ " << chip << "] = " << clockAlignVals[chip] << "\n";
-    }
-x    
+    }    
   }  
 }
 
