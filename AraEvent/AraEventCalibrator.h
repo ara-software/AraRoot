@@ -90,6 +90,7 @@ class AraEventCalibrator : public TObject
    double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_ICRR][2]; ///<Array to hold the wrap-around calibration constants
    double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
    double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //Well by default clock align 0 is 0
+   double clockLagVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //For debugging
 
    ///These are just utility arrays that are used in the calibration
    double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped

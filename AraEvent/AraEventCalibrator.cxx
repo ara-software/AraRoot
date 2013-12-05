@@ -675,6 +675,7 @@ void AraEventCalibrator::calcClockAlignVals(UsefulIcrrStationEvent *theEvent, Ar
     int chanIndex=ICRR1_CLOCK_CHANNEL+CHANNELS_PER_LAB3*chip; 
     grClock[chip]=theEvent->getGraphFromElecChan(chanIndex);
     lag[chip]=estimateClockLag(grClock[chip]);
+    clockLagVals[chip]=lag[chip];
     delete grClock[chip];
 
     if(chip>0) {
@@ -688,7 +689,7 @@ void AraEventCalibrator::calcClockAlignVals(UsefulIcrrStationEvent *theEvent, Ar
 	clockAlignVals[stationId][chip]+=25;
       //      std::cout << "clockAlignVals[ " << chip << "] = " << clockAlignVals[chip] << "\n";
     }
-    
+x    
   }  
 }
 
