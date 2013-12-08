@@ -653,6 +653,9 @@ void AraStationInfo::readChannelMapDbIcrr(){
 	break;
       case 7: //daqTrigChan
 	thisAntInfo->daqTrigChan=sqlite3_column_int(stmt, column);
+	//RJN feature for now
+	if(thisAntInfo->daqChanType==AraDaqChanType::kBatwingChan)
+	  thisAntInfo->daqTrigChan+=8;
 	//printf("fStationInfoICRR[%i].fAntInfo[%i].daqTrigChan %i\n", fStationId, row, thisAntInfo->daqTrigChan);
 
 	break;
@@ -724,6 +727,7 @@ void AraStationInfo::readChannelMapDbIcrr(){
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
 	strncpy(thisAntInfo->designator, temp, 3);
+	strncpy(thisAntInfo->antName, temp, 3);
 	//printf("fStationInfoICRR[%i].fAntInfo[%i].designator %s\n", fStationId, row, thisAntInfo->designator);
 
 	break;
@@ -760,6 +764,7 @@ void AraStationInfo::readChannelMapDbIcrr(){
 
 	temp = (const char*)sqlite3_column_text(stmt, column);
 	strncpy(thisAntInfo->locationName, temp, 4);
+	strncpy(thisAntInfo->holeName, temp, 4);
 	//printf("fStationInfoICRR[%i].fAntInfo[%i].locationName %s\n", fStationId, row, thisAntInfo->locationName);
 
 

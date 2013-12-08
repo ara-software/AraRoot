@@ -23,6 +23,7 @@ add_subdirectory(utilities/Atri)
 add_subdirectory(utilities/Icrr)
 add_subdirectory(analysis)
 add_subdirectory(AraVertex)
+add_subdirectory(calibration/antCalib) 
 add_subdirectory(calibration/ATRI) 
 add_subdirectory(calibration/ATRI/voltageCalib) 
 

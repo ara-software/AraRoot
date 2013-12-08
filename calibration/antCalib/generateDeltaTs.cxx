@@ -22,11 +22,14 @@
 //ROOT Includes
 #include "TTree.h"
 #include "TFile.h"
+#include "TMath.h"
 #include "TGraph.h"
 #include "TTimeStamp.h"
 #include "TSystem.h"
 
 #include <map>
+
+//#define DEBUG_FILE 1
 
 RawIcrrStationEvent *rawIcrrEvPtr=0;
 RawAtriStationEvent *rawAtriEvPtr=0;
@@ -34,6 +37,9 @@ RawAraStationEvent *rawEvPtr=0;
 UsefulIcrrStationEvent *realIcrrEvPtr=0;
 UsefulAtriStationEvent *realAtriEvPtr=0;
 UsefulAraStationEvent *realEvPtr=0;
+
+TGraph *correlateAndAverage(Int_t numGraphs, TGraph **grPtrPtr, Double_t *deltaTVals=0);
+
 
 void usage(char **argv) 
 {  
@@ -73,7 +79,9 @@ int main(int argc, char **argv) {
   eventTree->SetBranchAddress("event",&rawEvPtr);
   eventTree->SetBranchAddress("run",&runNumber);
   eventTree->GetEntry(0);
-
+  int stationId=0;
+  stationId=rawEvPtr->stationId;
+    
   if((rawEvPtr->stationId)<2){
     isIcrrEvent=1;
     isAtriEvent=0;
@@ -83,6 +91,12 @@ int main(int argc, char **argv) {
     isAtriEvent=1; 
   }
   eventTree->ResetBranchAddresses();
+
+  AraGeomTool *fGeomTool = AraGeomTool::Instance();
+  AraStationInfo *fStationInfo = fGeomTool->getStationInfo(stationId);
+  Int_t numVPols=fStationInfo->getNumAntennasByPol(AraAntPol::kVertical);
+  Int_t numHPols=fStationInfo->getNumAntennasByPol(AraAntPol::kHorizontal);
+
 
   //Now set the appropriate branch addresses
   //The Icrr case
@@ -131,11 +145,17 @@ int main(int argc, char **argv) {
       strncpy(lastPedFileName,pedFileName,FILENAME_MAX);
     }
     //Got the pedestal run
-    AraEventCalibrator::Instance()->setAtriPedFile(lastPedFileName, rawAtriEvPtr->stationId);    
+    AraEventCalibrator::Instance()->setAtriPedFile(lastPedFileName, stationId);    
   }
 
 
-  //  numEntries=200;
+  //  numEntries=20;
+  Double_t dt3[8];
+  TFile *fpOut = new TFile("calPulserTimes.root","RECREATE");
+  TTree *dtTree = new TTree("dtTree","Tree of deltaTs");
+  dtTree->Branch("dt3",&dt3,"dt3[8]/D");
+  
+
   for(Long64_t event=0;event<numEntries;event++) {
     if(event%starEvery==0) {
       std::cerr << "*";       
@@ -173,16 +193,143 @@ int main(int argc, char **argv) {
     if(!isCalPulser) continue;
 
 
-    Int_t numChannels=realEvPtr->getNumRFChannels();
 
-    TGraph *gr[100]={0};
+    TGraph *grV[10]={0};
+    TGraph *grH[10]={0};
 
-
-    for( int i=0; i<numChannels; ++i ) {
-
+    
+    Double_t deltaTVs[10]={0};
+    Double_t maxV[10]={0};
+    Int_t indexV[10]={0};
+    Int_t numPoints=0;
+    for( int i=0; i<numVPols; ++i ) {
+      int rfchan=fStationInfo->getRFChanByPolAndAnt(i,AraAntPol::kVertical);
+      TGraph *grTemp=realAtriEvPtr->getGraphFromRFChan(rfchan);
+      grV[i]=FFTtools::getInterpolatedGraph(grTemp,0.1);
+      delete grTemp;
+      Int_t numVals=grV[i]->GetN();
+      if(numVals>numPoints) numPoints=numVals;
+      Double_t maxValue=TMath::MaxElement(numVals,grV[i]->GetY());
+      Double_t minValue=TMath::MinElement(numVals,grV[i]->GetY());
+      maxV[i]=maxValue;
+      if(TMath::Abs(minValue)>maxValue) maxV[i]=TMath::Abs(minValue);
     }
+    TMath::Sort(numVPols,maxV,indexV);
+    for(int ant=0;ant<numVPols;ant++) {
+      //      std::cout << ant << "\t" << indexV[ant] << "\t" << maxV[ant] << "\n";
+    }
+
+    TGraph *grVOrdered[10];
+    for(int ant=0;ant<numVPols;ant++) {
+      grVOrdered[ant]=grV[indexV[ant]];
+    }
+    Double_t orderedDeltaTs[10];
+    TGraph *grSum=correlateAndAverage(numVPols,grVOrdered,orderedDeltaTs);
+    for( int i=0; i<numVPols; ++i ) {
+      deltaTVs[indexV[i]]=orderedDeltaTs[i];      
+      //      std::cout << eventNumber << "\t" << i << "\t" << indexV[i] << "\t" << orderedDeltaTs[i] << "\n";
+      delete grV[i];
+    }  
+
+    //Arbitrary choice to set this as the reference antenna... well not quite arbitrary but could be any of teh other six
+    Double_t deltaT0=deltaTVs[3];
+    for( int i=0; i<numVPols; ++i ) {
+      deltaTVs[i]-=deltaT0;
+      dt3[i]=deltaTVs[i];
+      //      std::cout << eventNumber << "\t" << i << "\t" << deltaTVs[i] << "\n";
+    }
+    dtTree->Fill();
+
   }
+  dtTree->AutoSave();
   std::cerr << "\n";
 
+
+}
+
+TGraph *correlateAndAverage(Int_t numGraphs, TGraph **grPtrPtr, Double_t *deltaTVals)
+{
+#ifdef DEBUG_FILE
+  char grName[180];
+  TFile *fpDebug = new TFile("debug.root","RECREATE");
+  for(int i=0;i<numGraphs;i++) {
+    sprintf(grName,"gr%d",i);
+    grPtrPtr[i]->SetName(grName);
+    grPtrPtr[i]->Write();
+  }
+#endif
+  //Assume they are all at same sampling rate
+  if(numGraphs<2) return NULL;
+  TGraph *grA = grPtrPtr[0];
+  Int_t numPoints=grA->GetN();  
+  Double_t *timeVals= grA->GetX();
+  Double_t *safeTimeVals = new Double_t[numPoints];
+  Double_t *sumVolts = new Double_t [numPoints];
+  for(int i=0;i<numPoints;i++) 
+    safeTimeVals[i]=timeVals[i];  
+  
+  int countWaves=1;
+  if( deltaTVals) deltaTVals[0]=0;
+  for(int graphNum=1;graphNum<numGraphs;graphNum++) {
+    TGraph *grB = grPtrPtr[graphNum];
+    if(grB->GetN()<numPoints)
+      numPoints=grB->GetN();
+    TGraph *grCorAB = FFTtools::getCorrelationGraph(grA,grB);
+#ifdef DEBUG_FILE
+    sprintf(grName,"grCor%d",graphNum);
+    grCorAB->SetName(grName);
+    grCorAB->Write();
+#endif
+
+    Int_t peakBin = FFTtools::getPeakBin(grCorAB);
+    Double_t *corTVals=grCorAB->GetX();
+    //    cout << peakBin << "\t" << grCorAB->GetN() << endl;
+    Int_t offset=peakBin-(grCorAB->GetN()/2);
+    if(deltaTVals) deltaTVals[graphNum]=corTVals[peakBin];
+    //    cout << deltaTVals[peakBin] << "\t" << safeTimeVals[offset] << endl;
+ 
+    Double_t *aVolts = grA->GetY();
+    Double_t *bVolts = grB->GetY();
+
+    for(int ind=0;ind<numPoints;ind++) {
+      int aIndex=ind;
+      int bIndex=ind-offset;
+      
+      if(bIndex>=0 && bIndex<numPoints) {
+	sumVolts[ind]=(aVolts[aIndex]+bVolts[bIndex]);
+      }
+      else {
+	sumVolts[ind]=aVolts[aIndex];
+      }
+    }
+    
+
+    TGraph *grComAB = new TGraph(numPoints,safeTimeVals,sumVolts);
+
+    //    delete grB;
+    delete grCorAB;
+    if(graphNum>1)
+      delete grA;
+    grA=grComAB;
+    countWaves++;
+
+  }
+  for(int i=0;i<numPoints;i++) {
+    sumVolts[i]/=countWaves;
+  }
+  Double_t meanVal=TMath::Mean(numPoints,sumVolts);
+  for(int i=0;i<numPoints;i++) {
+    sumVolts[i]-=meanVal;
+  }
+  delete grA;
+  TGraph *grRet = new TGraph(numPoints,safeTimeVals,sumVolts);
+#ifdef DEBUG_FILE
+  grRet->SetName("grCorSum");
+  grRet->Write();
+  fpDebug->Close();
+#endif
+  delete [] safeTimeVals;
+  delete [] sumVolts;
+  return grRet;
 
 }
