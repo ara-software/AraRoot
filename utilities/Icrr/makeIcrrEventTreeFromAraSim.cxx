@@ -71,8 +71,9 @@ int processRun(char *simFileName, char *outFileName, Int_t stationId){
   }
 
   UsefulIcrrStationEvent *simEvPtr=0;
-  Int_t retVal = simTree->SetBranchAddress("event", &simEvPtr);
-  
+  Int_t retVal = simTree->SetBranchAddress("UsefulARAStationEvent", &simEvPtr);
+  //  if( retVal != 0 ) simTree->SetBranchAddress("UsefulARAStationEvent", &simEvPtr);
+
   Int_t numEntries = simTree->GetEntries();
   Int_t starEvery=numEntries/80;
   if(starEvery==0) starEvery=1;
