@@ -930,7 +930,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
       if(AraCalType::hasBinWidthCalib(calType)) {
 	if(!firstTime) {
 	  //Add on the time between blocks
-	  time+=fAtriEpsilonTimes[dda][chan][capArray];
+//	  time+=fAtriEpsilonTimes[dda][chan][capArray];    //I think this is not needed anymore. The actual block timing is given in the calibration file. -THM-
 	  // if(dda==1 && chan==1)
 	  //   std::cerr << "Block " << time << "\t" << fAtriEpsilonTimes[dda][chan][capArray] << "\n";
 
