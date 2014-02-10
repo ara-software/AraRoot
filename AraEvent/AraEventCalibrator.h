@@ -111,11 +111,14 @@ class AraEventCalibrator : public TObject
    Int_t fGotAtriCalibFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI calib have been loaded and for which station
    char fAtriPedFile[ATRI_NO_STATIONS][FILENAME_MAX]; ///< Filename of the ATRI pedestal file
    Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
+   Double_t fAtriSampleADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][9];//added for voltage conversion -THM-
+   Double_t fAtriSampleHighADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][5];//added for high voltages -THM-
    Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
    Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
    Int_t fAtriNumSamples[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The number of samples per block in a particular dda, chan, capArray
 
    void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
+   Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample); //A conversion module from ADC counts to millivolts  -THM-
    void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
    void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
    void loadAtriCalib(AraStationId_t stationId); ///< Internally used fuction that loads the calibration values into memory.

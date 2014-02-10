@@ -947,7 +947,11 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  voltIndex[samp]=fAtriSampleIndex[dda][chan][capArray][samp];
 
 	  //Now get the time
-	  tempTimes[samp]=time+fAtriSampleTimes[dda][chan][capArray][samp];
+//	  tempTimes[samp]=time+fAtriSampleTimes[dda][chan][capArray][samp];   //replaced with line below -THM-
+//	  	  
+//	  A new version of timing calibration: every block starts nominally at multiples of 20. The single samples though are referenced to the TSA-strobe
+//	  which happens every 40.0 ns. The odd blocks (capArray=1) T need to have 20ns subtracted then. The even blocks (capArray=0) wont be modified  -THM-
+	  tempTimes[samp]=block*20.0 + fAtriSampleTimes[dda][chan][capArray][samp] - 20.0*capArray;
 
 	  	  // if(dda==1 && chan==1) {
 		  //   std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
@@ -965,7 +969,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	if(!AraCalType::hasPedestalSubtraction(calType))
 	  tempVolts[samp]=(*shortIt); ///<Filling with ADC
 	else {
-	  tempVolts[samp]=(*shortIt)-(Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]; ///<Filling with ADC-Pedestal
+	  //tempVolts does contain millivolts now, including the offset of 11 counts. If possible, we need to correct the pedestals, otherwise the following is not correct and we need to think of something else. -THM-
+	  tempVolts[samp]=convertADCtoMilliVolts( (*shortIt)-(Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] -11.0, dda, block, chan, samp); ///<Filling with ADC-Pedestal
 	  // if(dda==3 && samp<2) {
 	  //   std::cerr << (*shortIt)  << "\t" << (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
 	  // }
@@ -1178,7 +1183,24 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   }  
 
   int dda,chan,sample,capArray;
-  sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
+
+
+//  Reading the reference VadjValues from file (only for ARA02). -THM-
+  int VadjRef[DDA_PER_ATRI]={17562, 17765, 17834, 17526};//These default values are from ARA02. Not to be applied to any other station.-THM-
+  int currentVadj[DDA_PER_ATRI]={17795, 17725, 17602, 17676};//These default values are from ARA02. Not to be applied to any other station.-THM-
+  if(stationId==2){
+    char VadjRefFile[200];
+    sprintf(VadjRefFile,"%s/ATRI/araAtriStation%iVadjRef.txt", calibDir, stationId );
+    fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Vadj reference file = %s\n", VadjRefFile);//DEBUG
+    std::ifstream VadjFile(VadjRefFile);
+    while(VadjFile >> dda){
+      VadjFile >> VadjRef[dda];
+    }
+    VadjFile.close();
+  }//end modification -THM-
+
+//  sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
+  sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTimingNew.txt",calibDir, stationId); // opening the new calibration file -THM-
   fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
@@ -1195,6 +1217,8 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     }
   }
 
+
+
   Double_t value;
   Int_t index;
   while(SampleFile >> dda >> chan >> capArray){
@@ -1210,13 +1234,55 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     //    std::cerr <<  dda << "\t" << chan << "\t" << capArray << "\t" << fAtriNumSamples[dda][chan][capArray] << "\t";
     for(sample=0;sample<fAtriNumSamples[dda][chan][capArray];sample++) {
       SampleFile >> value;
-      fAtriSampleTimes[dda][chan][capArray][sample]=value;
+      //   Now the sample times are read and corrected compared to the TSA reference for a change of Vadj. Note that this should be only done for ARA02 so far. 
+      //   Only for ARA02 we have data about the dependency of the sampling speed on Vadj which look reliable. Maybe we can fix this with future measurements.
+      //   Current Vadj somehow needs to get here from the eventHk-file. Not sure what the best way is. -THM- 
+      if(stationId==2){
+        fAtriSampleTimes[dda][chan][capArray][sample]=value * 1.0/(0.9978 - 0.0002*(VadjRef[dda] - currentVadj[dda]));
+      }
+      else{
+        fAtriSampleTimes[dda][chan][capArray][sample]=value;
+      }//end modification -THM-
       //      std::cerr << fAtriSampleTimes[dda][chan][capArray][sample] << " ";    
     }
     //    std::cerr << "\n";
   }
   SampleFile.close();
-  
+
+  //Read the ADC to volts conversion factors for the range between -400 and 400 ADC counts. -THM-
+  int blockNumber;
+  double conv;
+  char adcToVoltageConvFile[200];
+  sprintf(adcToVoltageConvFile,"%s/ATRI/araAtriStation%iadcToVoltsConv.txt", calibDir, stationId );
+  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Voltage-calibration file = %s\n", adcToVoltageConvFile);//DEBUG
+  std::ifstream ADCConvFile(adcToVoltageConvFile);
+  while(ADCConvFile >> dda >> chan >> blockNumber){
+    for(sample=0;sample<64;sample++){
+      for(int cv=0;cv<9;cv++){
+        ADCConvFile >> conv;
+        fAtriSampleADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
+      }
+    }
+  }
+  ADCConvFile.close();
+  //end modification -THM-
+
+  //Read the ADC to volts conversion factors for the range below -400 and above 400 ADC counts. -THM-
+  char highAdcToVoltageConvFile[200];
+  sprintf(highAdcToVoltageConvFile,"%s/ATRI/araAtriStation%ihighAdcToVoltsConv.txt", calibDir, stationId );
+  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - high voltage-calibration file = %s\n", highAdcToVoltageConvFile);//DEBUG
+  std::ifstream highADCConvFile(highAdcToVoltageConvFile);
+  while(highADCConvFile >> dda >> chan >> blockNumber){
+    for(sample=0;sample<64;sample++){
+      for(int cv=0;cv<5;cv++){
+        highADCConvFile >> conv;
+        fAtriSampleHighADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
+      }
+    }
+  }
+  highADCConvFile.close();
+  //end modification -THM-
+
   char epsilonFileName[100];
   sprintf(epsilonFileName,"%s/ATRI/araAtriStation%iEpsilon.txt",calibDir, stationId);
   //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
@@ -1296,4 +1362,62 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
   }
   theFile.close();
   return numPedVals;
+}
+
+
+Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample){//-THM-
+   //There is an offset induced in the pedestal numbers, due to asymmetry of the chip. 
+   //From calibration files this offset with the given noise will be around 11 ADC counts.
+   Double_t volts = 0.0;
+   int block = inBlock;
+
+   //Only apply calibration on calibrated channels (RF channels)!
+ if( (dda==0 && chan<6)||(dda==1 && chan<4)||(dda==2 && chan<4)||(dda==3 && chan<6) ){
+   //Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
+   while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - 2 + 512)%512;
+   //Offset needs to be subtracted
+   double adcCounts = adcCountsIn;
+   //Start ADC to voltage conversion
+   if(TMath::Abs(adcCounts)<400)
+   {//conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
+	if(adcCounts>0)
+	{//positive and negative values need different calibration constants
+	    volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
+		+ (adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7])
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
+		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 2)
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
+		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 3)
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][2]; 
+	}
+	else
+	{
+	    volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
+		+ (adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7])
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] 
+		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 2)
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][4]
+		+  pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 3)
+			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
+	}
+   }
+   else
+   {//here is the alternative calibration if the ADC count exceeds 400
+	if(adcCounts>0)
+	{
+	    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
+		+ adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
+	}
+	else
+	{
+	    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2] 
+		+ adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+	}
+   }
+
+ }
+ else{
+     volts = adcCountsIn;
+ }
+ return volts;
 }
