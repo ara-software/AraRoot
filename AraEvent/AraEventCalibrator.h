@@ -50,6 +50,7 @@ namespace AraCalType {
   Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
   Bool_t hasUnDiplexing(AraCalType::AraCalType_t calType); ///<Does the calibration type perform un-diplexing
   Bool_t hasZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform
+  Bool_t hasVoltCal(AraCalType::AraCalType_t calType); ///< Does the calibration type convert ADC to volts-THM-
 } 
 
 class UsefulAtriStationEvent;

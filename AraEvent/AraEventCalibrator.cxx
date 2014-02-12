@@ -26,6 +26,13 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
   
 }
 
+//added, 12-Feb 2014 -THM-
+Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
+{
+  if(calType<=kVoltageTime) return kFALSE;
+  return kTRUE;
+}
+
 Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
   if(calType==kFirstCalibPlusCables || calType==kSecondCalibPlusCables || calType==kSecondCalibPlusCablesUnDiplexed)
@@ -969,8 +976,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	if(!AraCalType::hasPedestalSubtraction(calType))
 	  tempVolts[samp]=(*shortIt); ///<Filling with ADC
 	else {
-	  //tempVolts does contain millivolts now, including the offset of 11 counts. If possible, we need to correct the pedestals, otherwise the following is not correct and we need to think of something else. -THM-
-	  tempVolts[samp]=convertADCtoMilliVolts( (*shortIt)-(Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] -11.0, dda, block, chan, samp); ///<Filling with ADC-Pedestal
+	  tempVolts[samp]=(*shortIt)-(Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]; ///<Filling with ADC-Pedestal
 	  // if(dda==3 && samp<2) {
 	  //   std::cerr << (*shortIt)  << "\t" << (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)] << "\n";
 	  // }
@@ -984,7 +990,6 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
       for(samp=0;samp<numSamples;samp++) {
 	timeMapIt->second.push_back(tempTimes[samp]); ///<Filling with time
 	voltMapIt->second.push_back(tempVolts[voltIndex[samp]]); //Filling with volts
-	
       }
       
 	    
@@ -1030,6 +1035,25 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	    voltMapIt->second[samp]-=mean;
 	  }
 	}	  	  	
+      }
+    }
+  }
+  //THM added 12-Feb-2014
+  //After zeroMean (and only then!!) do voltage calibration,   
+  if(hasZeroMean(calType) && hasVoltCal(calType)) {
+	int blockNumber = 0;//This still needs to be gotten from somewhere! -THM-
+	int sampleNumber = 0;
+    for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+      for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
+  	Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+  	voltMapIt=theEvent->fVolts.find(chanId);
+	if(voltMapIt!=theEvent->fVolts.end()) {
+	  Int_t numPoints=(voltMapIt->second).size();
+	  for(int samp=0;samp<numPoints;samp++) {
+	  //ADC counts are now calibrated, including the offset of 11 counts. -THM-
+	    voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp] -11.0, dda, blockNumber, chan, sampleNumber);
+	  }
+	}
       }
     }
   }
