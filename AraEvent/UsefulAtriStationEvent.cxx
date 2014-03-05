@@ -58,8 +58,24 @@ TGraph *UsefulAtriStationEvent::getGraphFromElecChan(int chanId)
 
   //Why do we need to sort the array. Shouldn't this be done in AraEventCalibrator??
   //FIXME -- jpd - this is my dumb idea
-  gr->Sort();
-  
+//   double lastTime=-1e9;
+//   int countNegative=0;
+//   for(int i=0;i<fTimes[chanId].size();i++) {
+//      if(fTimes[chanId][i]<lastTime) {
+// 	std::cerr << "Ooops: " << chanId << "\t" << i << "\t" << lastTime << "\t" << fTimes[chanId][i] << "\n";
+// 	countNegative++;
+//      }
+//      lastTime=fTimes[chanId][i];
+//   }
+
+//   if(countNegative>0) {
+//      std::cerr << "Back in time on chan Id: " << chanId << "\t" << countNegative << "\n";
+//      gr->Sort();
+//   }
+  if(fTimes[chanId].size()==0) {
+     std::cerr << "Oh no there aren't any points\n";
+  }
+
   return gr;
 }
 

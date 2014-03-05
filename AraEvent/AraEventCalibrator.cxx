@@ -864,12 +864,15 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 
   //Step one is loop over the blocks
 
+  std::vector<Int_t> blockList[DDA_PER_ATRI];
   std::vector<RawAtriStationBlock>::iterator blockIt;
   std::vector< std::vector<UShort_t> >::iterator vecVecIt;
   std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
   std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
   std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt2;
   std::vector< UShort_t >::iterator shortIt;
+  Int_t blockInEvent[DDA_PER_ATRI]={0};
+  for(int dda=0;dda<DDA_PER_ATRI;dda++) blockInEvent[dda]=-1;
   for(blockIt = theEvent->blockVec.begin(); 
       blockIt!=theEvent->blockVec.end();
       blockIt++) {
@@ -885,6 +888,13 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     }
     //    std::cout << "Got numChans " << numChans << "\n";
 
+    
+    Int_t dda=blockIt->getDda();
+    Int_t block=blockIt->getBlock();  ///< This is a number between 0 and 511 and is the storage block
+    Int_t capArray=blockIt->getCapArray();
+    blockList[dda].push_back(block);
+    blockInEvent[dda]++;
+
     //Step three is loop over the channels within a block
     Int_t uptoChan=0;
     for(vecVecIt=blockIt->data.begin();
@@ -892,9 +902,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	vecVecIt++) {
       Int_t chanId=irsChan[uptoChan] | ((blockIt->channelMask&0x300)>>5);
       Int_t chan=irsChan[uptoChan];
-      Int_t dda=blockIt->getDda();
-      Int_t block=blockIt->getBlock();
-      Int_t capArray=blockIt->getCapArray();
+
       //      std::cout << "Got chanId " << chanId << "\t" << irsChan[uptoChan] << "\t" 
       //		<< dda << "\t" << block << "\t" << RawAtriStationEvent::getPedIndex(dda,block,chan,0) << "\n";
       uptoChan++;
@@ -954,16 +962,18 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  voltIndex[samp]=fAtriSampleIndex[dda][chan][capArray][samp];
 
 	  //Now get the time
-//	  tempTimes[samp]=time+fAtriSampleTimes[dda][chan][capArray][samp];   //replaced with line below -THM-
-//	  	  
-//	  A new version of timing calibration: every block starts nominally at multiples of 20. The single samples though are referenced to the TSA-strobe
-//	  which happens every 40.0 ns. The odd blocks (capArray=1) T need to have 20ns subtracted then. The even blocks (capArray=0) wont be modified  -THM-
-	  tempTimes[samp]=block*20.0 + fAtriSampleTimes[dda][chan][capArray][samp] - 20.0*capArray;
+	  //	  tempTimes[samp]=time+fAtriSampleTimes[dda][chan][capArray][samp];   //replaced with line below -THM-
+	  //	  	  
+	  //	  A new version of timing calibration: every block starts nominally at multiples of 20. The single samples though are referenced to the TSA-strobe
+	  //	  which happens every 40.0 ns. The odd blocks (capArray=1) T need to have 20ns subtracted then. The even blocks (capArray=0) wont be modified  -THM-
+	  //RJN -- Now confusingly the [samp] in tempTimes actually refers to the valid sample time
+	  // (i.e if there are 33 valid samples only the first 33 entries in this array will be valid)
+	  tempTimes[samp]=blockInEvent[dda]*20.0 + fAtriSampleTimes[dda][chan][capArray][samp] - 20.0*capArray;
 
-	  	  // if(dda==1 && chan==1) {
-		  //   std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
-	  	  //   std::cerr << index << "\t" << tempTimes[samp] << "\t" << time << "\n";
-	  	  // }
+	  // 	  if(dda==3 && chan==1 && samp<fAtriNumSamples[dda][chan][capArray])  {
+	  // 	     std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << blockInEvent[dda] << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
+	  // 	     std::cerr << chanId << "\t" << tempTimes[samp] << "\t" << time << "\t" << voltIndex[samp] << "\n";
+	  // 	  }
 	  
 	}
 	else {
@@ -1217,10 +1227,16 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     sprintf(VadjRefFile,"%s/ATRI/araAtriStation%iVadjRef.txt", calibDir, stationId );
     fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Vadj reference file = %s\n", VadjRefFile);//DEBUG
     std::ifstream VadjFile(VadjRefFile);
-    while(VadjFile >> dda){
-      VadjFile >> VadjRef[dda];
+    if(VadjFile.is_open()) {
+       while(VadjFile >> dda){
+	  VadjFile >> VadjRef[dda];
+       }
+       VadjFile.close();
     }
-    VadjFile.close();
+    else {
+       std::cerr << "Can not open: " << VadjRefFile << "\n";
+       abort();
+    }
   }//end modification -THM-
 
 //  sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
@@ -1228,13 +1244,17 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
   std::ifstream SampleFile(calibFile);
+  if(!SampleFile.is_open()) {
+     std::cerr << "Can not open: " << calibFile << "\n";
+     abort();
+  }
   //Initialises to some default values
   for(dda=0;dda<DDA_PER_ATRI;dda++) {
     for(chan=0;chan<RFCHAN_PER_DDA;chan++) {
       for(capArray=0;capArray<2;capArray++) {
 	for(sample=0;sample<SAMPLES_PER_BLOCK;sample++) {
 	  fAtriSampleTimes[dda][chan][capArray][sample]=sample/3.2;
-	  fAtriSampleIndex[dda][chan][capArray][sample]=sample;
+	  fAtriSampleIndex[dda][chan][capArray][sample]=-1;
 	}
 	fAtriEpsilonTimes[dda][chan][capArray]=1/3.2;
       }
@@ -1280,43 +1300,61 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   sprintf(adcToVoltageConvFile,"%s/ATRI/araAtriStation%iadcToVoltsConv.txt", calibDir, stationId );
   fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Voltage-calibration file = %s\n", adcToVoltageConvFile);//DEBUG
   std::ifstream ADCConvFile(adcToVoltageConvFile);
-  while(ADCConvFile >> dda >> chan >> blockNumber){
-    for(sample=0;sample<64;sample++){
-      for(int cv=0;cv<9;cv++){
-        ADCConvFile >> conv;
-        fAtriSampleADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
-      }
-    }
+  if(ADCConvFile.is_open()) {
+     while(ADCConvFile >> dda >> chan >> blockNumber){
+	for(sample=0;sample<64;sample++){
+	   for(int cv=0;cv<9;cv++){
+	      ADCConvFile >> conv;
+	      fAtriSampleADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
+	   }
+	}
+     }
+     ADCConvFile.close();
+     //end modification -THM-
   }
-  ADCConvFile.close();
-  //end modification -THM-
+  else {
+     std::cerr << "Can not open: " << adcToVoltageConvFile << "\n";
+     abort();
+  }
 
   //Read the ADC to volts conversion factors for the range below -400 and above 400 ADC counts. -THM-
   char highAdcToVoltageConvFile[200];
   sprintf(highAdcToVoltageConvFile,"%s/ATRI/araAtriStation%ihighAdcToVoltsConv.txt", calibDir, stationId );
   fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - high voltage-calibration file = %s\n", highAdcToVoltageConvFile);//DEBUG
   std::ifstream highADCConvFile(highAdcToVoltageConvFile);
-  while(highADCConvFile >> dda >> chan >> blockNumber){
-    for(sample=0;sample<64;sample++){
-      for(int cv=0;cv<5;cv++){
-        highADCConvFile >> conv;
-        fAtriSampleHighADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
-      }
-    }
+  if(highADCConvFile.is_open()) {
+     while(highADCConvFile >> dda >> chan >> blockNumber){
+	for(sample=0;sample<64;sample++){
+	   for(int cv=0;cv<5;cv++){
+	      highADCConvFile >> conv;
+	      fAtriSampleHighADCVoltsConversion[dda][chan][blockNumber][sample][cv] = conv;
+	   }
+	}
+     }
+     highADCConvFile.close();
   }
-  highADCConvFile.close();
+  else {
+     std::cerr << "Can not open: " << highAdcToVoltageConvFile << "\n";
+     abort();
+  }
   //end modification -THM-
 
   char epsilonFileName[100];
   sprintf(epsilonFileName,"%s/ATRI/araAtriStation%iEpsilon.txt",calibDir, stationId);
   //  fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Epsilon file = %s\n", epsilonFileName);//DEBUG
   std::ifstream epsilonFile(epsilonFileName);
-  while(epsilonFile >> dda >> chan >> capArray){
-    epsilonFile >> value;
-    fAtriEpsilonTimes[dda][chan][capArray]=value;
-    //printf("%s : dda %i channel %i capArray %f\n", __FUNCTION__, dda, chan, value);
+  if(epsilonFile.is_open()) {
+     while(epsilonFile >> dda >> chan >> capArray){
+	epsilonFile >> value;
+	fAtriEpsilonTimes[dda][chan][capArray]=value;
+	//printf("%s : dda %i channel %i capArray %f\n", __FUNCTION__, dda, chan, value);
+     }
+     epsilonFile.close();
   }
-  epsilonFile.close();
+  else {
+     std::cerr << "Can not open: " << epsilonFile << "\n";
+     abort();
+  }
 
 //   {
 //      double time=0;
@@ -1404,25 +1442,21 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
    //Start ADC to voltage conversion
    if(TMath::Abs(adcCounts)<400)
    {//conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
-	if(adcCounts>0)
-	{//positive and negative values need different calibration constants
+      //RJN chnaged the below to remove calls to pow for code optimisation
+      double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
+      if(adcCounts>0)
+	 {//positive and negative values need different calibration constants
 	    volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
-		+ (adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7])
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
-		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 2)
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
-		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 3)
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][2]; 
-	}
-	else
-	{
-	    volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
-		+ (adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7])
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] 
-		+ pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 2)
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][4]
-		+  pow((adcCounts - fAtriSampleADCVoltsConversion[dda][chan][block][sample][7]), 3)
-			*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
+	      +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
+	       +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
+	       +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][2]; 
+	 }
+      else
+	 {
+	    volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 	       
+	       +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] 
+	       +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][4]
+	       +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
 	}
    }
    else
