@@ -118,6 +118,7 @@ class AraEventCalibrator : public TObject
    Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
    Int_t fAtriNumSamples[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The number of samples per block in a particular dda, chan, capArray
 
+   void checkAtriSampleTiming();
    void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
    Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample); //A conversion module from ADC counts to millivolts  -THM-
    void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea

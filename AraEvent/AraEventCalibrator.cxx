@@ -970,10 +970,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  // (i.e if there are 33 valid samples only the first 33 entries in this array will be valid)
 	  tempTimes[samp]=blockInEvent[dda]*20.0 + fAtriSampleTimes[dda][chan][capArray][samp] - 20.0*capArray;
 
-	  // 	  if(dda==3 && chan==1 && samp<fAtriNumSamples[dda][chan][capArray])  {
-	  // 	     std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << blockInEvent[dda] << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
-	  // 	     std::cerr << chanId << "\t" << tempTimes[samp] << "\t" << time << "\t" << voltIndex[samp] << "\n";
-	  // 	  }
+	 //  if(dda==1 && chan==1 && samp<fAtriNumSamples[dda][chan][capArray])  {
+// 	     std::cerr << dda << "\t" << chan << "\t" << capArray << "\t" << samp << "\t" << blockInEvent[dda] << "\t" << fAtriSampleTimes[dda][chan][capArray][samp] << "\n";
+// 	     std::cerr << chanId << "\t" << tempTimes[samp] << "\t" << time << "\t" << voltIndex[samp] << "\n";
+// 	  }
 	  
 	}
 	else {
@@ -1069,7 +1069,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   }
   //jpd change 25-03-13
   //now subtract off the cable delays
-  if(hasCableDelays(calType)){
+  if(0 && hasCableDelays(calType)){
     for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
       AraGeomTool* tempGeom = AraGeomTool::Instance();
       Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
@@ -1293,6 +1293,10 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   }
   SampleFile.close();
 
+  //RJN -- Add call to check sample timing
+  checkAtriSampleTiming();
+
+
   //Read the ADC to volts conversion factors for the range between -400 and 400 ADC counts. -THM-
   int blockNumber;
   double conv;
@@ -1393,6 +1397,39 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
   memset(fGotAtriCalibFile,ATRI_NO_STATIONS*sizeof(Int_t),0);
   calibIndex = AraGeomTool::getStationCalibIndex(stationId);
   fGotAtriCalibFile[calibIndex]=1;
+
+
+}
+
+void AraEventCalibrator::checkAtriSampleTiming() {
+  for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+    for(int chan=0;chan<RFCHAN_PER_DDA;chan++) {
+      int madeChange=0;
+      do {
+	madeChange=0;
+	//Need to check if times follow each other or not
+	if(fAtriSampleTimes[dda][chan][0][fAtriNumSamples[dda][chan][0]-1]>
+	   fAtriSampleTimes[dda][chan][1][0]) {
+	  //Need to trim one sample off cap array 0
+	  std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 0 << ", sample " << fAtriNumSamples[dda][chan][0]-1 << ":" << fAtriSampleTimes[dda][chan][0][fAtriNumSamples[dda][chan][0]-1] << " is after capArray: 1 sample 0: " <<  fAtriSampleTimes[dda][chan][1][0] << "\n";
+	  std::cerr << "Removing one sample from cap array 0\n";
+	  fAtriNumSamples[dda][chan][0]--;
+	  madeChange=1;
+	  
+	}
+	if(fAtriSampleTimes[dda][chan][1][fAtriNumSamples[dda][chan][1]-1]>
+	   (40+fAtriSampleTimes[dda][chan][0][0])) {
+	  //Need to trim one sample off cap array 1
+	  std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 1 << ", sample " << fAtriNumSamples[dda][chan][1]-1 << ": " << fAtriSampleTimes[dda][chan][1][fAtriNumSamples[dda][chan][1]-1] << " is after capArray: 0 sample 0: " <<  40+fAtriSampleTimes[dda][chan][0][0] << "\n";
+	  std::cerr << "Removing one sample from cap array 1\n";
+	  fAtriNumSamples[dda][chan][1]--;
+	  madeChange=1;
+	}
+      }
+      while(madeChange);
+     
+    }
+  }
 
 
 }
