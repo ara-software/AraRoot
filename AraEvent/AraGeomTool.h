@@ -103,6 +103,7 @@ class AraGeomTool
    static Double_t getSunZenithLongLat(Double_t longitude, Double_t latitude, Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
    static Double_t getSunZenithLongLat(Double_t longitude, Double_t latitude, unsigned int unixTime);
 
+
    TVector3 getSunPosition(AraStationId_t stationId, unsigned int unixTime);
    TVector3 getSunPosition(AraStationId_t stationId, Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
    

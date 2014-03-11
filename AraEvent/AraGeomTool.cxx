@@ -926,13 +926,14 @@ TVector3 AraGeomTool::getSunPosition(AraStationId_t stationId, unsigned int unix
 
   Double_t azimuth = getSunAzimuthLongLat(longitude, latitude, unixTime);
   Double_t zenith = getSunZenithLongLat(longitude, latitude, unixTime);
+  Double_t elevation = 90 - zenith;
 
   //Azimuth is measured as an angle from Northing in the getSunAzimuth function, but our coordinates are x = Easting, y = Northing, z = Uping
   //Hence we switch sine and cosine
 
-  sunPositionArrayCentric[0] = fAU*TMath::Sin(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*zenith);
-  sunPositionArrayCentric[1] = fAU*TMath::Cos(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*zenith);
-  sunPositionArrayCentric[2] = fAU*TMath::Sin(TMath::DegToRad()*zenith);
+  sunPositionArrayCentric[0] = fAU*TMath::Sin(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*elevation);
+  sunPositionArrayCentric[1] = fAU*TMath::Cos(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*elevation);
+  sunPositionArrayCentric[2] = fAU*TMath::Cos(TMath::DegToRad()*elevation);
   
   sunPositionStationCentric = convertArrayToStationCoords(stationId, sunPositionArrayCentric);
  
