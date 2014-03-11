@@ -11,12 +11,12 @@ AraEventCalibrator.h        AtriEventHkData.h           RawAraGenericHeader.h   
 AtriSensorHkData.h          RawAraStationEvent.h        UsefulAraStationEvent.h     araSoft.h  			AraGeomTool.h
 FullIcrrHkEvent.h           RawAtriSimpleStationEvent.h UsefulAtriStationEvent.h    AraRawIcrrRFChannel.h       IcrrHkData.h                
 RawAtriStationBlock.h       UsefulIcrrStationEvent.h   	AraRootVersion.h            IcrrTriggerMonitor.h        RawAtriStationEvent.h       
-araAtriStructures.h	    AraCalAntennaInfo.h
+araAtriStructures.h	    AraCalAntennaInfo.h         AraSunPos.h
 	  )
 
 #Source for library
 File(GLOB ${libname}Source AraAntennaInfo.cxx  AraCalAntennaInfo.cxx          AraRawIcrrRFChannel.cxx       FullIcrrHkEvent.cxx           RawAraStationEvent.cxx        RawIcrrStationEvent.cxx       UsefulIcrrStationEvent.cxx  AraEventCalibrator.cxx     AraStationInfo.cxx            IcrrHkData.cxx                 RawIcrrStationHeader.cxx
-AtriEventHkData.cxx    RawAtriSimpleStationEvent.cxx	   IcrrTriggerMonitor.cxx        RawAtriStationBlock.cxx       UsefulAraStationEvent.cxx     AraGeomTool.cxx               AtriSensorHkData.cxx          RawAraGenericHeader.cxx     RawAtriStationEvent.cxx       UsefulAtriStationEvent.cxx
+  AtriEventHkData.cxx    RawAtriSimpleStationEvent.cxx	   IcrrTriggerMonitor.cxx        RawAtriStationBlock.cxx       UsefulAraStationEvent.cxx     AraGeomTool.cxx               AtriSensorHkData.cxx          RawAraGenericHeader.cxx     RawAtriStationEvent.cxx       UsefulAtriStationEvent.cxx          AraSunPos.cxx
 	  )
 
 #Generate the ROOT dictionary using the ROOT CMake function

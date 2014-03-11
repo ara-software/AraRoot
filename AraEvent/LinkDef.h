@@ -26,6 +26,10 @@
 #pragma link C++ class RawAtriStationBlock+;
 #pragma link C++ class RawAtriStationEvent+;
 #pragma link C++ class RawAraGenericHeader+;
+#pragma link C++ class AraSunPos+;
+#pragma link C++  struct AraSunPosTime;
+#pragma link C++  struct AraSunPosLocation;
+#pragma link C++  struct AraSunPosSunCoordinates;
 
 #pragma link C++ typedef AraDataStructureType_t;
 

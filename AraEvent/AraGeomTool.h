@@ -19,6 +19,7 @@
 #include "araAtriStructures.h"
 #include "AraAntennaInfo.h"
 #include "AraStationInfo.h"
+#include "AraSunPos.h"
 
 //! Part of AraEvent library. Loads and stores information about each station's geometry as well as information about the antennae (filters, positions, channels etc...).
 /*!
@@ -80,6 +81,41 @@ class AraGeomTool
    
    //Some variables to do with ice properties
    static Double_t nTopOfIce;
+   
+   //JPD -- This section is for Sun Position Calculations
+   
+   //Firstly functions to handle unixTime
+   static Int_t getSecond(time_t unixTime);
+   static Int_t getMinute(time_t unixTime);
+   static Int_t getHour(time_t unixTime);
+   static Int_t getDay(time_t unixTime);
+   static Int_t getMonth(time_t unixTime);
+   static Int_t getYear(time_t unixTime);
+   static time_t getUnixTime(Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
+
+   //Now some functions to get azimuth and elevation of sun from time and location
+
+   //Azimuth is angle from Northing. Ara Global Coordinates have x = Easting, y = Northing, z = Uping
+   static Double_t getSunAzimuthLongLat(Double_t longitude, Double_t latitude, Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
+   static Double_t getSunAzimuthLongLat(Double_t longitude, Double_t latitude, unsigned int unixTime);
+   
+   //Should be elevation
+   static Double_t getSunZenithLongLat(Double_t longitude, Double_t latitude, Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
+   static Double_t getSunZenithLongLat(Double_t longitude, Double_t latitude, unsigned int unixTime);
+
+   TVector3 getSunPosition(AraStationId_t stationId, unsigned int unixTime);
+   TVector3 getSunPosition(AraStationId_t stationId, Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
+   
+   //JPD -- geometry tools to get longitude and latitude
+   static Double_t getLongitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year=2011);
+   static Double_t getGeometricLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year=2011);
+   static Double_t getGeographicLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year=2011);
+
+   //Maybe these will be useful one day
+   static Double_t getNorthingFromLatLong(Double_t Latitude, Double_t Longitude);
+   static Double_t getEastingFromLatLong(Double_t Latitude, Double_t Longitude);
+
+
 
   
  protected:

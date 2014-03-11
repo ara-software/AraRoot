@@ -13,7 +13,7 @@
 #include <cstring>
 #include <zlib.h>
 #include <cstdlib>
-
+#include <ctime>
 
 //sqlite includes
 #include <sqlite3.h>
@@ -26,6 +26,17 @@
 AraGeomTool * AraGeomTool::fgInstance=0;
 Double_t AraGeomTool::nTopOfIce=1.48;
 const Double_t fFtInm=0.3048;
+
+
+//See Amy Connolly's Note https://www.phys.hawaii.edu/elog/ARA/91
+//fGeoidA / fGeoidC are for the WGS84 GPS ellipsoid 
+//These are all in meters
+const Double_t fIceThicknessSP=2646.28;
+const Double_t fGeoidA=6378137;
+const Double_t fGeoidC=6356752.3;
+
+//1 Astronomical Unit ~ mean distance from Earth to Sun (for sun position calculations);
+const Double_t fAU=149597890000; //(in meters)
 
 //Some locations in ARA global coordinates
 Double_t fSouthPole2010_11[3]={27344.05*fFtInm,-3395.14*fFtInm,-35.63*fFtInm};
@@ -751,4 +762,269 @@ void AraGeomTool::convertArrayToStationCoords(AraStationId_t stationId, Double_t
   outputCoords[2]=output.z();
 
 
+}
+
+//JPD -- This section is for Sun Position Calculations
+
+//Firstly functions to handle unixTime
+Int_t AraGeomTool::getSecond(time_t unixTime){
+  
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_sec;
+
+}
+
+Int_t AraGeomTool::getMinute(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_min;
+
+}
+
+Int_t AraGeomTool::getHour(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_hour;
+
+}
+
+Int_t AraGeomTool::getDay(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_mday;
+
+}
+
+Int_t AraGeomTool::getMonth(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_mon+1;
+
+}
+
+Int_t AraGeomTool::getYear(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_year+1900;
+
+}
+
+time_t AraGeomTool::getUnixTime(Int_t year, Int_t month, Int_t day, Int_t hour, Int_t minute, Int_t second){
+
+  time_t unixTime;
+  
+  struct tm *timeStruct;
+
+  time(&unixTime);
+
+  timeStruct = localtime(&unixTime);
+  timeStruct->tm_year=year-1900;
+  timeStruct->tm_mon=month-1;
+  timeStruct->tm_mday=day;
+  timeStruct->tm_hour=hour;
+  timeStruct->tm_min=minute;
+  timeStruct->tm_sec=second;
+
+  unixTime = mktime(timeStruct);
+  
+  return unixTime;
+  
+}
+
+
+//JPD Now some functions to get azimuth and elevation of sun from time and location
+Double_t AraGeomTool::getSunAzimuthLongLat(Double_t longitude, Double_t latitude, Int_t year, Int_t month, Int_t day, Int_t hour, Int_t minute, Int_t second){
+  
+  AraSunPosTime time;
+  time.iYear = year;
+  time.iMonth = month;
+  time.iDay = day;
+  time.dHours = hour;
+  time.dMinutes = minute;
+  time.dSeconds = second;
+  
+  AraSunPosLocation location;
+  location.dLongitude = longitude;
+  location.dLatitude = latitude;
+
+  AraSunPosSunCoordinates sunPosCoords;
+
+  AraSunPos pos;
+
+  pos.sunpos(time, location, &sunPosCoords);
+
+  return sunPosCoords.dAzimuth+longitude;
+
+}
+
+Double_t AraGeomTool::getSunAzimuthLongLat(Double_t longitude, Double_t latitude, unsigned int unixTime){
+  
+  Int_t second = getSecond(unixTime);
+  Int_t minute = getMinute(unixTime);
+  Int_t hour = getHour(unixTime);
+  Int_t day = getDay(unixTime);
+  Int_t month = getMonth(unixTime);
+  Int_t year = getYear(unixTime);
+
+  return getSunAzimuthLongLat(longitude, latitude, year, month, day, hour, minute, second);
+
+}
+
+Double_t AraGeomTool::getSunZenithLongLat(Double_t longitude, Double_t latitude, Int_t year, Int_t month, Int_t day, Int_t hour, Int_t minute, Int_t second){
+  
+  AraSunPosTime time;
+  time.iYear = year;
+  time.iMonth = month;
+  time.iDay = day;
+  time.dHours = hour;
+  time.dMinutes = minute;
+  time.dSeconds = second;
+  
+  AraSunPosLocation location;
+  location.dLongitude = longitude;
+  location.dLatitude = latitude;
+
+  AraSunPosSunCoordinates sunPosCoords;
+
+  AraSunPos pos;
+
+  pos.sunpos(time, location, &sunPosCoords);
+
+  return sunPosCoords.dZenithAngle;
+
+}
+
+Double_t AraGeomTool::getSunZenithLongLat(Double_t longitude, Double_t latitude, unsigned int unixTime){
+  
+  Int_t second = getSecond(unixTime);
+  Int_t minute = getMinute(unixTime);
+  Int_t hour = getHour(unixTime);
+  Int_t day = getDay(unixTime);
+  Int_t month = getMonth(unixTime);
+  Int_t year = getYear(unixTime);
+
+  return getSunZenithLongLat(longitude, latitude, year, month, day, hour, minute, second);
+
+}
+
+TVector3 AraGeomTool::getSunPosition(AraStationId_t stationId, unsigned int unixTime){
+
+  TVector3 sunPositionArrayCentric;
+  TVector3 sunPositionStationCentric;
+  
+  TVector3 stationVector = getStationVector(stationId);;
+  Int_t year = getYear(unixTime);
+  
+  Double_t longitude = getLongitudeFromArrayCoords(stationVector[1], stationVector[0], year);
+  Double_t latitude = getGeographicLatitudeFromArrayCoords(stationVector[1], stationVector[0], year);
+
+  Double_t azimuth = getSunAzimuthLongLat(longitude, latitude, unixTime);
+  Double_t zenith = getSunZenithLongLat(longitude, latitude, unixTime);
+
+  //Azimuth is measured as an angle from Northing in the getSunAzimuth function, but our coordinates are x = Easting, y = Northing, z = Uping
+  //Hence we switch sine and cosine
+
+  sunPositionArrayCentric[0] = fAU*TMath::Sin(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*zenith);
+  sunPositionArrayCentric[1] = fAU*TMath::Cos(TMath::DegToRad()*azimuth)*TMath::Sin(TMath::DegToRad()*zenith);
+  sunPositionArrayCentric[2] = fAU*TMath::Sin(TMath::DegToRad()*zenith);
+  
+  sunPositionStationCentric = convertArrayToStationCoords(stationId, sunPositionArrayCentric);
+ 
+  
+  return sunPositionStationCentric;
+}
+
+TVector3 AraGeomTool::getSunPosition(AraStationId_t stationId, Int_t year, Int_t month, Int_t day, Int_t hour, Int_t minute, Int_t second){
+
+  time_t unixTime = getUnixTime(year, month, day, hour, minute, second);
+
+  return getSunPosition(stationId, unixTime);
+  
+}
+
+//JPD -- this part has tools for getting the longitude and latitude
+Double_t AraGeomTool::getGeometricLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year){
+
+  Double_t deltaNorthing = Northing;
+  if(year==2011) deltaNorthing -= fSouthPole2010_11[1];
+  else if(year==2012) deltaNorthing -= fSouthPole2011_12[1];
+  else deltaNorthing -= fSouthPole2010_11[1];
+
+  Double_t deltaEasting = Easting;
+  if(year==2011) deltaEasting -= fSouthPole2010_11[0];
+  else if(year==2012) deltaEasting -= fSouthPole2011_12[0];
+  else deltaEasting -= fSouthPole2010_11[0];
+
+  Double_t deltaR = TMath::Sqrt(TMath::Power(deltaNorthing,2)+TMath::Power(deltaEasting,2));
+  Double_t tangent = (fGeoidC+fIceThicknessSP)/(deltaR);
+
+  Double_t latitude = TMath::RadToDeg()*TMath::ATan(tangent);
+  
+  return -1*latitude;
+}
+
+Double_t AraGeomTool::getGeographicLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year){
+
+  Double_t deltaNorthing = Northing;
+  if(year==2011) deltaNorthing -= fSouthPole2010_11[1];
+  else if(year==2012) deltaNorthing -= fSouthPole2011_12[1];
+  else deltaNorthing -= fSouthPole2010_11[1];
+
+  Double_t deltaEasting = Easting;
+  if(year==2011) deltaEasting -= fSouthPole2010_11[0];
+  else if(year==2012) deltaEasting -= fSouthPole2011_12[0];
+  else deltaEasting -= fSouthPole2010_11[0];
+
+  Double_t deltaR = TMath::Sqrt(TMath::Power(deltaNorthing,2)+TMath::Power(deltaEasting,2));
+  Double_t tangent = (fGeoidC+fIceThicknessSP)/(deltaR)*(TMath::Power(fGeoidA,2))/(TMath::Power(fGeoidC,2));
+
+  Double_t latitude = TMath::RadToDeg()*TMath::ATan(tangent);
+  
+  return -1*latitude;
+
+}
+
+Double_t AraGeomTool::getLongitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year){
+
+  Double_t deltaNorthing = Northing;
+  if(year==2011) deltaNorthing -= fSouthPole2010_11[1];
+  else if(year==2012) deltaNorthing -= fSouthPole2011_12[1];
+  else deltaNorthing -= fSouthPole2010_11[1];
+
+  Double_t deltaEasting = Easting;
+  if(year==2011) deltaEasting -= fSouthPole2010_11[0];
+  else if(year==2012) deltaEasting -= fSouthPole2011_12[0];
+  else deltaEasting -= fSouthPole2010_11[0];
+  
+  Double_t longitude = TMath::RadToDeg()*TMath::ATan2(deltaEasting, deltaNorthing);
+
+  return longitude;
+
+}
+
+Double_t AraGeomTool::getNorthingFromLatLong(Double_t Latitude, Double_t Longitude){
+  
+  Double_t tanLatitude = TMath::Tan(TMath::DegToRad()*Latitude);
+  Double_t cosLongitude = TMath::Cos(TMath::DegToRad()*Longitude);
+  
+  Double_t Northing = cosLongitude/tanLatitude*(fGeoidC+fIceThicknessSP)*(TMath::Power(fGeoidA,2))/(TMath::Power(fGeoidC,2));
+  
+  return Northing;
+
+}
+
+Double_t AraGeomTool::getEastingFromLatLong(Double_t Latitude, Double_t Longitude){
+  
+  Double_t tanLatitude = TMath::Tan(TMath::DegToRad()*Latitude);
+  Double_t sinLongitude = TMath::Sin(TMath::DegToRad()*Longitude);
+  
+  Double_t Easting = sinLongitude/tanLatitude*(fGeoidC+fIceThicknessSP)*(TMath::Power(fGeoidA,2))/(TMath::Power(fGeoidC,2));
+  
+  return Easting;
 }

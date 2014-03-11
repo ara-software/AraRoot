@@ -16,6 +16,8 @@ void plotAntennaPositions(int stationId,char *outName){
   posTree->Branch("daqChanNum", &daqChanNum, "daqChanNum/I");
   posTree->Branch("isCalPulser", &isCalPulser, "isCalPulser/I");
 
+  fprintf(stderr, "Receive Antennas\n\n");
+
 
   for(int i=0;i<20;i++){
     Double_t *antLoc = stationInfo->getAntennaInfo(i)->getLocationXYZ();
@@ -27,8 +29,15 @@ void plotAntennaPositions(int stationId,char *outName){
     polType=(int)stationInfo->getAntennaInfo(i)->polType;
     polNum=(int)stationInfo->getAntennaInfo(i)->antPolNum;
     isCalPulser=0;
+
+    if(polType <2)
+      fprintf(stderr, "%s ant %i %s X %f Y %f Z %f\n", polType ? "HPol" : "VPol",
+	      polNum, stationInfo->getAntennaInfo(i)->designator, antLocX, antLocY, antLocZ);
     posTree->Fill();
   }
+
+  fprintf(stderr, "\n\nCalibration Antennas\n\n");
+  
   for(int i=0;i<4;i++){
     Double_t *antLoc = stationInfo->getCalAntennaInfo(i)->getLocationXYZ();
     antLocX=antLoc[0];
@@ -38,6 +47,8 @@ void plotAntennaPositions(int stationId,char *outName){
     daqChanNum=-1;
     polType=(int)stationInfo->getCalAntennaInfo(i)->polType;
     polNum=-1;
+    fprintf(stderr, "%s ant %i X %f Y %f Z %f\n", polType ? "HPol" : "VPol",
+	    polNum, antLocX, antLocY, antLocZ);
     isCalPulser=1;
     posTree->Fill();
   }
