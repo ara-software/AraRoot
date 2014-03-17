@@ -101,6 +101,8 @@ AraEventCalibrator::AraEventCalibrator()
   memset(fGotAtriCalibFile,0,sizeof(Int_t)*ATRI_NO_STATIONS);
   memset(gotIcrrPedFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
   memset(gotIcrrCalibFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
+  fAtriPeds=0;
+
 
 }
 
