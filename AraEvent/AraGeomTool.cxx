@@ -831,7 +831,7 @@ time_t AraGeomTool::getUnixTime(Int_t year, Int_t month, Int_t day, Int_t hour, 
   timeStruct->tm_min=minute;
   timeStruct->tm_sec=second;
 
-  unixTime = gmtime(timeStruct);
+  unixTime = timegm(timeStruct);
   
   return unixTime;
   
