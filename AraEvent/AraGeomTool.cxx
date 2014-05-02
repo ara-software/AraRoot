@@ -799,6 +799,14 @@ Int_t AraGeomTool::getDay(time_t unixTime){
 
 }
 
+Int_t AraGeomTool::getDayOfYear(time_t unixTime){
+
+  struct tm *temp_time = gmtime(&unixTime);
+
+  return temp_time->tm_yday;
+
+}
+
 Int_t AraGeomTool::getMonth(time_t unixTime){
 
   struct tm *temp_time = gmtime(&unixTime);

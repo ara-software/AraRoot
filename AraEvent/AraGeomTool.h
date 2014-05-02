@@ -89,6 +89,7 @@ class AraGeomTool
    static Int_t getMinute(time_t unixTime);
    static Int_t getHour(time_t unixTime);
    static Int_t getDay(time_t unixTime);
+   static Int_t getDayOfYear(time_t unixTime);
    static Int_t getMonth(time_t unixTime);
    static Int_t getYear(time_t unixTime);
    static time_t getUnixTime(Int_t year, Int_t month, Int_t day, Int_t hour=0, Int_t minute=0, Int_t second=0);
