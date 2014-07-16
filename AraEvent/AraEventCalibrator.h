@@ -19,7 +19,8 @@
 
 #define ADCMV 0.939   /* mV/adc, per Gary's email of 05/04/2006 */
 #define SATURATION 1300 
-#define NSPERSAMP 0.95
+#define NSPERSAMP_ICRR 0.95
+#define NSPERSAMP_ATRI 0.3125
 
 //!  AraCalType -- The Calibration Type
 /*!

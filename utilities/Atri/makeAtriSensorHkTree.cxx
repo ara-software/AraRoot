@@ -92,7 +92,7 @@ void makeHkTree(char *inputName, char *outFile) {
 	error=1;
 	break;
       }
-      cout << "Hk: " << theSensorHkStruct.unixTime << endl;
+      //      cout << "Hk: " << theSensorHkStruct.unixTime << endl;
       processHk();
     }
     gzclose(infile);

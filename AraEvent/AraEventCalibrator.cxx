@@ -29,6 +29,7 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
+   return kFALSE; //RJN hackcd ..
   if(calType<=kVoltageTime) return kFALSE;
   return kTRUE;
 }
@@ -377,10 +378,10 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
   if(stationId==ARA_TESTBED) theEvent->numRFChans=RFCHANS_TESTBED;
   else theEvent->numRFChans=RFCHANS_STATION1;
 
-  // Calibrate waveforms
+
   for(int samp=0;samp<MAX_NUMBER_SAMPLES_LAB3;++samp){
     sampNums[samp]=samp;
-    timeNums[samp]=samp*NSPERSAMP;
+    timeNums[samp]=samp*NSPERSAMP_ICRR;
   }
   
   for(int  chanIndex = 0; chanIndex < NUM_DIGITIZED_ICRR_CHANNELS; ++chanIndex ){
@@ -537,7 +538,7 @@ void AraEventCalibrator::calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCal
 	  else {
 	    //ci1 
 	    theEvent->fVoltsRF[rfchan][i]=theEvent->fVolts[ci1][i/2];
-	    theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci1][i/2]+0.5*NSPERSAMP;	  
+	    theEvent->fTimesRF[rfchan][i]=theEvent->fTimes[ci1][i/2]+0.5*NSPERSAMP_ICRR;	  
 	  }
 	  
 	}
@@ -979,7 +980,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 	  
 	}
 	else {
-	  time+=1;	
+	  time+=NSPERSAMP_ATRI;	
 	  tempTimes[samp]=time;
 	  voltIndex[samp]=samp;
 	}
@@ -1071,7 +1072,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   }
   //jpd change 25-03-13
   //now subtract off the cable delays
-  if(0 && hasCableDelays(calType)){
+  if( hasCableDelays(calType)){
     for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
       AraGeomTool* tempGeom = AraGeomTool::Instance();
       Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
