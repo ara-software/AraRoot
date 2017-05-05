@@ -4,6 +4,12 @@ CREATE TABLE ARA02(antId integer primary key, holeName text, antName text, polTy
 
 CREATE TABLE ARA03(antId integer primary key, holeName text, antName text, polType text, antPolNum integer, daqChanNum integer, daqTrigChan integer, foamId integer, foamChanNum integer, antType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real, antOrientX real, antOrientY real, antOrientZ real, highPassFilterMhz real, lowPassFilterMhz real, avgNoiseFigure real);
 
+CREATE TABLE ARA04(antId integer primary key, holeName text, antName text, polType text, antPolNum integer, daqChanNum integer, daqTrigChan integer, foamId integer, foamChanNum integer, antType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real, antOrientX real, antOrientY real, antOrientZ real, highPassFilterMhz real, lowPassFilterMhz real, avgNoiseFigure real);
+
+CREATE TABLE ARA05(antId integer primary key, holeName text, antName text, polType text, antPolNum integer, daqChanNum integer, daqTrigChan integer, foamId integer, foamChanNum integer, antType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real, antOrientX real, antOrientY real, antOrientZ real, highPassFilterMhz real, lowPassFilterMhz real, avgNoiseFigure real);
+
+CREATE TABLE ARA06(antId integer primary key, holeName text, antName text, polType text, antPolNum integer, daqChanNum integer, daqTrigChan integer, foamId integer, foamChanNum integer, antType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real, antOrientX real, antOrientY real, antOrientZ real, highPassFilterMhz real, lowPassFilterMhz real, avgNoiseFigure real);
+
 
 --chanNum,hole,antName,polType 
 --polNum,daqChan,daqtrig,foam,foamchan
@@ -242,6 +248,9 @@ insert into ARA02 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,0,  
 0,0,0,25,116,0);
 
+
+
+
 -- ARA03 information
 --Position Done
 --daqChan Mapping done
@@ -362,7 +371,346 @@ insert into ARA03 VALUES(19, "S4", "SA4", "kSurface",
 3, 29, 19, 0, 0, "kFatDipole",
 1,2,3,4,  
 0,0,0,0,  
+0,0,0,25,116,
+
+
+-- ARA04 information
+-- Placeholder infomation... for now this is just a copy of the ARA03 info
+
+insert into ARA04 VALUES(0 , "BH1", "TVPol", "kVertical", 
+0, 0, 1, 0, 0, "kBicone",
+4.4113,-9.3933,-173.3937,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(1 , "BH2", "TVPol", "kVertical", 
+1, 8, 5, 0, 0, "kBicone",
+10.6919,3.5089,-173.9734,115.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(2 , "BH3", "TVPol", "kVertical", 
+2, 16, 9, 0, 0, "kBicone",
+-2.0103,9.4124,-174.1054,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(3 , "BH4", "TVPol", "kVertical", 
+3, 24, 13, 0, 0, "kBicone",
+-8.0990,-3.7098,-173.5476,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA04 VALUES(4 , "BH1", "BVPol", "kVertical", 
+4, 1, 0, 0, 0, "kBicone",
+4.4111,-9.3936,-192.4470,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(5 , "BH2", "BVPol", "kVertical", 
+5, 9, 4, 0, 0, "kBicone",
+10.6916,3.5086,-192.6981,181.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(6 , "BH3", "BVPol", "kVertical", 
+6, 17, 8, 0, 0, "kBicone",
+-2.0102,9.4120,-192.6658,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(7 , "BH4", "BVPol", "kVertical", 
+7, 25, 12, 0, 0, "kBicone",
+-8.0992,-3.7101,-192.6009,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA04 VALUES(8, "BH1", "THPol", "kHorizontal", 
+0, 2, 3, 0, 0, "kQuadSlot",
+4.4114,-9.3932,-170.2728,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(9 , "BH2", "THPol", "kHorizontal", 
+1, 10, 7, 0, 0, "kQuadSlot",
+10.6919,3.5090,-171.0168,107.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(10 , "BH3", "THPol", "kHorizontal", 
+2, 18, 11, 0, 0, "kQuadSlot",
+-2.0100,9.4124,-172.6271,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(11, "BH4", "THPol", "kHorizontal", 
+3, 26, 15, 0, 0, "kQuadSlot",
+-8.0989,-3.7097,-170.5910,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+
+insert into ARA04 VALUES(12, "BH1", "BHPol", "kHorizontal", 
+4, 3, 2, 0, 0, "kQuadSlot",
+4.4111,-9.3935,-189.1947,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(13, "BH2", "BHPol", "kHorizontal", 
+5, 11, 6, 0, 0, "kQuadSlot",
+10.6917,3.5087,-189.7415,173.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA04 VALUES(14, "BH3", "BHPol", "kHorizontal", 
+6, 19, 10, 0, 0, "kQuadSlot",
+-2.0102,9.4121,-189.7092,73.2,
+0,0,0,0, 
+0,0,0,140,800,0);
+insert into ARA04 VALUES(15, "BH4", "BHPol", "kHorizontal", 
+7, 27, 14, 0, 0, "kQuadSlot",
+-8.0992,-3.7100,-189.4800,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA04 VALUES(16, "S1", "SA1", "kSurface", 
+0, 4, 16, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
 0,0,0,25,116,0);
+insert into ARA04 VALUES(17, "S2", "SA2", "kSurface", 
+1, 5, 17, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA04 VALUES(18, "S3", "SA3", "kSurface", 
+2, 28, 18, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA04 VALUES(19, "S4", "SA4", "kSurface", 
+3, 29, 19, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+
+
+
+-- ARA05 information
+-- Placeholder infomation... for now this is just a copy of the ARA03 info
+
+insert into ARA05 VALUES(0 , "BH1", "TVPol", "kVertical", 
+0, 0, 1, 0, 0, "kBicone",
+4.4113,-9.3933,-173.3937,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(1 , "BH2", "TVPol", "kVertical", 
+1, 8, 5, 0, 0, "kBicone",
+10.6919,3.5089,-173.9734,115.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(2 , "BH3", "TVPol", "kVertical", 
+2, 16, 9, 0, 0, "kBicone",
+-2.0103,9.4124,-174.1054,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(3 , "BH4", "TVPol", "kVertical", 
+3, 24, 13, 0, 0, "kBicone",
+-8.0990,-3.7098,-173.5476,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA05 VALUES(4 , "BH1", "BVPol", "kVertical", 
+4, 1, 0, 0, 0, "kBicone",
+4.4111,-9.3936,-192.4470,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(5 , "BH2", "BVPol", "kVertical", 
+5, 9, 4, 0, 0, "kBicone",
+10.6916,3.5086,-192.6981,181.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(6 , "BH3", "BVPol", "kVertical", 
+6, 17, 8, 0, 0, "kBicone",
+-2.0102,9.4120,-192.6658,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(7 , "BH4", "BVPol", "kVertical", 
+7, 25, 12, 0, 0, "kBicone",
+-8.0992,-3.7101,-192.6009,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA05 VALUES(8, "BH1", "THPol", "kHorizontal", 
+0, 2, 3, 0, 0, "kQuadSlot",
+4.4114,-9.3932,-170.2728,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(9 , "BH2", "THPol", "kHorizontal", 
+1, 10, 7, 0, 0, "kQuadSlot",
+10.6919,3.5090,-171.0168,107.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(10 , "BH3", "THPol", "kHorizontal", 
+2, 18, 11, 0, 0, "kQuadSlot",
+-2.0100,9.4124,-172.6271,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(11, "BH4", "THPol", "kHorizontal", 
+3, 26, 15, 0, 0, "kQuadSlot",
+-8.0989,-3.7097,-170.5910,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+
+insert into ARA05 VALUES(12, "BH1", "BHPol", "kHorizontal", 
+4, 3, 2, 0, 0, "kQuadSlot",
+4.4111,-9.3935,-189.1947,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(13, "BH2", "BHPol", "kHorizontal", 
+5, 11, 6, 0, 0, "kQuadSlot",
+10.6917,3.5087,-189.7415,173.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA05 VALUES(14, "BH3", "BHPol", "kHorizontal", 
+6, 19, 10, 0, 0, "kQuadSlot",
+-2.0102,9.4121,-189.7092,73.2,
+0,0,0,0, 
+0,0,0,140,800,0);
+insert into ARA05 VALUES(15, "BH4", "BHPol", "kHorizontal", 
+7, 27, 14, 0, 0, "kQuadSlot",
+-8.0992,-3.7100,-189.4800,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA05 VALUES(16, "S1", "SA1", "kSurface", 
+0, 4, 16, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA05 VALUES(17, "S2", "SA2", "kSurface", 
+1, 5, 17, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA05 VALUES(18, "S3", "SA3", "kSurface", 
+2, 28, 18, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA05 VALUES(19, "S4", "SA4", "kSurface", 
+3, 29, 19, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+
+
+
+
+-- ARA06 information
+-- Placeholder infomation... for now this is just a copy of the ARA03 info
+
+insert into ARA06 VALUES(0 , "BH1", "TVPol", "kVertical", 
+0, 0, 1, 0, 0, "kBicone",
+4.4113,-9.3933,-173.3937,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(1 , "BH2", "TVPol", "kVertical", 
+1, 8, 5, 0, 0, "kBicone",
+10.6919,3.5089,-173.9734,115.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(2 , "BH3", "TVPol", "kVertical", 
+2, 16, 9, 0, 0, "kBicone",
+-2.0103,9.4124,-174.1054,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(3 , "BH4", "TVPol", "kVertical", 
+3, 24, 13, 0, 0, "kBicone",
+-8.0990,-3.7098,-173.5476,15.44,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA06 VALUES(4 , "BH1", "BVPol", "kVertical", 
+4, 1, 0, 0, 0, "kBicone",
+4.4111,-9.3936,-192.4470,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(5 , "BH2", "BVPol", "kVertical", 
+5, 9, 4, 0, 0, "kBicone",
+10.6916,3.5086,-192.6981,181.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(6 , "BH3", "BVPol", "kVertical", 
+6, 17, 8, 0, 0, "kBicone",
+-2.0102,9.4120,-192.6658,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(7 , "BH4", "BVPol", "kVertical", 
+7, 25, 12, 0, 0, "kBicone",
+-8.0992,-3.7101,-192.6009,81.41,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA06 VALUES(8, "BH1", "THPol", "kHorizontal", 
+0, 2, 3, 0, 0, "kQuadSlot",
+4.4114,-9.3932,-170.2728,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(9 , "BH2", "THPol", "kHorizontal", 
+1, 10, 7, 0, 0, "kQuadSlot",
+10.6919,3.5090,-171.0168,107.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(10 , "BH3", "THPol", "kHorizontal", 
+2, 18, 11, 0, 0, "kQuadSlot",
+-2.0100,9.4124,-172.6271,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(11, "BH4", "THPol", "kHorizontal", 
+3, 26, 15, 0, 0, "kQuadSlot",
+-8.0989,-3.7097,-170.5910,7.24,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+
+insert into ARA06 VALUES(12, "BH1", "BHPol", "kHorizontal", 
+4, 3, 2, 0, 0, "kQuadSlot",
+4.4111,-9.3935,-189.1947,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(13, "BH2", "BHPol", "kHorizontal", 
+5, 11, 6, 0, 0, "kQuadSlot",
+10.6917,3.5087,-189.7415,173.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+insert into ARA06 VALUES(14, "BH3", "BHPol", "kHorizontal", 
+6, 19, 10, 0, 0, "kQuadSlot",
+-2.0102,9.4121,-189.7092,73.2,
+0,0,0,0, 
+0,0,0,140,800,0);
+insert into ARA06 VALUES(15, "BH4", "BHPol", "kHorizontal", 
+7, 27, 14, 0, 0, "kQuadSlot",
+-8.0992,-3.7100,-189.4800,73.2,
+0,0,0,0,  
+0,0,0,140,800,0);
+
+insert into ARA06 VALUES(16, "S1", "SA1", "kSurface", 
+0, 4, 16, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA06 VALUES(17, "S2", "SA2", "kSurface", 
+1, 5, 17, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA06 VALUES(18, "S3", "SA3", "kSurface", 
+2, 28, 18, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+insert into ARA06 VALUES(19, "S4", "SA4", "kSurface", 
+3, 29, 19, 0, 0, "kFatDipole",
+1,2,3,4,  
+0,0,0,0,  
+0,0,0,25,116,0);
+
+
+
+
+
+
 
 
 

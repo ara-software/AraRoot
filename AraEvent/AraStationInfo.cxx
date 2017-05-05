@@ -203,6 +203,9 @@ void AraStationInfo::readChannelMapDbAtri(){
   if(fStationId==ARA_STATION1B) query = "select * from ARA01";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
   else if(fStationId==ARA_STATION3) query = "select * from ARA03";
+  else if(fStationId==ARA_STATION4) query = "select * from ARA04";
+  else if(fStationId==ARA_STATION5) query = "select * from ARA05";
+  else if(fStationId==ARA_STATION6) query = "select * from ARA06";
   else{
     fprintf(stderr, "%s : fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
     return;
@@ -962,6 +965,9 @@ void AraStationInfo::readCalPulserDb(){
   else if(fStationId==ARA_STATION1B) query = "select * from ARA01";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
   else if(fStationId==ARA_STATION3) query = "select * from ARA03";
+  else if(fStationId==ARA_STATION4) query = "select * from ARA04";
+  else if(fStationId==ARA_STATION5) query = "select * from ARA05";
+  else if(fStationId==ARA_STATION6) query = "select * from ARA06";
   else{
     fprintf(stderr, "%s : Not loading calpulser information - fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
     return;
@@ -1136,8 +1142,11 @@ void AraStationInfo::readChannelMapDbAtri_2(){
   if(fStationId==ARA_STATION1B) query = "select * from ARA01";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
   else if(fStationId==ARA_STATION3) query = "select * from ARA03";
+  else if(fStationId==ARA_STATION4) query = "select * from ARA04";
+  else if(fStationId==ARA_STATION5) query = "select * from ARA05";
+  else if(fStationId==ARA_STATION6) query = "select * from ARA06";
   else{
-    fprintf(stderr, "%s : fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
+    fprintf(stderr, "%s : fStationId %i is not ARA1-6\n", __FUNCTION__, fStationId);
     return;
   }
   
