@@ -371,7 +371,7 @@ insert into ARA03 VALUES(19, "S4", "SA4", "kSurface",
 3, 29, 19, 0, 0, "kFatDipole",
 1,2,3,4,  
 0,0,0,0,  
-0,0,0,25,116,
+0,0,0,25,116,0);
 
 
 -- ARA04 information

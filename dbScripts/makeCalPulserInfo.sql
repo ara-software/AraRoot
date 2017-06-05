@@ -5,7 +5,11 @@ CREATE TABLE ARA02(antCalId integer primary key, holeName text, antName text, pu
 
 CREATE TABLE ARA03(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
 
+CREATE TABLE ARA04(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
 
+CREATE TABLE ARA05(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
+
+CREATE TABLE ARA06(antCalId integer primary key, holeName text, antName text, pulserName text, antType text, polType text, antLocationX real, antLocationY real, antLocationZ real, cableDelay real, calibAntLocationX real, calibAntLocationY real, calibAntLocationZ real, calibCableDelay real);
 --TESTBED Calpulsers
 --Ant position only supplied for the pulser not the individual antennas
 
@@ -102,5 +106,67 @@ insert into ARA03 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 17.9354,36.3856,-188.0112,0
 );
 
-
 --updated 15-07-13
+
+--ARA04 Calpulers
+
+insert into ARA04 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
+38.0057,-16.3989,-194.8979,0,
+38.0057,-16.3989,-194.8979,0
+);
+insert into ARA04 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
+38.0057,-16.3989,-198.1828,0,
+38.0057,-16.3989,-198.1828,0
+);
+insert into ARA04 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
+17.9354,36.3856,-184.7263,0,
+17.9354,36.3856,-184.7263,0
+);
+insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
+17.9354,36.3856,-188.0112,0,
+17.9354,36.3856,-188.0112,0
+);
+
+--updated 17-05-17
+
+--ARA04 Calpulers
+
+insert into ARA05 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
+38.0057,-16.3989,-194.8979,0,
+38.0057,-16.3989,-194.8979,0
+);
+insert into ARA05 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
+38.0057,-16.3989,-198.1828,0,
+38.0057,-16.3989,-198.1828,0
+);
+insert into ARA05 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
+17.9354,36.3856,-184.7263,0,
+17.9354,36.3856,-184.7263,0
+);
+insert into ARA05 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
+17.9354,36.3856,-188.0112,0,
+17.9354,36.3856,-188.0112,0
+);
+
+--updated 17-05-17
+
+--ARA04 Calpulers
+
+insert into ARA06 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
+38.0057,-16.3989,-194.8979,0,
+38.0057,-16.3989,-194.8979,0
+);
+insert into ARA06 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
+38.0057,-16.3989,-198.1828,0,
+38.0057,-16.3989,-198.1828,0
+);
+insert into ARA06 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
+17.9354,36.3856,-184.7263,0,
+17.9354,36.3856,-184.7263,0
+);
+insert into ARA06 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
+17.9354,36.3856,-188.0112,0,
+17.9354,36.3856,-188.0112,0
+);
+
+--updated 17-05-17
