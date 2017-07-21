@@ -1359,7 +1359,7 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
      epsilonFile.close();
   }
   else {
-     std::cerr << "Can not open: " << epsilonFile << "\n";
+     std::cerr << "Can not open: " << epsilonFileName << "\n";
      abort();
   }
 
