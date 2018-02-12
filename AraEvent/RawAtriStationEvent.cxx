@@ -147,6 +147,8 @@ bool RawAtriStationEvent::isCalpulserEvent(){
   if(stationId==ARA_STATION1B) pulserTime=254;
   else if(stationId==ARA_STATION2) pulserTime=245;
   else if(stationId==ARA_STATION3) pulserTime=245;
+  else if(stationId==ARA_STATION4) pulserTime=400;
+  else if(stationId==ARA_STATION5) pulserTime=400;
   else return false;
 
   if(TMath::Abs((Int_t)timeStamp-pulserTime)<1e4){
