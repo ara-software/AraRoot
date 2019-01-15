@@ -85,8 +85,17 @@ TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
   if(elecChan < 0){
     return NULL;
   }
+  
+  TGraph *grRet = getGraphFromElecChan(elecChan);
 
-  return getGraphFromElecChan(elecChan);
+  // for A3, channels 0, 4, 8, need to invert the voltages
+  // see talk by B Clark (http://ara.physics.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=1790)
+  if(stationId==3 && (chan==0 || chan==4 || chan==8)){
+    invertGraph(grRet);
+  }
+
+  return grRet;
+
 }
 
 
@@ -170,4 +179,17 @@ Int_t UsefulAtriStationEvent::getNumRFChannels()
 {
   return AraGeomTool::Instance()->getStationInfo(stationId)->getNumRFChans();
 
+}
+
+/*
+Vertically invert a waveform
+necessary for some channels in A3 (RF chans 0, 4, 8)
+*/
+
+void UsefulAtriStationEvent::invertGraph(TGraph *gr){
+  double t1, v1;
+  for(int i=0; i<gr->GetN(); i++){ // loop over all samples in waveform
+    gr->GetPoint(i,t1,v1); //g et the voltage point
+    gr->SetPoint(i,t1,-v1); // re-set the voltage point, multiplying by -1
+  }
 }

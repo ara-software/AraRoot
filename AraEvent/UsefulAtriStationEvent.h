@@ -45,7 +45,7 @@ class UsefulAtriStationEvent: public RawAtriStationEvent, public UsefulAraStatio
    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns - the returned TGraph is from FFTtools::makePowerSpectrumMilliVoltsNanoS$
    TH1D *getFFTHistForRFChan(int chan); ///< Utility function for webplotter -- produces a TH1D form of getFFTForRFChan(int chan)
    int fillFFTHistoForRFChan(int chan, TH1D *histFFT); ///< Utility function for webplotter
-
+   void invertGraph(TGraph *gr); ///<Invert the graph; that is, multiply by -1
 
    //Calibrated data
    Int_t fNumChannels; ///< The number of channels
