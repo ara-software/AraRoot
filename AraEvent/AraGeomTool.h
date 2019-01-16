@@ -21,6 +21,8 @@
 #include "AraStationInfo.h"
 #include "AraSunPos.h"
 
+#include "time.h"
+
 //! Part of AraEvent library. Loads and stores information about each station's geometry as well as information about the antennae (filters, positions, channels etc...).
 /*!
   The Ara geometry and numbering tool
