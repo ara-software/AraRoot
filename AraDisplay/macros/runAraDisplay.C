@@ -27,7 +27,7 @@ void runAraDisplay(char *eventFile, char *pedFile, int stationID) {
     gSystem->Load("libAraCorrelator.so");
     gSystem->Load("libAraDisplay.so");
 
-    AraEventCalibrator::Instance()->setAtriPedFile(pedFile,2);
+    AraEventCalibrator::Instance()->setAtriPedFile(pedFile,stationID);
     AraDisplay *magicPtr = new AraDisplay(eventFile,AraCalType::kJustPed);
     magicPtr->startEventDisplay();
 }
