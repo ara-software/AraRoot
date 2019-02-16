@@ -30,7 +30,7 @@ class AraStationInfo: public TObject
  public:
   
   AraStationInfo(); ///< Default constructor
-  AraStationInfo(AraStationId_t stationId); ///< Assignment constructor
+  AraStationInfo(Double_t unixtime, AraStationId_t stationId); ///< Assignment constructor ///unixtime argument added by UAL 01/25/2019
   ~AraStationInfo(); ////< Destructor
 
   Int_t getNumCalAnts() {return fNumberCalAntennas;}
@@ -101,7 +101,7 @@ class AraStationInfo: public TObject
   void fillAntIndexVec();
   void fillTrigChanVec();
   void readChannelMapDbAtri();
-  void readChannelMapDbAtri_2();
+  void readChannelMapDbAtri_2(Int_t yrtime);
   void readChannelMapDbIcrr();
 
 

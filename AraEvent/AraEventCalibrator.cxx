@@ -854,6 +854,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   //  fprintf(stderr, "begin calibrating event\n");//FIXME
   AraStationId_t thisStationId = theEvent->stationId;
 
+  ////The unixtime line was added by UAL 01/26/2019.
+  Double_t unixtime = theEvent->unixTime;
+  
   Int_t calibIndex = AraGeomTool::getStationCalibIndex(thisStationId);
   //RJN debug
   //  std::cout << "Station Id fun: " << (int)thisStationId << "\t" << calibIndex << "\n";
@@ -1075,6 +1078,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
   if( hasCableDelays(calType)){
     for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
       AraGeomTool* tempGeom = AraGeomTool::Instance();
+      ////LoadSQLDbAtri() added by UAL 01/25/2019
+      tempGeom->LoadSQLDbAtri(unixtime,thisStationId);
+      
       Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
       int chanId = tempGeom->getElecChanFromRFChan(rfChan, thisStationId);
       timeMapIt=theEvent->fTimes.find(chanId);

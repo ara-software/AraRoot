@@ -47,8 +47,10 @@ class AraGeomTool
    Double_t calcDeltaTR(Int_t rfChan1, Int_t rfChan2, Double_t phiWave, Double_t thetaWave,Double_t R, AraStationId_t stationId);
    Double_t calcDeltaTSimple(Double_t ant1[3], Double_t ant2[3], Double_t source[3]);
 
-   AraStationInfo *getStationInfo(AraStationId_t stationId); ///< Would like to make this const but for now this is fine
+   ////LoadSQLDbAtri added by UAL 01/25/2019
+   AraStationInfo *LoadSQLDbAtri(Double_t unixtime, AraStationId_t stationId);
    
+   AraStationInfo *getStationInfo(AraStationId_t stationId); ///< Would like to make this const but for now this is fine
 
    //Utility functions to do with the different stations
    static bool isIcrrStation(AraStationId_t stationId); ///< Returns TRUE if the station is an ICRR station and false otherwise

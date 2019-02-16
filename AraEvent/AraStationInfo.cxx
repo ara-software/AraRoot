@@ -30,8 +30,8 @@ AraStationInfo::AraStationInfo()
 
 }
 
-
-AraStationInfo::AraStationInfo(AraStationId_t stationId)
+////unixtime argument added by UAL 01/25/2019
+AraStationInfo::AraStationInfo(Double_t unixtime, AraStationId_t stationId)
   :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(CAL_ANTS_PER_ATRI)
 {
   fStationId=stationId;
@@ -42,8 +42,30 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId)
     readChannelMapDbIcrr();
   }
   else {
-    readChannelMapDbAtri_2();
+    
+    Int_t yrtime=0;
+    /////These if statements check if the run is before December 1st or not
+    if(unixtime<=1512090000){
+      if(unixtime>0){
+	std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before December 1st 2017"<<std::endl;
+      }
+
+      if(unixtime==0){
+	std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 2018 & after please call "<<std::endl;
+	std::cout<<"UsefulAtriStationEvent *realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kLatestCalib); ***BEFORE*** "<<std::endl;
+	std::cout<<"AraAraGeomTool *geom = AraGeomTool::Instance();"<<std::endl;
+      }
+      yrtime=0;
+    }
+
+    if(unixtime>1512090000){
+      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is after December 1st 2017"<<std::endl;
+      yrtime=1;
+    }
+    
+    readChannelMapDbAtri_2(yrtime);
     //    readChannelMapDbAtri();
+
   }
   readCalPulserDb();
 
@@ -1110,7 +1132,7 @@ void AraStationInfo::readCalPulserDb(){
 // ----------------------------------------------------------------------
 
 
-void AraStationInfo::readChannelMapDbAtri_2(){
+void AraStationInfo::readChannelMapDbAtri_2(Int_t yrtime){
   sqlite3 *db;
   char *zErrMsg = 0;
   sqlite3_stmt *stmt;
@@ -1129,6 +1151,15 @@ void AraStationInfo::readChannelMapDbAtri_2(){
     strncpy(calibDir,calibEnv,FILENAME_MAX);
   }  
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
+
+  ////These two if statements were added by UAL 01/25/2019
+  if(yrtime==0){
+    std::cout<<"Opening default 2013-2017 SQLite tables for all stations "<<std::endl;
+  }
+  if(yrtime==1){
+    std::cout<<"Opening the database with new channel mappings for ARA03 and default mappings for all the other stations "<<std::endl;
+  }
+  
   //open the database
   int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
@@ -1142,7 +1173,11 @@ void AraStationInfo::readChannelMapDbAtri_2(){
   //This is where we decide which table to access in the database
   if(fStationId==ARA_STATION1B) query = "select * from ARA01";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
-  else if(fStationId==ARA_STATION3) query = "select * from ARA03";
+
+  ////Change made by UAL to ARA03 in an attemp to keep track of various channel mappins over various years
+  else if(fStationId==ARA_STATION3 && yrtime==0) query = "select * from ARA03";
+  else if(fStationId==ARA_STATION3 && yrtime==1) query = "select * from ARA03_2018";
+  
   else if(fStationId==ARA_STATION4) query = "select * from ARA04";
   else if(fStationId==ARA_STATION5) query = "select * from ARA05";
   else if(fStationId==ARA_STATION6) query = "select * from ARA06";
