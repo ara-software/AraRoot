@@ -31,7 +31,8 @@ AraStationInfo::AraStationInfo()
 }
 
 ////unixtime argument added by UAL 01/25/2019
-AraStationInfo::AraStationInfo(Double_t unixtime, AraStationId_t stationId)
+////Order of arguments in AraStationInfo changed and set the default value of unixtime to zero in the header file for the constructor to enable backwards compatibility by UAL 02/19/2019
+AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
   :fAntInfo(ANTS_PER_ATRI),fCalAntInfo(CAL_ANTS_PER_ATRI)
 {
   fStationId=stationId;

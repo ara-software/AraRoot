@@ -35,7 +35,8 @@ const Double_t fIceThicknessSP=2646.28;
 const Double_t fGeoidA=6378137;
 const Double_t fGeoidC=6356752.3;
 
-Double_t Utime=0;//added by UAL 01/25/2019
+////Removed the Utime variable and changed the order of arguments of AraStationInfo to have backwards compatibility after introducing default value in the constructor of AraStationInfo by UAL 02/19/2019
+
 
 //1 Astronomical Unit ~ mean distance from Earth to Sun (for sun position calculations);
 const Double_t fAU=149597890000; //(in meters)
@@ -506,20 +507,20 @@ const char* AraGeomTool::getStationName(AraStationId_t stationId){
 
 }
 
-
+////Removed the Utime argument in AraStationInfo by UAL 02/19/2019
 AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
 {
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
     if(!fStationInfoICRR[calibIndex]) {
-      fStationInfoICRR[calibIndex] = new AraStationInfo(Utime,stationId);
+      fStationInfoICRR[calibIndex] = new AraStationInfo(stationId);
     }
     if(calibIndex>=0 && calibIndex<ICRR_NO_STATIONS)
       return fStationInfoICRR[calibIndex];
   }
   if(isAtriStation(stationId)) {
     if(!fStationInfoATRI[calibIndex]) {
-      fStationInfoATRI[calibIndex] = new AraStationInfo(Utime,stationId);
+      fStationInfoATRI[calibIndex] = new AraStationInfo(stationId);
     }
     if(calibIndex>=0 && calibIndex<ATRI_NO_STATIONS)
       return fStationInfoATRI[calibIndex];
@@ -528,13 +529,13 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
 }
 
 ////LoadSQLDbAtri added by UAL 01/25/2019
+////Changed the order of arguments of AraStationInfo to have backwards compatibility after introducing default value in the constructor of AraStationInfo by UAL 02/19/2019
 AraStationInfo *AraGeomTool::LoadSQLDbAtri(Double_t unixtime, AraStationId_t stationId)
 {
-  Utime=unixtime;
   int calibIndex=getStationCalibIndex(stationId);
   if(isAtriStation(stationId)) {
     if(!fStationInfoATRI[calibIndex]) {
-      fStationInfoATRI[calibIndex] = new AraStationInfo(unixtime,stationId);
+      fStationInfoATRI[calibIndex] = new AraStationInfo(stationId,unixtime);
     }
     if(calibIndex>=0 && calibIndex<ATRI_NO_STATIONS)
       return fStationInfoATRI[calibIndex];

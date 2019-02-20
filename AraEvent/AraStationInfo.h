@@ -30,7 +30,9 @@ class AraStationInfo: public TObject
  public:
   
   AraStationInfo(); ///< Default constructor
-  AraStationInfo(Double_t unixtime, AraStationId_t stationId); ///< Assignment constructor ///unixtime argument added by UAL 01/25/2019
+  AraStationInfo(AraStationId_t stationId,Int_t unixtime=0 ); ///< Assignment constructor
+  ///unixtime argument added by UAL 01/25/2019
+  ///default value given to unixtime and changed the order of arguments to enable backwards compatibility by UAL 02/19/2019
   ~AraStationInfo(); ////< Destructor
 
   Int_t getNumCalAnts() {return fNumberCalAntennas;}
