@@ -5,12 +5,19 @@
 /////     The Ara class imposing some event qualtiy cuts                 /////
 //////////////////////////////////////////////////////////////////////////////
 
-#include "AraQualCuts.h"
+//C++ includes
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
 
+//class definition requires
+#include "AraQualCuts.h"
+
+//AraRoot Includes
+#include "araSoft.h"
+
+//ROOT includes
 #include "TGraph.h"
 
 AraQualCuts * AraQualCuts::fgInstance=0;
@@ -35,7 +42,46 @@ AraQualCuts*  AraQualCuts::Instance()
   return fgInstance;
 }
 
-bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *ev)
+//! Returns if a real atri event has a quality problem
+/*!
+  \param ev the real atri event pointer
+  \return if the event has a block gap
+*/
+bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 {
-  return true;
+  bool isGoodEvent=true;
+  bool hasBlockGap = AraQualCuts::hasBlockGap(realEvent);
+  if(hasBlockGap){
+    isGoodEvent=false;
+  }
+  return isGoodEvent;
+}
+
+//! Returns if a raw atri event has a block gap
+/*!
+  \param rawEvent the raw atri event pointer
+  \return if the event has a block gap
+*/
+bool AraQualCuts::hasBlockGap(RawAtriStationEvent *rawEventv)
+{
+
+  /*
+    In normal digitizer readout, blocks are read out sequentially
+    In the order "DDA1, DDA2, DDA3, DDA4"
+    So if we read out three blocks, we'd see
+    24 24 24 24 25 25 25 25 26 26 26 26
+    If the readout is *not* sequential, we should not analyze the event
+    So, we check to see if final block = first block + 4*num_blocks
+  */
+
+  bool hasBlockGap=false;
+  int lenBlockVec = rawEventv->blockVec.size();
+  int numDDA=DDA_PER_ATRI; //defined in araSoft.h
+  int numBlocks = BLOCKS_PER_DDA; //defined in araSoft.h
+  if(rawEventv->blockVec[lenBlockVec-1].getBlock() != (rawEventv->blockVec[0].getBlock() + lenBlockVec/numDDA -1 ) ){
+    if( numBlocks-rawEventv->blockVec[0].getBlock() + rawEventv->blockVec[lenBlockVec-1].getBlock() != lenBlockVec/numDDA-1){
+      hasBlockGap=true;
+    }
+  }
+  return hasBlockGap;
 }

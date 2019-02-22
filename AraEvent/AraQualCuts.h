@@ -9,6 +9,7 @@
 #define ARAQUALCUTS_H
 
 //Includes
+#include "RawAtriStationEvent.h"
 #include "UsefulAtriStationEvent.h"
 
 //! Part of AraEvent library. Can report on if there is a quality cut problem with an event
@@ -26,6 +27,8 @@ class AraQualCuts
     static AraQualCuts*  Instance();
 
     static bool isGoodEvent(UsefulAtriStationEvent *ev);
+
+    static bool hasBlockGap(RawAtriStationEvent *ev);
 
   
   protected:
