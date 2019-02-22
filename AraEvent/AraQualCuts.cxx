@@ -13,25 +13,29 @@
 
 #include "TGraph.h"
 
-AraGeomTool * AraGeomTool::fgInstance=0;
+AraQualCuts * AraQualCuts::fgInstance=0;
 
-AraGeomTool::AraGeomTool() 
+AraQualCuts::AraQualCuts() 
 {
 	//for the moment, this doesn't do anything intelligent...
 }
 
-AraGeomTool::~AraGeomTool() {
+AraQualCuts::~AraQualCuts() {
 	//for the moment, this doesn't need to do anything intelligent
 }
 
 //______________________________________________________________________________
-AraGeomTool*  AraGeomTool::Instance()
+AraQualCuts*  AraQualCuts::Instance()
 {
   //static function
   if(fgInstance)
     return fgInstance;
 
-  fgInstance = new AraGeomTool();
+  fgInstance = new AraQualCuts();
   return fgInstance;
 }
 
+bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *ev)
+{
+  return true;
+}
