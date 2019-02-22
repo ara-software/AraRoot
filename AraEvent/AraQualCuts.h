@@ -11,26 +11,25 @@
 //Includes
 #include "UsefulAtriStationEvent.h"
 
-
 //! Part of AraEvent library. Can report on if there is a quality cut problem with an event
 /*!
   The Ara event quality cuts tool
   \ingroup rootclasses
 */
-class AraGeomTool
+class AraQualCuts
 {
   public:
     AraQualCuts(); ///< Default constructor
     ~AraQualCuts(); ///< Destructor
 
     //Instance generator
-    static AraGeomTool*  Instance();
+    static AraQualCuts*  Instance();
 
     static bool isGoodEvent(UsefulAtriStationEvent *ev);
 
   
   protected:
-    static AraGeomTool *fgInstance; // protect against multiple instances
+    static AraQualCuts *fgInstance; // protect against multiple instances
     
   private:
     //nothing private for right now
