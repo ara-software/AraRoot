@@ -1,6 +1,4 @@
 # ARA ROOT-based  Software
-######  Author: Ryan Nichol (rjn@hep.ucl.ac.uk)
-######  & Jonathan Davies (jdavies@hep.ucl.ac.uk)
 
 ## Website
 http://www.hep.ucl.ac.uk/uhen/ara/araroot
@@ -61,10 +59,8 @@ The executable will be created in two loactions: `${ARA_ROOT_DIR}/build/analysis
 
 
 ## Troubleshooting
-There are a myriad of ways that one can run into problems with the software:
-1. Path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the `ARA_UTIL_INSTALL_DIR` and have it point to the location you want to install all the packages. If things are set up correctly you will end up with a `ARA_UTIL_INSTALL_DIR/include` and `ARA_UTIL_INSTALL_DIR/lib`, `ARA_UTIL_INSTALL_DIR/bin`, `ARA_UTIL_INSTALL_DIR/scripts` and `ARA_UTIL_INSTALL_DIR/share/araCalib` all populated with essential headers, libraries and calibration constants. 
+There are a myriad of ways that one can run into problems with the software. The most common are path problems -- the bane of poorly organised code. By far the easiest way to use the ARA root code is to just set the `ARA_UTIL_INSTALL_DIR` and have it point to the location you want to install all the packages. If things are set up correctly you will end up with a `ARA_UTIL_INSTALL_DIR/include` and `ARA_UTIL_INSTALL_DIR/lib`, `ARA_UTIL_INSTALL_DIR/bin`, `ARA_UTIL_INSTALL_DIR/scripts` and `ARA_UTIL_INSTALL_DIR/share/araCalib` all populated with essential headers, libraries and calibration constants. 
 
-Most problems are fixed by running `bash INSTALL.sh 1` to re-build AraRoot from scratch. 
-If this doesn't fix things try removing everything from the `ARA_UTIL_INSTALL_DIR`, re-installating `libRootFftwWrapper` and then re-running `bash INSTALL.sh` with either 1 or 99.
+Most problems are fixed by running `bash INSTALL.sh 1` to re-build AraRoot from scratch. If this doesn't fix things try removing everything from the `ARA_UTIL_INSTALL_DIR`, re-installating `libRootFftwWrapper` and then re-running `bash INSTALL.sh` with either 1 or 99.
 
 If problems persist, seek help!
