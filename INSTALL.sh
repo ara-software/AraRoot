@@ -63,6 +63,7 @@ if [ $ERROR_FLAG == 1 ]; then
 fi
 
 #First thing to do is to go into the build directory and get rid of everything there
+mkdir -p $ARA_ROOT_DIR/build #make this directory if it doesn't exist already (it won't be in the git checkout by default)
 cd $ARA_ROOT_DIR/build
 
 #This forces a complete re-build
