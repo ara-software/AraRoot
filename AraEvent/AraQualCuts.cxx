@@ -11,7 +11,7 @@
 #include <cstring>
 #include <cstdlib>
 
-//class definition requires
+//class definition includes
 #include "AraQualCuts.h"
 
 //AraRoot Includes
