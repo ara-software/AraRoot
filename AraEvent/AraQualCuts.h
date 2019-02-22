@@ -27,6 +27,7 @@ class AraQualCuts
     static AraQualCuts*  Instance();
 
     static bool isGoodEvent(UsefulAtriStationEvent *realEvent);
+    
     static bool hasBlockGap(RawAtriStationEvent *rawEvent);
     static bool hasTimingError(UsefulAtriStationEvent *realEvent);
     static bool hasTooFewBlocks(UsefulAtriStationEvent *realEvent);
