@@ -26,10 +26,9 @@ class AraQualCuts
     //Instance generator
     static AraQualCuts*  Instance();
 
-    static bool isGoodEvent(UsefulAtriStationEvent *ev);
-
-    static bool hasBlockGap(RawAtriStationEvent *ev);
-
+    static bool isGoodEvent(UsefulAtriStationEvent *realEvent);
+    static bool hasBlockGap(RawAtriStationEvent *rawEvent);
+    static bool hasTimingError(UsefulAtriStationEvent *realEvent);
   
   protected:
     static AraQualCuts *fgInstance; // protect against multiple instances

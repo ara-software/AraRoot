@@ -44,14 +44,15 @@ AraQualCuts*  AraQualCuts::Instance()
 
 //! Returns if a real atri event has a quality problem
 /*!
-  \param ev the real atri event pointer
+  \param ev the useful atri event pointer
   \return if the event has a block gap
 */
 bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 {
   bool isGoodEvent=true;
   bool hasBlockGap = AraQualCuts::hasBlockGap(realEvent);
-  if(hasBlockGap){
+  bool hasTimingError = AraQualCuts::hasTimingError(realEvent);
+  if(hasBlockGap || hasTimingError){
     isGoodEvent=false;
   }
   return isGoodEvent;
@@ -84,4 +85,33 @@ bool AraQualCuts::hasBlockGap(RawAtriStationEvent *rawEventv)
     }
   }
   return hasBlockGap;
+}
+
+//! Returns if a real atri event has a timing error
+/*!
+  \param realEvent the useful atri event pointer
+  \return if the event has a timing error
+*/
+bool AraQualCuts::hasTimingError(UsefulAtriStationEvent *realEvent)
+{
+
+  /*
+    In an analyzable waveform, later samples should have later times
+    so we check to see if ever x_j < x_j+1
+    which is acausal and will cause the interpolator to fail
+  */
+
+  bool hasTimingError=false;
+  for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
+    TGraph* gr = realEvent->getGraphFromRFChan(chan); //get the waveform
+    Double_t *xVals = gr->GetX(); //get the time array
+    for(int i=1; i<gr->GetN(); i++){
+      if(xVals[i]<xVals[i-1]){
+        hasTimingError=true;
+        break;
+      }
+    }
+    delete gr;
+  }
+  return hasTimingError;
 }
