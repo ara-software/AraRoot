@@ -50,9 +50,12 @@ AraQualCuts*  AraQualCuts::Instance()
 bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 {
   bool isGoodEvent=true;
+  
   bool hasBlockGap = AraQualCuts::hasBlockGap(realEvent);
   bool hasTimingError = AraQualCuts::hasTimingError(realEvent);
-  if(hasBlockGap || hasTimingError){
+  bool hasTooFewBlocks = AraQualCuts::hasTooFewBlocks(realEvent);
+  
+  if(hasBlockGap || hasTimingError || hasTooFewBlocks){
     isGoodEvent=false;
   }
   return isGoodEvent;
@@ -114,4 +117,30 @@ bool AraQualCuts::hasTimingError(UsefulAtriStationEvent *realEvent)
     delete gr;
   }
   return hasTimingError;
+}
+
+//! Returns if a real atri event has two few blocks
+/*!
+  \param realEvent the useful atri event pointer
+  \return if the event has two few blocks/samples to be analyzed
+*/
+bool AraQualCuts::hasTooFewBlocks(UsefulAtriStationEvent *realEvent)
+{
+
+  /*
+    In an analyzable waveform, it should have at leat 1 fully read-out block (64 samples)
+    (This is SAMPLES_PER_BLOCK from araSoft.h)
+    If not, we shouldn't analyze this event
+  */
+
+  bool hasTooFewBlocks=false;
+  for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
+    TGraph* gr = realEvent->getGraphFromRFChan(chan); //get the waveform
+    if(gr->GetN()<SAMPLES_PER_BLOCK){
+      hasTooFewBlocks=true;
+      break;
+    }
+    delete gr;
+  }
+  return hasTooFewBlocks;
 }

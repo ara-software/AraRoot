@@ -29,6 +29,7 @@ class AraQualCuts
     static bool isGoodEvent(UsefulAtriStationEvent *realEvent);
     static bool hasBlockGap(RawAtriStationEvent *rawEvent);
     static bool hasTimingError(UsefulAtriStationEvent *realEvent);
+    static bool hasTooFewBlocks(UsefulAtriStationEvent *realEvent);
   
   protected:
     static AraQualCuts *fgInstance; // protect against multiple instances
@@ -36,6 +37,5 @@ class AraQualCuts
   private:
     //nothing private for right now
 };
-
 
 #endif //ARAQUALCUTS_H
