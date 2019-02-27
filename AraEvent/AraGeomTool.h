@@ -48,9 +48,11 @@ class AraGeomTool
    Double_t calcDeltaTSimple(Double_t ant1[3], Double_t ant2[3], Double_t source[3]);
 
    ////LoadSQLDbAtri added by UAL 01/25/2019
-   AraStationInfo *LoadSQLDbAtri(Double_t unixtime, AraStationId_t stationId);
-   
-   AraStationInfo *getStationInfo(AraStationId_t stationId); ///< Would like to make this const but for now this is fine
+   ////Corrected unixtime argument from Double_t to Int_t by UAL 02/27/2019
+   AraStationInfo *LoadSQLDbAtri(Int_t unixtime, AraStationId_t stationId);
+
+   ////Added ifile argument by UAL 02/27/2019
+   AraStationInfo *getStationInfo(AraStationId_t stationId,Int_t ifile=0); ///< Would like to make this const but for now this is fine
 
    //Utility functions to do with the different stations
    static bool isIcrrStation(AraStationId_t stationId); ///< Returns TRUE if the station is an ICRR station and false otherwise

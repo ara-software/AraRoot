@@ -508,19 +508,37 @@ const char* AraGeomTool::getStationName(AraStationId_t stationId){
 }
 
 ////Removed the Utime argument in AraStationInfo by UAL 02/19/2019
-AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
+////Added the ifile argument in getStationInfo by UAL 02/27/2019
+AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId,Int_t ifile)
 {
+
+  Int_t unixtime=0;
+  if(ifile==1){
+    ////In 2017
+    std::cout<<"Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
+    std::cout<<"Will use default 2017 default unixtime argument: "<<1510000000<<std::endl;  
+    unixtime=1510000000;
+  }
+  
+  if(ifile==2){
+    ////In 2018
+    std::cout<<"Opening 2018 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
+    std::cout<<"Will use default 2018 default unixtime argument: "<<1520000000<<std::endl;  
+    unixtime=1520000000;
+  }
+
+    
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
     if(!fStationInfoICRR[calibIndex]) {
-      fStationInfoICRR[calibIndex] = new AraStationInfo(stationId);
+      fStationInfoICRR[calibIndex] = new AraStationInfo(stationId,unixtime);
     }
     if(calibIndex>=0 && calibIndex<ICRR_NO_STATIONS)
       return fStationInfoICRR[calibIndex];
   }
   if(isAtriStation(stationId)) {
     if(!fStationInfoATRI[calibIndex]) {
-      fStationInfoATRI[calibIndex] = new AraStationInfo(stationId);
+      fStationInfoATRI[calibIndex] = new AraStationInfo(stationId,unixtime);
     }
     if(calibIndex>=0 && calibIndex<ATRI_NO_STATIONS)
       return fStationInfoATRI[calibIndex];
@@ -530,7 +548,7 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId)
 
 ////LoadSQLDbAtri added by UAL 01/25/2019
 ////Changed the order of arguments of AraStationInfo to have backwards compatibility after introducing default value in the constructor of AraStationInfo by UAL 02/19/2019
-AraStationInfo *AraGeomTool::LoadSQLDbAtri(Double_t unixtime, AraStationId_t stationId)
+AraStationInfo *AraGeomTool::LoadSQLDbAtri(Int_t unixtime, AraStationId_t stationId)
 {
   int calibIndex=getStationCalibIndex(stationId);
   if(isAtriStation(stationId)) {
