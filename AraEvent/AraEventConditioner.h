@@ -37,6 +37,7 @@ class AraEventConditioner : public TObject
 
   private:
     void invertA3Chans(UsefulAtriStationEvent *theEvent);
+    void trimFirstBlocks(UsefulAtriStationEvent *theEvent);
 
   protected:
     static AraEventConditioner *fgInstance;  ///< protect against multiple instances

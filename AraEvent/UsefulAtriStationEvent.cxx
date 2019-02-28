@@ -94,9 +94,7 @@ TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
   }
   
   TGraph *grRet = getGraphFromElecChan(elecChan);
-  TGraph *grOut = trimGraph(grRet, 20.); //trim off 20 ns from the *front* (remove the first block essentially)
-  delete grRet;
-  return grOut;
+  return grRet;
 }
 
 
@@ -180,33 +178,4 @@ Int_t UsefulAtriStationEvent::getNumRFChannels()
 {
   return AraGeomTool::Instance()->getStationInfo(stationId)->getNumRFChans();
 
-}
-
-/*
-Trim first 20ns from the waveform
-inputs: graph to be trimmed, amount to trim from the front of the graph
-returns: pointer to new trimmed graph
-*/
-TGraph *UsefulAtriStationEvent::trimGraph(TGraph *grIn, double trim_value){
-
-  //load the old X and Y arrays
-  double *oldX = grIn->GetX();
-  double *oldY = grIn->GetY();
-  
-  //record the first sample
-  double first_time = oldX[0];
-
-  //create holders for the trimmed X and Y arrays
-  std::vector<double> newX;
-  std::vector<double> newY;
-
-  for(int samp=0; samp<grIn->GetN(); samp++){ //loop over samples in the old waveform
-    if(oldX[samp]>first_time+trim_value){ //if the time of the sample is > the trim amount, keep it
-      newX.push_back(oldX[samp]); //record the x value
-      newY.push_back(oldY[samp]); //record the y value
-    }
-  }
-
-  TGraph *grOut = new TGraph(newX.size(), &newX[0], &newY[0]);
-  return grOut;
 }

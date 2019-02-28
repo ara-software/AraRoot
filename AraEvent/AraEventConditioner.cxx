@@ -15,6 +15,7 @@
 #include "UsefulAtriStationEvent.h"
 #include "AraEventConditioner.h"
 #include "AraGeomTool.h"
+#include "araSoft.h"
 
 #include "TGraph.h"
 
@@ -49,8 +50,26 @@ void AraEventConditioner::conditionEvent(UsefulAtriStationEvent *theEvent)
   if(theEvent->stationId==ARA_STATION3){
     AraEventConditioner::invertA3Chans(theEvent);
   }
+  trimFirstBlocks(theEvent);
   theEvent->fIsConditioned = true; //mark the event as conditioned
   //now we're done
+}
+
+//! Trimp the first block (SAMPLES_PER_BLOCK) from all graphs
+/*!
+  \param ev the useful atri event pointer
+  \return void
+*/
+
+void AraEventConditioner::trimFirstBlocks(UsefulAtriStationEvent *theEvent){
+  for(Int_t num_channels=0; num_channels<theEvent->fTimes.size(); num_channels++){
+    theEvent->fTimes[num_channels].erase(theEvent->fTimes[num_channels].begin(), theEvent->fTimes[num_channels].begin()+SAMPLES_PER_BLOCK);
+    theEvent->fVolts[num_channels].erase(theEvent->fVolts[num_channels].begin(), theEvent->fVolts[num_channels].begin()+SAMPLES_PER_BLOCK);
+  }
+  //record the trimming
+  std::stringstream ss;
+  ss<<"trim_first_blocks_all";
+  theEvent->fConditioningList.push_back(ss.str());
 }
 
 
