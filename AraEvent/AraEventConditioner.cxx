@@ -46,8 +46,6 @@ AraEventConditioner*  AraEventConditioner::Instance()
 void AraEventConditioner::conditionEvent(UsefulAtriStationEvent *theEvent)
 {
 
-  AraStationId_t thisStationId = theEvent->stationId;
-
   if(theEvent->stationId==ARA_STATION3){
     AraEventConditioner::invertA3Chans(theEvent);
   }
