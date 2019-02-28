@@ -10,6 +10,7 @@
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 
 #include "UsefulAtriStationEvent.h"
 #include "AraEventConditioner.h"
@@ -59,8 +60,26 @@ void AraEventConditioner::conditionEvent(UsefulAtriStationEvent *theEvent)
   \return void
 */
 void AraEventConditioner::invertA3Chans(UsefulAtriStationEvent *theEvent){
-  int chan;
-  
-  chan=0;
+  //make a list of channels we want to invert
+  std::vector<Int_t> list_to_invert;
+  list_to_invert.push_back(0);
+  list_to_invert.push_back(4);
+  list_to_invert.push_back(8);
 
+  //loop over that list and invert them (multiply by -1)
+  for(int i=0; i<list_to_invert.size(); i++){
+    //get the elec chan
+    Int_t rf_chan = list_to_invert[i];
+    Int_t elec_chan = AraGeomTool::Instance()->getElecChanFromRFChan(rf_chan, theEvent->stationId);
+    
+    //perform inversion on every sample
+    for(Int_t samp=0; samp<theEvent->fTimes[elec_chan].size(); samp++){
+      theEvent->fVolts[elec_chan][samp]*=-1.;
+    }
+
+    //record the inversion
+    std::stringstream ss;
+    ss<<"invert_ch"<<rf_chan;
+    theEvent->fCondtioningList.push_back(ss.str());
+  }
 }
