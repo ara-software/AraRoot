@@ -136,11 +136,12 @@ bool AraQualCuts::hasTooFewBlocks(UsefulAtriStationEvent *realEvent)
   bool hasTooFewBlocks=false;
   for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
     TGraph* gr = realEvent->getGraphFromRFChan(chan); //get the waveform
-    if(gr->GetN()<SAMPLES_PER_BLOCK){
+    int N = gr->GetN();
+    delete gr;
+    if(N<SAMPLES_PER_BLOCK){
       hasTooFewBlocks=true;
       break;
     }
-    delete gr;
   }
   return hasTooFewBlocks;
 }
