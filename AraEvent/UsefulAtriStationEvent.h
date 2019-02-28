@@ -32,30 +32,31 @@
 */
 class UsefulAtriStationEvent: public RawAtriStationEvent, public UsefulAraStationEvent
 {
- public:
-   UsefulAtriStationEvent(); ///< Default constructor
-   UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Constructor from RawAtriStationEvent object. This uses AraEventCalibrator to apply calibrations to the event.
-   ~UsefulAtriStationEvent(); ///< Destructor
+  public:
+    UsefulAtriStationEvent(); ///< Default constructor
+    UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Constructor from RawAtriStationEvent object. This uses AraEventCalibrator to apply calibrations to the event.
+    ~UsefulAtriStationEvent(); ///< Destructor
 
+    Int_t getNumElecChannels() {return fNumChannels;} ///< Returns the number of electronics channels
+    Int_t getNumRFChannels(); ///< Returns the number of RF channels - NB this may differ from the number of electronics channels
+    TGraph *getGraphFromElecChan(int chanId); ///< Returns the voltages-time graph for the appropriate electronics channel
+    TGraph *getGraphFromRFChan(int chanId); ///< Returns the voltage-time graph for the appropriate rf channel
+    TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns - the returned TGraph is from FFTtools::makePowerSpectrumMilliVoltsNanoS$
+    TH1D *getFFTHistForRFChan(int chan); ///< Utility function for webplotter -- produces a TH1D form of getFFTForRFChan(int chan)
+    int fillFFTHistoForRFChan(int chan, TH1D *histFFT); ///< Utility function for webplotter
+    void invertGraph(TGraph *gr); ///<Invert the graph; that is, multiply by -1
+    TGraph *trimGraph(TGraph *grIn, double trim_value); ///<trim grIn by trim_value (ns) at the *beginning* of the waveform
 
-   Int_t getNumElecChannels() {return fNumChannels;} ///< Returns the number of electronics channels
-   Int_t getNumRFChannels(); ///< Returns the number of RF channels - NB this may differ from the number of electronics channels
-   TGraph *getGraphFromElecChan(int chanId); ///< Returns the voltages-time graph for the appropriate electronics channel
-   TGraph *getGraphFromRFChan(int chanId); ///< Returns the voltage-time graph for the appropriate rf channel
-   TGraph *getFFTForRFChan(int chan); ///<Utility function for webplotter, all channels are interpolated to 0.5 ns - the returned TGraph is from FFTtools::makePowerSpectrumMilliVoltsNanoS$
-   TH1D *getFFTHistForRFChan(int chan); ///< Utility function for webplotter -- produces a TH1D form of getFFTForRFChan(int chan)
-   int fillFFTHistoForRFChan(int chan, TH1D *histFFT); ///< Utility function for webplotter
-   void invertGraph(TGraph *gr); ///<Invert the graph; that is, multiply by -1
-   TGraph *trimGraph(TGraph *grIn, double trim_value); ///<trim grIn by trim_value (ns) at the *beginning* of the waveform
+    //Calibrated data
+    Int_t fNumChannels; ///< The number of channels
+    std::map< Int_t, std::vector <Double_t> > fTimes; ///< The times of samples
+    std::map< Int_t, std::vector <Double_t> > fVolts; ///< The voltages of samples
 
-   //Calibrated data
-   Int_t fNumChannels; ///< The number of channels
-   std::map< Int_t, std::vector <Double_t> > fTimes; ///< The times of samples
-   std::map< Int_t, std::vector <Double_t> > fVolts; ///< The voltages of samples
-
+    //to track conditioning
+    bool fIsConditioned;
+    std::vector<std::string> fCondtioningList;
 
   ClassDef(UsefulAtriStationEvent,1);
 };
-
 
 #endif //USEFULATRISTATIONEVENT_H

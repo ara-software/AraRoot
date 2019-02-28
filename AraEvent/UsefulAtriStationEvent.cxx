@@ -9,6 +9,7 @@
 
 #include "UsefulAtriStationEvent.h"
 #include "AraEventCalibrator.h"
+#include "AraEventConditioner.h"
 #include "FFTtools.h"
 #include "AraGeomTool.h"
 #include "TH1.h"
@@ -18,18 +19,23 @@
 ClassImp(UsefulAtriStationEvent);
 
 AraEventCalibrator *fCalibrator;
+AraEventConditioner *fConditioner;
 
 UsefulAtriStationEvent::UsefulAtriStationEvent() 
 {
-   //Default Constructor
+  //Default Constructor
   fNumChannels=0;
   fCalibrator=0;
+  fConditioner=0;
+  fIsConditioned=0;
 }
 
 UsefulAtriStationEvent::~UsefulAtriStationEvent() {
    //Default Destructor
   fNumChannels=0;
   fCalibrator=0;
+  fConditioner=0;
+  fIsConditioned=0;
 }
 
 UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType)
@@ -38,8 +44,9 @@ UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, Ar
   fCalibrator=AraEventCalibrator::Instance();
   fNumChannels=0;
   fCalibrator->calibrateEvent(this,calType);
-  //  fprintf(stderr, "UsefulAtriStationEvent::UsefulAtriStationEvent() -- finished constructing event\n");  //DEBUG
-
+  fIsConditioned=0;
+  fConditioner=AraEventConditioner::Instance();
+  fConditioner->conditionEvent(this);
 }
 
 

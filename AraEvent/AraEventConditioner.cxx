@@ -48,7 +48,7 @@ void AraEventConditioner::conditionEvent(UsefulAtriStationEvent *theEvent)
   if(theEvent->stationId==ARA_STATION3){
     AraEventConditioner::invertA3Chans(theEvent);
   }
-  // theEvent->fIsConditioned = true; //mark the event as conditioned
+  theEvent->fIsConditioned = true; //mark the event as conditioned
   //now we're done
 }
 
