@@ -80,6 +80,6 @@ void AraEventConditioner::invertA3Chans(UsefulAtriStationEvent *theEvent){
     //record the inversion
     std::stringstream ss;
     ss<<"invert_ch"<<rf_chan;
-    theEvent->fCondtioningList.push_back(ss.str());
+    theEvent->fConditioningList.push_back(ss.str());
   }
 }

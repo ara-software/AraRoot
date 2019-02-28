@@ -54,7 +54,7 @@ class UsefulAtriStationEvent: public RawAtriStationEvent, public UsefulAraStatio
 
     //to track conditioning
     bool fIsConditioned;
-    std::vector<std::string> fCondtioningList;
+    std::vector<std::string> fConditioningList;
 
   ClassDef(UsefulAtriStationEvent,1);
 };
