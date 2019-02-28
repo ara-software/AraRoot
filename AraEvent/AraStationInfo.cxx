@@ -46,6 +46,15 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
     
     Int_t yrtime=0;
     /////These if statements check if the run is before December 1st or not
+    if(unixtime==1510000000){
+      std::cout<<"Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
+      std::cout<<"Will use default 2017 default unixtime argument: "<<1510000000<<std::endl;
+    }
+    if(unixtime==1520000000){
+      std::cout<<"Opening 2018 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
+      std::cout<<"Will use default 2018 default unixtime argument: "<<1510000000<<std::endl;
+    }
+    
     if(unixtime<=1512090000){
       if(unixtime>0){
 	std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before December 1st 2017"<<std::endl;

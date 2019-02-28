@@ -515,18 +515,13 @@ AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId,Int_t ifile
   Int_t unixtime=0;
   if(ifile==1){
     ////In 2017
-    std::cout<<"Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-    std::cout<<"Will use default 2017 default unixtime argument: "<<1510000000<<std::endl;  
     unixtime=1510000000;
   }
   
   if(ifile==2){
     ////In 2018
-    std::cout<<"Opening 2018 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-    std::cout<<"Will use default 2018 default unixtime argument: "<<1520000000<<std::endl;  
     unixtime=1520000000;
   }
-
     
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
