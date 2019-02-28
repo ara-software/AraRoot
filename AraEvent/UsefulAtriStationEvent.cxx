@@ -9,6 +9,7 @@
 
 #include "UsefulAtriStationEvent.h"
 #include "AraEventCalibrator.h"
+#include "AraEventConditioner.h"
 #include "FFTtools.h"
 #include "AraGeomTool.h"
 #include "TH1.h"
@@ -18,18 +19,23 @@
 ClassImp(UsefulAtriStationEvent);
 
 AraEventCalibrator *fCalibrator;
+AraEventConditioner *fConditioner;
 
 UsefulAtriStationEvent::UsefulAtriStationEvent() 
 {
-   //Default Constructor
+  //Default Constructor
   fNumChannels=0;
   fCalibrator=0;
+  fConditioner=0;
+  fIsConditioned=0;
 }
 
 UsefulAtriStationEvent::~UsefulAtriStationEvent() {
    //Default Destructor
   fNumChannels=0;
   fCalibrator=0;
+  fConditioner=0;
+  fIsConditioned=0;
 }
 
 UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, AraCalType::AraCalType_t calType)
@@ -38,8 +44,9 @@ UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, Ar
   fCalibrator=AraEventCalibrator::Instance();
   fNumChannels=0;
   fCalibrator->calibrateEvent(this,calType);
-  //  fprintf(stderr, "UsefulAtriStationEvent::UsefulAtriStationEvent() -- finished constructing event\n");  //DEBUG
-
+  fIsConditioned=0;
+  fConditioner=AraEventConditioner::Instance();
+  fConditioner->conditionEvent(this);
 }
 
 
@@ -87,16 +94,7 @@ TGraph *UsefulAtriStationEvent::getGraphFromRFChan(int chan)
   }
   
   TGraph *grRet = getGraphFromElecChan(elecChan);
-
-  // for A3, channels 0, 4, 8, need to invert the voltages
-  // see talk by B Clark (http://ara.physics.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=1790)
-  if(stationId==3 && (chan==0 || chan==4 || chan==8)){
-    invertGraph(grRet);
-  }
-  TGraph *grOut = trimGraph(grRet, 20.); //trim off 20 ns from the *front* (remove the first block essentially)
-  delete grRet;
-  
-  return grOut;
+  return grRet;
 }
 
 
@@ -180,45 +178,4 @@ Int_t UsefulAtriStationEvent::getNumRFChannels()
 {
   return AraGeomTool::Instance()->getStationInfo(stationId)->getNumRFChans();
 
-}
-
-/*
-Vertically invert a waveform
-necessary for some channels in A3 (RF chans 0, 4, 8)
-*/
-void UsefulAtriStationEvent::invertGraph(TGraph *gr){
-  double t1, v1;
-  for(int i=0; i<gr->GetN(); i++){ // loop over all samples in waveform
-    gr->GetPoint(i,t1,v1); //g et the voltage point
-    gr->SetPoint(i,t1,-v1); // re-set the voltage point, multiplying by -1
-  }
-}
-
-/*
-Trim first 20ns from the waveform
-inputs: graph to be trimmed, amount to trim from the front of the graph
-returns: pointer to new trimmed graph
-*/
-TGraph *UsefulAtriStationEvent::trimGraph(TGraph *grIn, double trim_value){
-
-  //load the old X and Y arrays
-  double *oldX = grIn->GetX();
-  double *oldY = grIn->GetY();
-  
-  //record the first sample
-  double first_time = oldX[0];
-
-  //create holders for the trimmed X and Y arrays
-  std::vector<double> newX;
-  std::vector<double> newY;
-
-  for(int samp=0; samp<grIn->GetN(); samp++){ //loop over samples in the old waveform
-    if(oldX[samp]>first_time+trim_value){ //if the time of the sample is > the trim amount, keep it
-      newX.push_back(oldX[samp]); //record the x value
-      newY.push_back(oldY[samp]); //record the y value
-    }
-  }
-
-  TGraph *grOut = new TGraph(newX.size(), &newX[0], &newY[0]);
-  return grOut;
 }

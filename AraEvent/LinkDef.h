@@ -23,6 +23,7 @@
 #pragma link C++ class AraStationInfo+;
 #pragma link C++ class AraGeomTool+;
 #pragma link C++ class AraEventCalibrator+;
+#pragma link C++ class AraEventConditioner+;
 #pragma link C++ class RawAtriStationBlock+;
 #pragma link C++ class RawAtriStationEvent+;
 #pragma link C++ class RawAraGenericHeader+;
