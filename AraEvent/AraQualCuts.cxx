@@ -94,25 +94,45 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
   int nChanBelowThresh=0;
   std::vector<double> maxTimeVec;
 
+  AraAntPol::AraAntPol_t Vpol = AraAntPol::kVertical;
+  AraAntPol::AraAntPol_t Hpol = AraAntPol::kHorizontal;
+
   //loop over all RF chans
   for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
 
     TGraph* grRaw = realEvent->getGraphFromRFChan(chan); //get the waveform
 
-    //select an interpolation time step (V vs H)
-    double deltaT;
     AraAntPol::AraAntPol_t this_pol = AraGeomTool::Instance()->getPolByRFChan(chan,realEvent->stationId);
-    if(this_pol==AraAntPol::kVertical) deltaT=_VdeltaT;
-    else if(this_pol==AraAntPol::kHorizontal) deltaT=_HdeltaT;
-    else deltaT=.5; //fallback
-  
+
+    //set up two polarization parameters
+    //the interpolation time step (V vs H)
+    //and the voltage threshold for a bad block
+
+    double deltaT; //interpolation time step
+    double this_thresh; //the voltage threshold for a bad block
+
+    if(this_pol==Vpol){
+      deltaT=_VdeltaT;
+      this_thresh=_VOffsetThresh;
+    }
+    else if(this_pol==Hpol){
+      deltaT=_HdeltaT;
+      this_thresh=_HOffsetThresh;
+    }
+    else{ //fallback to V (more conservative)
+      deltaT=.5;
+      this_thresh=_VOffsetThresh;
+    }
+
     //get interpolated waveform
     TGraph *grInt = FFTtools::getInterpolatedGraph(grRaw, deltaT); 
     //then, get the rolling mean graph
     TGraph *grMean = getRollingMean(grInt,SAMPLES_PER_BLOCK); //SAMPLES_PER_BLOCK=64, in araSoft.h
+    //gte the max of the rolling mean, and when it occurs
     double maxTime;
     double meanMax = getMax(grMean, &maxTime);
-    if(meanMax<(chan<8?_VOffsetThresh:_HOffsetThresh)){
+    //check to see if we have a threshold violation and record when it happened
+    if(meanMax<this_thresh){
       nChanBelowThresh++;
       maxTimeVec.push_back(maxTime);
     }
@@ -120,13 +140,14 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
     delete grInt;
     delete grRaw;
   }
+  //check all the threshold violations we found, and see if they all happen near eachother
+  //where "near eachother" means within the _OffsetBlocksTimeWindowCut amount of time
   double timeRange;
   if(nChanBelowThresh>=_NumOffsetBlocksCut){
     timeRange = *max_element(maxTimeVec.begin(), maxTimeVec.end()) - *min_element(maxTimeVec.begin(), maxTimeVec.end());
     if(timeRange < _OffsetBlocksTimeWindowCut)
       hasOffsetBlocks=true;
   }
-
   return hasOffsetBlocks;
 }
 
