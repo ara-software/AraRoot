@@ -16,6 +16,9 @@
 
 //AraRoot Includes
 #include "araSoft.h"
+#include "FFTtools.h"
+#include "AraAntennaInfo.h"
+#include "AraGeomTool.h"
 
 //ROOT includes
 #include "TGraph.h"
@@ -24,6 +27,12 @@ AraQualCuts * AraQualCuts::fgInstance=0;
 
 AraQualCuts::AraQualCuts() 
 {
+  _VdeltaT=0.4;
+  _HdeltaT=0.625;
+  _VOffsetThresh=-20.;
+  _HOffsetThresh=-12.;
+  _NumOffsetBlocksCut=11;
+  _OffsetBlocksTimeWindowCut=40.;
 	//for the moment, this doesn't do anything intelligent...
 }
 
@@ -31,7 +40,6 @@ AraQualCuts::~AraQualCuts() {
 	//for the moment, this doesn't need to do anything intelligent
 }
 
-//______________________________________________________________________________
 AraQualCuts*  AraQualCuts::Instance()
 {
   //static function
@@ -51,14 +59,135 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 {
   bool isGoodEvent=true;
   
-  bool hasBlockGap = AraQualCuts::hasBlockGap(realEvent);
-  bool hasTimingError = AraQualCuts::hasTimingError(realEvent);
-  bool hasTooFewBlocks = AraQualCuts::hasTooFewBlocks(realEvent);
-  
-  if(hasBlockGap || hasTimingError || hasTooFewBlocks){
+  bool this_hasBlockGap = hasBlockGap(realEvent);
+  bool this_hasTimingError = hasTimingError(realEvent);
+  bool this_hasTooFewBlocks = hasTooFewBlocks(realEvent);
+  bool this_hasOffsetBlocks = false;
+  if(!this_hasTooFewBlocks && !this_hasTimingError){
+    this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
+  }
+
+  if(this_hasBlockGap || this_hasTimingError || this_hasTooFewBlocks || this_hasOffsetBlocks){
     isGoodEvent=false;
   }
   return isGoodEvent;
+}
+
+//! Returns if a real atri event has an offset block probelm
+/*!
+  \param realEvent the real atri event pointer
+  \return does the event have offset blocks?
+*/
+bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
+{
+
+  /*
+    We want to loop over every waveform
+    For every waveform, figure out if it has a "offset block"
+    And record when it happens
+    Then, we will check at the end if we have >_NumOffsetBlocksCut offset blocks
+    And we will them check if they all happen in the same time window (_OffsetBlocksTimeWindowCut)
+    If so, this is an offset block event
+  */
+
+  bool hasOffsetBlocks=false;
+  int nChanBelowThresh=0;
+  std::vector<double> maxTimeVec;
+
+  //loop over all RF chans
+  for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
+
+    TGraph* grRaw = realEvent->getGraphFromRFChan(chan); //get the waveform
+
+    //select an interpolation time step (V vs H)
+    double deltaT;
+    AraAntPol::AraAntPol_t this_pol = AraGeomTool::Instance()->getPolByRFChan(chan,realEvent->stationId);
+    if(this_pol==AraAntPol::kVertical) deltaT=_VdeltaT;
+    else if(this_pol==AraAntPol::kHorizontal) deltaT=_HdeltaT;
+    else deltaT=.5; //fallback
+  
+    //get interpolated waveform
+    TGraph *grInt = FFTtools::getInterpolatedGraph(grRaw, deltaT); 
+    //then, get the rolling mean graph
+    TGraph *grMean = getRollingMean(grInt,SAMPLES_PER_BLOCK); //SAMPLES_PER_BLOCK=64, in araSoft.h
+    double maxTime;
+    double meanMax = getMax(grMean, &maxTime);
+    if(meanMax<(chan<8?_VOffsetThresh:_HOffsetThresh)){
+      nChanBelowThresh++;
+      maxTimeVec.push_back(maxTime);
+    }
+    delete grMean;
+    delete grInt;
+    delete grRaw;
+  }
+  double timeRange;
+  if(nChanBelowThresh>=_NumOffsetBlocksCut){
+    timeRange = *max_element(maxTimeVec.begin(), maxTimeVec.end()) - *min_element(maxTimeVec.begin(), maxTimeVec.end());
+    if(timeRange < _OffsetBlocksTimeWindowCut)
+      hasOffsetBlocks=true;
+  }
+
+  return hasOffsetBlocks;
+}
+
+//! Returns the rolling mean graph with a window size samplePerBlock
+/*!
+  \param grInt an interpolated waveform
+  \param samplePerBlock the window size
+  \return TGraph the rolling mean graph
+*/
+TGraph* AraQualCuts::getRollingMean(TGraph *grInt, int samplePerBlock){
+  int nSamp = grInt->GetN();
+  double t0, t1, v0, v1;
+  grInt->GetPoint(0, t0, v0);
+  grInt->GetPoint(1, t1, v1);
+  double wInt = t1 - t0;
+ 
+  TGraph *grCrop;
+  TGraph *grMean = new TGraph();
+  for(int i=0; i<nSamp-samplePerBlock; i++){
+    grCrop = FFTtools::cropWave(grInt, t0+i*wInt, t0+(i+samplePerBlock)*wInt);
+    grMean->SetPoint(i, wInt*i, getMean(grCrop));
+    delete grCrop;
+  }
+   return grMean;
+}
+
+//! Returns the max value (pos or neg) of a waveform
+/*!
+  \param gr the tgraph
+  \param maxTime a pointer to the max time
+  \return the max value (pos or neg) of a waveform
+*/
+double AraQualCuts::getMax(TGraph *gr, double *maxTime){
+  double max=0.;
+  double x,y;
+  double _maxTime;
+  for(int i=0; i<gr->GetN(); i++){
+    gr->GetPoint(i,x,y);
+    if(fabs(y)>fabs(max)){
+      max = y;
+      _maxTime = x;
+    }
+  }
+  if(maxTime) *maxTime = _maxTime;
+  return max;
+}
+
+//! Returns the mean value of a waveform
+/*!
+  \param gr the tgraph
+  \return the mean of the waveform
+*/
+double AraQualCuts::getMean(TGraph *gr){
+  double v, t, mean;
+  mean=0;
+  for(int i=0; i<gr->GetN(); i++){
+    gr->GetPoint(i,t,v);
+    mean+=v;
+  }
+  mean = mean / double(gr->GetN());
+  return mean;
 }
 
 //! Returns if a raw atri event has a block gap
@@ -66,7 +195,7 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
   \param rawEvent the raw atri event pointer
   \return if the event has a block gap
 */
-bool AraQualCuts::hasBlockGap(RawAtriStationEvent *rawEventv)
+bool AraQualCuts::hasBlockGap(RawAtriStationEvent *rawEvent)
 {
 
   /*
@@ -79,11 +208,11 @@ bool AraQualCuts::hasBlockGap(RawAtriStationEvent *rawEventv)
   */
 
   bool hasBlockGap=false;
-  int lenBlockVec = rawEventv->blockVec.size();
+  int lenBlockVec = rawEvent->blockVec.size();
   int numDDA=DDA_PER_ATRI; //defined in araSoft.h
   int numBlocks = BLOCKS_PER_DDA; //defined in araSoft.h
-  if(rawEventv->blockVec[lenBlockVec-1].getBlock() != (rawEventv->blockVec[0].getBlock() + lenBlockVec/numDDA -1 ) ){
-    if( numBlocks-rawEventv->blockVec[0].getBlock() + rawEventv->blockVec[lenBlockVec-1].getBlock() != lenBlockVec/numDDA-1){
+  if(rawEvent->blockVec[lenBlockVec-1].getBlock() != (rawEvent->blockVec[0].getBlock() + lenBlockVec/numDDA -1 ) ){
+    if( numBlocks-rawEvent->blockVec[0].getBlock() + rawEvent->blockVec[lenBlockVec-1].getBlock() != lenBlockVec/numDDA-1){
       hasBlockGap=true;
     }
   }
