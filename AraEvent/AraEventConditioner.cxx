@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <numeric>
 
 #include "UsefulAtriStationEvent.h"
 #include "AraEventConditioner.h"
@@ -50,25 +51,48 @@ void AraEventConditioner::conditionEvent(UsefulAtriStationEvent *theEvent)
   if(theEvent->stationId==ARA_STATION3){
     AraEventConditioner::invertA3Chans(theEvent);
   }
-  trimFirstBlocks(theEvent);
+
+  trimFirstBlock(theEvent);
+
+  makeMeanZero(theEvent);
+  
   theEvent->fIsConditioned = true; //mark the event as conditioned
-  //now we're done
 }
 
-//! Trimp the first block (SAMPLES_PER_BLOCK) from all graphs
+//! Make the mean of the voltage samples zero again; to be used *after* trimFirstBlock
 /*!
   \param ev the useful atri event pointer
   \return void
 */
+void AraEventConditioner::makeMeanZero(UsefulAtriStationEvent *theEvent){
+  for(Int_t chan=0; chan<theEvent->fTimes.size(); chan++){
+    //compute the mean, and let C++ help by doing the addition for us
+    Double_t mean = std::accumulate(theEvent->fVolts[chan].begin(), theEvent->fVolts[chan].end(), 0.0);
+    mean/=double(theEvent->fVolts[chan].size()); //divide by N to make it a mean
+    for(Int_t samp=0; samp<theEvent->fTimes[chan].size(); samp++){
+      theEvent->fVolts[chan][samp]-=mean;
+    }
+    mean = std::accumulate(theEvent->fVolts[chan].begin(), theEvent->fVolts[chan].end(), 0.0);
+  }
+  //record the making of the zero mean
+  std::stringstream ss;
+  ss<<"make_mean_zero_all_chans";
+  theEvent->fConditioningList.push_back(ss.str());
+}
 
-void AraEventConditioner::trimFirstBlocks(UsefulAtriStationEvent *theEvent){
-  for(Int_t num_channels=0; num_channels<theEvent->fTimes.size(); num_channels++){
-    theEvent->fTimes[num_channels].erase(theEvent->fTimes[num_channels].begin(), theEvent->fTimes[num_channels].begin()+SAMPLES_PER_BLOCK);
-    theEvent->fVolts[num_channels].erase(theEvent->fVolts[num_channels].begin(), theEvent->fVolts[num_channels].begin()+SAMPLES_PER_BLOCK);
+//! Trim the first block (SAMPLES_PER_BLOCK) from all graphs
+/*!
+  \param ev the useful atri event pointer
+  \return void
+*/
+void AraEventConditioner::trimFirstBlock(UsefulAtriStationEvent *theEvent){
+  for(Int_t chan=0; chan<theEvent->fTimes.size(); chan++){
+    theEvent->fTimes[chan].erase(theEvent->fTimes[chan].begin(), theEvent->fTimes[chan].begin()+SAMPLES_PER_BLOCK);
+    theEvent->fVolts[chan].erase(theEvent->fVolts[chan].begin(), theEvent->fVolts[chan].begin()+SAMPLES_PER_BLOCK);
   }
   //record the trimming
   std::stringstream ss;
-  ss<<"trim_first_blocks_all";
+  ss<<"trim_first_blocks_all_chans";
   theEvent->fConditioningList.push_back(ss.str());
 }
 

@@ -36,8 +36,9 @@ class AraEventConditioner : public TObject
    void conditionEvent(UsefulAtriStationEvent *theEvent);
 
   private:
-    void invertA3Chans(UsefulAtriStationEvent *theEvent);
-    void trimFirstBlocks(UsefulAtriStationEvent *theEvent);
+    void invertA3Chans(UsefulAtriStationEvent *theEvent); ///<invert channels 0, 4, 8 of A3
+    void trimFirstBlock(UsefulAtriStationEvent *theEvent); ///<remove the first block from all waveforms
+    void makeMeanZero(UsefulAtriStationEvent *theEvent); ///<make the mean zero (to be used *after* trimFirstBlock)
 
   protected:
     static AraEventConditioner *fgInstance;  ///< protect against multiple instances
