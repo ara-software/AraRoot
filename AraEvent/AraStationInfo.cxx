@@ -15,10 +15,6 @@
 #include "AraStationInfo.h"
 #include "AraGeomTool.h"
 
-
-
-
-
 ClassImp(AraStationInfo);
 
 AraStationInfo::AraStationInfo()
@@ -43,34 +39,35 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
     readChannelMapDbIcrr();
   }
   else {
-    
+
     Int_t yrtime=0;
     /////These if statements check if the run is before December 1st or not
-    if(unixtime==1510000000){
+    if(unixtime==2017){
       std::cout<<"Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-      std::cout<<"Will use default 2017 default unixtime argument: "<<1510000000<<std::endl;
+      yrtime=0;
     }
-    if(unixtime==1520000000){
+    if(unixtime==2018){
       std::cout<<"Opening 2018 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-      std::cout<<"Will use default 2018 default unixtime argument: "<<1510000000<<std::endl;
+      yrtime=1;
     }
     
-    if(unixtime<=1512090000){
-      if(unixtime>0){
-	std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before December 1st 2017"<<std::endl;
-      }
-
-      if(unixtime==0){
-	std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 2018 & after please call "<<std::endl;
-	std::cout<<"UsefulAtriStationEvent *realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kLatestCalib); ***BEFORE*** "<<std::endl;
-	std::cout<<"AraAraGeomTool *geom = AraGeomTool::Instance();"<<std::endl;
-      }
+    if(unixtime<=1512090000 && unixtime>3000){
+      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before December 1st 2017"<<std::endl;
       yrtime=0;
     }
 
     if(unixtime>1512090000){
       std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is after December 1st 2017"<<std::endl;
       yrtime=1;
+    }
+
+    if(unixtime==0){
+      std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 2018 & after please specify either: "<<std::endl;
+      std::cout<<"a) The right year when you call AraGeomTool::getStationInfo(3,2017) where 3 is stationID and 2017 is DB year"<<std::endl;
+      std::cout<<"OR"<<std::endl;
+      std::cout<<"b) Call UsefulAtriStationEvent *realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kLatestCalib); ***BEFORE*** "<<std::endl;
+      std::cout<<"AraGeomTool::getStationInfo(3,2017)"<<std::endl;
+      yrtime=0;
     }
     
     readChannelMapDbAtri_2(yrtime);

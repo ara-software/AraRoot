@@ -509,19 +509,9 @@ const char* AraGeomTool::getStationName(AraStationId_t stationId){
 
 ////Removed the Utime argument in AraStationInfo by UAL 02/19/2019
 ////Added the ifile argument in getStationInfo by UAL 02/27/2019
-AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId,Int_t ifile)
+AraStationInfo *AraGeomTool::getStationInfo(AraStationId_t stationId,Int_t DByear)
 {
-
-  Int_t unixtime=0;
-  if(ifile==1){
-    ////In 2017
-    unixtime=1510000000;
-  }
-  
-  if(ifile==2){
-    ////In 2018
-    unixtime=1520000000;
-  }
+  Int_t unixtime=DByear;
     
   int calibIndex=getStationCalibIndex(stationId);
   if(isIcrrStation(stationId)) {
