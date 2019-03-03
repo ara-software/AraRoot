@@ -86,7 +86,7 @@ void AraEventConditioner::makeMeanZero(UsefulAtriStationEvent *theEvent){
 void AraEventConditioner::trimFirstBlock(UsefulAtriStationEvent *theEvent){
   bool hasTooFewBlocks=false;
   for(Int_t chan=0; chan<theEvent->fTimes.size(); chan++){
-    if(theEvent->fTimes[chan].size()<64){
+    if(theEvent->fTimes[chan].size()<SAMPLES_PER_BLOCK){
       hasTooFewBlocks=true;
       break;
     }
