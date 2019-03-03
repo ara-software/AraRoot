@@ -315,7 +315,9 @@ bool AraQualCuts::hasA2FirstEventCorruption(RawAtriStationEvent *rawEvent)
   */
 
   bool hasA2FirstEventCorruption=false;
-  if(rawEvent->unixTime>=1448485911 && rawEvent->eventNumber<4){
+  if(rawEvent->stationId==ARA_STATION2
+    && rawEvent->unixTime>=1448485911 
+    && rawEvent->eventNumber<4){
     hasA2FirstEventCorruption=true;
   }
   return hasA2FirstEventCorruption;
