@@ -84,6 +84,14 @@ void AraEventConditioner::makeMeanZero(UsefulAtriStationEvent *theEvent){
   \return void
 */
 void AraEventConditioner::trimFirstBlock(UsefulAtriStationEvent *theEvent){
+  bool hasTooFewBlocks=false;
+  for(Int_t chan=0; chan<theEvent->fTimes.size(); chan++){
+    if(theEvent->fTimes[chan].size()<64){
+      hasTooFewBlocks=true;
+      break;
+    }
+  }
+  if(hasTooFewBlocks) return;
   for(Int_t chan=0; chan<theEvent->fTimes.size(); chan++){
     theEvent->fTimes[chan].erase(theEvent->fTimes[chan].begin(), theEvent->fTimes[chan].begin()+SAMPLES_PER_BLOCK);
     theEvent->fVolts[chan].erase(theEvent->fVolts[chan].begin(), theEvent->fVolts[chan].begin()+SAMPLES_PER_BLOCK);
