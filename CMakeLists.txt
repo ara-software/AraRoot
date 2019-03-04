@@ -8,8 +8,8 @@ set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 #set(SQLITE3_HINT_INCLUDES "~/repositories/InstallDir/utilities/include/")
 #set(SQLITE3_HINT_LIBRARIES "~/repositories/InstallDir/utilities/lib")
 #you might also need to specify FFTW stuff
-set(FFTW_LIBRARIES "$ENV{PLATFORM_DIR}/lib/libfftw3.so.3.4.4")
-set(FFTW_INCLUDES "$ENV{PLATFORM_DIR}/include")
+#set(FFTW_LIBRARIES "$ENV{PLATFORM_DIR}/lib/libfftw3.so.3.4.4")
+#set(FFTW_INCLUDES "$ENV{PLATFORM_DIR}/include")
 
 project(AraRoot)
 find_package(ROOT REQUIRED COMPONENTS MathMore Gui)
