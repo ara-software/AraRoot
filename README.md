@@ -64,3 +64,8 @@ There are a myriad of ways that one can run into problems with the software. The
 Most problems are fixed by running `bash INSTALL.sh 1` to re-build AraRoot from scratch. If this doesn't fix things try removing everything from the `ARA_UTIL_INSTALL_DIR`, re-installating `libRootFftwWrapper` and then re-running `bash INSTALL.sh` with either 1 or 99.
 
 If problems persist, seek help!
+
+### ROOT6 Support
+ROOT6 support is here!
+
+As a friendly reminder, you need to compile AraRoot with the same C++ standard used to compile ROOT, which was likely C++11. To enable this, you should uncomment the line in the CMakeLists that goes like set(CMAKE_CXX_STANDARD 11)
