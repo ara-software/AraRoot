@@ -63,9 +63,11 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
   bool this_hasTimingError = hasTimingError(realEvent);
   bool this_hasTooFewBlocks = hasTooFewBlocks(realEvent);
   bool this_hasOffsetBlocks = false;
+  /* //don't perform offset block detection right now
   if(!this_hasTooFewBlocks && !this_hasTimingError){
     this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
   }
+  */
   bool this_hasA2FirstEventCorruption = hasA2FirstEventCorruption(realEvent);
 
   if(this_hasBlockGap 
