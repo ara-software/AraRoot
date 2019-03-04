@@ -28,6 +28,11 @@ Add_Library(${libname} SHARED ${${libname}Source} ${Dictionary})
 
 SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  set(DICTNAME G__${libname})
+  add_custom_target(${DICTNAME}.pcm DEPENDS ${DICTNAME})
+endif()
+
 target_link_libraries(AraCorrelator AraEvent)
 
 add_executable(makeCorrelationMaps makeCorrelationMaps.cxx)
@@ -39,3 +44,7 @@ install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
 install(TARGETS AraCorrelator DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
 #not sure this will work
 install(TARGETS makeCorrelationMaps DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  install (FILES ${PROJECT_BINARY_DIR}/${libname}/${DICTNAME}_rdict.pcm DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
+endif()

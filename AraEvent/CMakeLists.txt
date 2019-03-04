@@ -33,6 +33,12 @@ SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 #Set up the linking to pre-requisite libraries (sqlite etc...)
 target_link_libraries(AraEvent ${LIBROOTFFTWWRAPPER_LIBRARIES} ${SQLITE3_LIBRARIES} ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})
 
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  message("Using ROOT_VERSION 6")
+  set(DICTNAME G__${libname})
+  add_custom_target(${DICTNAME}.pcm DEPENDS ${DICTNAME})
+endif()
+
 #Set the install paths
 FILE(GLOB antennaFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/*.sqlite")
 FILE(GLOB atriCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ATRI/*.txt")
@@ -46,4 +52,8 @@ install(FILES ${antennaFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib
 install(FILES ${atriCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ATRI)
 install(FILES ${icrrTestBedCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/TestBed)
 install(FILES ${icrrStation1CalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/Station1)
+
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  install (FILES ${PROJECT_BINARY_DIR}/${libname}/${DICTNAME}_rdict.pcm DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
+endif()
 

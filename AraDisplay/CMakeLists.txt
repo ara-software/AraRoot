@@ -25,6 +25,11 @@ Add_Library(${libname} SHARED ${${libname}Source} ${Dictionary})
 
 SET_TARGET_PROPERTIES(${libname} PROPERTIES SUFFIX .so)
 
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  set(DICTNAME G__${libname})
+  add_custom_target(${DICTNAME}.pcm DEPENDS ${DICTNAME})
+endif()
+
 target_link_libraries(AraDisplay AraEvent AraCorrelator ${ROOT_GUI_LIBRARY})
 
 #Install the libraries and headers
@@ -34,3 +39,7 @@ install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
 #Install the ROOT macros
 SET(${libname}macros macros/runAraDisplay.C)
 install(FILES ${${libname}macros} DESTINATION ${ARAROOT_INSTALL_PATH}/macros)
+
+if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
+  install (FILES ${PROJECT_BINARY_DIR}/${libname}/${DICTNAME}_rdict.pcm DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
+endif()
