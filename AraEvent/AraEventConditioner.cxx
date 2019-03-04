@@ -70,7 +70,6 @@ void AraEventConditioner::makeMeanZero(UsefulAtriStationEvent *theEvent){
     for(Int_t samp=0; samp<theEvent->fTimes[chan].size(); samp++){
       theEvent->fVolts[chan][samp]-=mean;
     }
-    mean = std::accumulate(theEvent->fVolts[chan].begin(), theEvent->fVolts[chan].end(), 0.0);
   }
   //record the making of the zero mean
   std::stringstream ss;
