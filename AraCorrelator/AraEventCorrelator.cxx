@@ -20,7 +20,8 @@ AraEventCorrelator::AraEventCorrelator(Int_t numAnts, Int_t stationId)
   fNumAnts=numAnts;
   fNumPairs=0;
   fStationId=stationId;
-  
+  fDebugMode=0;
+    
   if(numAnts > MAX_NUM_ANTS){
     fprintf(stderr, "%s -- numAnts %i larger than the maximum %i!\n", __FUNCTION__, numAnts, MAX_NUM_ANTS);
   }
