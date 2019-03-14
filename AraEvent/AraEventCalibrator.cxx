@@ -1420,8 +1420,8 @@ void AraEventCalibrator::checkAtriSampleTiming() {
 	if(fAtriSampleTimes[dda][chan][0][fAtriNumSamples[dda][chan][0]-1]>
 	   fAtriSampleTimes[dda][chan][1][0]) {
 	  //Need to trim one sample off cap array 0
-	  std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 0 << ", sample " << fAtriNumSamples[dda][chan][0]-1 << ":" << fAtriSampleTimes[dda][chan][0][fAtriNumSamples[dda][chan][0]-1] << " is after capArray: 1 sample 0: " <<  fAtriSampleTimes[dda][chan][1][0] << "\n";
-	  std::cerr << "Removing one sample from cap array 0\n";
+	  // std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 0 << ", sample " << fAtriNumSamples[dda][chan][0]-1 << ":" << fAtriSampleTimes[dda][chan][0][fAtriNumSamples[dda][chan][0]-1] << " is after capArray: 1 sample 0: " <<  fAtriSampleTimes[dda][chan][1][0] << "\n";
+	  // std::cerr << "Removing one sample from cap array 0\n";
 	  fAtriNumSamples[dda][chan][0]--;
 	  madeChange=1;
 	  
@@ -1429,8 +1429,8 @@ void AraEventCalibrator::checkAtriSampleTiming() {
 	if(fAtriSampleTimes[dda][chan][1][fAtriNumSamples[dda][chan][1]-1]>
 	   (40+fAtriSampleTimes[dda][chan][0][0])) {
 	  //Need to trim one sample off cap array 1
-	  std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 1 << ", sample " << fAtriNumSamples[dda][chan][1]-1 << ": " << fAtriSampleTimes[dda][chan][1][fAtriNumSamples[dda][chan][1]-1] << " is after capArray: 0 sample 0: " <<  40+fAtriSampleTimes[dda][chan][0][0] << "\n";
-	  std::cerr << "Removing one sample from cap array 1\n";
+	  // std::cerr << "Oops calibration issue: dda: " << dda << ", chan: " << chan << ", capArray: " << 1 << ", sample " << fAtriNumSamples[dda][chan][1]-1 << ": " << fAtriSampleTimes[dda][chan][1][fAtriNumSamples[dda][chan][1]-1] << " is after capArray: 0 sample 0: " <<  40+fAtriSampleTimes[dda][chan][0][0] << "\n";
+	  // std::cerr << "Removing one sample from cap array 1\n";
 	  fAtriNumSamples[dda][chan][1]--;
 	  madeChange=1;
 	}
