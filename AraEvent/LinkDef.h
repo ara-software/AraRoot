@@ -64,13 +64,4 @@
 #pragma link C++ enum          AraAntDir::EAraAntDir;
 #pragma link C++ nestedtypedef AraAntDir::AraAntDir_t;
 
-
-//JPD depricated
-//#pragma link C++ namespace     AraSurfaceOrientation;
-//#pragma link C++ enum          AraSurfaceOrientation::EAraSurfaceOrientation;
-//#pragma link C++ nestedtypedef AraSurfaceOrientation::AraSurfaceOrientation_t;
-
-
-
 #endif
-

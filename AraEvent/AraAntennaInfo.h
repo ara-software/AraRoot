@@ -62,22 +62,6 @@ namespace AraAntDir {
         kTransmitter = 2
     } AraAntDir_t;
 }
-        
-
-//JPD Depricated
-/* namespace AraSurfaceOrientation { */
-/*   typedef enum EAraSurfaceOrientation { */
-/*     kNorthSouth =1, */
-/*     kEastWest =2 */
-/*   } AraSurfaceOrientation_t; */
-/* } */
-
-//!  Part of AraEvent library. A class for storing information about the Antennae in the ARA stations.
-/*!
-    A simple class for storing information about an Ara Antenna
-    \ingroup rootclasses
-*/
-
 
 class AraAntennaInfo: public TObject
 {
