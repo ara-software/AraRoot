@@ -20,30 +20,30 @@ class UsefulAtriStationEvent;
 
 //!  Part of AraEvent library. The conditioner takes real ATRI pointer and applies some conditioning after calibration
 /*!
-  The Ara Event Conditioner
-  \ingroup rootclasses
+    The Ara Event Conditioner
+    \ingroup rootclasses
 */
 class AraEventConditioner : public TObject
 {
-  public:
-    AraEventConditioner(); ///< Default constructor
-    ~AraEventConditioner(); ///< Destructor
+    public:
+        AraEventConditioner(); ///< Default constructor
+        ~AraEventConditioner(); ///< Destructor
 
-   //Instance generator
-   static AraEventConditioner*  Instance(); ///< Generates an instance of AraEventConditioner to use
+     //Instance generator
+     static AraEventConditioner*  Instance(); ///< Generates an instance of AraEventConditioner to use
 
-   //function to condition an event
-   void conditionEvent(UsefulAtriStationEvent *theEvent);
+     //function to condition an event
+     void conditionEvent(UsefulAtriStationEvent *theEvent);
 
-  private:
-    void invertA3Chans(UsefulAtriStationEvent *theEvent); ///<invert channels 0, 4, 8 of A3
-    void trimFirstBlock(UsefulAtriStationEvent *theEvent); ///<remove the first block from all waveforms
-    void makeMeanZero(UsefulAtriStationEvent *theEvent); ///<make the mean zero (to be used *after* trimFirstBlock)
+    private:
+        void invertA3Chans(UsefulAtriStationEvent *theEvent); ///<invert channels 0, 4, 8 of A3
+        void trimFirstBlock(UsefulAtriStationEvent *theEvent); ///<remove the first block from all waveforms
+        void makeMeanZero(UsefulAtriStationEvent *theEvent); ///<make the mean zero (to be used *after* trimFirstBlock)
 
-  protected:
-    static AraEventConditioner *fgInstance;  ///< protect against multiple instances
+    protected:
+        static AraEventConditioner *fgInstance;  ///< protect against multiple instances
 
-  ClassDef(AraEventConditioner,1);
+    ClassDef(AraEventConditioner,1);
 };
 
 #endif //ARAEVENTCONDITIONER_H
