@@ -17,7 +17,7 @@ using namespace std;
 #include "araAtriStructures.h"
 #include "RawAtriStationEvent.h"  
 
-void process();
+void process(int run);
 void processFileList(char *inputName, char *outDir, int run);
 
 AraStationEventHeader_t theEventHeader;
@@ -45,7 +45,6 @@ Int_t lastNumEvents_CPU=0;
 Int_t lastNumEvents_RF0=0;
 Int_t lastNumEvents_CALPULSER=0;
 
-
 //For Tree
 UInt_t lastUnixTime=0;
 UInt_t thisUnixTime=0;
@@ -55,6 +54,8 @@ Double_t CPURate=0;
 Int_t lastTime=0;
 Int_t firstTime=0;
 
+//To save files as PNG
+const char *filename;
 
 int main(int argc, char **argv) {
   dataBuffer = new char[200000];
@@ -139,7 +140,7 @@ void processFileList(char *inputName, char *outFileName, int run) {
 	}
 	stationId = theEventHeader.gHdr.stationId;
 
-	process();
+	process(run);
      	//	exit(0);
       }
       else {
@@ -154,14 +155,20 @@ void processFileList(char *inputName, char *outFileName, int run) {
     //	if(error) break;
   }
   lastTime=1;
-  process();
+  process(run);
 
   outFile->Write();
 
 }
 
 
-void process() {
+void process(int run) {
+  TString txtout="out_run";
+  txtout+=run;
+  txtout+=".txt";
+  filename=txtout.Data();
+  ofstream aout(filename);
+ 
   static int doneInit=0;
   if(!doneInit) {
     doneInit=1;
@@ -169,12 +176,11 @@ void process() {
   if(theEvent) delete theEvent;
   
   theEvent = new RawAtriStationEvent(&theEventHeader,dataBuffer);
-
-
   //Create stats
   if(firstTime){
     lastUnixTime=theEvent->unixTime;
     thisUnixTime=lastUnixTime;
+    
     outTree->Fill();
     firstTime=0;
   }
@@ -205,5 +211,27 @@ void process() {
     lastNumEvents_CALPULSER=numEvents_CALPULSER;
   }
 
+  aout<<"lastUnixTime= "<<lastUnixTime<<endl;
+  //aout<<"thisUnixTime= "<<thisUnixTime<<endl;
+  aout<<"numEvents= "<<numEvents<<endl;
+  aout<<"numEvents_CPU= "<<numEvents_CPU<<endl;
+  aout<<"numEvents_RF0= "<<numEvents_RF0<<endl;
+  aout<<"numEvents_CALPULSER= "<<numEvents_CALPULSER<<endl;
+  aout<<"eventRate= "<<eventRate<<endl;
+  aout<<"calPulserRate= "<<calPulserRate<<endl;
+  aout<<"RF0Rate= "<<RF0Rate<<endl;
+  aout<<"CPURate= "<<CPURate<<endl;
+
+  cout<<"RUN STATISTIC FOR RUN "<<run<<":"<<endl;
+  cout<<"lastUnixTime= "<<lastUnixTime<<endl;
+  //aout<<"thisUnixTime= "<<thisUnixTime<<endl;
+  cout<<"numEvents= "<<numEvents<<endl;
+  cout<<"numEvents_CPU= "<<numEvents_CPU<<endl;
+  cout<<"numEvents_RF0= "<<numEvents_RF0<<endl;
+  cout<<"numEvents_CALPULSER= "<<numEvents_CALPULSER<<endl;
+  cout<<"eventRate= "<<eventRate<<endl;
+  cout<<"calPulserRate= "<<calPulserRate<<endl;
+  cout<<"RF0Rate= "<<RF0Rate<<endl;
+  cout<<"CPURate= "<<CPURate<<endl;
 
 }

@@ -51,18 +51,18 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
       yrtime=1;
     }
     
-    if(unixtime<=1512090000 && unixtime>3000){
-      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before December 1st 2017"<<std::endl;
+    if(unixtime<=1515974400 && unixtime>3000){
+      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before January 15th 2018"<<std::endl;
       yrtime=0;
     }
 
-    if(unixtime>1512090000){
-      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is after December 1st 2017"<<std::endl;
+    if(unixtime>1515974400){
+      std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is after January 15th 2018"<<std::endl;
       yrtime=1;
     }
 
     if(unixtime==0){
-      std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 2018 & after please specify either: "<<std::endl;
+      std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 & ARA01 for 2018 & after please specify either: "<<std::endl;
       std::cout<<"a) The right year when you call AraGeomTool::getStationInfo(3,2017) where 3 is stationID and 2017 is DB year"<<std::endl;
       std::cout<<"OR"<<std::endl;
       std::cout<<"b) Call UsefulAtriStationEvent *realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kLatestCalib); ***BEFORE*** "<<std::endl;
@@ -1164,7 +1164,7 @@ void AraStationInfo::readChannelMapDbAtri_2(Int_t yrtime){
     std::cout<<"Opening default 2013-2017 SQLite tables for all stations "<<std::endl;
   }
   if(yrtime==1){
-    std::cout<<"Opening the database with new channel mappings for ARA03 and default mappings for all the other stations "<<std::endl;
+    std::cout<<"Opening the database with new channel mappings for ARA03 & ARA01 and default mappings for all the other stations "<<std::endl;
   }
   
   //open the database
@@ -1178,9 +1178,9 @@ void AraStationInfo::readChannelMapDbAtri_2(Int_t yrtime){
   const char *query;
 
   //This is where we decide which table to access in the database
-  if(fStationId==ARA_STATION1B) query = "select * from ARA01";
+  if(fStationId==ARA_STATION1B && yrtime==0) query = "select * from ARA01";
+  else if(fStationId==ARA_STATION1B && yrtime==1) query = "select * from ARA01_2018";
   else if(fStationId==ARA_STATION2) query = "select * from ARA02";
-
   ////Change made by UAL to ARA03 in an attemp to keep track of various channel mappins over various years
   else if(fStationId==ARA_STATION3 && yrtime==0) query = "select * from ARA03";
   else if(fStationId==ARA_STATION3 && yrtime==1) query = "select * from ARA03_2018";
