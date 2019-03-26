@@ -33,7 +33,7 @@ ARA ROOT based software, AraRoot, comprises several libraries and executables.
 ## Prerequisites
 * ROOT -- As the name ARA ROOT suggests this is needed
 * FFTW3 -- Fastest Fourier Transform in the West - used for FFT fun
-* libRootFftwWrapper -- a ROOT wrapper for FFTW 3 downloadable from http://www.hep.ucl.ac.uk/uhen/libRootFftwWrapper/
+* libRootFftwWrapper -- a ROOT wrapper for FFTW 3 downloadable from [Ryan Nichol's GitHub](https://github.com/nichol77/libRootFftwWrapper), with documentation [here](http://www.hep.ucl.ac.uk/uhen/libRootFftwWrapper/)
 * GSL -- Needed by ROOT's Mathmore library
 * sqlite3 -- Need for loading of antenna information and station geometry
 * CMake -- Cross platform Makefile generation - the current version of AraRoot has transitioned to using CMake instead of bespoke Makefiles - hopefully this will make things a bit easier for everybody to install things!
