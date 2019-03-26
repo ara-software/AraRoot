@@ -1,5 +1,24 @@
 #!/bin/bash
 
+
+####################################
+####################################
+
+# This is how the script works.
+# How to use the script to get your run stats:
+
+# 1. Copy past the script from $ARA_UTIL_INSTALL_DIR/scripts/runGetAtriRunStatistics.sh to whereever you are going to look at run stats.
+# 2. Open the script and adjust the TARGZ_DIR,  SPS_ARA_FILE and CURRENT_DIR variables to whatever they are for you.
+# 3. Once you have done that you can run the script by doing:
+# 	bash runGetAtriRunStatistics.sh 2 11578 (where 2 is the stationId and 11578 is the run number)
+# 4. The script will produce an output text file and root file.
+# 	For this example they will be out_run12248.txt and runInfo_ARA02_run12248.root.
+# 	You can use any of them to look at the statistics.
+
+####################################
+####################################
+
+
 #Return 0 on success, 1 on failure
 if [ "$1" = "" ] | [ "$2" = "" ]
 then
