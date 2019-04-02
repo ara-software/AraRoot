@@ -115,20 +115,20 @@ insert into ARA03 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --ARA04 Calpulers
 
 insert into ARA04 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
-38.0057,-16.3989,-194.8979,0,
-38.0057,-16.3989,-194.8979,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA04 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
-38.0057,-16.3989,-198.1828,0,
-38.0057,-16.3989,-198.1828,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA04 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
-17.9354,36.3856,-184.7263,0,
-17.9354,36.3856,-184.7263,0
+-17.5813,46.6157,-184.46,0,
+-17.5813,46.6157,-184.46,0
 );
 insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
-17.9354,36.3856,-188.0112,0,
-17.9354,36.3856,-188.0112,0
+-17.5813,46.6157,-187.51,0,
+-17.5813,46.6157,-187.51,0
 );
 
 --updated 17-05-17
@@ -136,20 +136,20 @@ insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --ARA04 Calpulers
 
 insert into ARA05 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
-38.0057,-16.3989,-194.8979,0,
-38.0057,-16.3989,-194.8979,0
+-32.4331,-44.8312,-171.07,0,
+-32.4331,-44.8312,-171.07,0
 );
 insert into ARA05 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
-38.0057,-16.3989,-198.1828,0,
-38.0057,-16.3989,-198.1828,0
+-32.4331,-44.8312,-174.06,0,
+-32.4331,-44.8312,-174.06,0
 );
 insert into ARA05 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
-17.9354,36.3856,-184.7263,0,
-17.9354,36.3856,-184.7263,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA05 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
-17.9354,36.3856,-188.0112,0,
-17.9354,36.3856,-188.0112,0
+0,0,0,0,
+0,0,0,0
 );
 
 --updated 17-05-17
@@ -157,20 +157,20 @@ insert into ARA05 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --ARA04 Calpulers
 
 insert into ARA06 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
-38.0057,-16.3989,-194.8979,0,
-38.0057,-16.3989,-194.8979,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA06 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
-38.0057,-16.3989,-198.1828,0,
-38.0057,-16.3989,-198.1828,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA06 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
-17.9354,36.3856,-184.7263,0,
-17.9354,36.3856,-184.7263,0
+0,0,0,0,
+0,0,0,0
 );
 insert into ARA06 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
-17.9354,36.3856,-188.0112,0,
-17.9354,36.3856,-188.0112,0
+0,0,0,0,
+0,0,0,0
 );
 
 --updated 17-05-17
