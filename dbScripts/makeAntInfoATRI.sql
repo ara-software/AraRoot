@@ -136,7 +136,7 @@ insert into ARA01 VALUES(19, "S4", "SA4", "kSurface",
 
 insert into ARA01_2018 VALUES(0 , "BH1", "TVPol", "kVertical", 
 0, 0, 1, 1, 4, "kBicone",
--4.03552152,7.5351132,-63.7909824,85.8187,  
+-4.03552152,7.5351132,-63.7909824,13.714,  
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(1 , "BH2", "TVPol", "kVertical", 
@@ -146,18 +146,18 @@ insert into ARA01_2018 VALUES(1 , "BH2", "TVPol", "kVertical",
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(2 , "BH3", "TVPol", "kVertical", 
 2, 16, 9, 3, 4, "kBicone",
--9.74665056,-5.33259792,-54.7856664,85.8187,  
+-9.74665056,-5.33259792,-54.7856664,13.714,  
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(3 , "BH4", "TVPol", "kVertical", 
 3, 24, 13, 3, 4, "kBicone",
- 2.210659536,-10.78126368,-61.7863128,80.7578,  
+ 2.210659536,-10.78126368,-61.7863128,13.714,  
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA01_2018 VALUES(4 , "BH1", "BVPol", "kVertical", 
 4, 1, 0, 1, 2, "kBicone",
--4.035552,7.53505224,-82.663284,13.714,  
+-4.035552,7.53505224,-82.663284,85.8187,  
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(5 , "BH2", "BVPol", "kVertical", 
@@ -167,12 +167,12 @@ insert into ARA01_2018 VALUES(5 , "BH2", "BVPol", "kVertical",
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(6 , "BH3", "BVPol", "kVertical", 
 6, 17, 8, 3, 2, "kBicone",
--9.74671152,-5.33265888,-73.6576632,13.714,  
+-9.74671152,-5.33265888,-73.6576632,85.8187,  
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA01_2018 VALUES(7 , "BH4", "BVPol", "kVertical", 
 7, 25, 12, 4, 2, "kBicone",
-2.210616864,-10.78129416,-79.3632144,13.714,  
+2.210616864,-10.78129416,-79.3632144,80.7578,  
 0,0,0,0,  
 0,0,0,140,800,0);
 
@@ -492,6 +492,7 @@ insert into ARA03 VALUES(19, "S4", "SA4", "kSurface",
 --Update by UAL (01/25/2018). Here I have made the ARA03 2018 table where the channel mappings for channel 2 and channel 3 have been corrected. The correction has been by essentially switching the daqChanNum variable values between them. ARA02 did not have problems for channel mapping.
 ----------------------------------------------------------------------------------------
 
+
 insert into ARA03_2018 VALUES(0 , "BH1", "TVPol", "kVertical", 
 0, 0, 1, 0, 0, "kBicone",
 4.82341,-9.41804,-172.607,19.1537,
@@ -504,7 +505,7 @@ insert into ARA03_2018 VALUES(1 , "BH2", "TVPol", "kVertical",
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(2 , "BH3", "TVPol", "kVertical", 
 2, 17, 9, 0, 0, "kBicone",
--2.0103,9.4124,-174.105,93.41,
+-2.0103,9.4124,-174.105,19.44,
 0,0,0,0,  
 0,0,0,140,800,0);
 
@@ -528,7 +529,7 @@ insert into ARA03_2018 VALUES(5 , "BH2", "BVPol", "kVertical",
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(6 , "BH3", "BVPol", "kVertical", 
 6, 16, 8, 0, 0, "kBicone",
--2.0102,9.412,-192.666,19.44,
+-2.0102,9.412,-192.666,93.41,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(7 , "BH4", "BVPol", "kVertical", 
@@ -550,8 +551,8 @@ insert into ARA03_2018 VALUES(9 , "BH2", "THPol", "kHorizontal",
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(10 , "BH3", "THPol", "kHorizontal", 
-2, 19, 11, 0, 0, "kQuadSlot",
--2.01,9.4124,-170.617,81.2,
+2, 18, 11, 0, 0, "kQuadSlot",
+-2.01,9.4124,-170.617,7.24,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(11, "BH4", "THPol", "kHorizontal", 
@@ -573,8 +574,8 @@ insert into ARA03_2018 VALUES(13, "BH2", "BHPol", "kHorizontal",
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(14, "BH3", "BHPol", "kHorizontal", 
-6, 18, 10, 0, 0, "kQuadSlot",
--2.0102,9.4121,-189.709,7.24,
+6, 19, 10, 0, 0, "kQuadSlot",
+-2.0102,9.4121,-189.709,81.2,
 0,0,0,0, 
 0,0,0,140,800,0);
 insert into ARA03_2018 VALUES(15, "BH4", "BHPol", "kHorizontal", 
@@ -631,50 +632,50 @@ insert into ARA04 VALUES(2 , "BH3", "TVPol", "kVertical",
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(3 , "BH4", "TVPol", "kVertical", 
-3, 25, 13, 0, 2, "kBicone",
+3, 29, 13, 0, 2, "kBicone",
 -13.183,-4.55271,-165.27,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA04 VALUES(4 , "BH1", "BVPol", "kVertical", 
 4, 16, 0, 0, 4, "kBicone",
--12.6388,22.5182,-192.84,18.62,
+-12.6388,22.5182,-192.84,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(5 , "BH2", "BVPol", "kVertical", 
 5, 8, 4, 0, 4, "kBicone",
-11.8342,5.40161,-189.23,18.62,
+11.8342,5.40161,-189.23,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(6 , "BH3", "BVPol", "kVertical", 
 6, 0, 8, 0, 4, "kBicone",
-7.93627,-21.847,-193.3,18.62,
+7.93627,-21.847,-193.3,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(7 , "BH4", "BVPol", "kVertical", 
-7, 24, 12, 0, 4, "kBicone",
--13.183,-4.55271,-194.9,18.62,
+7, 28, 12, 0, 4, "kBicone",
+-13.183,-4.55271,-194.9,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA04 VALUES(8, "BH1", "THPol", "kHorizontal", 
 0, 19, 3, 0, 1, "kQuadSlot",
--12.6388,22.5182,-160.15,120.54,
+-12.6388,22.5182,-160.15,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(9 , "BH2", "THPol", "kHorizontal", 
 1, 11, 7, 0, 1, "kQuadSlot",
-11.8342,5.40161,-156.54,120.54,
+11.8342,5.40161,-156.54,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(10 , "BH3", "THPol", "kHorizontal", 
 2, 3, 11, 0, 1, "kQuadSlot",
-7.93627,-21.847,-160.54,120.54,
+7.93627,-21.847,-160.54,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(11, "BH4", "THPol", "kHorizontal", 
-3, 27, 15, 0, 1, "kQuadSlot",
--13.183,-4.55271,-162.35,120.54,
+3, 31, 15, 0, 1, "kQuadSlot",
+-13.183,-4.55271,-162.35,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 
@@ -695,7 +696,7 @@ insert into ARA04 VALUES(14, "BH3", "BHPol", "kHorizontal",
 0,0,0,0, 
 0,0,0,140,800,0);
 insert into ARA04 VALUES(15, "BH4", "BHPol", "kHorizontal", 
-7, 26, 14, 0, 3, "kQuadSlot",
+7, 30, 14, 0, 3, "kQuadSlot",
 -13.183,-4.55271,-191.99,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
@@ -722,22 +723,22 @@ insert into ARA04 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,25,116,0);
 
 
-
 -- ARA05 information
--- Updated by UAL (01/25/2019). Updated the X, Y and Z coordinates of the station, the foamChanNum, the channel mappings and the cable delays. I used Yue Pan's AntennaInfoV3.sqlite to get the right channel mappings (daqChanNum) and cable delays (which I am not sure about). Used this file: https://www.overleaf.com/read/bpvxgfrhqhzh  to get the surveyor coordinates which I then converted Ara Station Centric Coordinate system.  
+-- Updated by UAL (01/25/2019). Updated the X, Y and Z coordinates of the station, the foamChanNum, the channel mappings and the cable delays. I used Yue Pan's AntennaInfoV3.sqlite to get the right channel mappings (daqChanNum) and cable delays (which I am not sure about). Used this file: https://www.overleaf.com/read/bpvxgfrhqhzh  to get the surveyor coordinates which I then converted Ara Station Centric Coordinate system.
+
 
 insert into ARA05 VALUES(0 , "BH1", "TVPol", "kVertical", 
-0, 1, 1, 0, 2, "kBicone",
+0, 9, 1, 0, 2, "kBicone",
 23.8258,-1.6605,-165.46,132.3,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA05 VALUES(1 , "BH2", "TVPol", "kVertical", 
-1, 9, 5, 0, 2, "kBicone",
+1, 1, 5, 0, 2, "kBicone",
 -3.94569,-12.6275,-164.67,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(2 , "BH3", "TVPol", "kVertical", 
-2, 25, 9, 0, 2, "kBicone",
+2, 29, 9, 0, 2, "kBicone",
 -15.4036,18.0452,-161.34,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
@@ -748,60 +749,60 @@ insert into ARA05 VALUES(3 , "BH4", "TVPol", "kVertical",
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(4 , "BH1", "BVPol", "kVertical", 
-4, 0, 0, 0, 4, "kBicone",
-23.8258,-1.6605,-195.32,18.62,
+4, 8, 0, 0, 4, "kBicone",
+23.8258,-1.6605,-195.32,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(5 , "BH2", "BVPol", "kVertical", 
-5, 8, 4, 0, 4, "kBicone",
--3.94569,-12.6275,-194.52,18.62,
+5, 0, 4, 0, 4, "kBicone",
+-3.94569,-12.6275,-194.52,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(6 , "BH3", "BVPol", "kVertical", 
-6, 24, 8, 0, 4, "kBicone",
--15.4036,18.0452,-191.28,18.62,
+6, 28, 8, 0, 4, "kBicone",
+-15.4036,18.0452,-191.28,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(7 , "BH4", "BVPol", "kVertical", 
 7, 16, 12, 0, 4, "kBicone",
-11.4825,25.1047,-177.72,18.62,
+11.4825,25.1047,-177.72,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(8, "BH1", "THPol", "kHorizontal", 
-0, 3, 3, 0, 1, "kQuadSlot",
-23.8258,-1.6605,-162.53,120.54,
+0, 11, 3, 0, 1, "kQuadSlot",
+23.8258,-1.6605,-162.53,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(9 , "BH2", "THPol", "kHorizontal", 
-1, 11, 7, 0, 1, "kQuadSlot",
--3.94569,-12.6275,-161.75,120.54,
+1, 3, 7, 0, 1, "kQuadSlot",
+-3.94569,-12.6275,-161.75,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(10 , "BH3", "THPol", "kHorizontal", 
-2, 27, 11, 0, 1, "kQuadSlot",
--15.4036,18.0452,-158.39,120.54,
+2, 31, 11, 0, 1, "kQuadSlot",
+-15.4036,18.0452,-158.39,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(11, "BH4", "THPol", "kHorizontal", 
 3, 19, 15, 0, 1, "kQuadSlot",
-11.4825,25.1047,-145.01,120.54,
+11.4825,25.1047,-145.01,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 
 insert into ARA05 VALUES(12, "BH1", "BHPol", "kHorizontal", 
-4, 2, 2, 0, 3, "kQuadSlot",
+4, 10, 2, 0, 3, "kQuadSlot",
 23.8258,-1.6605,-192.35,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(13, "BH2", "BHPol", "kHorizontal", 
-5, 10, 6, 0, 3, "kQuadSlot",
+5, 2, 6, 0, 3, "kQuadSlot",
 -3.94569,-12.6275,-191.37,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(14, "BH3", "BHPol", "kHorizontal", 
-6, 26, 10, 0, 3, "kQuadSlot",
+6, 30, 10, 0, 3, "kQuadSlot",
 -15.4036,18.0452,-188.12,6.86,
 0,0,0,0, 
 0,0,0,140,800,0);
@@ -831,6 +832,7 @@ insert into ARA05 VALUES(19, "S4", "SA4", "kSurface",
 1,2,3,4,  
 0,0,0,0,  
 0,0,0,25,116,0);
+
 
 
 
