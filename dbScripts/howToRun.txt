@@ -1,8 +1,6 @@
 use the following commands:
 
-
 sqlite3 dbname.db < makeAntInfoATRI.sql
-
 
 This is a friendly reminder that when you generate AntennaInfo.sqlite, please load both ATRI and ICRR antenans into it.
 
@@ -10,4 +8,3 @@ That is, you should do both command right after eachother (the file will not ove
 
 sqlite3 AntennaInfo.sqlite < makeAntInfoATRI.sql
 sqlite3 AntennaInfo.sqlite < makeAntInfoICRR.sql
-

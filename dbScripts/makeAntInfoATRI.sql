@@ -610,94 +610,92 @@ insert into ARA03_2018 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,0,  
 0,0,0,25,116,0);
 
-
---NEEDS TO BE CHECKED (Note made by UAL 01/25/2019)- ARA04 and ARA05 have the same cable delays and also antennas in one string have the same cable delays (this is true for all the strings).
-
 -- ARA04 information
 -- Updated by UAL (01/25/2019). Updated the X, Y and Z coordinates of the station, the foamChanNum, the channel mappings and the cable delays. I used Yue Pan's AntennaInfoV3.sqlite to get the right channel mappings (daqChanNum) and cable delays (which I am not sure about). Used this file: https://www.overleaf.com/read/bpvxgfrhqhzh  to get the surveyor coordinates which I then converted Ara Station Centric Coordinate system.
+-- Updated by BAC (04/24/2019). Updated the cable delays for all deep channels.
 
 insert into ARA04 VALUES(0 , "BH1", "TVPol", "kVertical", 
 0, 17, 1, 0, 2, "kBicone",
--12.6388,22.5182,-163.16,132.3,
+-12.6388,22.5182,-163.16,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(1 , "BH2", "TVPol", "kVertical", 
 1, 9, 5, 0, 2, "kBicone",
-11.8342,5.40161,-159.5,132.3,
+11.8342,5.40161,-159.5,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(2 , "BH3", "TVPol", "kVertical", 
 2, 1, 9, 0, 2, "kBicone",
-7.93627,-21.847,-163.52,132.3,
+7.93627,-21.847,-163.52,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(3 , "BH4", "TVPol", "kVertical", 
 3, 29, 13, 0, 2, "kBicone",
--13.183,-4.55271,-165.27,132.3,
+-13.183,-4.55271,-165.27,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA04 VALUES(4 , "BH1", "BVPol", "kVertical", 
 4, 16, 0, 0, 4, "kBicone",
--12.6388,22.5182,-192.84,120.54,
+-12.6388,22.5182,-192.84,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(5 , "BH2", "BVPol", "kVertical", 
 5, 8, 4, 0, 4, "kBicone",
-11.8342,5.40161,-189.23,120.54,
+11.8342,5.40161,-189.23,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(6 , "BH3", "BVPol", "kVertical", 
 6, 0, 8, 0, 4, "kBicone",
-7.93627,-21.847,-193.3,120.54,
+7.93627,-21.847,-193.3,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(7 , "BH4", "BVPol", "kVertical", 
 7, 28, 12, 0, 4, "kBicone",
--13.183,-4.55271,-194.9,120.54,
+-13.183,-4.55271,-194.9,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA04 VALUES(8, "BH1", "THPol", "kHorizontal", 
 0, 19, 3, 0, 1, "kQuadSlot",
--12.6388,22.5182,-160.15,18.62,
+-12.6388,22.5182,-160.15,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(9 , "BH2", "THPol", "kHorizontal", 
 1, 11, 7, 0, 1, "kQuadSlot",
-11.8342,5.40161,-156.54,18.62,
+11.8342,5.40161,-156.54,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(10 , "BH3", "THPol", "kHorizontal", 
 2, 3, 11, 0, 1, "kQuadSlot",
-7.93627,-21.847,-160.54,18.62,
+7.93627,-21.847,-160.54,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(11, "BH4", "THPol", "kHorizontal", 
 3, 31, 15, 0, 1, "kQuadSlot",
--13.183,-4.55271,-162.35,18.62,
+-13.183,-4.55271,-162.35,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 
 insert into ARA04 VALUES(12, "BH1", "BHPol", "kHorizontal", 
 4, 18, 2, 0, 3, "kQuadSlot",
--12.6388,22.5182,-189.89,6.86,
+-12.6388,22.5182,-189.89,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(13, "BH2", "BHPol", "kHorizontal", 
 5, 10, 6, 0, 3, "kQuadSlot",
-11.8342,5.40161,-186.16,6.86,
+11.8342,5.40161,-186.16,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA04 VALUES(14, "BH3", "BHPol", "kHorizontal", 
 6, 2, 10, 0, 3, "kQuadSlot",
-7.93627,-21.847,-190.3,6.86,
+7.93627,-21.847,-190.3,120.54,
 0,0,0,0, 
 0,0,0,140,800,0);
 insert into ARA04 VALUES(15, "BH4", "BHPol", "kHorizontal", 
 7, 30, 14, 0, 3, "kQuadSlot",
--13.183,-4.55271,-191.99,6.86,
+-13.183,-4.55271,-191.99,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 
@@ -725,90 +723,90 @@ insert into ARA04 VALUES(19, "S4", "SA4", "kSurface",
 
 -- ARA05 information
 -- Updated by UAL (01/25/2019). Updated the X, Y and Z coordinates of the station, the foamChanNum, the channel mappings and the cable delays. I used Yue Pan's AntennaInfoV3.sqlite to get the right channel mappings (daqChanNum) and cable delays (which I am not sure about). Used this file: https://www.overleaf.com/read/bpvxgfrhqhzh  to get the surveyor coordinates which I then converted Ara Station Centric Coordinate system.
-
+-- Updated by BAC (04/24/2019). Updated the cable delays for all deep channels.
 
 insert into ARA05 VALUES(0 , "BH1", "TVPol", "kVertical", 
 0, 9, 1, 0, 2, "kBicone",
-23.8258,-1.6605,-165.46,132.3,
+23.8258,-1.6605,-165.46,18.62,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA05 VALUES(1 , "BH2", "TVPol", "kVertical", 
 1, 1, 5, 0, 2, "kBicone",
--3.94569,-12.6275,-164.67,132.3,
+-3.94569,-12.6275,-164.67,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(2 , "BH3", "TVPol", "kVertical", 
 2, 29, 9, 0, 2, "kBicone",
--15.4036,18.0452,-161.34,132.3,
+-15.4036,18.0452,-161.34,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(3 , "BH4", "TVPol", "kVertical", 
 3, 17, 13, 0, 2, "kBicone",
-11.4825,25.1047,-147.93,132.3,
+11.4825,25.1047,-147.93,18.62,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(4 , "BH1", "BVPol", "kVertical", 
 4, 8, 0, 0, 4, "kBicone",
-23.8258,-1.6605,-195.32,120.54,
+23.8258,-1.6605,-195.32,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(5 , "BH2", "BVPol", "kVertical", 
 5, 0, 4, 0, 4, "kBicone",
--3.94569,-12.6275,-194.52,120.54,
+-3.94569,-12.6275,-194.52,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(6 , "BH3", "BVPol", "kVertical", 
 6, 28, 8, 0, 4, "kBicone",
--15.4036,18.0452,-191.28,120.54,
+-15.4036,18.0452,-191.28,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(7 , "BH4", "BVPol", "kVertical", 
 7, 16, 12, 0, 4, "kBicone",
-11.4825,25.1047,-177.72,120.54,
+11.4825,25.1047,-177.72,132.3,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(8, "BH1", "THPol", "kHorizontal", 
 0, 11, 3, 0, 1, "kQuadSlot",
-23.8258,-1.6605,-162.53,18.62,
+23.8258,-1.6605,-162.53,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(9 , "BH2", "THPol", "kHorizontal", 
 1, 3, 7, 0, 1, "kQuadSlot",
--3.94569,-12.6275,-161.75,18.62,
+-3.94569,-12.6275,-161.75,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(10 , "BH3", "THPol", "kHorizontal", 
 2, 31, 11, 0, 1, "kQuadSlot",
--15.4036,18.0452,-158.39,18.62,
+-15.4036,18.0452,-158.39,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(11, "BH4", "THPol", "kHorizontal", 
 3, 19, 15, 0, 1, "kQuadSlot",
-11.4825,25.1047,-145.01,18.62,
+11.4825,25.1047,-145.01,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 
 insert into ARA05 VALUES(12, "BH1", "BHPol", "kHorizontal", 
 4, 10, 2, 0, 3, "kQuadSlot",
-23.8258,-1.6605,-192.35,6.86,
+23.8258,-1.6605,-192.35,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(13, "BH2", "BHPol", "kHorizontal", 
 5, 2, 6, 0, 3, "kQuadSlot",
--3.94569,-12.6275,-191.37,6.86,
+-3.94569,-12.6275,-191.37,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(14, "BH3", "BHPol", "kHorizontal", 
 6, 30, 10, 0, 3, "kQuadSlot",
--15.4036,18.0452,-188.12,6.86,
+-15.4036,18.0452,-188.12,120.54,
 0,0,0,0, 
 0,0,0,140,800,0);
 insert into ARA05 VALUES(15, "BH4", "BHPol", "kHorizontal", 
 7, 18, 14, 0, 3, "kQuadSlot",
-11.4825,25.1047,-174.74,6.86,
+11.4825,25.1047,-174.74,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 
