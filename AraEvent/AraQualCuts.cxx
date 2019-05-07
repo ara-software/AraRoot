@@ -31,7 +31,6 @@ AraQualCuts::AraQualCuts()
     _HdeltaT=0.625;
     _VOffsetThresh=-20.;
     _HOffsetThresh=-12.;
-    _NumOffsetBlocksCut=11;
     _OffsetBlocksTimeWindowCut=40.;
     //for the moment, this doesn't do anything intelligent...
 }
@@ -63,11 +62,10 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
     bool this_hasTimingError = hasTimingError(realEvent);
     bool this_hasTooFewBlocks = hasTooFewBlocks(realEvent);
     bool this_hasOffsetBlocks = false;
-    /* //don't perform offset block detection right now
-    if(!this_hasTooFewBlocks && !this_hasTimingError){
+    if(!this_hasBlockGap && !this_hasTimingError && !this_hasTooFewBlocks){
         this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
     }
-    */
+    
     bool this_hasA2FirstEventCorruption = hasA2FirstEventCorruption(realEvent);
 
     if(this_hasBlockGap 
@@ -88,33 +86,31 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
 {
 
-    /*
-        We want to loop over every waveform
-        For every waveform, figure out if it has a "offset block"
-        And record when it happens
-        Then, we will check at the end if we have >_NumOffsetBlocksCut offset blocks
-        And we will them check if they all happen in the same time window (_OffsetBlocksTimeWindowCut)
-        If so, this is an offset block event
-    */
-
     bool hasOffsetBlocks=false;
-    int nChanBelowThresh=0;
-    std::vector<double> maxTimeVec;
+
+    /*
+        This is currently only tuned for A2
+        So "bounce out" if someone tries to use it for another station
+    */
+    if(realEvent->stationId!=ARA_STATION2){
+        return hasOffsetBlocks;
+    }
+
+    int nChanBelowThresh_V[4]={0};
+    int nChanBelowThresh_H[4]={0};
+    std::vector< std::vector< std::vector<double> > > maxTimeVec;
+    maxTimeVec.resize(4);
+    for(int string=0; string<4; string++){
+        maxTimeVec[string].resize(2);
+    }
 
     AraAntPol::AraAntPol_t Vpol = AraAntPol::kVertical;
     AraAntPol::AraAntPol_t Hpol = AraAntPol::kHorizontal;
 
-    //loop over all RF chans
     for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
-
         TGraph* grRaw = realEvent->getGraphFromRFChan(chan); //get the waveform
 
         AraAntPol::AraAntPol_t this_pol = AraGeomTool::Instance()->getPolByRFChan(chan,realEvent->stationId);
-
-        //set up two polarization parameters
-        //the interpolation time step (V vs H)
-        //and the voltage threshold for a bad block
-
         double deltaT; //interpolation time step
         double this_thresh; //the voltage threshold for a bad block
 
@@ -127,33 +123,57 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
             this_thresh=_HOffsetThresh;
         }
         else{ //fallback to V (more conservative)
-            deltaT=.5;
+            deltaT=_VdeltaT;
             this_thresh=_VOffsetThresh;
         }
-
         //get interpolated waveform
         TGraph *grInt = FFTtools::getInterpolatedGraph(grRaw, deltaT); 
         //then, get the rolling mean graph
         TGraph *grMean = getRollingMean(grInt,SAMPLES_PER_BLOCK); //SAMPLES_PER_BLOCK=64, in araSoft.h
-        //gte the max of the rolling mean, and when it occurs
         double maxTime;
         double meanMax = getMax(grMean, &maxTime);
-        //check to see if we have a threshold violation and record when it happened
-        if(meanMax<this_thresh){
-            nChanBelowThresh++;
-            maxTimeVec.push_back(maxTime);
+
+        if(-1.*fabs(meanMax)<this_thresh){
+            if(this_pol==Vpol){
+                nChanBelowThresh_V[chan%4]+=1;
+                maxTimeVec[chan%4][0].push_back(maxTime);
+            }
+            else if (this_pol==Hpol){
+                nChanBelowThresh_H[chan%4]+=1;
+                maxTimeVec[chan%4][1].push_back(maxTime);
+            }
         }
+
         delete grMean;
         delete grInt;
         delete grRaw;
     }
-    //check all the threshold violations we found, and see if they all happen near eachother
-    //where "near eachother" means within the _OffsetBlocksTimeWindowCut amount of time
+
+    /* Check for offset block
+        Criteria: at least 2 offset block strings. An offset block string is defined as having offset blocks in both Vpols and at least 1
+        Hpol, and their offset time is within timeRangeCut for Vpol & Hpol resoectively.
+    */
+
     double timeRange;
-    if(nChanBelowThresh>=_NumOffsetBlocksCut){
-        timeRange = *max_element(maxTimeVec.begin(), maxTimeVec.end()) - *min_element(maxTimeVec.begin(), maxTimeVec.end());
-        if(timeRange < _OffsetBlocksTimeWindowCut)
-            hasOffsetBlocks=true;
+    int noffsetBlockString=0;
+    for(int string=0; string<4; string++){
+        if (nChanBelowThresh_V[string]==2){
+            timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
+                      - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
+            if(timeRange<_OffsetBlocksTimeWindowCut){
+                if(nChanBelowThresh_H[string]>0){
+                    timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
+                              - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
+                    if(timeRange < _OffsetBlocksTimeWindowCut){
+                        noffsetBlockString++;
+                    }
+                }
+            }
+        }
+    }
+
+    if(noffsetBlockString>1){
+        hasOffsetBlocks=true;
     }
     return hasOffsetBlocks;
 }
