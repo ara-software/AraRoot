@@ -31,7 +31,6 @@ AraQualCuts::AraQualCuts()
     _HdeltaT=0.625;
     _VOffsetThresh=-20.;
     _HOffsetThresh=-12.;
-    _NumOffsetBlocksCut=11;
     _OffsetBlocksTimeWindowCut=40.;
     //for the moment, this doesn't do anything intelligent...
 }
@@ -150,19 +149,24 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
         delete grRaw;
     }
 
+    /* Check for offset block
+        Criteria: at least 2 offset block strings. An offset block string is defined as having offset blocks in both Vpols and at least 1
+        Hpol, and their offset time is within timeRangeCut for Vpol & Hpol resoectively.
+    */
+
     double timeRange;
     int noffsetBlockString=0;
     for(int string=0; string<4; string++){
         if (nChanBelowThresh_V[string]==2){
             timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
                       - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
-        }
-        if(timeRange<_OffsetBlocksTimeWindowCut){
-            if(nChanBelowThresh_H[string]>0){
-                timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
-                          - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
-                if(timeRange < _OffsetBlocksTimeWindowCut){
-                    noffsetBlockString++;
+            if(timeRange<_OffsetBlocksTimeWindowCut){
+                if(nChanBelowThresh_H[string]>0){
+                    timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
+                              - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
+                    if(timeRange < _OffsetBlocksTimeWindowCut){
+                        noffsetBlockString++;
+                    }
                 }
             }
         }
