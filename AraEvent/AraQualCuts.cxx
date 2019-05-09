@@ -31,7 +31,7 @@ AraQualCuts::AraQualCuts()
     _HdeltaT=0.625;
     _VOffsetThresh=-20.;
     _HOffsetThresh=-12.;
-    _OffsetBlocksTimeWindowCut=40.;
+    _OffsetBlocksTimeWindowCut=10.;
     //for the moment, this doesn't do anything intelligent...
 }
 
