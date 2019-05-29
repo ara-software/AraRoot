@@ -31,7 +31,7 @@ class AraQualCuts
         bool hasBlockGap(RawAtriStationEvent *rawEvent); ///< Detects block gaps
         bool hasTimingError(UsefulAtriStationEvent *realEvent); ///< Detects timing errors
         bool hasTooFewBlocks(UsefulAtriStationEvent *realEvent); ///< Detects too few block cases
-        bool hasA2FirstEventCorruption(RawAtriStationEvent *rawEvent); ///<Checks for first four event corruption in A2
+        bool hasFirstEventCorruption(RawAtriStationEvent *rawEvent); ///<Checks for event corruption in A2 and A3
 
         /*
             the cut variables for the offset blocks cut

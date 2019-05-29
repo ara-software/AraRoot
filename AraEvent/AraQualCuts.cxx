@@ -66,13 +66,13 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
         this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
     }
     
-    bool this_hasA2FirstEventCorruption = hasA2FirstEventCorruption(realEvent);
+    bool this_hasFirstEventCorruption = hasFirstEventCorruption(realEvent);
 
     if(this_hasBlockGap 
         || this_hasTimingError 
         || this_hasTooFewBlocks 
         || this_hasOffsetBlocks
-        || this_hasA2FirstEventCorruption){
+        || this_hasFirstEventCorruption){
         isGoodEvent=false;
     }
     return isGoodEvent;
@@ -323,24 +323,33 @@ bool AraQualCuts::hasTooFewBlocks(UsefulAtriStationEvent *realEvent)
     return hasTooFewBlocks;
 }
 
-//! Returns if a real atri event has A2 corruption issues
+//! Returns if a real atri event has first event corruption issues
 /*!
     \param rawEvent the raw atri event pointer
-    \return if the event was one of the first four readout in A2 after unixtime 1448485911
+    \return if the event was one of the first four read out for some subset of A2 and A3 which are known to be corrupted
 */
-bool AraQualCuts::hasA2FirstEventCorruption(RawAtriStationEvent *rawEvent)
+bool AraQualCuts::hasFirstEventCorruption(RawAtriStationEvent *rawEvent)
 {
 
     /*
         The first four events readout in A2 after unixTime 1448485911 are corrupted
         And should be marked "bad"
+
+        And, we mark any of the first four events in A3.
     */
 
-    bool hasA2FirstEventCorruption=false;
+    bool hasFirstEventCorruption=false;
+
     if(rawEvent->stationId==ARA_STATION2
         && rawEvent->unixTime>=1448485911 
-        && rawEvent->eventNumber<4){
-        hasA2FirstEventCorruption=true;
+        && rawEvent->eventNumber<4)
+    {
+        hasFirstEventCorruption=true;
     }
-    return hasA2FirstEventCorruption;
+    else if(rawEvent->stationId==ARA_STATION3
+        && rawEvent->eventNumber<4)
+    {
+        hasFirstEventCorruption=true;
+    }
+    return hasFirstEventCorruption;
 }
