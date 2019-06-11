@@ -195,6 +195,7 @@ void AraDisplay::zeroPointers()
   fAtriRawEventPtr=0;
   fIcrrData=0;
   fIsUsefulEvent=0;
+  fRawStationEventPtr = 0; 
 
   fAraCanvas=0;
   fAraEventInfoPad=0;
