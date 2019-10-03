@@ -218,8 +218,8 @@ void AraStationInfo::readChannelMapDbAtri(){
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
   //open the database
-  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
-  int rc = sqlite3_open(fileName, &db);;
+   int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  // int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
     printf("AraStationInfo::readChannelMapDbAtri() - Can't open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
@@ -596,8 +596,8 @@ void AraStationInfo::readChannelMapDbIcrr(){
   sprintf(fileName, "%s/AntennaInfo.sqlite", calibDir);
 
   //open the database
-  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
-  int rc = sqlite3_open(fileName, &db);;
+  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  // int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
     printf("AraStationInfo::readChannelMapDbIcrr() - Can't open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
@@ -980,8 +980,8 @@ void AraStationInfo::readCalPulserDb(){
   sprintf(fileName, "%s/CalPulserInfo.sqlite", calibDir);
 
   //open the database
-  //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
-  int rc = sqlite3_open(fileName, &db);;
+   int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  // int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
     printf("AraStationInfo::readCalPulserDb() - Can't open database: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
@@ -1168,7 +1168,8 @@ void AraStationInfo::readChannelMapDbAtri_2(Int_t yrtime){
   }
   
   //open the database
-  int rc = sqlite3_open(fileName, &db);;
+  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+  // int rc = sqlite3_open(fileName, &db);;
   if(rc!=SQLITE_OK){
     fprintf(stderr, "%s - Can't open database: %s\n", __FUNCTION__, sqlite3_errmsg(db));
     sqlite3_close(db);
