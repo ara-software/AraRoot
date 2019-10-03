@@ -235,7 +235,7 @@ void AraStationInfo::readChannelMapDbAtri(){
     else if(fStationId==ARA_STATION5) query = "select * for ARA05";
     else if(fStationId==ARA_STATION6) query = "select * for ARA06";
     else{
-        fprintf(stderr, "%s : fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
+        fprintf(stderr, "%s : fStationId %i is not ARA1-6\n", __FUNCTION__, fStationId);
         return;
     }
 
@@ -806,7 +806,7 @@ void AraStationInfo::readCalPulserDb(){
     else if(fStationId==ARA_STATION5) query = "select * from ARA05";
     else if(fStationId==ARA_STATION6) query = "select * from ARA06";
     else{
-        fprintf(stderr, "%s : Not loading calpulser information - fStationId %i is not ARA1-3\n", __FUNCTION__, fStationId);
+        fprintf(stderr, "%s : Not loading calpulser information - fStationId %i is not ARA1-6\n", __FUNCTION__, fStationId);
         return;
     }
     //prepare an sql statment which will be used to obtain information from the data base
