@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "AraEventCorrelator.h"
 #include "AraGeomTool.h"
 #include "AraAntennaInfo.h"
@@ -92,13 +93,15 @@ void AraEventCorrelator::fillAntennaPositionsAtri()
     }
   }
   std::cout << "\n";
-  for(int i=0;i<8;i++) {
-    std::cout << "V\t" << i << "\t" << fVPolPos[i][0] << "\t" << fVPolPos[i][1] << "\t" << fVPolPos[i][2] << "\n";
+  if(fDebugMode){
+    for(int i=0;i<8;i++) {
+      std::cout << "V\t" << i << "\t" << fVPolPos[i][0] << "\t" << fVPolPos[i][1] << "\t" << fVPolPos[i][2] << "\n";
+    }
+    for(int i=0;i<8;i++) {
+      std::cout << "H\t" << i << "\t" << fHPolPos[i][0] << "\t" << fHPolPos[i][1] << "\t" << fHPolPos[i][2] << "\n";
+    }
+      std::cout << "\n";
   }
-  for(int i=0;i<8;i++) {
-    std::cout << "H\t" << i << "\t" << fHPolPos[i][0] << "\t" << fHPolPos[i][1] << "\t" << fHPolPos[i][2] << "\n";
-  }
-    std::cout << "\n";
   //Now fill the arrays with angles
   Double_t deltaPhi=360./NUM_PHI_BINS;
   Double_t deltaTheta=180./NUM_THETA_BINS;
