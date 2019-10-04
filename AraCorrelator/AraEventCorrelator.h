@@ -50,7 +50,7 @@ namespace AraCorrelatorType {
 class AraEventCorrelator : public TObject
 {
  public:
-  AraEventCorrelator(Int_t numAnts=4, Int_t stationId=0); ///< Default constructor
+  AraEventCorrelator(Int_t numAnts, Int_t stationId); ///< Default constructor
    ~AraEventCorrelator(); ///< Destructor
    
    TH2D *getInterferometricMap(UsefulIcrrStationEvent *evPtr, AraAntPol::AraAntPol_t polType, AraCorrelatorType::AraCorrelatorType_t corType=AraCorrelatorType::kPlaneWave);
@@ -66,7 +66,7 @@ class AraEventCorrelator : public TObject
    Double_t calcDeltaTR(Double_t ant1[3],Double_t rho1, Double_t phi1, Double_t ant2[3],Double_t rho2, Double_t phi2, Double_t phiWave, Double_t thetaWave,Double_t R);
 
    //Instance generator
-   static AraEventCorrelator*  Instance(Int_t numAnts=5, Int_t stationId=0);
+   static AraEventCorrelator*  Instance(Int_t numAnts, Int_t stationId);
    
    static AraEventCorrelator *fgInstance;  
    // protect against multiple instances
