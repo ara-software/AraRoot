@@ -577,8 +577,8 @@ void AraGeomTool::readAraArrayCoords() {
     sprintf(fileName, "%s/AraArrayCoords.sqlite", calibDir);
 
     // open the database
-    //  int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
-    int rc = sqlite3_open(fileName, &db);;
+     int rc = sqlite3_open_v2(fileName, &db, SQLITE_OPEN_READONLY, NULL);
+    // int rc = sqlite3_open(fileName, &db);;
     if(rc!=SQLITE_OK){
         printf("AraGeomTool::readAraArrayCoords() - Can't open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
