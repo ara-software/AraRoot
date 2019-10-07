@@ -456,7 +456,7 @@ TH2D *AraEventCorrelator::getInterferometricMap(UsefulAtriStationEvent *evPtr, A
       getPairIndices(pair,ind1,ind2);
       std::cerr << pair << "\t" << ind1 << "\t" << ind2 << "\n";
 
-      grCor[pair]=FFTtools::getCorrelationGraph(grNorm[ind1],grNorm[ind2]);      
+      grCor[pair]=FFTtools::getHilbertEnvelope(FFTtools::getCorrelationGraph(grNorm[ind1],grNorm[ind2]));      
       for(int phiBin=0;phiBin<NUM_PHI_BINS;phiBin++) {
 	for(int thetaBin=0;thetaBin<NUM_THETA_BINS;thetaBin++) {
 	  //I think this is the correct equation to work out the bin number
