@@ -48,14 +48,16 @@ class AraQualCuts
         int _NumOffsetBlocksCut; ///< numer of channels which must have an offset block to qualify the event as bad
         int _OffsetBlocksTimeWindowCut; ///< the coincidence window for offset blocks
         bool hasOffsetBlocks(UsefulAtriStationEvent *realEvent); ///< Detects offset blocks
+
+        double getMax(TGraph *gr, double *maxTime); ///< gets the max of waveform
+        double getMean(TGraph *gr); ///< gets the mean of a waveform
+        TGraph* getRollingMean(TGraph *grInt, int samplePerBlock); ///< gets the rolling average of a waveform
     
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
         
     private:
-        double getMax(TGraph *gr, double *maxTime); ///< gets the max of waveform
-        double getMean(TGraph *gr); ///< gets the mean of a waveform
-        TGraph* getRollingMean(TGraph *grInt, int samplePerBlock); ///< gets the rolling average of a waveform
+
 
 };
 
