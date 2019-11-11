@@ -187,7 +187,7 @@ void process(int run) {
   thisUnixTime=theEvent->unixTime;
   numEvents++;
   if(theEvent->numReadoutBlocks<80) numEvents_CPU++;
-  else numEvents_RF0++;
+  if(theEvent->numReadoutBlocks>=80 && theEvent->isCalpulserEvent()==false)numEvents_RF0++;
   if(theEvent->isCalpulserEvent()) numEvents_CALPULSER++;
 
 
