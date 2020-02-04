@@ -100,13 +100,14 @@ int main (int nargs, char ** args)
         for (unsigned isamp = 0; isamp < ev->blockVec[iblk].data[chan_idx].size(); isamp++) 
         {
           UShort_t val = ev->blockVec[iblk].data[chan_idx][isamp]; 
-          sum2[chan][offset+isamp] += val*val; 
-          sum[chan][offset+isamp] += val; 
-          num[chan][offset+isamp] ++; 
+          unsigned i = (offset+isamp) % nsamp; 
+          sum2[chan][i] += val*val; 
+          sum[chan][i] += val; 
+          num[chan][i] ++; 
 
           if (full_hists[chan]) 
           {
-            full_hists[chan]->SetBinContent(1+offset+isamp,val, 1 + full_hists[chan]->GetBinContent(1+offset+isamp, val)); 
+            full_hists[chan]->SetBinContent(1+i,val, 1 + full_hists[chan]->GetBinContent(1+i, val)); 
           }
         }
 
