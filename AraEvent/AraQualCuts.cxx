@@ -89,11 +89,22 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
     bool hasOffsetBlocks=false;
 
     /*
-        This is currently only tuned for A2
+        This is currently only tuned for A2, and sort of for A3
         So "bounce out" if someone tries to use it for another station
     */
-    if(realEvent->stationId!=ARA_STATION2){
+    if(realEvent->stationId!=ARA_STATION2 && realEvent->stationId!=ARA_STATION3){
         return hasOffsetBlocks;
+    }
+    int numStringsToCheck=4;
+
+    if(realEvent->stationId==ARA_STATION3){
+
+        // if string 4 has gone "bad" in A3 (which we think happened at run 1901)
+        // then reduce the strings we scan over for a mistake
+        if(realEvent->unixTime > 1387451885 ){
+            numStringsToCheck=3;
+        }
+        _OffsetBlocksTimeWindowCut=20.; // bump this for A3 only; actually makes a little more sense. this says "anywhere within a block"
     }
 
     int nChanBelowThresh_V[4]={0};
@@ -107,7 +118,7 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
     AraAntPol::AraAntPol_t Vpol = AraAntPol::kVertical;
     AraAntPol::AraAntPol_t Hpol = AraAntPol::kHorizontal;
 
-    for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
+    for(int chan=0; chan<16; chan++){
         TGraph* grRaw = realEvent->getGraphFromRFChan(chan); //get the waveform
 
         AraAntPol::AraAntPol_t this_pol = AraGeomTool::Instance()->getPolByRFChan(chan,realEvent->stationId);
@@ -132,6 +143,7 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
         TGraph *grMean = getRollingMean(grInt,SAMPLES_PER_BLOCK); //SAMPLES_PER_BLOCK=64, in araSoft.h
         double maxTime;
         double meanMax = getMax(grMean, &maxTime);
+        // printf("Chan %d: maxTime %.2f and meanMax %.2f \n", chan, maxTime, meanMax);
 
         if(-1.*fabs(meanMax)<this_thresh){
             if(this_pol==Vpol){
@@ -155,24 +167,35 @@ bool AraQualCuts::hasOffsetBlocks(UsefulAtriStationEvent *realEvent)
     */
 
     double timeRange;
-    int noffsetBlockString=0;
-    for(int string=0; string<4; string++){
+    int noffsetBlockString_startV=0;
+    for(int string=0; string<numStringsToCheck; string++){
+      // printf("String %d, nChanBelowThresh_V is %d \n",string,nChanBelowThresh_V[string]);
         if (nChanBelowThresh_V[string]==2){
             timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
                       - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
-            if(timeRange<_OffsetBlocksTimeWindowCut){
+            // printf("    timeRange for string %d is %.2f \n", string, timeRange);
+            if(timeRange<=_OffsetBlocksTimeWindowCut){
+	           // printf("        nChanBelowThresh_H is %d \n",nChanBelowThresh_H[string]);
                 if(nChanBelowThresh_H[string]>0){
-                    timeRange = *max_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end())
-                              - *min_element(maxTimeVec[string][0].begin(), maxTimeVec[string][0].end());
-                    if(timeRange < _OffsetBlocksTimeWindowCut){
-                        noffsetBlockString++;
+                    timeRange = *max_element(maxTimeVec[string][1].begin(), maxTimeVec[string][1].end())
+                              - *min_element(maxTimeVec[string][1].begin(), maxTimeVec[string][1].end());
+                    // printf("            second timeRange for string %d is %.2f\n", string, timeRange);
+                    if(timeRange <= _OffsetBlocksTimeWindowCut){
+                        noffsetBlockString_startV++;
+                        // printf("               noffsetBlockString_startV is %d \n",noffsetBlockString_startV);
                     }
                 }
             }
         }
     }
 
-    if(noffsetBlockString>1){
+    // also, check the reverse
+    // where you look for at least hpol + 1 vpol
+    // currently unused
+    int noffsetBlockString_startH=0;
+
+    if(noffsetBlockString_startV>1 || noffsetBlockString_startH>1){
+        // printf("Yes! Has offset blocks!\n");
         hasOffsetBlocks=true;
     }
     return hasOffsetBlocks;
