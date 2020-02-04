@@ -6,19 +6,21 @@
 #include "TTree.h" 
 #include "RawAtriStationEvent.h" 
 #include "TGraphErrors.h" 
+#include "araSoft.h" 
 
 /** program to recalculate pedestals for ATRI  from data*/ 
 
 
-const int nchan = 32; 
-const int nblk = 512; 
-const int nsamp = 32768; 
+const int nchan = CHANNELS_PER_ATRI; 
+const int nblk = BLOCKS_PER_DDA; 
+const int nsamp = BLOCKS_PER_DDA * SAMPLES_PER_BLOCK; 
 const int min_adu = 2048-512; 
 const int max_adu = 2048+512; 
-const int samp_per_block = 64; 
 const int adu_bin = 1; 
-const int chan_per_dda = 8; 
-const int dda_per_atri = 4; 
+
+const int samp_per_block = SAMPLES_PER_BLOCK; 
+const int chan_per_dda = RFCHAN_PER_DDA; 
+const int dda_per_atri = DDA_PER_ATRI; 
 
 void usage() 
 {
