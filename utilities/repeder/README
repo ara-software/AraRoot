@@ -1,0 +1,8 @@
+A tool to regenerate pedestals from event samples. 
+Should be run on 100% data for best results. 
+
+Usage: 
+./repeder input_event_file.root  pedestal_file.dat  [output_file.root] 
+
+if specified, the output file will have a histogram of all the samples and other diagnostic information. 
+

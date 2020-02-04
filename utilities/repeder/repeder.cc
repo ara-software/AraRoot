@@ -1,0 +1,161 @@
+
+#include <iostream> 
+#include <fstream> 
+#include "TH2.h" 
+#include "TFile.h" 
+#include "TTree.h" 
+#include "RawAtriStationEvent.h" 
+#include "TGraphErrors.h" 
+
+/** program to recalculate pedestals for ATRI  from data*/ 
+
+
+const int nchan = 32; 
+const int nblk = 512; 
+const int nsamp = 32768; 
+const int min_adu = 2048-512; 
+const int max_adu = 2048+512; 
+const int samp_per_block = 64; 
+const int adu_bin = 1; 
+const int chan_per_dda = 8; 
+const int dda_per_atri = 4; 
+
+void usage() 
+{
+  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0x1]" << std::endl; 
+}
+
+
+int main (int nargs, char ** args) 
+{
+
+  if (nargs < 3) 
+  {
+    usage(); 
+    return 1; 
+  }
+
+  TFile infile(args[1]); 
+
+  TTree *t = (TTree*) infile.Get("eventTree"); 
+
+  if (!t) 
+  {
+    std::cerr << "Could not find eventTree in " << args[1] << std::endl; 
+    return 1; 
+  }
+
+  bool do_full_hists = nargs > 3; 
+  TH2 * full_hists[nchan] ;  
+  TFile * full_hists_file = 0; 
+
+  if (do_full_hists) 
+  {
+    int hist_mask = 1; 
+    if (nargs > 4) hist_mask = strtol(args[4], 0, 0); 
+
+    full_hists_file = new TFile(args[3],"RECREATE"); 
+    for (int i = 0; i < nchan; i++) 
+    {
+      if (( hist_mask << i)  & 1 ) 
+      {
+        full_hists[i] = new TH2S(Form("samp_hist_ch%d", i), 
+                                 Form("Sample Histogram Channel %d", i), nsamp, 0, nsamp, 
+                                 (max_adu-min_adu+1)/adu_bin, min_adu, max_adu); 
+                               
+      }
+      else full_hists[i] = 0; 
+    }
+  }
+
+  std::vector<std::vector<double> > sum(nchan, std::vector<double> ( nsamp,0)); 
+  std::vector<std::vector<double> > sum2(nchan, std::vector<double> ( nsamp,0)) ; 
+  std::vector<std::vector<int > >num(nchan, std::vector<int> ( nsamp,0));
+
+  RawAtriStationEvent * ev = 0; 
+  t->SetBranchAddress("event",&ev); 
+
+  int nev = t->GetEntries(); 
+  int pct = -1; 
+
+  for (int iev = 0; iev < t->GetEntries(); iev++) 
+  {
+    t->GetEntry(iev); 
+    if (double(iev) / nev * 100 > pct) 
+    {
+      std::cout << iev << "/"  <<  nev << "\r"; 
+    }
+
+    for (unsigned iblk = 0; iblk < ev->blockVec.size(); iblk++) 
+    {
+
+      int chan_idx = 0; 
+      for (int ich= 0; ich< ev->blockVec[iblk].getNumChannels(); ich++) 
+      {
+        if (ev->blockVec[iblk].channelMask && (1 << ich) == 0) continue; 
+        int chan= chan_per_dda *ev->blockVec[iblk].getDda() + ich; 
+        int offset = ev->blockVec[iblk].getBlock() * samp_per_block; 
+        for (unsigned isamp = 0; isamp < ev->blockVec[iblk].data[chan_idx].size(); isamp++) 
+        {
+          UShort_t val = ev->blockVec[iblk].data[chan_idx][isamp]; 
+          sum2[chan][offset+isamp] += val*val; 
+          sum[chan][offset+isamp] += val; 
+          num[chan][offset+isamp] ++; 
+
+          if (full_hists[chan]) 
+          {
+            full_hists[chan]->SetBinContent(1+offset+isamp,val, 1 + full_hists[chan]->GetBinContent(1+offset+isamp, val)); 
+          }
+        }
+
+        chan_idx++; 
+      }
+    }
+  }
+
+  std::cout << std::endl; 
+
+  //write out pedestal file
+
+  std::ofstream pf(args[2]); 
+
+  for (int ich = 0; ich < nchan; ich++) 
+  {
+    for (int blk = 0; blk < nblk; blk++) 
+
+    {
+      pf << ich / dda_per_atri << blk << ich % chan_per_dda ; 
+
+      for (int isamp = 0; isamp < samp_per_block; isamp++) 
+      {
+        pf << round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block]); 
+      }
+
+      pf << std::endl; 
+    }
+  }
+
+
+
+  if (do_full_hists) 
+  {
+    for (int ih = 0; ih < nchan; ih++) 
+    {
+      if (full_hists[ih]) full_hists[ih]->Write(); 
+    }
+
+    for (int ich; ich < nchan; ich++) 
+    {
+      TGraphErrors g(nsamp); 
+
+      for (int isamp = 0; isamp < nsamp; isamp++) 
+      {
+        g.SetPoint(isamp,isamp, sum[ich][isamp]/ num[ich][isamp]); 
+        g.SetPointError(isamp, 0, sqrt(sum2[ich][isamp]/ num[ich][isamp] - g.GetX()[isamp]*g.GetX()[isamp] )); 
+      }
+      g.Write(Form("g_ch^d",ich)); 
+    }
+  }
+
+  delete full_hists_file; 
+}
