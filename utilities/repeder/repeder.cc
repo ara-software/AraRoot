@@ -25,6 +25,8 @@ int adu_bin = 1;
 int n_adu_bins = 0; 
 unsigned hist_mask = 0xf0f0f0f0; 
 
+int max = -1; 
+
 const char * input_file = 0; 
 const char * pedestal_file = 0; 
 bool use_median = false; 
@@ -42,6 +44,7 @@ void usage()
   std::cout << "-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. " << std::endl; 
   std::cout << "-x :  Histogram mask. Has no effect if neither -o nor -d are defined. " << std::endl; 
   std::cout << "-C :  Include events marked as calpulsers. Default is to exclude. " << std::endl; 
+  std::cout << "-N :  Only process up to event N. " << std::end; 
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
 
@@ -108,6 +111,12 @@ int parse(int nargs, char ** args)
       adu_bin = atoi(args[++iarg]); 
       continue; 
     }
+    if (!strcmp(args[iarg],"-N"))
+    {
+      max = atoi(args[++iarg]); 
+      continue; 
+    }
+
 
     if (!strcmp(args[iarg],"-x"))
     {
@@ -225,10 +234,11 @@ int main (int nargs, char ** args)
   t->SetCacheSize(300*1000*1000); 
   t->AddBranchToCache("event",true); 
 
-  int nev = t->GetEntries(); 
   int nhundred = 0; 
 
-  for (int iev = 0; iev < t->GetEntries(); iev++) 
+  int nev = max < 0 ? t->GetEntries()+1+max : TMath::Min(max, t->GetEntries()); 
+  
+  for (int iev = 0; iev < nev; iev++) 
   {
     t->GetEntry(iev); 
     if (iev >= nhundred*100)
