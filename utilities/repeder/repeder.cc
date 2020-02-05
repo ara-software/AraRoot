@@ -68,7 +68,7 @@ int main (int nargs, char ** args)
     full_hists_file = new TFile(args[3],"RECREATE"); 
     for (int i = 0; i < nchan; i++) 
     {
-      if (( hist_mask << i)  & 1 ) 
+      if ( hist_mask  & (1 << i) ) 
       {
         full_hists[i] = new TH2S(Form("samp_hist_ch%d", i), 
                                  Form("Sample Histogram Channel %d", i), nsamp, 0, nsamp, 
