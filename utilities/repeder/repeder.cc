@@ -178,7 +178,7 @@ int main (int nargs, char ** args)
 
   bool do_full_hists = (use_median || root_output) && hist_mask; 
 
-  TH2S * full_hists[nchan] ;  
+  TH2S * full_hists[nchan]  = {0};  
   short * arrays[nchan]; 
   Long64_t entries[nchan]; 
   TFile * full_hists_file = 0; 
