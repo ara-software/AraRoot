@@ -9,6 +9,7 @@ Usage: repeder input_file.root output_pedestal_file.dat
 -d :  Use median instead of mean (for channels defined in hist mask only)
 -o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. 
 -x :  Histogram mask. Has no effect if neither -o nor -d are defined. 
+-C :  Include events marked as calpulsers. Default is to exclude. 
 -m,-M,-b :   Set histogram bounds /binning.  
 
 This tool should be run on 100% data input for best results. By default, will just use the

@@ -30,6 +30,7 @@ const char * pedestal_file = 0;
 bool use_median = false; 
 const char * root_output = 0; 
 
+bool use_calpulsers = false; 
 
 void usage() 
 {
@@ -40,6 +41,7 @@ void usage()
   std::cout << "-d :  Use median instead of mean (for channels defined in hist mask only)" << std::endl; 
   std::cout << "-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. " << std::endl; 
   std::cout << "-x :  Histogram mask. Has no effect if neither -o nor -d are defined. " << std::endl; 
+  std::cout << "-C :  Include events marked as calpulsers. Default is to exclude. " << std::endl; 
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
 
@@ -93,6 +95,13 @@ int parse(int nargs, char ** args)
       use_median = true; 
       continue; 
     }
+
+    if (!strcmp(args[iarg],"-C"))
+    {
+      use_calpulsers = true; 
+      continue; 
+    }
+
 
     if (!strcmp(args[iarg],"-b"))
     {
@@ -229,7 +238,10 @@ int main (int nargs, char ** args)
       nhundred++; 
     }
 
-    for (unsigned iblk = 0; iblk < ev->blockVec.size(); iblk++) 
+    if (ev->isCalpulserEvent() && !use_calpulsers)  continue; 
+
+    //skip the first block! 
+    for (unsigned iblk = 1; iblk < ev->blockVec.size(); iblk++) 
     {
 
       int chan_idx = 0; 
