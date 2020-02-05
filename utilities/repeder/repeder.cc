@@ -22,6 +22,7 @@ const int dda_per_atri = DDA_PER_ATRI;
 int min_adu = 1750-512; 
 int max_adu = 1750+512; 
 int adu_bin = 1; 
+int binsy = 0; 
 unsigned hist_mask = 0xf0f0f0f0; 
 
 const char * input_file = 0; 
@@ -177,11 +178,14 @@ int main (int nargs, char ** args)
 
   bool do_full_hists = (use_median || root_output) && hist_mask; 
 
-  TH2 * full_hists[nchan] ;  
+  TH2S * full_hists[nchan] ;  
+  short * arrays[nchan]; 
+  Long64_t entries[nchan]; 
   TFile * full_hists_file = 0; 
 
   if (do_full_hists) 
-  {
+  { 
+    binsy= (max_adu-min_adu+1)/adu_bin;
     if (root_output) full_hists_file = new TFile(root_output,"RECREATE"); 
     for (int i = 0; i < nchan; i++) 
     {
@@ -189,10 +193,15 @@ int main (int nargs, char ** args)
       {
         full_hists[i] = new TH2S(Form("samp_hist_ch%d", i), 
                                  Form("Sample Histogram Channel %d;Sample;ADU", i), nsamp, 0, nsamp, 
-                                 (max_adu-min_adu+1)/adu_bin, min_adu, max_adu); 
+                                 binsy, min_adu, max_adu); 
                                
+        arrays[i] = full_hists[i]->GetArray(); 
       }
-      else full_hists[i] = 0; 
+      else 
+      {
+        full_hists[i] = 0; 
+        arrays[i] = 0; 
+      }
     }
   }
 
@@ -237,10 +246,14 @@ int main (int nargs, char ** args)
 
           if (full_hists[chan]) 
           {
-            full_hists[chan]->Fill(i,val); 
+            int ybin = 1+(val-min_adu)/adu_bin; 
+            if (ybin < 0) ybin = 0;
+            if (ybin > binsy) ybin = binsy+1;
+            arrays[chan][i+1 + (2 + nsamp) * ybin]++; 
           }
         }
 
+        entries[chan]+=ev->blockVec[iblk].data[chan_idx].size(); 
         chan_idx++; 
       }
     }
@@ -284,6 +297,7 @@ int main (int nargs, char ** args)
     {
       if (full_hists[ih])
       {
+        full_hists[ih]->SetEntries(entries[ih]); 
         full_hists[ih]->Write(); 
       }
     }
