@@ -14,9 +14,9 @@
 const int nchan = CHANNELS_PER_ATRI; 
 const int nblk = BLOCKS_PER_DDA; 
 const int nsamp = BLOCKS_PER_DDA * SAMPLES_PER_BLOCK; 
-const int min_adu = 2048-512; 
-const int max_adu = 2048+512; 
-const int adu_bin = 1; 
+int min_adu = 2048-512; 
+int max_adu = 2048+512; 
+int adu_bin = 1; 
 
 const int samp_per_block = SAMPLES_PER_BLOCK; 
 const int chan_per_dda = RFCHAN_PER_DDA; 
@@ -55,6 +55,9 @@ int main (int nargs, char ** args)
   {
     int hist_mask = 1; 
     if (nargs > 4) hist_mask = strtol(args[4], 0, 0); 
+    if (nargs > 5) min_adu = strtol(args[5],0,0); 
+    if (nargs > 6) max_adu = strtol(args[6],0,0); 
+    if (nargs > 7) adu_bin = strtol(args[7],0,0); 
 
     full_hists_file = new TFile(args[3],"RECREATE"); 
     for (int i = 0; i < nchan; i++) 
