@@ -23,7 +23,7 @@ int min_adu = 1750-512;
 int max_adu = 1750+512; 
 int adu_bin = 1; 
 int n_adu_bins = 0; 
-unsigned hist_mask = 0xf0f0f0f0; 
+unsigned hist_mask = 0x0f0f0f0f; 
 
 Long64_t max = -1; 
 
