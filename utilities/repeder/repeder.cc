@@ -14,40 +14,156 @@
 const int nchan = CHANNELS_PER_ATRI; 
 const int nblk = BLOCKS_PER_DDA; 
 const int nsamp = BLOCKS_PER_DDA * SAMPLES_PER_BLOCK; 
-int min_adu = 1750-512; 
-int max_adu = 1750+512; 
-int adu_bin = 1; 
-unsigned hist_mask = 0xf0f0f0f0; 
-
 const int samp_per_block = SAMPLES_PER_BLOCK; 
 const int chan_per_dda = RFCHAN_PER_DDA; 
 const int dda_per_atri = DDA_PER_ATRI; 
 
 
+int min_adu = 1750-512; 
+int max_adu = 1750+512; 
+int adu_bin = 1; 
+unsigned hist_mask = 0xf0f0f0f0; 
 
-
+const char * input_file = 0; 
+const char * pedestal_file = 0; 
+bool use_median = false; 
+const char * root_output = 0; 
 
 
 void usage() 
 {
-  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0xf0f0f0f0] [min_adu="<< min_adu << "] [max_adu=" << max_adu <<" ] [adu_bin="<< adu_bin <<" ]" << std::endl; 
+  std::cout << "Usage: repeder input_file.root output_pedestal_file.dat " << std::endl 
+            << "      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] " << std::endl 
+            <<"       -m min_hist_adu="<< min_adu << "] [-M max_hist_adu=" << max_adu <<" ] [-b hist_adu_bin="<< adu_bin <<"]" << std::endl; 
+  std::cout << "-h :  Display this message" << std::endl; 
+  std::cout << "-d :  Use median instead of mean (for channels defined in hist mask only)" << std::endl; 
+  std::cout << "-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. " << std::endl; 
+  std::cout << "-x :  Histogram mask. Has no effect if neither -o nor -d are defined. " << std::endl; 
+  std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
+
+double get_median_slice(const TH2 * h, int xbin) 
+{
+  int sum = 0; 
+  for (int i = 1; i <= h->GetNbinsY(); i++) 
+  {
+    sum += h->GetBinContent(xbin,i); 
+  }
+
+  int partial_sum = 0; 
+  int i = 1; 
+  while (partial_sum < sum/2)
+  {
+    partial_sum += h->GetBinContent(xbin,i++); 
+  }
+  return h->GetBinLowEdge(i); 
+}
+
+
+int parse(int nargs, char ** args) 
+{
+
+  int iarg = 0; 
+  int ipositional = 0; 
+  while (++iarg < nargs) 
+  {
+
+//    std::cout << iarg << " " << args[iarg] << std::endl; 
+    if (!strcmp(args[iarg],"-o"))
+    {
+      root_output = args[++iarg]; 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-M"))
+    {
+      max_adu = atoi(args[++iarg]); 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-m"))
+    {
+      min_adu = atoi(args[++iarg]); 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-d"))
+    {
+      use_median = true; 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-b"))
+    {
+      adu_bin = atoi(args[++iarg]); 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-x"))
+    {
+      hist_mask = strtol(args[++iarg],0,0); 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-h"))
+    {
+      usage(); 
+      return 1; 
+    }
+
+    if (args[iarg][0]=='-')
+    {
+      std::cerr << "unknown argument: " << args[iarg] << std::endl; 
+      usage(); 
+      return -1; 
+    }
+
+    ipositional++; 
+
+
+    if (ipositional == 1) 
+    {
+      input_file = args[iarg]; 
+      continue;
+    }
+    else if (ipositional == 2) 
+    {
+      pedestal_file = args[iarg]; 
+      continue;
+    }
+    else if (ipositional > 2) 
+    {
+      std::cerr << "extra positional argument: " << args[iarg] << std::endl; 
+      usage(); 
+      return -1;
+    }
+  }
+
+  if (ipositional < 2) 
+  {
+    usage(); 
+    return -1; 
+  }
+
+  return 0; 
+}
+
+
 
 
 int main (int nargs, char ** args) 
 {
 
-  if (nargs < 3) 
-  {
-    usage(); 
-    return 1; 
-  }
+  int parse_return = parse(nargs,args); 
+  if (parse_return < 0) return 1; 
+  if (parse_return) return 0; 
 
-  TFile *  infile = TFile::Open(args[1]); 
+
+  TFile *  infile = TFile::Open(input_file); 
 
   if (!infile) 
   {
-    std::cerr << "Problem opening " << args[1] << std::endl; 
+    std::cerr << "Problem opening " << infile << std::endl; 
     return 1; 
 
   }
@@ -59,24 +175,20 @@ int main (int nargs, char ** args)
     return 1; 
   }
 
-  bool do_full_hists = nargs > 3; 
+  bool do_full_hists = (use_median || root_output) && hist_mask; 
+
   TH2 * full_hists[nchan] ;  
   TFile * full_hists_file = 0; 
 
   if (do_full_hists) 
   {
-    if (nargs > 4) hist_mask = strtol(args[4], 0, 0); 
-    if (nargs > 5) min_adu = strtol(args[5],0,0); 
-    if (nargs > 6) max_adu = strtol(args[6],0,0); 
-    if (nargs > 7) adu_bin = strtol(args[7],0,0); 
-
-    full_hists_file = new TFile(args[3],"RECREATE"); 
+    if (root_output) full_hists_file = new TFile(root_output,"RECREATE"); 
     for (int i = 0; i < nchan; i++) 
     {
       if ( hist_mask  & (1 << i) ) 
       {
         full_hists[i] = new TH2S(Form("samp_hist_ch%d", i), 
-                                 Form("Sample Histogram Channel %d", i), nsamp, 0, nsamp, 
+                                 Form("Sample Histogram Channel %d;Sample;ADU", i), nsamp, 0, nsamp, 
                                  (max_adu-min_adu+1)/adu_bin, min_adu, max_adu); 
                                
       }
@@ -136,7 +248,7 @@ int main (int nargs, char ** args)
 
   std::cout << std::endl; 
 
-  //write out pedestal file
+  //write out pedestal file. This probably isn't in the normal order but the way it's read in, it doesn't matter. 
 
   std::ofstream pf(args[2]); 
 
@@ -149,7 +261,14 @@ int main (int nargs, char ** args)
 
       for (int isamp = 0; isamp < samp_per_block; isamp++) 
       {
-        pf << " " <<  round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block]); 
+        if (full_hists[ich] && use_median) 
+        {
+          pf << " " <<  int(get_median_slice(full_hists[ich], isamp+1)); 
+        }
+        else
+        {
+          pf << " " <<  int(round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block])); 
+        }
       }
 
       pf << std::endl; 
@@ -158,12 +277,15 @@ int main (int nargs, char ** args)
 
 
 
-  if (do_full_hists) 
+  if (root_output) 
   {
     full_hists_file->cd(); 
     for (int ih = 0; ih < nchan; ih++) 
     {
-      if (full_hists[ih]) full_hists[ih]->Write(); 
+      if (full_hists[ih])
+      {
+        full_hists[ih]->Write(); 
+      }
     }
 
     for (int ich; ich < nchan; ich++) 
@@ -175,8 +297,10 @@ int main (int nargs, char ** args)
         g->SetPoint(isamp,isamp, sum[ich][isamp]/ num[ich][isamp]); 
         g->SetPointError(isamp, 0, sqrt(sum2[ich][isamp]/ num[ich][isamp] - g->GetY()[isamp]*g->GetY()[isamp] )); 
       }
-      g->SetTitle(Form("Channel %d",ich)); 
-      g->Write(Form("g_ch%d",ich)); 
+      g->SetTitle(Form("Channel %d mean/rms",ich)); 
+      g->GetXaxis()->SetTitle("Sample"); 
+      g->GetYaxis()->SetTitle("ADU mean/RMS"); 
+      g->Write(Form("g_ch%02d",ich)); 
       delete g; 
     }
   }
