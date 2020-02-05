@@ -85,16 +85,20 @@ int main (int nargs, char ** args)
 
   RawAtriStationEvent * ev = 0; 
   t->SetBranchAddress("event",&ev); 
+  t->SetCacheSize(100*1000*1000); 
+  t->AddBranchToCache("event",true); 
 
   int nev = t->GetEntries(); 
-  int pct = -1; 
+  int nhundred = 0; 
 
   for (int iev = 0; iev < t->GetEntries(); iev++) 
   {
     t->GetEntry(iev); 
-    if (double(iev) / nev * 100 > pct) 
+    if (iev >= nhundred*100)
     {
       std::cout << iev << "/"  <<  nev << "\r"; 
+      std::cout << std::flush; 
+      nhundred++; 
     }
 
     for (unsigned iblk = 0; iblk < ev->blockVec.size(); iblk++) 
