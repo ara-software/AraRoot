@@ -120,7 +120,7 @@ int main (int nargs, char ** args)
 
           if (full_hists[chan]) 
           {
-            full_hists[chan]->SetBinContent(1+i,val, 1 + full_hists[chan]->GetBinContent(1+i, val)); 
+            full_hists[chan]->Fill(i,val); 
           }
         }
 
@@ -140,11 +140,11 @@ int main (int nargs, char ** args)
     for (int blk = 0; blk < nblk; blk++) 
 
     {
-      pf << ich / dda_per_atri << blk << ich % chan_per_dda ; 
+      pf <<  ich / dda_per_atri <<  " " << blk << " " <<  ich % chan_per_dda ; 
 
       for (int isamp = 0; isamp < samp_per_block; isamp++) 
       {
-        pf << round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block]); 
+        pf << " " <<  round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block]); 
       }
 
       pf << std::endl; 
@@ -155,6 +155,7 @@ int main (int nargs, char ** args)
 
   if (do_full_hists) 
   {
+    full_hists_file->cd(); 
     for (int ih = 0; ih < nchan; ih++) 
     {
       if (full_hists[ih]) full_hists[ih]->Write(); 
@@ -162,14 +163,16 @@ int main (int nargs, char ** args)
 
     for (int ich; ich < nchan; ich++) 
     {
-      TGraphErrors g(nsamp); 
+      TGraphErrors * g = new TGraphErrors(nsamp); 
 
       for (int isamp = 0; isamp < nsamp; isamp++) 
       {
-        g.SetPoint(isamp,isamp, sum[ich][isamp]/ num[ich][isamp]); 
-        g.SetPointError(isamp, 0, sqrt(sum2[ich][isamp]/ num[ich][isamp] - g.GetX()[isamp]*g.GetX()[isamp] )); 
+        g->SetPoint(isamp,isamp, sum[ich][isamp]/ num[ich][isamp]); 
+        g->SetPointError(isamp, 0, sqrt(sum2[ich][isamp]/ num[ich][isamp] - g->GetY()[isamp]*g->GetY()[isamp] )); 
       }
-      g.Write(Form("g_ch^d",ich)); 
+      g->SetTitle(Form("Channel %d",ich)); 
+      g->Write(Form("g_ch%d",ich)); 
+      delete g; 
     }
   }
 
