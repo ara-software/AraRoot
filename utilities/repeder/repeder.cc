@@ -22,7 +22,7 @@ const int dda_per_atri = DDA_PER_ATRI;
 int min_adu = 1750-512; 
 int max_adu = 1750+512; 
 int adu_bin = 1; 
-int binsy = 0; 
+int n_adu_bins = 0; 
 unsigned hist_mask = 0xf0f0f0f0; 
 
 const char * input_file = 0; 
@@ -43,21 +43,21 @@ void usage()
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
 
-double get_median_slice(const TH2 * h, int xbin) 
+double get_median_slice(const TH2 * h, int bin) 
 {
   int sum = 0; 
-  for (int i = 1; i <= h->GetNbinsY(); i++) 
+  for (int i = 1; i <= h->GetNbinsX(); i++) 
   {
-    sum += h->GetBinContent(xbin,i); 
+    sum += h->GetBinContent(i,bin); 
   }
 
   int partial_sum = 0; 
   int i = 1; 
   while (partial_sum < sum/2)
   {
-    partial_sum += h->GetBinContent(xbin,i++); 
+    partial_sum += h->GetBinContent(i++,bin); 
   }
-  return h->GetYaxis()->GetBinLowEdge(i); 
+  return h->GetXaxis()->GetBinLowEdge(i); 
 }
 
 
@@ -185,15 +185,17 @@ int main (int nargs, char ** args)
 
   if (do_full_hists) 
   { 
-    binsy= (max_adu-min_adu+1)/adu_bin;
+    n_adu_bins= (max_adu-min_adu+1)/adu_bin;
     if (root_output) full_hists_file = new TFile(root_output,"RECREATE"); 
     for (int i = 0; i < nchan; i++) 
     {
       if ( hist_mask  & (1 << i) ) 
       {
         full_hists[i] = new TH2S(Form("samp_hist_ch%d", i), 
-                                 Form("Sample Histogram Channel %d;Sample;ADU", i), nsamp, 0, nsamp, 
-                                 binsy, min_adu, max_adu); 
+                                 Form("Sample Histogram Channel %d;ADU;Sample", i), 
+                                 n_adu_bins, min_adu, max_adu,
+                                 nsamp, 0, nsamp 
+                                 ); 
                                
         arrays[i] = full_hists[i]->GetArray(); 
       }
@@ -246,10 +248,11 @@ int main (int nargs, char ** args)
 
           if (full_hists[chan]) 
           {
-            int ybin = 1+(val-min_adu)/adu_bin; 
-            if (ybin < 0) ybin = 0;
-            if (ybin > binsy) ybin = binsy+1;
-            arrays[chan][i+1 + (2 + nsamp) * ybin]++; 
+            int bin = 1+(val-min_adu)/adu_bin; 
+            if (bin < 0) bin = 0;
+            if (bin > n_adu_bins) bin = n_adu_bins+1;
+            arrays[chan][bin + (2 + n_adu_bins) * (i+1)]++; 
+            __builtin_prefetch( arrays[chan] + bin-16 + (2 + n_adu_bins) * (i+2),1,0);
           }
         }
 
