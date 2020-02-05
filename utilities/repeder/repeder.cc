@@ -255,13 +255,13 @@ int main (int nargs, char ** args)
     {
 
       int chan_idx = 0; 
-      unsigned nchannels = ev->blockVec[iblk].getNumChannels; 
+      unsigned nchannels = ev->blockVec[iblk].getNumChannels(); 
       for (int ich= 0; ich< nchannels; ich++) 
       {
         if (ev->blockVec[iblk].channelMask && (1 << ich) == 0) continue; 
         int chan= chan_per_dda * ev->blockVec[iblk].getDda() + ich; 
         int offset = ev->blockVec[iblk].getBlock() * samp_per_block; 
-        unsigned size = ev->blockVec()[iblk].data[chan_idx].size(); 
+        unsigned size = ev->blockVec[iblk].data[chan_idx].size(); 
         for (unsigned isamp = 0; isamp < size; isamp++) 
         {
           UShort_t val = ev->blockVec[iblk].data[chan_idx][isamp]; 
@@ -277,7 +277,7 @@ int main (int nargs, char ** args)
             if (bin > n_adu_bins) bin = n_adu_bins+1;
             arrays[chan][bin + (2 + n_adu_bins) * (i+1)]++; 
 
-            /** Try to prefetch next row, assuming the next sample will be similar bin*/. 
+            /** Try to prefetch next row, assuming the next sample will be similar bin*/ 
             __builtin_prefetch( arrays[chan] + bin-32 + (2 + n_adu_bins) * (i+2),1,0); 
           }
         }
