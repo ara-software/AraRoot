@@ -37,9 +37,15 @@ int main (int nargs, char ** args)
     return 1; 
   }
 
-  TFile infile(args[1]); 
+  TFile *  infile = TFile::Open(args[1]); 
 
-  TTree *t = (TTree*) infile.Get("eventTree"); 
+  if (!infile) 
+  {
+    std::cerr << "Problem opening " << args[1] << std::endl; 
+    return 1; 
+
+  }
+  TTree *t = (TTree*) infile->Get("eventTree"); 
 
   if (!t) 
   {
