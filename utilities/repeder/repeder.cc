@@ -24,7 +24,7 @@ const int dda_per_atri = DDA_PER_ATRI;
 
 void usage() 
 {
-  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0x1]" << std::endl; 
+  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0x1] [min_adu=1536] [max_adu=2560] [adu_bin=1]" << std::endl; 
 }
 
 
