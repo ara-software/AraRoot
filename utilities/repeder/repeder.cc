@@ -14,17 +14,23 @@
 const int nchan = CHANNELS_PER_ATRI; 
 const int nblk = BLOCKS_PER_DDA; 
 const int nsamp = BLOCKS_PER_DDA * SAMPLES_PER_BLOCK; 
-int min_adu = 2048-512; 
-int max_adu = 2048+512; 
+int min_adu = 1750-512; 
+int max_adu = 1750+512; 
 int adu_bin = 1; 
+unsigned hist_mask = 0xf0f0f0f0; 
 
 const int samp_per_block = SAMPLES_PER_BLOCK; 
 const int chan_per_dda = RFCHAN_PER_DDA; 
 const int dda_per_atri = DDA_PER_ATRI; 
 
+
+
+
+
+
 void usage() 
 {
-  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0x1] [min_adu=1536] [max_adu=2560] [adu_bin=1]" << std::endl; 
+  std::cerr << "Usage: repeder input_file.root output_pedestal_file.dat [output_file.root] [hist_channel_mask = 0xf0f0f0f0] [min_adu="<< min_adu << "] [max_adu=" << max_adu <<" ] [adu_bin="<< adu_bin <<" ]" << std::endl; 
 }
 
 
@@ -59,7 +65,6 @@ int main (int nargs, char ** args)
 
   if (do_full_hists) 
   {
-    int hist_mask = 1; 
     if (nargs > 4) hist_mask = strtol(args[4], 0, 0); 
     if (nargs > 5) min_adu = strtol(args[5],0,0); 
     if (nargs > 6) max_adu = strtol(args[6],0,0); 
@@ -85,7 +90,7 @@ int main (int nargs, char ** args)
 
   RawAtriStationEvent * ev = 0; 
   t->SetBranchAddress("event",&ev); 
-  t->SetCacheSize(100*1000*1000); 
+  t->SetCacheSize(300*1000*1000); 
   t->AddBranchToCache("event",true); 
 
   int nev = t->GetEntries(); 
