@@ -56,7 +56,7 @@ double get_median_slice(const TH2 * h, int xbin)
   {
     partial_sum += h->GetBinContent(xbin,i++); 
   }
-  return h->GetBinLowEdge(i); 
+  return h->GetYaxis()->GetBinLowEdge(i); 
 }
 
 
