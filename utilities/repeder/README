@@ -1,8 +1,29 @@
-A tool to regenerate pedestals from event samples. 
-Should be run on 100% data for best results. 
+repeder: A tool to regenerate pedestals from event samples. 
+Cosmin Deaconu <cozzyd@kicp.uchicago.edu> 
 
-Usage: 
-./repeder input_event_file.root  pedestal_file.dat  [output_file.root] 
+Usage: repeder input_file.root output_pedestal_file.dat 
+        [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] 
+        [-m min_hist_adu=1238] [-M max_hist_adu=2262 ] [-b hist_adu_bin=1]
 
-if specified, the output file will have a histogram of all the samples and other diagnostic information. 
+-h :  Display this message
+-d :  Use median instead of mean (for channels defined in hist mask only)
+-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. 
+-x :  Histogram mask. Has no effect if neither -o nor -d are defined. 
+-m,-M,-b :   Set histogram bounds /binning.  
+
+This tool should be run on 100% data input for best results. By default, will just use the
+mean of each sample over the run for the pedestals.  With the -d option, the
+median will be used but only for channels defined in the mask (-x). 
+
+Calculating the median requires histogramming so will use some amount of memory
+(32768 * 2 bytes * channels in mask * bins in histogram). The histogram binning
+can be controlled by -m/-M/-b. 
+
+An output file can be specified with -o that will store any histograms in the
+mask as well as TGraphErrors containing the mean/RMS of each sample. Enabling
+ROOT output enables the histograms in the mask even if the median option is not
+specified. 
+
+
+
 
