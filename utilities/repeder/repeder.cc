@@ -3,10 +3,11 @@
 #include <fstream> 
 #include "TH2.h" 
 #include "TFile.h" 
-#include "TTree.h" 
 #include "RawAtriStationEvent.h" 
 #include "TGraphErrors.h" 
 #include "araSoft.h" 
+#include "TChain.h" 
+#include "TROOT.h" 
 
 /** program to recalculate pedestals for ATRI  from data*/ 
 
@@ -33,18 +34,24 @@ bool use_median = false;
 const char * root_output = 0; 
 
 bool use_calpulsers = false; 
+int cache_size = 100; 
+
+TChain chain("eventTree"); 
 
 void usage() 
 {
-  std::cout << "Usage: repeder input_file.root output_pedestal_file.dat " << std::endl 
+  std::cout << "Usage: repeder input_file.root [intput_file2.root]  output_pedestal_file.dat " << std::endl 
             << "      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] " << std::endl 
+            << "      [-p] [-N num_events] [-C cache_size=100M] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] " << std::endl 
             <<"       -m min_hist_adu="<< min_adu << "] [-M max_hist_adu=" << max_adu <<" ] [-b hist_adu_bin="<< adu_bin <<"]" << std::endl; 
   std::cout << "-h :  Display this message" << std::endl; 
   std::cout << "-d :  Use median instead of mean (for channels defined in hist mask only)" << std::endl; 
   std::cout << "-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. " << std::endl; 
   std::cout << "-x :  Histogram mask. Has no effect if neither -o nor -d are defined. " << std::endl; 
-  std::cout << "-C :  Include events marked as calpulsers. Default is to exclude. " << std::endl; 
-  std::cout << "-N :  Only process up to event N. " << std::endl; 
+  std::cout << "-p :  Include events marked as calpulsers. Default is to exclude. " << std::endl; 
+  std::cout << "-N :  Only process up to event N" << std::endl; 
+  std::cout << "-t :  Enable multithreading (in tree reading). Specify number of threads (or 0 to choose automatically. Specify number of threads (or 0 to choose automatically)) " << std::endl; 
+  std::cout << "-C :  Size in megabytes of TTreeCache" << std::endl; 
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
 
@@ -71,7 +78,7 @@ int parse(int nargs, char ** args)
 {
 
   int iarg = 0; 
-  int ipositional = 0; 
+  std::vector<char *> positional_args; 
   while (++iarg < nargs) 
   {
 
@@ -100,9 +107,21 @@ int parse(int nargs, char ** args)
       continue; 
     }
 
-    if (!strcmp(args[iarg],"-C"))
+    if (!strcmp(args[iarg],"-p"))
     {
       use_calpulsers = true; 
+      continue; 
+    }
+    if (!strcmp(args[iarg],"-C"))
+    {
+      cache_size = atoi(args[++iarg]); 
+      continue; 
+    }
+
+    if (!strcmp(args[iarg],"-t"))
+    {
+      ROOT::EnableImplicitMT(atoi(args[++iarg])); 
+      chain.SetParallelUnzip(); 
       continue; 
     }
 
@@ -138,31 +157,20 @@ int parse(int nargs, char ** args)
       return -1; 
     }
 
-    ipositional++; 
-
-
-    if (ipositional == 1) 
-    {
-      input_file = args[iarg]; 
-      continue;
-    }
-    else if (ipositional == 2) 
-    {
-      pedestal_file = args[iarg]; 
-      continue;
-    }
-    else if (ipositional > 2) 
-    {
-      std::cerr << "extra positional argument: " << args[iarg] << std::endl; 
-      usage(); 
-      return -1;
-    }
+    positional_args.push_back(args[iarg]); 
   }
 
-  if (ipositional < 2) 
+  if (positional_args.size() < 2) 
   {
     usage(); 
     return -1; 
+  }
+
+  pedestal_file= *positional_args.end(); 
+
+  for (unsigned ipositional = 0; ipositional < positional_args.size()-1; ipositional++) 
+  {
+    chain.Add(positional_args[ipositional]); 
   }
 
   return 0; 
@@ -179,19 +187,11 @@ int main (int nargs, char ** args)
   if (parse_return) return 0; 
 
 
-  TFile *  infile = TFile::Open(input_file); 
 
-  if (!infile) 
+
+  if (!chain.GetEntries()) 
   {
-    std::cerr << "Problem opening " << infile << std::endl; 
-    return 1; 
-
-  }
-  TTree *t = (TTree*) infile->Get("eventTree"); 
-
-  if (!t) 
-  {
-    std::cerr << "Could not find eventTree in " << args[1] << std::endl; 
+    std::cerr << "No entries found :(" << std::endl; 
     return 1; 
   }
 
@@ -231,17 +231,18 @@ int main (int nargs, char ** args)
   std::vector<std::vector<int > >num(nchan, std::vector<int> ( nsamp,0));
 
   RawAtriStationEvent * ev = 0; 
-  t->SetBranchAddress("event",&ev); 
-  t->SetCacheSize(300*1000*1000); 
-  t->AddBranchToCache("event",true); 
+  chain.SetBranchAddress("event",&ev); 
+  chain.SetCacheSize(cache_size*1024*1024); 
+  chain.AddBranchToCache("event",true); 
+  chain.StopCacheLearningPhase(); 
 
   int nhundred = 0; 
 
-  int nev = max < 0 ? t->GetEntries()+1+max : TMath::Min(max, t->GetEntries()); 
+  int nev = max < 0 ? chain.GetEntries()+1+max : TMath::Min(max, chain.GetEntries()); 
   
   for (int iev = 0; iev < nev; iev++) 
   {
-    t->GetEntry(iev); 
+    chain.GetEntry(iev); 
     if (iev >= nhundred*100)
     {
       std::cout << iev << "/"  <<  nev << "\r"; 
@@ -304,13 +305,14 @@ int main (int nargs, char ** args)
 
       for (int isamp = 0; isamp < samp_per_block; isamp++) 
       {
+        int idx= isamp+blk*samp_per_block;
         if (full_hists[ich] && use_median) 
         {
-          pf << " " <<  int(get_median_slice(full_hists[ich], isamp+1)); 
+          pf << " " <<  get_median_slice(full_hists[ich], idx+1); 
         }
         else
         {
-          pf << " " <<  int(round( sum[ich][isamp+blk*samp_per_block] / num[ich][isamp+blk*samp_per_block])); 
+          pf << " " <<  int(round( sum[ich][idx] / num[ich][idx])); 
         }
       }
 
