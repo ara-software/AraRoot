@@ -55,22 +55,22 @@ void usage()
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }
 
-short get_median_slice(const TH2S * h, int bin) 
+int get_median_slice(const TH2S * h, int bin) 
 {
   int sum = 0; 
   const short * array = h->GetArray(); 
   for (int i = 1; i <=n_adu_bins; i++) 
   {
-    sum += array[ bin * (nsamp+2) + i]; 
+    sum += array[ bin * (n_adu_bins+2) + i]; 
   }
 
   int partial_sum = 0; 
   int i = 1; 
   while (partial_sum < sum/2)
   {
-    partial_sum += array[ bin * (nsamp+2) + i++]; 
+    partial_sum += array[ bin * (n_adu_bins+2) + i++]; 
   }
-  return floor(h->GetXaxis()->GetBinCenter(i)); //this makes sense if anything is binned.. 
+  return floor(h->GetXaxis()->GetBinCenter(i-1)); //this makes sense if anything is binned.. 
 }
 
 
