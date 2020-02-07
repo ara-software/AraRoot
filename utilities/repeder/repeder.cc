@@ -198,6 +198,7 @@ int main (int nargs, char ** args)
   bool do_full_hists = (use_median || root_output) && hist_mask; 
 
   TH2S * full_hists[nchan]  = {0};  
+  TH1I * median_difference_hists[nchan] = {0}; 
   short * arrays[nchan]; 
   Long64_t entries[nchan]; 
   TFile * full_hists_file = 0; 
@@ -215,6 +216,11 @@ int main (int nargs, char ** args)
                                  n_adu_bins, min_adu, max_adu,
                                  nsamp, 0, nsamp 
                                  ); 
+
+        median_difference_hists[i] = new TH1I(Form("median_diff_hist_ch%d",i), 
+                                              Form("Median Difference, Channel %d; Median-Mean", i),  
+                                              201, -100,100); 
+
                                
         arrays[i] = full_hists[i]->GetArray(); 
       }
@@ -306,13 +312,20 @@ int main (int nargs, char ** args)
       for (int isamp = 0; isamp < samp_per_block; isamp++) 
       {
         int idx= isamp+blk*samp_per_block;
-        if (full_hists[ich] && use_median) 
+        int mean =  int(round( sum[ich][idx] / num[ich][idx])); 
+        if (full_hists[ich]) 
         {
-          pf << " " <<  get_median_slice(full_hists[ich], idx+1); 
+          int median = get_median_slice(full_hists[ich], idx+1); 
+          median_difference_hists[ich]->Fill(median-mean); 
+          if (use_median) 
+          {
+            pf << " " <<  median-mean; 
+          }
         }
-        else
+
+        if (!full_hists[ich] || !use_median); 
         {
-          pf << " " <<  int(round( sum[ich][idx] / num[ich][idx])); 
+          pf << " " << mean; 
         }
       }
 
@@ -331,6 +344,7 @@ int main (int nargs, char ** args)
       {
         full_hists[ih]->SetEntries(entries[ih]); 
         full_hists[ih]->Write(); 
+        median_difference_hists[ih]->Write(); 
       }
     }
 
