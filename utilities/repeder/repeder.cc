@@ -40,17 +40,17 @@ TChain chain("eventTree");
 
 void usage() 
 {
-  std::cout << "Usage: repeder input_file.root [intput_file2.root]  output_pedestal_file.dat " << std::endl 
-            << "      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] " << std::endl 
-            << "      [-p] [-N num_events] [-C cache_size=100M] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] " << std::endl 
-            <<"       -m min_hist_adu="<< min_adu << "] [-M max_hist_adu=" << max_adu <<" ] [-b hist_adu_bin="<< adu_bin <<"]" << std::endl; 
+  std::cout << "Usage: repeder input_file.root [intput_file2.root ...]  output_pedestal_file.dat " << std::endl 
+            << "      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0x0f0f0f0f] " << std::endl 
+            << "      [-p] [-N num_events] [-C cache_size=100] [-t num_threads] " << std::endl 
+            <<"       [-m min_hist_adu="<< min_adu << "] [-M max_hist_adu=" << max_adu <<" ] [-b hist_adu_bin="<< adu_bin <<"]" << std::endl; 
   std::cout << "-h :  Display this message" << std::endl; 
   std::cout << "-d :  Use median instead of mean (for channels defined in hist mask only)" << std::endl; 
   std::cout << "-o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. " << std::endl; 
   std::cout << "-x :  Histogram mask. Has no effect if neither -o nor -d are defined. " << std::endl; 
   std::cout << "-p :  Include events marked as calpulsers. Default is to exclude. " << std::endl; 
   std::cout << "-N :  Only process up to event N" << std::endl; 
-  std::cout << "-t :  Enable multithreading (in tree reading). Specify number of threads (or 0 to choose automatically. Specify number of threads (or 0 to choose automatically)) " << std::endl; 
+  std::cout << "-t :  Enable multithreading (in TTree reading). Specify number of threads (or 0 to choose automatically) " << std::endl; 
   std::cout << "-C :  Size in megabytes of TTreeCache" << std::endl; 
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl; 
 }

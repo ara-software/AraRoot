@@ -1,36 +1,46 @@
-repeder: A tool to regenerate pedestals from event samples. 
+repeder: A tool to regenerate pedestals from event samples. Also apparently it means something in Latin. 
+
 Cosmin Deaconu <cozzyd@kicp.uchicago.edu> 
 
-Usage: repeder input_file.root [intput_file2.root]  output_pedestal_file.dat 
-      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] 
-      [-p] [-N num_events] [-C cache_size=100M] [-o output_file.root] [-x hist_channel_mask=0xf0f0f0f0] 
-       -m min_hist_adu=1238] [-M max_hist_adu=2262 ] [-b hist_adu_bin=1]
+Usage: repeder input_file.root [input_file2.root ...]  output_pedestal_file.dat 
+      [-d] [-h] [-o output_file.root] [-x hist_channel_mask=0x0f0f0f0f] 
+      [-p] [-N num_events] [-C cache_size=100] [-t num_threads] 
+       [-m min_hist_adu=1238] [-M max_hist_adu=2262 ] [-b hist_adu_bin=1]
 -h :  Display this message
 -d :  Use median instead of mean (for channels defined in hist mask only)
 -o :  Auxilliary ROOT output. Will contain histograms for channels in hist mask and also mean/rms graphs. 
 -x :  Histogram mask. Has no effect if neither -o nor -d are defined. 
 -p :  Include events marked as calpulsers. Default is to exclude. 
 -N :  Only process up to event N
--t :  Enable multithreading (in tree reading). Specify number of threads (or 0 to choose automatically. Specify number of threads (or 0 to choose automatically)) 
+-t :  Enable multithreading (in TTree reading). Specify number of threads (or 0 to choose automatically) 
 -C :  Size in megabytes of TTreeCache
 -m,-M,-b :   Set histogram bounds /binning.  
 
-This tool should be run on 100% data input for best results. By default, will just use the
-mean of each sample over the run for the pedestals.  With the -d option, the
-median will be used but only for channels defined in the mask (-x). 
+This tool should be run on 100% data input for best results. By default, will
+just use the mean of each sample over the run(s) for the pedestals.  With the
+-d option, the median will be used but only for channels defined in the channel
+mask (-x). Multiple input files can be used (everything is passed to
+TChain::Add, which supports wildcards and uses TFile::Open so that things like
+https://user:password@example.org/path/to/file/input.root will work). 
 
 Calculating the median requires histogramming so will use some amount of memory
 (32768 * 2 bytes * channels in mask * bins in histogram). The histogram binning
-can be controlled by -m/-M/-b. 
+can be controlled by -m/-M/-b. For the default settings this is something like
+1.2-1.3 GB (although keep in mind that the TTreeCache can use more, especially
+if you enable multiple threads!)
 
 An output file can be specified with -o that will store any histograms in the
 mask as well as TGraphErrors containing the mean/RMS of each sample. Enabling
 ROOT output enables the histograms in the mask even if the median option is not
 specified. 
 
-The -C and -t settings may help speed up tree-reading, which is the dominant part of the runtime. 
+The -C and -t settings may help speed up tree-reading, which is the dominant
+part of the runtime.  The default TTreeCache size is 100 MB which hasn't been
+super tuned. -t enables multiple threads, allowing faster deserialization of
+the input data, but in practice it's only a 10-20% speedup in my experiments (I
+think the majority of runtime is deserialization of the RawAtriStationEvent
+object, which cannot be easily parallelized the way it's set up). 
 
-
-
-
-
+The code has a lot of silly performance tricks that probably didn't help all
+that much and make it harder to read (e.g. I never use TH2::Fill in
+histogramming because that's much slower than incrementing the array directly). 
