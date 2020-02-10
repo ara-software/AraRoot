@@ -166,7 +166,7 @@ int parse(int nargs, char ** args)
     return -1;
   }
 
-  pedestal_file= *positional_args.end();
+  pedestal_file= positional_args[positional_args.size()-1];
 
   for (unsigned ipositional = 0; ipositional < positional_args.size()-1; ipositional++)
   {
@@ -264,7 +264,7 @@ int main (int nargs, char ** args)
 
       int chan_idx = 0;
       unsigned nchannels = ev->blockVec[iblk].getNumChannels();
-      for (int ich= 0; ich< nchannels; ich++)
+      for (unsigned ich= 0; ich< nchannels; ich++)
       {
 
         if (ev->blockVec[iblk].channelMask && (1 << ich) == 0) continue;
@@ -301,7 +301,7 @@ int main (int nargs, char ** args)
 
   //write out pedestal file. This probably isn't in the normal order but the way it's read in, it doesn't matter.
 
-  std::ofstream pf(args[2]);
+  std::ofstream pf(pedestal_file);
 
   for (int blk = 0; blk < nblk; blk++)
 
@@ -325,7 +325,7 @@ int main (int nargs, char ** args)
           }
         }
 
-        if (!full_hists[ich] || !use_median);
+        if (!full_hists[ich] || !use_median)
         {
           pf << " " << mean;
         }
@@ -350,7 +350,7 @@ int main (int nargs, char ** args)
       }
     }
 
-    for (int ich; ich < nchan; ich++)
+    for (int ich=0; ich < nchan; ich++)
     {
       TGraphErrors * g = new TGraphErrors(nsamp);
 

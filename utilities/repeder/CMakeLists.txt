@@ -1,5 +1,5 @@
 include_directories( ${CMAKE_SOURCE_DIR}/AraEvent ${ROOT_INCLUDE_DIRS} )
 add_executable(repeder repeder.cc) 
-target_compile_options(repeder PRIVATE -g -Os ) 
+target_compile_options(repeder PRIVATE -g -Os -Wall -Wextra) 
 target_link_libraries(repeder AraEvent ${ROOT_LIBRARIES}) 
 install(TARGETS repeder DESTINATION ${ARAROOT_INSTALL_PATH}/bin) 
