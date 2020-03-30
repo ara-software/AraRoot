@@ -89,6 +89,8 @@ class AraVertex {
   RECOOUT doPairFit();
   void printPair(int i){printf ("\nusing to calculate transit time pair %d:(%f,%f,%f) (%f %f %f), dt=%f \n",i,RxPairIn[i].X1,RxPairIn[i].Y1,RxPairIn[i].Z1,RxPairIn[i].X2,RxPairIn[i].Y2,RxPairIn[i].Z2,RxPairIn[i].dT);};
 
+  void SetSeed(Double_t x, Double_t y, Double_t z) {RxInEarly.X=x; RxInEarly.Y=y; RxInEarly.Y=z;}
+
  private:
   //  RECOOUT recoOut;
  RECOOUT ro;
