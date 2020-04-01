@@ -23,7 +23,7 @@ using namespace std;
    Double_t Edm;
    Int_t nhits;
    Int_t Status;
-   Double_t dt[32];   
+   Double_t dt[120];   // max number of possible pairs
   //Float_t Rxtresid[16];
   //  Float_t deltaTime[16];
   //Float_t convergence[2];
