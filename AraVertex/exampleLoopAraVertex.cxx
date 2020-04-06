@@ -14,8 +14,8 @@
 #include "UsefulAraStationEvent.h"
 #include "UsefulIcrrStationEvent.h"
 #include "UsefulAtriStationEvent.h"
-#include "AraVertex.cxx" 
-#include "AraRecoHandler.cxx"
+#include "AraVertex.h" 
+#include "AraRecoHandler.h"
 
 //ROOT Includes
 #include "TTree.h"
