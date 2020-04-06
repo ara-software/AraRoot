@@ -34,9 +34,12 @@ target_link_libraries(AraVertex AraEvent)
 add_executable(exampleLoopL2Test exampleLoopL2.cxx)
 target_link_libraries(exampleLoopL2Test  AraEvent ${LIBROOTFFTWWRAPPER})
 
+add_executable(exampleLoopAraVertex exampleLoopAraVertex.cxx)
+target_link_libraries(exampleLoopAraVertex AraEvent AraVertex ${LIBROOTFFTWWRAPPER})
+
 install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
 install(TARGETS AraVertex DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
-install(TARGETS exampleLoopL2Test DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
+install(TARGETS exampleLoopL2Test exampleLoopAraVertex  DESTINATION ${ARAROOT_INSTALL_PATH}/bin)
 
 if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
   install (FILES ${PROJECT_BINARY_DIR}/${libname}/${DICTNAME}_rdict.pcm DESTINATION ${ARAROOT_INSTALL_PATH}/lib)

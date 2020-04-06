@@ -4,6 +4,7 @@
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "TVector.h"
+#include "TMath.h"
 
 AraVertex::AraVertex() {
   Tmin=-512;
