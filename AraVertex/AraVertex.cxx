@@ -259,7 +259,7 @@ TVector3 AraVertex::getVtrack()
       ro.Y=ro.R*sin(ro.theta)*sin(ro.phi)+COG_y;
       ro.Z=ro.R*cos(ro.theta)+COG_z;
 
-      for (int i=0; i<32;i++) {ro.dt[i]=-999;} // initialize time differences 
+      for (int i=0; i<120;i++) {ro.dt[i]=-999;} // initialize time differences 
 
       for (int i=0; i<RxPairIn.size();i++) {
      	double TransitTimens = ice->getDT(RxPairIn[i].X1,RxPairIn[i].Y1,RxPairIn[i].Z1,RxPairIn[i].X2,RxPairIn[i].Y2,RxPairIn[i].Z2,ro.X,ro.Y,ro.Z);
