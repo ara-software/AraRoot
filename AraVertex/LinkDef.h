@@ -5,6 +5,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class AraVertex+;
+#pragma link C++ class AraRecoHandler+;
 
 #endif
 

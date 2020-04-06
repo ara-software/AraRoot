@@ -1,9 +1,9 @@
 Set(libname AraVertex)
 Set(INCLUDE_DIRECTORIES  ${CMAKE_SOURCE_DIR}/AraEvent ${CMAKE_SOURCE_DIR}/AraCorrelator ${LIBROOTFFTWWRAPPER_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS})
 
-File(GLOB ${libname}Headers AraVertex.h iceProp.h
+File(GLOB ${libname}Headers AraVertex.h iceProp.h AraRecoHandler.h
 	  )
-File(GLOB ${libname}Source AraVertex.cxx  L2.cxx
+File(GLOB ${libname}Source AraVertex.cxx AraRecoHandler.cxx
 	  )
 #message(STATUS "${libname}Headers ${${libname}Headers}")
 
