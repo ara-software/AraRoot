@@ -27,7 +27,8 @@ AraRecoHandler::~AraRecoHandler(){
             for(int coord=0; coord<3; coord++){
                 this_chan_info.push_back(araGeom->getStationInfo(station)->getAntennaInfo(chan)->getLocationXYZ()[coord]);
             }
-        }        
+            chanLocations.push_back(this_chan_info);
+        }
     }
     return chanLocations;
 }
