@@ -9,9 +9,32 @@ AraRecoHandler::~AraRecoHandler(){
     // nothing right now
 }
 
-//! identify hits using sliding V2 SNR definition, and fill delays with AraVertex tool
+//! get a vector of channel location
 /*!
     \param araGeom an AraGeomTool tool
+    \param station the station you are interested in
+    \return chanLocations  a 2D vector of doubles with antenna coordinates; first index is RF chan number, second index is coordinate. [chan][coord]
+*/vector< vector< double> >  AraRecoHandler::getVectorOfChanLocations(AraGeomTool *araGeom, int station){
+
+    vector< vector<double> > chanLocations;
+    if(station<1){
+        printf("Warning! You have requested getVectorOfChanLocations for station %d, which is not supported currently \n", station);
+        printf("Array will be empty!\n");
+    }
+    else{
+        for(int chan=0; chan<16; chan++){
+            vector<double> this_chan_info;
+            for(int coord=0; coord<3; coord++){
+                this_chan_info.push_back(araGeom->getStationInfo(station)->getAntennaInfo(chan)->getLocationXYZ()[coord]);
+            }
+        }        
+    }
+    return chanLocations;
+}
+
+//! identify hits using sliding V2 SNR definition, and fill delays with AraVertex tool
+/*!
+    \param chanLocations vector of vector of doubles; first index is RF chan number, second index is coordinate. [chan][coord]
     \param Reco an AraVertex tool
     \param station what station are we reconstructing
     \param pol_select what polarization should we be trying to vertex
@@ -21,7 +44,7 @@ AraRecoHandler::~AraRecoHandler(){
     \return void
 */
 void AraRecoHandler::identifyHitsPrepToVertex(
-    AraGeomTool *araGeom, 
+    vector< vector<double> > chanLocations, 
     AraVertex *Reco, 
     int station, 
     int pol_select, 
@@ -32,8 +55,13 @@ void AraRecoHandler::identifyHitsPrepToVertex(
     // clear out AraVertex
     Reco->clear();
 
+    // break-out if there's a mis-match between the number
+    // of antennna positions and the number of waveforms
+    if(chanLocations.size()!=waveforms.size()){
+        return;
+    }
+
     int canUseChan[16]={0};
-    double chanLocations[16][3];
     vector<int> polarizations;
     // work out what channels we're allowed to use
     for(int chan=0; chan<16; chan++){
@@ -42,9 +70,6 @@ void AraRecoHandler::identifyHitsPrepToVertex(
         }
         if(chan<8) polarizations.push_back(0);
         if(chan>7) polarizations.push_back(1);
-        for(int coord=0; coord<3; coord++){
-            chanLocations[chan][coord] = araGeom->getStationInfo(station)->getAntennaInfo(chan)->getLocationXYZ()[coord];
-        }
     }
 
     // use a function to get the UW-based SNR defintion

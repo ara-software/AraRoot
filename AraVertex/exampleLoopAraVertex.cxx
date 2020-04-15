@@ -82,25 +82,28 @@ int main(int argc, char **argv)
     std::cerr << "Set Branch address to Atri\n";
   }
 
+  AraGeomTool *araGeom = AraGeomTool::Instance();
+
+  // also, invoke a RecoHandler tool
+  // the point of the RecoHandler is to help with management of the AraVertex tool
+  AraRecoHandler *RecoHandler = new AraRecoHandler();
+  vector< vector<double>> chanLocation = RecoHandler->getVectorOfChanLocations(araGeom, station);
 
   // compute the center of gravity (COG) of the station
-  AraGeomTool *araGeom = AraGeomTool::Instance();
   double antenna_average[3]={0.};
   for(int i=0; i<16; i++){
     for(int ii=0; ii<3; ii++){
-      antenna_average[ii]+=(araGeom->getStationInfo(station)->getAntennaInfo(i)->antLocation[ii]);
+      antenna_average[ii]+=chanLocation[i][ii];
     }
   }
   for(int ii=0; ii<3; ii++){
     antenna_average[ii]/=16.;
   }
+
   // invoke a AraVertex tool and set the COG of the station
   AraVertex *Reco = new AraVertex();
   Reco -> SetCOG(antenna_average[0], antenna_average[1], antenna_average[2]);
 
-  // also, invoke a RecoHandler tool
-  // the point of the RecoHandler is to help with management of the AraVertex tool
-  AraRecoHandler *RecoHandler = new AraRecoHandler();
 
   // define some parameters for interpolation
   double interpV = 0.4;
@@ -138,7 +141,7 @@ int main(int argc, char **argv)
     int polarization_of_interest = 0;
 
     // ask the reco handler to identify hits
-    RecoHandler->identifyHitsPrepToVertex(araGeom, Reco, station, polarization_of_interest, 
+    RecoHandler->identifyHitsPrepToVertex(chanLocation, Reco, station, polarization_of_interest, 
                 excluded_channels, waveforms,
                 8.
                 );

@@ -19,7 +19,10 @@ class AraRecoHandler {
         TGraph* getSqrtVoltageSquaredSummedWaveform(TGraph *gr, int nIntSamp);
         void getChannelSlidingV2SNR_UW(vector<TGraph*> interpolatedWaveforms, int nIntSamp_V, int nIntSamp_H, float *snrArray, float *hitTimeArray);
         
+        // a helper function
+        vector< vector<double>> getVectorOfChanLocations(AraGeomTool *araGeom, int station);
+
         // a function for hit finding and preparing to vertex
-        void identifyHitsPrepToVertex(AraGeomTool *araGeom, AraVertex *Reco, int station, int pol_select, vector<int> excluded_channels, vector<TGraph*> waveforms, double hitThreshold=8.);
+        void identifyHitsPrepToVertex(vector< vector<double> > chanLocations, AraVertex *Reco, int station, int pol_select, vector<int> excluded_channels, vector<TGraph*> waveforms, double hitThreshold=8.);
 };
 #endif
