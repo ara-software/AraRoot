@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   // also, invoke a RecoHandler tool
   // the point of the RecoHandler is to help with management of the AraVertex tool
   AraRecoHandler *RecoHandler = new AraRecoHandler();
-  vector< vector<double>> chanLocation = RecoHandler->getVectorOfChanLocations(araGeom, station);
+  vector< vector<double> > chanLocation = RecoHandler->getVectorOfChanLocations(araGeom, station);
 
   // compute the center of gravity (COG) of the station
   double antenna_average[3]={0.};
