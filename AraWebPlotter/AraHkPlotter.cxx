@@ -5,6 +5,7 @@
 #include "TMultiGraph.h"
 #include "TTimeStamp.h"
 #include "TSystem.h"
+#include <iostream>
 
 AraHkPlotter::AraHkPlotter(char *plotDir, char *dataDir)  
 {  
