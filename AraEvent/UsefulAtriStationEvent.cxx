@@ -45,8 +45,13 @@ UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, Ar
   fNumChannels=0;
   fCalibrator->calibrateEvent(this,calType);
   fIsConditioned=0;
-  fConditioner=AraEventConditioner::Instance();
-  fConditioner->conditionEvent(this);
+
+  // only run the conditioner if we want fully calibrated waveforms
+  // i.e. if the user asks for kNoCalib or kJustPed etc, we should not condition
+  if(calType > AraCalType::kADC){
+    fConditioner=AraEventConditioner::Instance();
+    fConditioner->conditionEvent(this);
+  }
 }
 
 
