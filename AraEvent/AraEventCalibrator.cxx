@@ -29,7 +29,7 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
-    //return kFALSE; //RJN hackcd .. un-hacked KAH
+    //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
     if(calType<=kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -891,7 +891,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         Int_t capArray=blockIt->getCapArray();
         blockList[dda].push_back(block);
         blockInEvent[dda]++;
-        //std::cout << "here is blockIt og " << block << std::endl;
+
         //Step three is loop over the channels within a block
         Int_t uptoChan=0;
         for(vecVecIt=blockIt->data.begin();
@@ -1025,13 +1025,20 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     
     //std::cout << "here's a test " << hasZeroMean(calType) << ", " << hasVoltCal(calType) << std::endl;
     // THM added 12-Feb-2014
-    // After zeroMean (and only then!!) do voltage calibration,   
+    // After zeroMean (and only then!!) do voltage calibration,
+
+    //KAH added 09-15-2020
+    //first, need to do voltage calibration. if you zero-mean the block beforehand, the ADC values get screwed up and the resulting waveform looks bad.
+    //each sample needs to be individually calibrated. This requires knowing the dda, the channel, the block and the sample%64. 
+    //The below code loops over each of these.
+    //the previous version of the code did the zero mean before the votlage calibration. If there are issues with A2 or A3 calibration, try switching the order back.
+
     if(hasZeroMean(calType) && hasVoltCal(calType)) {
-    	//blockIt = theEvent->blockVec.begin();
-    	//int testBlock = blockList[0][0];
-    	//std::cout << "testBlock is " << testBlock << std::endl;
-        int blockNumber = 0;//This still needs to be gotten from somewhere! -THM-
-        //int sampleNumber = 0;
+
+        int blockNumber = 0;//This is now filled in the code below- KAH
+        //int sampleNumber = 0; //removed this and instead use "samp" variable below.
+
+
         for(int dda=0;dda<DDA_PER_ATRI;dda++) {
 
             for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
@@ -1041,9 +1048,13 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
                     Int_t numPoints=(voltMapIt->second).size();
                     for(int samp=0;samp<numPoints;samp++) {
                     	blockNumber = blockList[dda][int(samp/64)];
-                    	//std::cout << "block number: " << blockNumber << ", " << int(samp/64) << std::endl;
-                        // ADC counts are now calibrated, including the offset of 11 counts. -THM-
-                        voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp], dda, blockNumber, chan, samp);
+                    	//if it's not station 5, subtract an offset of 11. (THM)
+                    	if(theEvent->stationId==5){
+                    		voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp], dda, blockNumber, chan, samp);
+                    	}
+                        else{
+                        	voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp]-11.0, dda, blockNumber, chan, samp);
+                        }
                     }
                 }
             }
@@ -1493,7 +1504,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
         	}
         }
         else {
-            //here is the alternative calibration if the ADC count exceeds 400
+            //here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
             if(adcCounts>0) {
                 volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
                 + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
