@@ -29,6 +29,7 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
+    if(calType==kLatestCalib_noV) return kFALSE;
     //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
     if(calType<=kVoltageTime) return kFALSE;
     return kTRUE;
@@ -38,7 +39,8 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
     if(calType==kFirstCalibPlusCables
         || calType==kSecondCalibPlusCables
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType ==kLatestCalib_noV){
         return kTRUE;
     }
     return kFALSE;
@@ -50,7 +52,8 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType==kSecondCalibPlusCables
         || calType==kFirstCalib
         || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType==kLatestCalib_noV){
         return kTRUE;
     }
     return kFALSE;
@@ -68,7 +71,8 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 { 
     if(calType==kSecondCalibPlusCables
         || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType==kLatestCalib_noV){
         return kTRUE;
     }
     return kFALSE;
@@ -91,7 +95,8 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
-    if(calType==kSecondCalibPlusCablesUnDiplexed) return kTRUE;
+    if(calType==kSecondCalibPlusCablesUnDiplexed 
+        || calType==kLatestCalib_noV) return kTRUE;
     return kFALSE;
 }
 
@@ -1476,7 +1481,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
     if( (dda==0 && chan<6)||(dda==1 && chan<4)||(dda==2 && chan<4)||(dda==3 && chan<6) ){
         // Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
         //while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - 2 + 512)%512;
-       //if(sample%2==0) sample=(sample+1)%32768;
+       if(sample%2==0 && chan>0) sample=(sample+1)%32768;
         while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - 2 + 32768)%32768;
 
         // Offset needs to be subtracted

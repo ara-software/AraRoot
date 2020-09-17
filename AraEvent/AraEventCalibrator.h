@@ -40,7 +40,8 @@ namespace AraCalType {
         kSecondCalibPlusCables          = 0x08,///< Same as second calib but also doing the clock alignment
         kSecondCalibPlusCablesUnDiplexed = 0x09,///< Same as secondCalibPlusCableDelays but with the undiplexing of diplexed channels in ARA_STATION1
 
-        kLatestCalib                    = 0x09 ///< Currenly this is kSecondCalibPlusCables
+        kLatestCalib                    = 0x09, ///< Currenly this is kSecondCalibPlusCables
+        kLatestCalib_noV                = 0x0A //new calibration: everything except voltage calibration. Was default from between ~2014 to September 2020
     } AraCalType_t;
 
     Bool_t hasCableDelays(AraCalType::AraCalType_t calType); ///< Does the calibration type ccount for the cable delays?
