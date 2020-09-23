@@ -1474,7 +1474,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
 	//pos_fit_x, pos_fit_x^2,pos_fit_x^3, neg_fit_x,neg_fit_x^2, neg_fit_x^3, fit_const, zeroval, chi2
 
     Double_t volts = 0.0;
-    int block = inBlock+1;
+    int block = inBlock;
     int sample = samp%64;
     //std::cout << chan << ", "<< block<<", " << samp << std::endl;
     // Only apply calibration on calibrated channels (RF channels)!
@@ -1487,19 +1487,19 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
         // Offset needs to be subtracted
         double adcCounts = adcCountsIn;
         // Start ADC to voltage conversion
-        if(TMath::Abs(adcCounts)<400){
+        if(TMath::Abs(adcCounts)<500){
             // conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
             // RJN chnaged the below to remove calls to pow for code optimisation
-            double modAdcCounts=adcCounts;//-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
+            double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
             if(modAdcCounts>0){
                 //positive and negative values need different calibration constants
-                volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
+                volts = 0.0
                     +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
                     +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][2]; 
             }
             else{
-                volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6]         
+                volts = 0.0//fAtriSampleADCVoltsConversion[dda][chan][block][sample][6]         
                     +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] 
                     +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][4]
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];

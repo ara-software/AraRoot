@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
-#set(CMAKE_CXX_STANDARD 11) #you may also have to specify that you want C++11 standard
+#set(CMAKE_CXX_STANDARD 14) #you may also have to specify that you want C++11 standard
 
 #Set the hint variables to point to where cmake should look first for a header / library file
 #This is in case you have multiple instances of for example sqlite3 - one of which is known to be the correct version
