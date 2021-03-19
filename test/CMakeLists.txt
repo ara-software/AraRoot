@@ -11,11 +11,11 @@ Set(TEST_DATA_DIR
   )
 
 
-add_executable(basicTest basicTest.cxx)
-target_link_libraries(basicTest 
+add_executable(FileAndEventCal fileAndEventCal.cxx)
+target_link_libraries(FileAndEventCal 
 	AraEvent 
 	${ROOT_LIBRARIES} 
 	${ZLIB_LIBRARIES})
 
-add_test(NAME BasicTest COMMAND basicTest ${TEST_DATA_DIR}/test_A2_run2000.root)
+add_test(NAME File_and_EventCal_Test COMMAND FileAndEventCal ${TEST_DATA_DIR}/test_A2_run2000.root)
 
