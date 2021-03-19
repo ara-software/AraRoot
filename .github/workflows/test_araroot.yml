@@ -65,4 +65,12 @@ jobs:
           mkdir the_build
           export ARA_UTIL_INSTALL_DIR=$PWD/the_build
           bash INSTALL.sh 1
+
+      - name: Run AraRoot tests
+        run: |
+
+          source root/bin/thisroot.sh
+          export ARA_ROOT_DIR=$PWD
+          export ARA_UTIL_INSTALL_DIR=$PWD/the_build
+          bash INSTALL.sh test
           
