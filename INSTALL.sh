@@ -66,7 +66,7 @@ fi
 if [ $MODE == "test" ]; then
 	echo "Running test suite"
 	cd $ARA_ROOT_DIR/build
-	make test
+	ctest --verbose
 	exit
 fi
 
