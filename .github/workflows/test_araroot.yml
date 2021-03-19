@@ -24,7 +24,8 @@ jobs:
         run: |
           
           sudo apt-get install dpkg-dev cmake g++ gcc binutils libx11-dev \
-           libxpm-dev libxft-dev libxext-dev python libssl-dev libfftw3-dev libgsl-dev libboost-dev
+           libxpm-dev libxft-dev libxext-dev python libssl-dev libfftw3-dev \
+           libgsl-dev libboost-dev sqlite3 libsqlite3-dev
 
 
       - name: Install ROOT
