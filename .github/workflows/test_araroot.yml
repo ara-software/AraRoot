@@ -46,27 +46,28 @@ jobs:
 
           # prepare to build
           cd libRootFftwWrapper
-          sed -i 's:@ccmake:@cmake:' Makefile
+          make
+          # sed -i 's:@ccmake:@cmake:' Makefile
 
-          # now build
-          make configure
-          make -j2
-          sudo make install
+          # # now build
+          # make configure
+          # make -j2
+          # sudo make install
 
-      - name: Build AraRoot
-        run: |
+      # - name: Build AraRoot
+      #   run: |
 
-          source root/bin/thisroot.sh
-          export ARA_ROOT_DIR=$PWD
-          mkdir the_build
-          export ARA_UTIL_INSTALL_DIR=$PWD/the_build
-          bash INSTALL.sh 1
+      #     source root/bin/thisroot.sh
+      #     export ARA_ROOT_DIR=$PWD
+      #     mkdir the_build
+      #     export ARA_UTIL_INSTALL_DIR=$PWD/the_build
+      #     bash INSTALL.sh 1
 
-      - name: Run AraRoot tests
-        run: |
+      # - name: Run AraRoot tests
+      #   run: |
 
-          source root/bin/thisroot.sh
-          export ARA_ROOT_DIR=$PWD
-          export ARA_UTIL_INSTALL_DIR=$PWD/the_build
-          bash INSTALL.sh test
+      #     source root/bin/thisroot.sh
+      #     export ARA_ROOT_DIR=$PWD
+      #     export ARA_UTIL_INSTALL_DIR=$PWD/the_build
+      #     bash INSTALL.sh test
           
