@@ -44,7 +44,7 @@ jobs:
           rm libRootFftwWrapper.tar.gz
           
 
-          # prepare to build
+          # build
           cd libRootFftwWrapper
           make -j2
           sudo make install
