@@ -29,7 +29,8 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
-    return kFALSE; //RJN hackcd ..
+    if(calType==kLatestCalib14to20_Bug) return kFALSE;
+    //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
     if(calType<=kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -38,7 +39,9 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
     if(calType==kFirstCalibPlusCables
         || calType==kSecondCalibPlusCables
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType ==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -50,7 +53,9 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType==kSecondCalibPlusCables
         || calType==kFirstCalib
         || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -68,7 +73,10 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 { 
     if(calType==kSecondCalibPlusCables
         || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed){
+        || calType==kSecondCalibPlusCablesUnDiplexed
+
+        || calType==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -91,7 +99,9 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
-    if(calType==kSecondCalibPlusCablesUnDiplexed) return kTRUE;
+    if(calType==kSecondCalibPlusCablesUnDiplexed 
+        || calType==kLatestCalib14to20_Bug) return kTRUE;
+
     return kFALSE;
 }
 
@@ -1022,6 +1032,45 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     
     // RJN change 13-Feb-2013
     // Now do zero mean,   
+    
+    //std::cout << "here's a test " << hasZeroMean(calType) << ", " << hasVoltCal(calType) << std::endl;
+    // THM added 12-Feb-2014
+    // After zeroMean (and only then!!) do voltage calibration,
+
+    //KAH added 09-15-2020
+    //first, need to do voltage calibration. if you zero-mean the block beforehand, the ADC values get screwed up and the resulting waveform looks bad.
+    //each sample needs to be individually calibrated. This requires knowing the dda, the channel, the block and the sample%64. 
+    //The below code loops over each of these.
+    //the previous version of the code did the zero mean before the votlage calibration. If there are issues with A2 or A3 calibration, try switching the order back.
+
+    if(hasZeroMean(calType) && hasVoltCal(calType)) {
+
+        int blockNumber = 0;//This is now filled in the code below- KAH
+        //int sampleNumber = 0; //removed this and instead use "samp" variable below.
+
+
+        for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+
+            for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
+                Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+                voltMapIt=theEvent->fVolts.find(chanId);
+                if(voltMapIt!=theEvent->fVolts.end()) {
+                    Int_t numPoints=(voltMapIt->second).size();
+                    for(int samp=0;samp<numPoints;samp++) {
+                    	blockNumber = blockList[dda][int(samp/64)];
+                    	//if it's not station 5, subtract an offset of 11. (THM)
+                    	if(theEvent->stationId==5){
+                    		voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp], dda, blockNumber, chan, samp);
+                    	}
+                        else{
+                        	voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp]-11.0, dda, blockNumber, chan, samp);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     if(hasZeroMean(calType)) {
         for(int dda=0;dda<DDA_PER_ATRI;dda++) {
             for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
@@ -1041,25 +1090,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
             }
         }
     }
-    // THM added 12-Feb-2014
-    // After zeroMean (and only then!!) do voltage calibration,   
-    if(hasZeroMean(calType) && hasVoltCal(calType)) {
-        int blockNumber = 0;//This still needs to be gotten from somewhere! -THM-
-        int sampleNumber = 0;
-        for(int dda=0;dda<DDA_PER_ATRI;dda++) {
-            for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
-                Int_t chanId=chan+RFCHAN_PER_DDA*dda;
-                voltMapIt=theEvent->fVolts.find(chanId);
-                if(voltMapIt!=theEvent->fVolts.end()) {
-                    Int_t numPoints=(voltMapIt->second).size();
-                    for(int samp=0;samp<numPoints;samp++) {
-                        // ADC counts are now calibrated, including the offset of 11 counts. -THM-
-                        voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp] -11.0, dda, blockNumber, chan, sampleNumber);
-                    }
-                }
-            }
-        }
-    }
+	
+
     // jpd change 25-03-13
     // now subtract off the cable delays
     if( hasCableDelays(calType)){
@@ -1441,39 +1473,51 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
 }
 
 
-Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample){//-THM-
+Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int samp){//-THM-
     // There is an offset induced in the pedestal numbers, due to asymmetry of the chip. 
     // From calibration files this offset with the given noise will be around 11 ADC counts.
+	//pos_fit_x, pos_fit_x^2,pos_fit_x^3, neg_fit_x,neg_fit_x^2, neg_fit_x^3, fit_const, zeroval, chi2
+
     Double_t volts = 0.0;
     int block = inBlock;
 
+    int sample = samp%64;
+    //std::cout << chan << ", "<< block<<", " << samp << std::endl;
     // Only apply calibration on calibrated channels (RF channels)!
     if( (dda==0 && chan<6)||(dda==1 && chan<4)||(dda==2 && chan<4)||(dda==3 && chan<6) ){
         // Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
-        while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - 2 + 512)%512;
+        //while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - 2 + 512)%512;
+       if(sample%2==0 && chan>0) sample=(sample+1)%32768;
+        while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - 2 + 32768)%32768;
+
         // Offset needs to be subtracted
         double adcCounts = adcCountsIn;
         // Start ADC to voltage conversion
-        if(TMath::Abs(adcCounts)<400){
+        if(TMath::Abs(adcCounts)<500){
             // conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
             // RJN chnaged the below to remove calls to pow for code optimisation
             double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
-            if(adcCounts>0){
+            //double modAdcCounts=adcCounts;//-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
+
+            if(modAdcCounts>0){
                 //positive and negative values need different calibration constants
-                volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6] 
+                volts = 0.0
                     +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
                     +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][2]; 
             }
             else{
-                volts = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6]         
+                volts = 0.0//fAtriSampleADCVoltsConversion[dda][chan][block][sample][6]         
                     +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] 
                     +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][4]
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
             }
+            if(volts>800){
+        		volts=modAdcCounts;
+        	}
         }
         else {
-            //here is the alternative calibration if the ADC count exceeds 400
+            //here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
             if(adcCounts>0) {
                 volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
                 + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
@@ -1483,6 +1527,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
             }
         }
+        
     }
     else{
         volts = adcCountsIn;
