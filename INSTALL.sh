@@ -62,6 +62,14 @@ if [ $ERROR_FLAG == 1 ]; then
     exit 1
 fi
 
+#If we're running a test
+if [ $MODE == "test" ]; then
+	echo "Running test suite"
+	cd $ARA_ROOT_DIR/build
+	ctest --verbose
+	exit
+fi
+
 #First thing to do is to go into the build directory and get rid of everything there
 mkdir -p $ARA_ROOT_DIR/build #make this directory if it doesn't exist already (it won't be in the git checkout by default)
 cd $ARA_ROOT_DIR/build
