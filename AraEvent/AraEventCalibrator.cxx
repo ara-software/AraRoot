@@ -29,7 +29,7 @@ Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
-    if(calType==kLatestCalib14to20) return kFALSE;
+    if(calType==kLatestCalib14to20_Bug) return kFALSE;
     //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
     if(calType<=kVoltageTime) return kFALSE;
     return kTRUE;
@@ -40,7 +40,7 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
     if(calType==kFirstCalibPlusCables
         || calType==kSecondCalibPlusCables
         || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType ==kLatestCalib14to20){
+        || calType ==kLatestCalib14to20_Bug){
         return kTRUE;
     }
     return kFALSE;
@@ -53,7 +53,7 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType==kFirstCalib
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType==kLatestCalib14to20){
+        || calType==kLatestCalib14to20_Bug){
         return kTRUE;
     }
     return kFALSE;
@@ -72,7 +72,7 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
     if(calType==kSecondCalibPlusCables
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType==kLatestCalib14to20){
+        || calType==kLatestCalib14to20_Bug){
         return kTRUE;
     }
     return kFALSE;
@@ -96,7 +96,7 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
     if(calType==kSecondCalibPlusCablesUnDiplexed 
-        || calType==kLatestCalib14to20) return kTRUE;
+        || calType==kLatestCalib14to20_Bug) return kTRUE;
     return kFALSE;
 }
 
