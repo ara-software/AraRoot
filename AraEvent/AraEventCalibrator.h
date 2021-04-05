@@ -42,6 +42,7 @@ namespace AraCalType {
 
         kLatestCalib                    = 0x09, ///< Currenly this is kSecondCalibPlusCables
         kLatestCalib14to20_Bug                = 0x0A //new calibration type: everything except voltage calibration. Will reproduce "kLatestCalib" bug present from between ~2014 to September 2020. Use with caution!
+
     } AraCalType_t;
 
     Bool_t hasCableDelays(AraCalType::AraCalType_t calType); ///< Does the calibration type ccount for the cable delays?

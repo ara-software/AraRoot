@@ -41,6 +41,7 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
         || calType==kSecondCalibPlusCables
         || calType==kSecondCalibPlusCablesUnDiplexed
         || calType ==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -54,6 +55,7 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
         || calType==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -72,7 +74,9 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
     if(calType==kSecondCalibPlusCables
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
+
         || calType==kLatestCalib14to20_Bug){
+
         return kTRUE;
     }
     return kFALSE;
@@ -97,6 +101,7 @@ Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
     if(calType==kSecondCalibPlusCablesUnDiplexed 
         || calType==kLatestCalib14to20_Bug) return kTRUE;
+
     return kFALSE;
 }
 
@@ -1475,6 +1480,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
 
     Double_t volts = 0.0;
     int block = inBlock;
+
     int sample = samp%64;
     //std::cout << chan << ", "<< block<<", " << samp << std::endl;
     // Only apply calibration on calibrated channels (RF channels)!
@@ -1491,6 +1497,8 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             // conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
             // RJN chnaged the below to remove calls to pow for code optimisation
             double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
+            //double modAdcCounts=adcCounts;//-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
+
             if(modAdcCounts>0){
                 //positive and negative values need different calibration constants
                 volts = 0.0
