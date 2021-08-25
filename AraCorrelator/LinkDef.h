@@ -5,6 +5,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class AraEventCorrelator+;
+#pragma link C++ class RayTraceCorrelator+;
 
 #pragma link C++ namespace     AraCorrelatorType;
 #pragma link C++ enum          AraCorrelatorType::EAraCorrelatorType;
