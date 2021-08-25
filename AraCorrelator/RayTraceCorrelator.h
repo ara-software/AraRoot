@@ -1,8 +1,9 @@
 #ifndef RAYTRACECORRELATOR_H
 #define RAYTRACECORRELATOR_H
 
-#include "TObject.h"
-#include "AraStationInfo.h"
+#include <map>
+class TGraph;
+class TH2D;
 
 class RayTraceCorrelator : public TObject
 {
@@ -44,6 +45,7 @@ class RayTraceCorrelator : public TObject
         double GetNumAntennas(){ return numAntennas_; }
         double GetUnixtime(){ return unixTime_; }
 
+        
         //! function to load the arrival time tables
         /*!
             \param filename full (absolute) path to the arrival timing tables
@@ -66,17 +68,65 @@ class RayTraceCorrelator : public TObject
        // NB: We must enable passing of the unixTime argument, since the geometry databases are time-evolving
         RayTraceCorrelator(int stationID, double radius, double angularSize, int iceModel,
             const std::string &tableDir, int unixTime=0);
-
-
+        
 
         ~RayTraceCorrelator(); ///< Destructor
 
 
+        //! function to get an interferometric map
+        /*!
+            \param interpolatedWaveforms a std::map of antenna numbers to interpolated waveforms
+            \param pairs a std::map of antenna pairs
+            \param solNum whether to have the first or second (0 or 1) solution hypothesis
+            \param applyHilbertEnvelope whether or not to apply a hilbert envelope to the correlation function
+            \return a 2D histogram with the values filled with the interferometric sums
+        */
+        TH2D* GetInterferometricMap(
+            std::map<int, TGraph*> interpolatedWaveforms,
+            std::map<int, std::vector<int> > pairs,
+            int solNum,
+            bool applyHilbertEnvelope = true
+        );
 
 
-    
-    // private:
-        // std::string table_dir_;
+        //! a function to return the pairs to be used in the interferometery
+        /*!
+            \param polarization what polarization to use
+            \param excludedChannels what channels to exclude in forming pairs (default: exclude none)
+            \return vector of vectors, holding the pairings
+        */
+        std::map<int, std::vector<int> > SetupPairs(
+            AraAntPol::AraAntPol_t polarization, 
+            std::vector<int> excludedChannels = {}
+        );
+
+
+        //! a function to get a correlation graph with some special normalization
+        /*!
+            \param gr1 the graph to be cross correlated
+            \param gr2 the second graph to be cross correlated
+            \return TGraph* the cross-correlation function
+        */
+        TGraph* getCorrelationGraph_WFweight(TGraph * gr1, TGraph * gr2);
+        
+
+        //! a function to get the un-normalized cross correlation function between two ararys
+        /*!
+            \param length the length of the two arrays
+            \param oldY1 array for first data series to be correlated
+            \param oldY2 array for the second series to be correlated
+            \return array of doubles, corresponding oto the un-normalized cross correlation function
+        */
+        double * getCorrelation_NoNorm(int length, double * oldY1, double * oldY2);
+
+        
+        //! a function to get the linearly interpolated value of a function at a time
+        /*!
+            \param grIn the TGraph to be evaluated
+            \param xvalue the point at which to get the interpolated value
+            \return the interpolated value of grIn at point xalue
+        */
+        double fastEvalForEvenSampling(TGraph* grIn, double xvalue);
 
     ClassDef(RayTraceCorrelator,0);
 

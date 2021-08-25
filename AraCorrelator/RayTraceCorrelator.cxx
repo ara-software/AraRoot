@@ -1,20 +1,24 @@
 //C/C++ includes
 #include <iostream>
 #include <stdio.h>
-#include <fstream>
 #include <sys/stat.h>
 #include <stdexcept>
 #include <math.h>
 
 //ROOT includes
-#include <TObject.h>
 #include "TFile.h"
 #include "TTree.h"
+#include "TH2D.h"
+
+// AraRoot includes
 #include "AraGeomTool.h"
 #include "RayTraceCorrelator.h"
+#include "RayTraceCorrelator_detail.h"
 
 // TODO:
 // - Make sure unixTime is getting handled correctly
+// - Add the ability to "weight" the various pairs
+// - Helper functions for "get peak," etc
 
 void RayTraceCorrelator::SetupStationInfo(int stationID, int unixTime) { 
     char errorMessage[400];
@@ -36,11 +40,11 @@ void RayTraceCorrelator::SetupStationInfo(int stationID, int unixTime) {
     // save the station info object
     // and count the number of non-surface channels
     AraGeomTool *geomTool = AraGeomTool::Instance();
-    auto araStationInfo_ = geomTool->getStationInfo(stationID_, unixTime);
-    int numAnts = (int) araStationInfo_->getNumRFChans();
+    auto araStationInfo = geomTool->getStationInfo(stationID_, unixTime);
+    int numAnts = (int) araStationInfo->getNumRFChans();
     int num_not_surface = 0;
     for(int ant=0; ant<numAnts; ant++){
-        auto pol = araStationInfo_->getAntennaInfo(ant)->polType;
+        auto pol = araStationInfo->getAntennaInfo(ant)->polType;
         if(pol!= AraAntPol::kSurface){
             num_not_surface++;
         }
@@ -170,5 +174,137 @@ RayTraceCorrelator::RayTraceCorrelator(int stationID,
     // load the arrival time tables
     this->ConfigureArrivalTimesVector();
     this->LoadArrivalTimeTables(directFileName, 0);
+    this->LoadArrivalTimeTables(reflecFileName, 1);
+}
+
+std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
+    AraAntPol::AraAntPol_t polSelection, 
+    std::vector<int> excludedChannels){
+    
+    // first, figure out what set of antennas is viable to form pairs
+    std::vector < int > viableAntennas;
+    
+    AraGeomTool *geomTool = AraGeomTool::Instance();
+    auto araStationInfo = geomTool->getStationInfo(this->stationID_, this->unixTime_);
+    for(int ant=0; ant<this->numAntennas_; ant++){
+
+        // first, check if this event is allowed
+        // if ant *is* in the list of excluded channels, don't use it
+        bool isExcluded = (std::find(excludedChannels.begin(), excludedChannels.end(), ant) != excludedChannels.end());
+        if(isExcluded){
+            continue;
+        }
+
+        // then, see if this is a polarization we intended to select
+        if(!isExcluded){
+            auto pol = araStationInfo->getAntennaInfo(ant)->polType;
+            if(pol==polSelection){
+                viableAntennas.push_back(ant);
+            }
+        }
+    }
+
+    // form pairs
+    std::map<int, std::vector<int> > pairs;
+    int num_pairs = 0;
+    for(int index1 = 0; index1 < viableAntennas.size() - 1; index1++){
+        for(int index2 = index1 +1; index2 < viableAntennas.size(); index2++){
+            int ant1 = viableAntennas[index1];
+            int ant2 = viableAntennas[index2];
+            std::vector<int> pair_temp;
+            pair_temp.push_back(ant1);
+            pair_temp.push_back(ant2);
+            pairs[num_pairs] = pair_temp;
+            num_pairs++;
+        }
+    }
+    return pairs;
+}
+
+TH2D* RayTraceCorrelator::GetInterferometricMap(
+    std::map<int, TGraph*> interpolatedWaveforms, 
+    std::map<int, std::vector<int> > pairs,
+    int solNum,
+    bool applyHilbertEnvelope
+    ){
+        
+    // first, calculate all of the correlation functions
+
+    // for performance reasons, it's actually better to store
+    // the correlation functions as a vector
+    std::vector<TGraph*> corrFunctions;
+    for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+        int pairNum = iter->first;
+        int ant1 = iter->second[0];
+        int ant2 = iter->second[1];
+
+        TGraph *grCorr = getCorrelationGraph_WFweight(
+            interpolatedWaveforms.find(ant1)->second,
+            interpolatedWaveforms.find(ant2)->second
+        );
+        if(applyHilbertEnvelope){
+            TGraph *grCorrHil = FFTtools::getHilbertEnvelope(grCorr);
+            corrFunctions.push_back(grCorrHil);
+            delete grCorr;
+        }
+        else{
+            corrFunctions.push_back(grCorr);
+        }
+    }
+
+    double scale = 1./double(pairs.size());
+    TH2D *histMap = new TH2D("", "", 
+        this->numPhiBins_, -180, 180, 
+        this->numThetaBins_, -90, 90
+    );
+
+    // now, make the map
+    for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+        int pairNum = iter->first;
+        int ant1 = iter->second[0];
+        int ant2 = iter->second[1];
+
+        for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
+            for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
+                
+                int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
+                double arrival_time1 = this->arrivalTimes_[solNum][thetaBin][phiBin][ant1];
+                double arrival_time2 = this->arrivalTimes_[solNum][thetaBin][phiBin][ant2];
+                double dt = arrival_time1 - arrival_time2;
+
+                // sanity check
+                if (arrival_time1 < -100 || arrival_time2 < -100 || histMap -> GetBinContent(globalBin) == -1000) {
+                    histMap -> SetBinContent(globalBin, -1000);
+                }
+                else{
+                    double corrVal = fastEvalForEvenSampling(corrFunctions[pairNum], dt);
+                    corrVal *= scale;
+                    double binVal = histMap -> GetBinContent(globalBin);
+                    if (corrVal == corrVal){ // not a nan
+                        histMap -> SetBinContent(globalBin, binVal + corrVal);
+                    }
+                }
+            }
+        }
+    }
+
+    // bit of sanity checking
+    for (int phiBin = 0; phiBin < this->numPhiBins_; phiBin++) {
+        for (int thetaBin = 0; thetaBin < this->numThetaBins_; thetaBin++) {
+            Int_t globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
+            if (histMap -> GetBinContent(globalBin) == -1000) {
+                histMap -> SetBinContent(globalBin, 0);
+            }
+        }
+    }
+
+    // cleanup
+    // if you're facing a memory leak, try making sure all the grCorr's
+    // above got cleaned up correctly. As written, this should work...
+    for(int i=0; i<corrFunctions.size(); i++){
+        delete corrFunctions[i];
+    }
+
+    return histMap;
 
 }
