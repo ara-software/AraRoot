@@ -245,7 +245,10 @@ But we emphasize that you can form whatever pairs you want!
 ## To Do
 1. Remove the IceModel dependence in the correlator. All the user needs to do is specify the tables.
 2. Remove the unixTime dependence. E.g. let the user specify `numAntennas_` manually?
-3. Add support for uniform binning in cos(theta) instead of theta. 
+3. Add support for uniform binning in cos(theta) instead of theta.
+4. Make sure unixTime is getting handled correctly
+5. Add the ability to "weight" various pairs
+6. Add helper functions for "get peak," "get max correlation," etc.
 
 
 More on 3: This should be done by changing the correlator constructor  

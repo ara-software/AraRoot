@@ -56,3 +56,8 @@ and called [here](https://github.com/ara-software/AraSim/blob/2758c07dc56fb1a9a7
 So, the timing tables script essentially replicates the work of those two functions
 (`ImportStationInfo` and `FlatToEarth_ARA_sharesurface`).
 That is why it looks so convoluted.
+
+## To Do
+1. Try and eliminate assumptions about number of strings, antennas, etc. in the function.
+
+More on 1: E.g. don't hardcode the loop to be over four strings, or 16 antennas, etc.

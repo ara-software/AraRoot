@@ -15,11 +15,6 @@
 #include "RayTraceCorrelator.h"
 #include "RayTraceCorrelator_detail.h"
 
-// TODO:
-// - Make sure unixTime is getting handled correctly
-// - Add the ability to "weight" the various pairs
-// - Helper functions for "get peak," etc
-
 void RayTraceCorrelator::SetupStationInfo(int stationID, int unixTime) { 
     char errorMessage[400];
 

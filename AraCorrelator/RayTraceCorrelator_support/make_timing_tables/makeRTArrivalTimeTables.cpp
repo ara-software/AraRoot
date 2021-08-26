@@ -193,10 +193,6 @@ double CalculateArrivalTime(
     return arrivalTime;
 }
 
-
-// TODO
-// - Add docs for wtf is going on
-// - Try and eliminate assumptions about number of strings, antennas, etc.
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel){
 
     // store all of the locations
