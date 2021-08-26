@@ -46,14 +46,6 @@ int main(int argc, char **argv)
 
     // and tell it to load up the arrival times tables
     theCorrelator->LoadTables("/mnt/home/baclark/ara/araroot_rt_correlator/tables/");
-    std::cout<<"Num theta bins "<<theCorrelator->GetNumThetaBins()<<std::endl;
-    std::cout<<"Num phi bins "<<theCorrelator->GetNumPhiBins()<<std::endl;
-    std::cout<<"Angular bin size "<<theCorrelator->GetAngularSize()<<std::endl;
-    std::cout<<"Station ID is "<<theCorrelator->GetStationID()<<std::endl;
-    std::cout<<"Radius is "<<theCorrelator->GetRadius()<<std::endl;
-    std::cout<<"Num antennas is "<<theCorrelator->GetNumAntennas()<<std::endl;
-    std::cout<<"Unixtime is "<<theCorrelator->GetUnixtime()<<std::endl;
-
 
     // How you set up the pairs is up to you!
     // There are a few helper functions;
