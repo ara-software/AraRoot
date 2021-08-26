@@ -12,7 +12,7 @@ the correlation functions are calculated using a ray tracer, so that
 the index of refraction can vary as a function of depth: n(z).
 The time delays are stored as tables in ROOT files.
 
-### Quick Start
+## Quick Start
 An example of how to use the interferometer is provided in `makeRTCorrelationMaps.cxx`.
 
 An instance of the RayTraceCorrelator can be called as such:
@@ -38,7 +38,7 @@ TH2D *map = theCorrelator->GetInterferometricMap(waveforms, pairs, solution);
 
 For more detailed discussion, see below, or see the example.
 
-### Design Philosopy
+## Design Philosopy
 
 The correlator tries to conceptually separate (1) *making* the maps
 from (2) *calculating* the arrival times. For this reason, arrival times
@@ -174,6 +174,73 @@ that is argument will ever be needed. But is provided for future proofing.
 An alternative might be to allow the user to specify `numAntennas_` manually.
 See the to-do list.
 
+## Making Correlation Maps
+
+There are three arguments to the `GetInterferometricMap` routine:
+- waveforms: a map of antennas (as keys) to their waveforms (as values)
+- radius: a map of pair indices (as keys) to their respective antennas (as values)
+- solution: what solution hypothesis to assume (direct or reflected/refracted)
+
+We use C++ maps to make handling things easier. Maps are much
+easier to use than you might think 
+(they function remarkably like python dictionaries, but with stronger typing).
+See e.g. [this page](https://www.freecodecamp.org/news/c-plus-plus-map-explained-with-examples/)
+for a crash-course.
+
+
+### Waveforms
+
+The waveforms need to be presented to the correlator as a map of
+antenna indices to waveforms:
+
+```c++
+std::map<int, TGraph*> waveforms;
+```
+
+We choose to use a C++ `std::map` to streamline and make more robust
+the identification of a specific antenna identifier with a specific waveform.
+(For example, traditionally this could have been a `std::vector<TGraph*>`,
+but that implicitly assumes that the vector index is meaningfully tied to the waveform,
+which isn't generally a good idea.)
+
+Populating a C++ map is easy, and shown in the example.
+
+The waveform must be interpolated to a common timebase!
+This is easily done with e.g. `FFTtools::getInterpolatedGraph`.
+The correlator probably won't explicitly fail if this is not true,
+but the results might be ill-behaved.
+
+### Pairs
+
+The pairs need to be presented to the correlator as a map of
+pair indices to antenna numbers:
+
+```c++
+std::map<int, std::vector<int> > pairs;
+```
+
+We choose to use a C++ `std::map` to streamline and make more robust
+the identification of a specific pair with their constituent antennas.
+For example, if we wanted to include the pairings of channel 0 and 1,
+and call it "pair 0", we would do the following:
+
+```c++
+std::map<int, std::vector<int> > pairs;
+std::vector<int> temp;
+temp.push_back(0);
+temp.push_back(1);
+pairs[0] = temp; // we'll call this one "pair 0"
+```
+
+Construction of the pairs is totally up to the user.
+However, anticiptaing that most users will want to do "standard" things
+like "just VPol" or "just HPol" maps, we provided one helper function:
+
+```c++
+theCorrelator->SetupPairs(AraAntPol::kVertical, excludedChannels);
+```
+
+But we emphasize that you can form whatever pairs you want!
 
 ## To Do
 1. Remove the IceModel dependence in the correlator. All the user needs to do is specify the tables.
