@@ -61,6 +61,17 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     angularSize_ = angularSize;
     numPhiBins_ = int(360. / angularSize);
     numThetaBins_ = int(180. / angularSize);
+
+    // now fill up the phi and theta angles
+    double PhiWaveDeg, ThetaWaveDeg;
+    for (int i = 0; i < numPhiBins_; i++) {
+        PhiWaveDeg = -180 + 0.5 * angularSize_ + angularSize_ * i;
+        phiAngles_.push_back(PhiWaveDeg * TMath::DegToRad());
+    }
+    for (int i = 0; i < numThetaBins_; i++) {
+        ThetaWaveDeg = -90 + 0.5 * angularSize_ + angularSize_ * i;
+        thetaAngles_.push_back(ThetaWaveDeg * TMath::DegToRad());
+    }
 }
 
 void RayTraceCorrelator::SetRadius(double radius){
@@ -70,6 +81,15 @@ void RayTraceCorrelator::SetRadius(double radius){
         throw std::invalid_argument(errorMessage);        
     }
     radius_ = radius;
+}
+
+void RayTraceCorrelator::SetIceModel(int iceModel){
+    if(iceModel<0 || isnan(iceModel)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested icemodel (%e) is has an\n", iceModel);
+        throw std::invalid_argument(errorMessage);        
+    }
+    iceModel_ = iceModel;
 }
 
 void RayTraceCorrelator::ConfigureArrivalTimesVector(){
@@ -135,18 +155,20 @@ RayTraceCorrelator::RayTraceCorrelator(int stationID,
     double radius, 
     double angularSize,
     int iceModel,
-    const std::string &tableDir,
     int unixTime
     ){
-
-    char errorMessage[400];
 
     // initialize and sanitize the input immediately
     // afterwards, we can (safely!) only refer to private variables
     this->SetAngularConfig(angularSize);
     this->SetupStationInfo(stationID, unixTime);
     this->SetRadius(radius);
+    this->SetIceModel(iceModel);
+}
 
+void RayTraceCorrelator::LoadTables(const std::string &tableDir){
+    char errorMessage[400];
+    
     // verify the directory containing the tables exists
     struct stat buffer;
     bool dirExists = (stat(tableDir.c_str(), &buffer) == 0);
@@ -159,9 +181,9 @@ RayTraceCorrelator::RayTraceCorrelator(int stationID,
     char directFileName[500];
     char reflecFileName[500];
     sprintf(directFileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
-        tableDir.c_str(), stationID, iceModel, radius, angularSize );
+        tableDir.c_str(), stationID_, iceModel_, radius_, angularSize_);
     sprintf(reflecFileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_1.root",
-        tableDir.c_str(), stationID, iceModel, radius, angularSize );
+        tableDir.c_str(), stationID_, iceModel_, radius_, angularSize_);
     
     // throw errors if these files don't exist
     bool dirFileExists = (stat(directFileName, &buffer) == 0);

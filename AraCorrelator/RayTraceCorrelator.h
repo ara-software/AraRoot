@@ -16,6 +16,9 @@ class RayTraceCorrelator : public TObject
         int numThetaBins_;               ///< Number of theta bins (zenith) in the arrival time tables
         int numAntennas_;                ///< Number of antennas in the station
         int unixTime_;                   ///< Unixtime of the geometry database we want
+        int iceModel_;                   ///< The AraSim RAY_TRACE_ICE_MODEL_PARAMS choice
+        std::vector<double> phiAngles_;   ///< Vector of the phi points to be sampled (in radians!)
+        std::vector<double> thetaAngles_; ///< Vector of the theta points to be sampled (in radians!)
 
         // The following setter functions (which nominally do trivial things)
         // are included to enable sanity checks on the arguments 
@@ -24,6 +27,7 @@ class RayTraceCorrelator : public TObject
         void SetupStationInfo(int stationID, int unixTime);
         void SetRadius(double radius);
         void SetAngularConfig(double angularSize);
+        void SetIceModel(int iceModel);
 
         // a high-dimensional vector to store the arrival times at antennats
         // first index is direct/reflected
@@ -40,12 +44,15 @@ class RayTraceCorrelator : public TObject
         int GetStationID(){ return stationID_; }
         int GetNumThetaBins(){return numThetaBins_; }
         int GetNumPhiBins(){return numPhiBins_; }
+        int GetIceModel(){return iceModel_; }
         double GetAngularSize(){ return angularSize_; }
         double GetRadius(){ return radius_; }
         double GetNumAntennas(){ return numAntennas_; }
         double GetUnixtime(){ return unixTime_; }
+        std::vector<double> GetPhiAngles(){ return phiAngles_; }
+        std::vector<double> GetThetaAngles(){ return thetaAngles_; }
 
-        
+
         //! function to load the arrival time tables
         /*!
             \param filename full (absolute) path to the arrival timing tables
@@ -61,16 +68,22 @@ class RayTraceCorrelator : public TObject
             \param radius The radius for the ray trace correlator
             \param angularSize The angular binning
             \param iceModel The AraSim icemodel (should match with RAY_TRACE_ICE_MODEL_PARAMS)
-            \param tableDir The full path to the location of the arrival time tables
             \param unixTime The unixTime of the events you want to correlated
             \return an instance of the ray trace correlator
         */
        // NB: We must enable passing of the unixTime argument, since the geometry databases are time-evolving
-        RayTraceCorrelator(int stationID, double radius, double angularSize, int iceModel,
-            const std::string &tableDir, int unixTime=0);
-        
+        RayTraceCorrelator(int stationID, double radius, double angularSize, int iceModel, int unixTime=0);
+
 
         ~RayTraceCorrelator(); ///< Destructor
+
+
+        //! constructor for the RayTraceCorrelator
+        /*!
+            \param tableDir The full path to the location of the arrival time tables
+            \return void
+        */
+        void LoadTables(const std::string &tableDir);
 
 
         //! function to get an interferometric map
@@ -108,7 +121,7 @@ class RayTraceCorrelator : public TObject
             \return TGraph* the cross-correlation function
         */
         TGraph* getCorrelationGraph_WFweight(TGraph * gr1, TGraph * gr2);
-        
+
 
         //! a function to get the un-normalized cross correlation function between two ararys
         /*!
@@ -119,7 +132,7 @@ class RayTraceCorrelator : public TObject
         */
         double * getCorrelation_NoNorm(int length, double * oldY1, double * oldY2);
 
-        
+
         //! a function to get the linearly interpolated value of a function at a time
         /*!
             \param grIn the TGraph to be evaluated

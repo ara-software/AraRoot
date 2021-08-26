@@ -40,12 +40,12 @@ int main(int argc, char **argv)
     double angular_size = 1.;
     int iceModel = 0;
     int unixTime = 0;
-
     RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, 
-        radius, angular_size, iceModel, 
-        "/mnt/home/baclark/ara/araroot_rt_correlator/tables/",
-        unixTime
+        radius, angular_size, iceModel, unixTime
     );
+
+    // and tell it to load up the arrival times tables
+    theCorrelator->LoadTables("/mnt/home/baclark/ara/araroot_rt_correlator/tables/");
     std::cout<<"Num theta bins "<<theCorrelator->GetNumThetaBins()<<std::endl;
     std::cout<<"Num phi bins "<<theCorrelator->GetNumPhiBins()<<std::endl;
     std::cout<<"Angular bin size "<<theCorrelator->GetAngularSize()<<std::endl;
