@@ -249,6 +249,7 @@ But we emphasize that you can form whatever pairs you want!
 4. Make sure unixTime is getting handled correctly
 5. Add the ability to "weight" various pairs
 6. Add helper functions for "get peak," "get max correlation," etc.
+7. Add ability to take weights for each pair in the `GetInterferometricMap` function.
 
 
 More on 3: This should be done by changing the correlator constructor  
