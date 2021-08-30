@@ -242,11 +242,29 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
     std::map<int, TGraph*> interpolatedWaveforms, 
     std::map<int, std::vector<int> > pairs,
     int solNum,
+    std::map<int, double> weights,
     bool applyHilbertEnvelope
     ){
+
+    char errorMessage[400];
+
+    // first, sort out the weights to apply to each pair
+    if(weights.size()>0){
+        // if the user provided weights, make sure they provided the right number
+        if(weights.size()!=pairs.size()){
+            sprintf(errorMessage,"Mismatch in size of provided weights (%d) and provided pairs (%d)\n",weights.size(), pairs.size());
+            throw std::invalid_argument(errorMessage);
+        }
+    }
+    else{
+        // otherwise, assume the user wanted equal weighting; which means 1/num_pairs
+        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+            int pairNum = iter->first;
+            weights[pairNum] = 1./double(pairs.size());
+        }
+    }
         
     // first, calculate all of the correlation functions
-
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
     std::vector<TGraph*> corrFunctions;
@@ -269,7 +287,7 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         }
     }
 
-    double scale = 1./double(pairs.size());
+    // create output histogram
     TH2D *histMap = new TH2D("", "", 
         this->numPhiBins_, -180, 180, 
         this->numThetaBins_, -90, 90
@@ -280,6 +298,14 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         int pairNum = iter->first;
         int ant1 = iter->second[0];
         int ant2 = iter->second[1];
+
+        // get the weight for this pair
+        auto weight_iter = weights.find(pairNum);
+        if(weight_iter==weights.end()){
+            sprintf(errorMessage,"Weights for pair %d not found\n",pairNum);
+            throw std::invalid_argument(errorMessage);
+        }
+        double scale = weight_iter->second;
 
         for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
             for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){

@@ -187,6 +187,10 @@ easier to use than you might think
 See e.g. [this page](https://www.freecodecamp.org/news/c-plus-plus-map-explained-with-examples/)
 for a crash-course.
 
+And two optional arguments:
+- weights: weights to apply to each pair during the map making
+- applyHilbertEnvelope: whether or not to take the hilbert envelope of the correlation functions
+
 
 ### Waveforms
 
@@ -242,14 +246,28 @@ theCorrelator->SetupPairs(AraAntPol::kVertical, excludedChannels);
 
 But we emphasize that you can form whatever pairs you want!
 
+### Weights
+
+This allows one to apply different weights to the pairs in a correlation map.
+In most circumstances, one wants to apply an equal weight to all pairs.
+That is, have the total map be the average of the individual maps,
+so that the weight on each map is 1/num_pairs.
+This is the default behavior of the interferometer if the weights are
+left as an empty map, e.g. `std::map<int, double> weights = {}`.
+
+### Hilbert Envelope Smoothing
+
+In many cases, we want to smooth the correlation functions with an Hilbert envelope.
+This is the default behavior in the correlator.
+If you want to turn this behavior off, set the argument to `false`.
+
 ## To Do
 1. Remove the IceModel dependence in the correlator. All the user needs to do is specify the tables.
 2. Remove the unixTime dependence. E.g. let the user specify `numAntennas_` manually?
 3. Add support for uniform binning in cos(theta) instead of theta.
 4. Make sure unixTime is getting handled correctly
-5. Add the ability to "weight" various pairs
-6. Add helper functions for "get peak," "get max correlation," etc.
-7. Add ability to take weights for each pair in the `GetInterferometricMap` function.
+5. Add helper functions for "get peak," "get max correlation," etc.
+6. ~Add ability to take weights for each pair in the `GetInterferometricMap` function.~ (Done, BAC).
 
 
 More on 3: This should be done by changing the correlator constructor  

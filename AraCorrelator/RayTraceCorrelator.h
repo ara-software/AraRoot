@@ -92,12 +92,14 @@ class RayTraceCorrelator : public TObject
             \param pairs a std::map of antenna pairs
             \param solNum whether to have the first or second (0 or 1) solution hypothesis
             \param applyHilbertEnvelope whether or not to apply a hilbert envelope to the correlation function
+            \param weights weights to apply to each map; default = equal weights, or 1/pairs.size()
             \return a 2D histogram with the values filled with the interferometric sums
         */
         TH2D* GetInterferometricMap(
             std::map<int, TGraph*> interpolatedWaveforms,
             std::map<int, std::vector<int> > pairs,
             int solNum,
+            std::map<int, double> weights = {},
             bool applyHilbertEnvelope = true
         );
 
