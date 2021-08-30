@@ -273,10 +273,29 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         int ant1 = iter->second[0];
         int ant2 = iter->second[1];
 
+        // make sure these antennas are in the waveforms map
+        auto gr1_iter = interpolatedWaveforms.find(ant1);
+        auto gr2_iter = interpolatedWaveforms.find(ant2);
+        if(gr1_iter==interpolatedWaveforms.end()){
+            sprintf(errorMessage,
+                    "Antenna %d in pair %d is not in the supplied waveforms\n",
+                    ant1, pairNum);
+            throw std::invalid_argument(errorMessage);
+        }
+        if(gr2_iter==interpolatedWaveforms.end()){
+            sprintf(errorMessage,
+                    "Antenna %d in pair %d is not in the supplied waveforms\n",
+                    ant2, pairNum);
+            throw std::invalid_argument(errorMessage);
+        }
+
+        // get the correlation function
         TGraph *grCorr = getCorrelationGraph_WFweight(
-            interpolatedWaveforms.find(ant1)->second,
-            interpolatedWaveforms.find(ant2)->second
-        );
+            gr1_iter->second, 
+            gr2_iter->second
+            );
+
+        // store the correlation function, with a hilbert envelope applied (if requested)
         if(applyHilbertEnvelope){
             TGraph *grCorrHil = FFTtools::getHilbertEnvelope(grCorr);
             corrFunctions.push_back(grCorrHil);

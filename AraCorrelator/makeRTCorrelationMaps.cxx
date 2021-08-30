@@ -107,10 +107,14 @@ int main(int argc, char **argv)
         char title[500];
         sprintf(title,"maps_ev%d.png", event);
         c->SaveAs(title);
+        delete c;
 
         // cleanup
-        delete c;
         delete dirMap;
+        for(int i=0; i<16; i++){
+            delete interpolatedWaveforms[i];
+        }
+        delete realAtriEvPtr;
 
     }
 }
