@@ -98,11 +98,20 @@ int main(int argc, char **argv)
 
         // draw and save the map
         gStyle->SetOptStat(0);
-        TCanvas *c = new TCanvas("", "", 1100, 850);
-        dirMap->Draw("colz");
-        dirMap->GetXaxis()->SetTitle("Phi [deg]");
-        dirMap->GetYaxis()->SetTitle("Theta [deg]");
-        dirMap->GetZaxis()->SetTitle("Summed Correlation");
+        TCanvas *c = new TCanvas("", "", 2200, 850);
+        c->Divide(2,1);
+            c->cd(1);
+            dirMap->Draw("colz"); // standard colz projection
+            dirMap->GetXaxis()->SetTitle("Phi [deg]");
+            dirMap->GetYaxis()->SetTitle("Theta [deg]");
+            dirMap->GetZaxis()->SetTitle("Summed Correlation");
+            dirMap->SetTitle("Standard colz Projection");
+        TH2D *dirMap_copy = (TH2D*) dirMap->Clone();
+            c->cd(2);
+            dirMap_copy->Draw("z aitoff"); // aitoff projection
+            dirMap_copy->GetXaxis()->SetTitle("Phi [deg]");
+            dirMap_copy->GetYaxis()->SetTitle("Theta [deg]");
+            dirMap_copy->SetTitle("Aitoff Projection");
         c->SetRightMargin(0.15);
         char title[500];
         sprintf(title,"maps_ev%d.png", event);
