@@ -106,13 +106,14 @@ int main(int argc, char **argv)
             dirMap->GetYaxis()->SetTitle("Theta [deg]");
             dirMap->GetZaxis()->SetTitle("Summed Correlation");
             dirMap->SetTitle("Standard colz Projection");
+            gPad->SetRightMargin(0.15);
         TH2D *dirMap_copy = (TH2D*) dirMap->Clone();
             c->cd(2);
             dirMap_copy->Draw("z aitoff"); // aitoff projection
             dirMap_copy->GetXaxis()->SetTitle("Phi [deg]");
             dirMap_copy->GetYaxis()->SetTitle("Theta [deg]");
             dirMap_copy->SetTitle("Aitoff Projection");
-        c->SetRightMargin(0.15);
+            gPad->SetRightMargin(0.15);
         char title[500];
         sprintf(title,"maps_ev%d.png", event);
         c->SaveAs(title);
