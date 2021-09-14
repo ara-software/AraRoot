@@ -74,8 +74,6 @@ void RayTraceCorrelator::SetTablePaths(const std::string &dirPath, const std::st
         sprintf(errorMessage,"Direct solution arrival times table is missing (dir file exists %d) ", dirFileExists);
         throw std::runtime_error(errorMessage);       
     }
-    // dirSolTablePath_ = strcpy(dirSolTablePath_, dirPath.c_str());
-    // std::copy(dirPath.begin(), dirPath.end(), dirSolTablePath_);
     dirSolTablePath_ = dirPath;
 
     bool refFileExists = (stat(refPath.c_str(), &buffer) == 0);
@@ -83,8 +81,6 @@ void RayTraceCorrelator::SetTablePaths(const std::string &dirPath, const std::st
         sprintf(errorMessage,"Reflected/refracted solution arrival times table is missing (dir file exists %d) ", refFileExists);
         throw std::runtime_error(errorMessage);       
     }
-    // refSolTablePath_ = strcpy(refSolTablePath_, refPath.c_str());
-    // std::copy(refPath.begin(), refPath.end(), refSolTablePath_);
     refSolTablePath_ = refPath;
 }
 
