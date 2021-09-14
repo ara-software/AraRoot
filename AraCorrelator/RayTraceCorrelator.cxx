@@ -15,7 +15,7 @@
 #include "RayTraceCorrelator.h"
 #include "RayTraceCorrelator_detail.h"
 
-void RayTraceCorrelator::SetupStationInfo(int stationID, int unixTime) { 
+void RayTraceCorrelator::SetupStationInfo(int stationID, int numAntennas) { 
     char errorMessage[400];
 
     // set station ID
@@ -25,26 +25,11 @@ void RayTraceCorrelator::SetupStationInfo(int stationID, int unixTime) {
     }
     stationID_ = stationID;
 
-    // set unixTime
-    if(unixTime<0 || isnan(unixTime)){ // testbed through A5 is supported
-        sprintf(errorMessage,"Requested unixTime (%d) is not supported\n", unixTime);
+    if(numAntennas < 1 || isnan(numAntennas)){
+        sprintf(errorMessage,"Number of antennas (%d) is not supported\n", numAntennas);
         throw std::invalid_argument(errorMessage);
     }
-    unixTime_ = unixTime;
-
-    // save the station info object
-    // and count the number of non-surface channels
-    AraGeomTool *geomTool = AraGeomTool::Instance();
-    auto araStationInfo = geomTool->getStationInfo(stationID_, unixTime);
-    int numAnts = (int) araStationInfo->getNumRFChans();
-    int num_not_surface = 0;
-    for(int ant=0; ant<numAnts; ant++){
-        auto pol = araStationInfo->getAntennaInfo(ant)->polType;
-        if(pol!= AraAntPol::kSurface){
-            num_not_surface++;
-        }
-    }
-    numAntennas_ = num_not_surface;
+    numAntennas_ = numAntennas;
 }
 
 void RayTraceCorrelator::SetAngularConfig(double angularSize){
@@ -78,14 +63,28 @@ void RayTraceCorrelator::SetRadius(double radius){
     radius_ = radius;
 }
 
-void RayTraceCorrelator::SetIceModel(int iceModel){
-    if(iceModel<0 || isnan(iceModel)){
-        char errorMessage[400];
-        sprintf(errorMessage,"Requested icemodel (%e) is has an\n", iceModel);
-        throw std::invalid_argument(errorMessage);        
+void RayTraceCorrelator::SetTablePaths(const std::string &dirPath, const std::string &refPath){
+
+    char errorMessage[400];
+    struct stat buffer;
+
+    // throw errors if these files don't exist
+    bool dirFileExists = (stat(dirPath.c_str(), &buffer) == 0);
+    if (!dirFileExists ){
+        sprintf(errorMessage,"Direct solution arrival times table is missing (dir file exists %d) ", dirFileExists);
+        throw std::runtime_error(errorMessage);       
     }
-    iceModel_ = iceModel;
+    dirSolTablePath_ = dirPath;
+
+    bool refFileExists = (stat(refPath.c_str(), &buffer) == 0);
+    if (!refFileExists){
+        sprintf(errorMessage,"Reflected/refracted solution arrival times table is missing (dir file exists %d) ", refFileExists);
+        throw std::runtime_error(errorMessage);       
+    }
+    refSolTablePath_ = refPath;
 }
+
+
 
 void RayTraceCorrelator::ConfigureArrivalTimesVector(){
     arrivalTimes_.resize(2);
@@ -146,63 +145,43 @@ RayTraceCorrelator::~RayTraceCorrelator()
 	//Default destructor
 }
 
-RayTraceCorrelator::RayTraceCorrelator(int stationID, 
+RayTraceCorrelator::RayTraceCorrelator(int stationID,
+    int numAntennas,
     double radius, 
     double angularSize,
-    int iceModel,
-    int unixTime
+    const std::string &dirSolTablePath, 
+    const std::string &refSolTablePath
     ){
 
     // initialize and sanitize the input immediately
     // afterwards, we can (safely!) only refer to private variables
     this->SetAngularConfig(angularSize);
-    this->SetupStationInfo(stationID, unixTime);
+    this->SetupStationInfo(stationID, numAntennas);
     this->SetRadius(radius);
-    this->SetIceModel(iceModel);
+    this->SetTablePaths(dirSolTablePath, refSolTablePath);
+
 }
 
-void RayTraceCorrelator::LoadTables(const std::string &tableDir){
+void RayTraceCorrelator::LoadTables(){
     char errorMessage[400];
     
-    // verify the directory containing the tables exists
-    struct stat buffer;
-    bool dirExists = (stat(tableDir.c_str(), &buffer) == 0);
-    if(!dirExists){
-        sprintf(errorMessage,"Tables directory (%s) does not exist! Abort!\n", tableDir.c_str());
-        throw std::runtime_error(errorMessage);
-    }
-
-    // set the table file names
-    char directFileName[500];
-    char reflecFileName[500];
-    sprintf(directFileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
-        tableDir.c_str(), stationID_, iceModel_, radius_, angularSize_);
-    sprintf(reflecFileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_1.root",
-        tableDir.c_str(), stationID_, iceModel_, radius_, angularSize_);
-    
-    // throw errors if these files don't exist
-    bool dirFileExists = (stat(directFileName, &buffer) == 0);
-    bool refFileExists = (stat(reflecFileName, &buffer) == 0);
-    if (!dirFileExists || !refFileExists){
-        sprintf(errorMessage,"An arrival times table is missing (dir file exists %d, ref file exists %d) ", dirFileExists, refFileExists);
-        throw std::runtime_error(errorMessage);       
-    }
-
     // load the arrival time tables
     this->ConfigureArrivalTimesVector();
-    this->LoadArrivalTimeTables(directFileName, 0);
-    this->LoadArrivalTimeTables(reflecFileName, 1);
+    this->LoadArrivalTimeTables(dirSolTablePath_, 0);
+    this->LoadArrivalTimeTables(refSolTablePath_, 1);
 }
 
+// FIXME
 std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
-    AraAntPol::AraAntPol_t polSelection, 
+    int stationID,
+    AraGeomTool *geomTool,
+    AraAntPol::AraAntPol_t polSelection,
     std::vector<int> excludedChannels){
     
     // first, figure out what set of antennas is viable to form pairs
     std::vector < int > viableAntennas;
     
-    AraGeomTool *geomTool = AraGeomTool::Instance();
-    auto araStationInfo = geomTool->getStationInfo(this->stationID_, this->unixTime_);
+    auto araStationInfo = geomTool->getStationInfo(stationID);
     for(int ant=0; ant<this->numAntennas_; ant++){
 
         // first, check if this event is allowed
