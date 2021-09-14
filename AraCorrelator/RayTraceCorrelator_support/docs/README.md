@@ -19,13 +19,13 @@ An instance of the RayTraceCorrelator can be called as such:
 
 ```c++
 RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(int station, 
-        double radius, double angular_size, int iceModel, int unixTime
+        double radius, double angular_size, string dirSolTablePath, string refSolTablePath
     );
 ```
 
 After the correlator is created, one must load the tables holding the arrival times:
 ```c++
-theCorrelator->LoadTables("/path/to/tables/");
+theCorrelator->LoadTables();
 ```
 
 The interferometer takes as inputs (1) interpolated waveforms, (2) pairs of antennas which
@@ -45,9 +45,6 @@ from (2) *calculating* the arrival times. For this reason, arrival times
 are stored in tables that are loaded by the correlator.
 Construction of the arrival time tables is technically up to user's preferences, 
 though we usually use AraSim ray tracer.
-Because the AraSim ray tracer is used, the index of refraction
-model is tied to the AraSim `RAY_TRACE_ICE_MODEL_PARAMS` variable.
-This is currently a simple integer.
 A script to calculate the timing tables via AraSim 
 is provided (`makeRTArrivalTimeTables.cpp`). 
 See below for more details on the ice model and using the table generation script.
@@ -119,8 +116,8 @@ the user to specify a few variables:
 - station: this must be an ARA station between 0 (Testbed) and 5 (A5)
 - radius: the distance from the station center of gravity for a putative source
 - angular size: the angular binning (in degrees)
-- icemodel: the ice model, which specifies the depth dependent index of refraction
-- unixtime: default is 0; use actual run time if you like 
+- direct tables path: path to the file containing the direct ray tracing solutions solution timing table
+- reflected tables path: path to the file containing the reflected/refracted ray tracing solution timing tables
 
 #### Angular Size
 The `angularSize` parameter controls the angular binning.
@@ -147,32 +144,6 @@ please use the correct corresponding getter function, e.g.:
 ```c++
 int numPhiBins theCorrelator->GetNumPhiBins();
 ```
-
-#### IceModel Params
-
-AraSim is used as the ray tracer, and so the icemodels are (presently) keyed 
-to the AraSim `RAY_TRACE_ICE_MODEL_PARAMS` variable.
-AraSim always assumes a exponential profile, with the parameters of that
-profile changing.
-See the [AraSim Settings.h](https://github.com/ara-software/AraSim/blob/2758c07dc56fb1a9a784e460306868f0f940b499/Settings.h#L264) file for a list
-of currently available ice models.
-
-Because the correlator doesn't interface with AraSim at all (only the delay tables)
-it should be possible to remove this icemodel key completely.
-And only pass e.g. the path to the tables. See the to-do list.
-
-#### Unixtime
-
-Because the ray trace correlator needs to know how many deep antennas
-are in a station, it does need to talk to the AraGeomTool.
-And since the station geometries change a bit as a function of time,
-it also needs to know the unixtime of the events you would like to correlate.
-Since the number of deep antennas is static for every station except
-maybe A5 (which was merged with the PA DAQ in 2019), it is unlikely
-that is argument will ever be needed. But is provided for future proofing.
-
-An alternative might be to allow the user to specify `numAntennas_` manually.
-See the to-do list.
 
 ## Making Correlation Maps
 
@@ -262,12 +233,13 @@ This is the default behavior in the correlator.
 If you want to turn this behavior off, set the argument to `false`.
 
 ## To Do
-1. Remove the IceModel dependence in the correlator. All the user needs to do is specify the tables.
-2. Remove the unixTime dependence. E.g. let the user specify `numAntennas_` manually?
+1. ~Remove the IceModel dependence in the correlator. All the user needs to do is specify the tables.~ (Done, BAC Sep 2021)
+2. ~Remove the unixTime dependence. E.g. let the user specify `numAntennas_` manually?~ (Done, BAC Sep 2021)
 3. Add support for uniform binning in cos(theta) instead of theta.
-4. Make sure unixTime is getting handled correctly
+4. ~Make sure unixTime is getting handled correctly~ (Done, See 1)
 5. Add helper functions for "get peak," "get max correlation," etc.
 6. ~Add ability to take weights for each pair in the `GetInterferometricMap` function.~ (Done, BAC).
+7. Should we remove the stationID dependence all together?
 
 
 More on 3: This should be done by changing the correlator constructor  

@@ -35,24 +35,36 @@ int main(int argc, char **argv)
     /////////////////////////////////////////////////
     /////////////////////////////////////////////////
 
-    // initialize a correlator
+    // setup the paths to our ray tracing tables
     double radius = 300.;
     double angular_size = 1.;
     int iceModel = 0;
-    int unixTime = 0;
-    RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, 
-        radius, angular_size, iceModel, unixTime
+    char dirPath[500];
+    char refPath[500];
+    std::string topDir = "/cvmfs/ara.opensciencegrid.org/data/raytrace_tables/";
+    sprintf(dirPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
+        topDir.c_str(), station, iceModel, radius, angular_size
+    );
+    sprintf(refPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_1.root",
+        topDir.c_str(), station, iceModel, radius, angular_size
+    );
+
+    int numAntennas = 16;
+    // initialize a correlator
+    RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas,
+        radius, angular_size, dirPath, refPath
     );
 
     // and tell it to load up the arrival times tables
-    theCorrelator->LoadTables("/cvmfs/ara.opensciencegrid.org/data/raytrace_tables/");
+    theCorrelator->LoadTables();
 
     // How you set up the pairs is up to you!
     // There are a few helper functions;
     // for example, here we can load all of the VPol pairs.
 
+    AraGeomTool *geomTool = AraGeomTool::Instance();
     std::vector<int> excludedChannels = {15};
-    std::map< int, std::vector<int> > pairs = theCorrelator->SetupPairs(AraAntPol::kVertical, excludedChannels);
+    std::map< int, std::vector<int> > pairs = theCorrelator->SetupPairs(station, geomTool, AraAntPol::kVertical, excludedChannels);
     std::cout<<"Number of pairs "<<pairs.size()<<std::endl;
     for(int i=0; i<pairs.size(); i++){
         printf("Pair %d: %d, %d\n",i,pairs.find(i)->second[0], pairs.find(i)->second[1]);

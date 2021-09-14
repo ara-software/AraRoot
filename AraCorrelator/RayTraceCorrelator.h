@@ -4,6 +4,7 @@
 #include <map>
 class TGraph;
 class TH2D;
+class AraGeomTool;
 
 class RayTraceCorrelator : public TObject
 {
@@ -15,19 +16,19 @@ class RayTraceCorrelator : public TObject
         int numPhiBins_;                 ///< Number of phi bins (azimuth) in the arrival time tables
         int numThetaBins_;               ///< Number of theta bins (zenith) in the arrival time tables
         int numAntennas_;                ///< Number of antennas in the station
-        int unixTime_;                   ///< Unixtime of the geometry database we want
-        int iceModel_;                   ///< The AraSim RAY_TRACE_ICE_MODEL_PARAMS choice
         std::vector<double> phiAngles_;   ///< Vector of the phi points to be sampled (in radians!)
         std::vector<double> thetaAngles_; ///< Vector of the theta points to be sampled (in radians!)
+        std::string dirSolTablePath_;     ///< Full path to the direct solution tables
+        std::string refSolTablePath_;     ///< Full path to the reflected/refracted solution tables
 
         // The following setter functions (which nominally do trivial things)
         // are included to enable sanity checks on the arguments 
         // e.g. ensuring radii are positive, station IDs are supported, etc.
 
-        void SetupStationInfo(int stationID, int unixTime);
+        void SetupStationInfo(int stationID, int numAntennas);
         void SetRadius(double radius);
         void SetAngularConfig(double angularSize);
-        void SetIceModel(int iceModel);
+        void SetTablePaths(const std::string &dirPath, const std::string &refPath);
 
         // a high-dimensional vector to store the arrival times at antennats
         // first index is direct/reflected
@@ -44,35 +45,30 @@ class RayTraceCorrelator : public TObject
         int GetStationID(){ return stationID_; }
         int GetNumThetaBins(){return numThetaBins_; }
         int GetNumPhiBins(){return numPhiBins_; }
-        int GetIceModel(){return iceModel_; }
         double GetAngularSize(){ return angularSize_; }
         double GetRadius(){ return radius_; }
         double GetNumAntennas(){ return numAntennas_; }
-        double GetUnixtime(){ return unixTime_; }
         std::vector<double> GetPhiAngles(){ return phiAngles_; }
         std::vector<double> GetThetaAngles(){ return thetaAngles_; }
 
 
         //! function to load the arrival time tables
-        /*!
-            \param filename full (absolute) path to the arrival timing tables
-            \param solNum Which solution table do we want to load
-            \return void
-        */
         void LoadArrivalTimeTables(const std::string &filename, int solNum);
 
 
         //! constructor for the RayTraceCorrelator
         /*!
             \param stationID ID of the station
-            \param radius The radius for the ray trace correlator
+            \param numAntennas number of antennas in the timing tables (that we expect the correlator to know about)
+            \param numAntennas The radius for the ray trace correlator
             \param angularSize The angular binning
-            \param iceModel The AraSim icemodel (should match with RAY_TRACE_ICE_MODEL_PARAMS)
-            \param unixTime The unixTime of the events you want to correlated
+            \param dirSolTablePath Complete path to the direct RT solution tables
+            \param refSolTablePath Complete path to the reflected/refracted RT solution tables
             \return an instance of the ray trace correlator
         */
-       // NB: We must enable passing of the unixTime argument, since the geometry databases are time-evolving
-        RayTraceCorrelator(int stationID, double radius, double angularSize, int iceModel, int unixTime=0);
+        RayTraceCorrelator(int stationID, int numAntennas, double radius, double angularSize, 
+            const std::string &dirSolTablePath, const std::string &refSolTablePath
+        );
 
 
         ~RayTraceCorrelator(); ///< Destructor
@@ -83,7 +79,7 @@ class RayTraceCorrelator : public TObject
             \param tableDir The full path to the location of the arrival time tables
             \return void
         */
-        void LoadTables(const std::string &tableDir);
+        void LoadTables();
 
 
         //! function to get an interferometric map
@@ -106,11 +102,15 @@ class RayTraceCorrelator : public TObject
 
         //! a function to return the pairs to be used in the interferometery
         /*!
+            \param stationID an ARA station ID
+            \param geomTool an instance of an AraGeom Tool
             \param polarization what polarization to use
             \param excludedChannels what channels to exclude in forming pairs (default: exclude none)
             \return vector of vectors, holding the pairings
         */
         std::map<int, std::vector<int> > SetupPairs(
+            int stationID,
+            AraGeomTool *geomTool,
             AraAntPol::AraAntPol_t polarization, 
             std::vector<int> excludedChannels = {}
         );
