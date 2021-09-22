@@ -18,6 +18,7 @@
 #include <cstring>
 #include <zlib.h>
 #include <cstdlib>
+#include <sstream>
 
 Bool_t AraCalType::hasZeroMean(AraCalType::AraCalType_t calType)
 {
@@ -1174,9 +1175,6 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
     // Pedestal file
     
     fprintf(stdout, "%s : Loading fAtriPedFile - %s\n", __FUNCTION__, fAtriPedFile[calibIndex]);
-    std::ifstream PedFile(fAtriPedFile[calibIndex]);
-    Int_t dda,block,chan;
-    UShort_t pedVal;
     
     // If there are pedestals in memory already then we need to delete them and replace with this station's
     if(fAtriPeds)
@@ -1187,14 +1185,38 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
         std::cerr << "Can not allocate memory for pedestal file\n";
         exit(0);
     }
-            
-    while(PedFile >> dda >> block >> chan) {
-        // std::cout << dda << "\t" << block << "\t" << chan << "\n";
-        for(int samp=0;samp<SAMPLES_PER_BLOCK;samp++) {
-            PedFile >> pedVal;
+
+    // now, we open and load the pedestal files
+    gzFile inPed = gzopen(fAtriPedFile[calibIndex], "r");
+    char buffer[6000000];
+    int nRead = gzread(inPed, &buffer, sizeof(buffer)/sizeof(buffer[0])-1);
+
+    // we then put the buffer (which are characters at this point)
+    // into a string object that we can manipulate
+    std::string string_buffer(buffer);
+    std::stringstream ss(string_buffer);
+
+    // to do this, we need "buffer" variables
+    std::string dda_buf;
+    std::string block_buf;
+    std::string chan_buf;
+    std::string ped_buf;
+    
+    while ( ss >> dda_buf >> block_buf >> chan_buf){
+        // we cast the dda, block, and channels into integers
+        int dda = std::stoi(dda_buf);
+        int block = std::stoi(block_buf);
+        int chan = std::stoi(chan_buf);
+
+        // the pedestal values are cast as shorts
+        for(int samp=0; samp < SAMPLES_PER_BLOCK; samp++){
+            ss >> ped_buf;
+            short pedVal = short(std::stoi(ped_buf));
             fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]=pedVal;
         }
-    }  
+    }
+    gzclose(inPed);
+    
     
     // Now we set the gotPedFile flags to indicate which station we have in memory
     
@@ -1459,16 +1481,23 @@ Bool_t AraEventCalibrator::fileExists(char *fileName){
 
 
 Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
-    std::ifstream theFile(fileName);
     Int_t numPedVals=0;
-    Double_t temp=0;
-    while(theFile >> temp >> temp >> temp) {
-        for(Int_t sample=0;sample<SAMPLES_PER_BLOCK;sample++){
-            theFile >> temp;
-            numPedVals++;
+    gzFile inPed = gzopen(fileName, "r");
+    if(inPed){
+        char buffer[6000000];
+        int nRead = gzread(inPed, &buffer, sizeof(buffer)/sizeof(buffer[0])-1);
+        std::string string_buffer(buffer); // shove this back into a string
+        std::stringstream ss(string_buffer); // and then convert to stringstream
+
+        std::string dummy;
+        while( ss >> dummy >> dummy >> dummy){
+            for(int samp=0; samp < SAMPLES_PER_BLOCK; samp++){
+                ss >> dummy;
+                numPedVals++;
+            }
         }
     }
-    theFile.close();
+    gzclose(inPed);
     return numPedVals;
 }
 
