@@ -67,6 +67,17 @@ In particular:
 - If the user wants a "single-pair" map (the contribution of a single antenna pair to the overall map), just pass that single pair to the correlator.
 - The user can correlate any arbitrary mix of waveforms. E.g. just VPol, just HPol, but also cross-polarization (VPol and HPol). This also allows a user to dynamically adjust what waveforms are used for a specific event, for example, by only including channels above a specific SNR threshold.
 
+Calculating the correlation functions is actually separate
+from calling the map making rountines. This is on purpose.
+The caluclation of the correlation function is the most expensive
+part of the routine by about a factor of 3-4.
+Meaning that 70%-ish of the time is spent creating the correlation
+functions, not on actually sampling them on the spatial grid.
+So if you need to make >=1 map (e.g. D and R, multiple radii, etc.),
+it is always in our favor to "cache" the waveforms in this way.
+This also makes it easier to examing the correlation functions
+directly for debugging purposes.
+
 ### History
 The "original" RayTraceCorrelator was developed by Eugene Hong and Carl Pfender
 at Ohio State circa 2013. Thanks for all their hard work!
@@ -170,7 +181,6 @@ for a crash-course.
 
 And one optional arguments:
 - weights: weights to apply to each pair during the map making
-
 
 ### Waveforms
 
