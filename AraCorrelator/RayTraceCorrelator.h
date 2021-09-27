@@ -82,21 +82,33 @@ class RayTraceCorrelator : public TObject
         void LoadTables();
 
 
+        //! function to get correlation functions
+        /*!
+            \param pairs a std::map of pair indices to antenna indices
+            \param interpolatedWaveforms a std::map of antenna indices to interpolated waveforms
+            \param applyHilbertEnvelope whether or not to apply hilbert enveloping to the correlation functions
+            \return a std::vector of the correlation functions (one for each pair)
+        */
+        std::vector<TGraph*> GetCorrFunctions(
+            std::map<int, std::vector<int> > pairs,
+            std::map<int, TGraph*> interpolatedWaveforms,
+            bool applyHilbertEnvelope = true
+        );
+
+
         //! function to get an interferometric map
         /*!
-            \param interpolatedWaveforms a std::map of antenna numbers to interpolated waveforms
             \param pairs a std::map of antenna pairs
+            \param corrFunctions a std::vector of correlation functions, one for each pair in pairs (in that order!)
             \param solNum whether to have the first or second (0 or 1) solution hypothesis
-            \param applyHilbertEnvelope whether or not to apply a hilbert envelope to the correlation function
             \param weights weights to apply to each map; default = equal weights, or 1/pairs.size()
             \return a 2D histogram with the values filled with the interferometric sums
         */
         TH2D* GetInterferometricMap(
-            std::map<int, TGraph*> interpolatedWaveforms,
             std::map<int, std::vector<int> > pairs,
+            std::vector<TGraph*> corrFunctions,
             int solNum,
-            std::map<int, double> weights = {},
-            bool applyHilbertEnvelope = true
+            std::map<int, double> weights = {}
         );
 
 
@@ -123,6 +135,15 @@ class RayTraceCorrelator : public TObject
             \return TGraph* the cross-correlation function
         */
         TGraph* getCorrelationGraph_WFweight(TGraph * gr1, TGraph * gr2);
+
+
+        //! a function to get a correlation graph with the normalization used in the OSU A2/3 Diffuse Analysis
+        /*!
+            \param gr1 the graph to be cross correlated
+            \param gr2 the second graph to be cross correlated
+            \return TGraph* the cross-correlation function
+        */
+        TGraph* getCorrelationGraph_OSUNormalization(TGraph * gr1, TGraph * gr2);
 
 
         //! a function to get the un-normalized cross correlation function between two ararys

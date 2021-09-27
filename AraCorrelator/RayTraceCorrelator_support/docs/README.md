@@ -28,12 +28,14 @@ After the correlator is created, one must load the tables holding the arrival ti
 theCorrelator->LoadTables();
 ```
 
-The interferometer takes as inputs (1) interpolated waveforms, (2) pairs of antennas which
-are to be included in the map, and (3) the solution hypothesis (direct or reflected/refracted).
+The interferometer takes as inputs (1) pairs of antennas which
+are to be included in the map, (2) correlation functions, 
+and (3) the solution hypothesis (direct or reflected/refracted).
 The map making routine returns a ROOT TH2D, and can be called like:
 
 ```c++
-TH2D *map = theCorrelator->GetInterferometricMap(waveforms, pairs, solution);
+std::vector<TGraph*> corr_funcs = theCorrelator->GetCorrFunctions(pairs, wavforms);
+TH2D *map = theCorrelator->GetInterferometricMap(pairs, corr_funcs, solution);
 ```
 
 For more detailed discussion, see below, or see the example.
@@ -64,6 +66,17 @@ In particular:
 - The user can adjust the waveforms (e.g. CW filter, bandpassing, etc.) before they arrive at the correlator.
 - If the user wants a "single-pair" map (the contribution of a single antenna pair to the overall map), just pass that single pair to the correlator.
 - The user can correlate any arbitrary mix of waveforms. E.g. just VPol, just HPol, but also cross-polarization (VPol and HPol). This also allows a user to dynamically adjust what waveforms are used for a specific event, for example, by only including channels above a specific SNR threshold.
+
+Calculating the correlation functions is actually separate
+from calling the map making rountines. This is on purpose.
+The caluclation of the correlation function is the most expensive
+part of the routine by about a factor of 3-4.
+Meaning that 70%-ish of the time is spent creating the correlation
+functions, not on actually sampling them on the spatial grid.
+So if you need to make >=1 map (e.g. D and R, multiple radii, etc.),
+it is always in our favor to "cache" the waveforms in this way.
+This also makes it easier to examing the correlation functions
+directly for debugging purposes.
 
 ### History
 The "original" RayTraceCorrelator was developed by Eugene Hong and Carl Pfender
@@ -147,9 +160,17 @@ int numPhiBins theCorrelator->GetNumPhiBins();
 
 ## Making Correlation Maps
 
+First, we must calculate the correlation functions.
+There are two arguments to the `GetCorrFuncs` routine:
+- pairs: a list of pairs of antennas to be correlated together, with pair indices (as keys) to their respective antennas (as values)
+- interpolated waveforms: a std::map of interpolated waveforms, with antenna numbers as keys and waveforms as values
+
+And one optional argument:
+- whether or not to apply hilbert smoothing to the correlation function
+
 There are three arguments to the `GetInterferometricMap` routine:
-- waveforms: a map of antennas (as keys) to their waveforms (as values)
-- radius: a map of pair indices (as keys) to their respective antennas (as values)
+- pairs: a list of pairs of antennas to be correlated together, with pair indices (as keys) to their respective antennas (as values)
+- correlation functions: a vector of correlation functions for each pair
 - solution: what solution hypothesis to assume (direct or reflected/refracted)
 
 We use C++ maps to make handling things easier. Maps are much
@@ -158,14 +179,12 @@ easier to use than you might think
 See e.g. [this page](https://www.freecodecamp.org/news/c-plus-plus-map-explained-with-examples/)
 for a crash-course.
 
-And two optional arguments:
+And one optional arguments:
 - weights: weights to apply to each pair during the map making
-- applyHilbertEnvelope: whether or not to take the hilbert envelope of the correlation functions
-
 
 ### Waveforms
 
-The waveforms need to be presented to the correlator as a map of
+The waveforms need to be presented to the correlation routine as a map of
 antenna indices to waveforms:
 
 ```c++

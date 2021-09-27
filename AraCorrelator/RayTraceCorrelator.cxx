@@ -217,32 +217,14 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     return pairs;
 }
 
-TH2D* RayTraceCorrelator::GetInterferometricMap(
-    std::map<int, TGraph*> interpolatedWaveforms, 
+std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
     std::map<int, std::vector<int> > pairs,
-    int solNum,
-    std::map<int, double> weights,
+    std::map<int, TGraph*> interpolatedWaveforms,
     bool applyHilbertEnvelope
     ){
 
     char errorMessage[400];
 
-    // first, sort out the weights to apply to each pair
-    if(weights.size()>0){
-        // if the user provided weights, make sure they provided the right number
-        if(weights.size()!=pairs.size()){
-            sprintf(errorMessage,"Mismatch in size of provided weights (%d) and provided pairs (%d)\n",weights.size(), pairs.size());
-            throw std::invalid_argument(errorMessage);
-        }
-    }
-    else{
-        // otherwise, assume the user wanted equal weighting; which means 1/num_pairs
-        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
-            int pairNum = iter->first;
-            weights[pairNum] = 1./double(pairs.size());
-        }
-    }
-        
     // first, calculate all of the correlation functions
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
@@ -283,6 +265,40 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         else{
             corrFunctions.push_back(grCorr);
         }
+    }
+    return corrFunctions;
+}
+
+
+TH2D* RayTraceCorrelator::GetInterferometricMap(
+    std::map<int, std::vector<int> > pairs,
+    std::vector<TGraph*> corrFunctions,
+    int solNum,
+    std::map<int, double> weights
+    ){
+
+    char errorMessage[400];
+
+    // first, sort out the weights to apply to each pair
+    if(weights.size()>0){
+        // if the user provided weights, make sure they provided the right number
+        if(weights.size()!=pairs.size()){
+            sprintf(errorMessage,"Mismatch in size of provided weights (%d) and provided pairs (%d)\n",weights.size(), pairs.size());
+            throw std::invalid_argument(errorMessage);
+        }
+    }
+    else{
+        // otherwise, assume the user wanted equal weighting; which means 1/num_pairs
+        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+            int pairNum = iter->first;
+            weights[pairNum] = 1./double(pairs.size());
+        }
+    }
+
+    // make sure number of pairs agrees with size of corrFunctions
+    if(pairs.size()!=corrFunctions.size()){
+        sprintf(errorMessage,"Mismatch in size of provided corr functions (%d) and provided pairs (%d)\n",corrFunctions.size(), pairs.size());
+        throw std::invalid_argument(errorMessage);
     }
 
     // create output histogram
@@ -339,13 +355,5 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         }
     }
 
-    // cleanup
-    // if you're facing a memory leak, try making sure all the grCorr's
-    // above got cleaned up correctly. As written, this should work...
-    for(int i=0; i<corrFunctions.size(); i++){
-        delete corrFunctions[i];
-    }
-
     return histMap;
-
 }
