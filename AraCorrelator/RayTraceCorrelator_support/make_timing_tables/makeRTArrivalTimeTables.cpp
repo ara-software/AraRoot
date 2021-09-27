@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     
     if(argc<4) {
         std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location>\n";
-        std::cout << "e.g.\n" << argv[0] << " 2 /path/to/my/home/dir \n";
+        std::cout << "e.g.\n" << argv[0] << " 2 300 /path/to/my/home/dir \n";
         return 0;
     }
 
