@@ -104,9 +104,10 @@ int main(int argc, char **argv)
             interpolatedWaveforms[i] = grInt;
             delete gr;
         }
+        std::vector<TGraph*> corrFunctions = theCorrelator->GetCorrFunctions(pairs, interpolatedWaveforms); // apply Hilbert envelope is default
 
         // get the map
-        TH2D *dirMap = theCorrelator->GetInterferometricMap(interpolatedWaveforms, pairs, 0); // direct solution
+        TH2D *dirMap = theCorrelator->GetInterferometricMap(pairs, corrFunctions, 0); // direct solution
 
         // draw and save the map
         gStyle->SetOptStat(0);
@@ -135,6 +136,9 @@ int main(int argc, char **argv)
         delete dirMap;
         for(int i=0; i<16; i++){
             delete interpolatedWaveforms[i];
+        }
+        for(int i=0; i<corrFunctions.size(); i++){
+            delete corrFunctions[i];
         }
         delete realAtriEvPtr;
 
