@@ -20,7 +20,7 @@
 #include "Settings.h"
 
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel);
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, const std::string &tableDir);
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir);
 Position CalculateStationCOG(std::map<int, Position> antennaLocations);
 double CalculateArrivalTime(
     RaySolver *raySolver,
@@ -32,33 +32,36 @@ double CalculateArrivalTime(
 int main(int argc, char **argv)
 {
     
-    if(argc<3) {
-        std::cout << "Usage\n" << argv[0] << " <station> <output location>\n";
-        std::cout << "e.g.\n" << argv[0] << " 2 http://www.hep.ucl.ac.uk/uhen/ara/monitor/root/run1841/event1841.root\n";
+    if(argc<4) {
+        std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location>\n";
+        std::cout << "e.g.\n" << argv[0] << " 2 /path/to/my/home/dir \n";
         return 0;
     }
 
     int station = atoi(argv[1]);
-
-    double radius = 300.;
+    double radius = atof(argv[2]);
+    
     double angular_size = 1.;
-    int iceModel = 0;
+    int iceModelidx = 0;
     int unixTime = 0;
+    int numAntennas = 16;
 
-    RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, 
-        radius, angular_size, iceModel, 
-        unixTime
+
+    std::string tempFileName = "temp.txt"; // the tables don't exist yet, so we feed it a dummy path
+    RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas, 
+        radius, angular_size, tempFileName, tempFileName
     );
 
-    CalculateTables(theCorrelator, 0, argv[2]);   
+    CalculateTables(theCorrelator, 0, iceModelidx, argv[3]);
+    CalculateTables(theCorrelator, 1, iceModelidx, argv[3]);
 
 }
 
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, const std::string &tableDir){
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir){
 
     char fileName[500];
     sprintf(fileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_%d.root",
-        tableDir.c_str(), theCorrelator->GetStationID(), theCorrelator->GetIceModel(),
+        tableDir.c_str(), theCorrelator->GetStationID(), iceModelidx,
         theCorrelator->GetRadius(), theCorrelator->GetAngularSize(), solNum
     );
 
@@ -115,7 +118,7 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, const std::s
     settings->Z_TOLERANCE = 0.05;
     
     settings->NOFZ=1; // make sure n(z) is turned on
-    settings->RAY_TRACE_ICE_MODEL_PARAMS = theCorrelator->GetIceModel(); // set the ice model as user requested
+    settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
 
     for (int thetaBin_temp = 0; thetaBin_temp < numThetaBins; thetaBin_temp++) {
 
