@@ -15,7 +15,7 @@
 #include "araAtriStructures.h"
 #include "araIcrrStructures.h"
 #include "araIcrrDefines.h"
-
+#include <map>
 
 #define ADCMV 0.939   /* mV/adc, per Gary's email of 05/04/2006 */
 #define SATURATION 1300 
@@ -45,6 +45,8 @@ namespace AraCalType {
 
     } AraCalType_t;
 
+    Bool_t hasTrimFirstBlock(AraCalType::AraCalType_t calType); ///< Does the calibration type trim first block (Apply Brian's conditioner inside of calibration) -MK-
+    Bool_t hasInvertA3Chans(AraCalType::AraCalType_t calType); ///< Does the calibration invert A3 channel (Apply Brian's conditioner inside of calibration) -MK-
     Bool_t hasCableDelays(AraCalType::AraCalType_t calType); ///< Does the calibration type ccount for the cable delays?
     Bool_t hasBinWidthCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform the bin-by-bin calibration
     Bool_t hasInterleaveCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform an interleave calibration
@@ -52,7 +54,8 @@ namespace AraCalType {
     Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
     Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
     Bool_t hasUnDiplexing(AraCalType::AraCalType_t calType); ///<Does the calibration type perform un-diplexing
-    Bool_t hasZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform
+    Bool_t hasADCZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform at ADC
+    Bool_t hasVoltZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform at Volt
     Bool_t hasVoltCal(AraCalType::AraCalType_t calType); ///< Does the calibration type convert ADC to volts-THM-
 } 
 
@@ -108,7 +111,6 @@ class AraEventCalibrator : public TObject
     double calVoltNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated volt numbers
     int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
 
-
     //Atri Calibrations
     UShort_t *fAtriPeds; ///< Storage array to hold the ATRI pedestal data
     Int_t fGotAtriPedFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI pedestals have been loaded and for which station
@@ -123,13 +125,25 @@ class AraEventCalibrator : public TObject
 
     void checkAtriSampleTiming();
     void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
-    Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample); //A conversion module from ADC counts to millivolts  -THM-
+    Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample, AraStationId_t stationId); //A conversion module from ADC counts to millivolts  -THM-
     void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
     void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
     void loadAtriCalib(AraStationId_t stationId); ///< Internally used fuction that loads the calibration values into memory.
      
     Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
     Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
+
+    //modulizating calibration step -MK-
+    void DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList);
+    void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
+    void ZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
+    void CableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId);
+    int TrimLenIdentifier(std::vector<int> sampleList);
+    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList);
+    void VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId);
+    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId);
+    void PedSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList);
+    void BinWidthCalib(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk);
 
     protected:
         static AraEventCalibrator *fgInstance;  ///< protect against multiple instances
