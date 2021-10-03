@@ -45,8 +45,8 @@ namespace AraCalType {
 
     } AraCalType_t;
 
-    Bool_t hasTrimFirstBlock(AraCalType::AraCalType_t calType); ///< Does the calibration type trim first block (Apply Brian's conditioner inside of calibration) -MK-
-    Bool_t hasInvertA3Chans(AraCalType::AraCalType_t calType); ///< Does the calibration invert A3 channel (Apply Brian's conditioner inside of calibration) -MK-
+    Bool_t hasTrimFirstBlock(AraCalType::AraCalType_t calType); ///< Does the calibration type trim the first block (Apply Brian's conditioner inside of calibration) -MK-
+    Bool_t hasInvertA3Chans(AraCalType::AraCalType_t calType); ///< Does the calibration invert A3 channels (Apply Brian's conditioner inside of calibration) -MK-
     Bool_t hasCableDelays(AraCalType::AraCalType_t calType); ///< Does the calibration type ccount for the cable delays?
     Bool_t hasBinWidthCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform the bin-by-bin calibration
     Bool_t hasInterleaveCalib(AraCalType::AraCalType_t calType); ///< Does the calibration type perform an interleave calibration
@@ -54,8 +54,8 @@ namespace AraCalType {
     Bool_t hasPedestalSubtraction(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a pedestal subtraction
     Bool_t hasCommonMode(AraCalType::AraCalType_t calType); ///<Does the calibration type perform a common mode correction
     Bool_t hasUnDiplexing(AraCalType::AraCalType_t calType); ///<Does the calibration type perform un-diplexing
-    Bool_t hasADCZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform at ADC
-    Bool_t hasVoltZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the waveform at Volt
+    Bool_t hasADCZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the ADC waveform -MK-
+    Bool_t hasVoltZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the voltage waveform -MK-
     Bool_t hasVoltCal(AraCalType::AraCalType_t calType); ///< Does the calibration type convert ADC to volts-THM-
 } 
 
@@ -133,17 +133,17 @@ class AraEventCalibrator : public TObject
     Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
     Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
 
-    //modulizating calibration step -MK-
-    void DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList);
+    //Modulates calibration step -MK-
+    void DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); // Converts DAQ data format to Electronic channel format
     void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
-    void ZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
-    void CableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId);
-    int TrimLenIdentifier(std::vector<int> sampleList);
-    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList);
-    void VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId);
-    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId);
-    void PedSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList);
-    void BinWidthCalib(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk);
+    void ZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt); // Zeroing WF by subtracting mean. ADC or Voltage
+    void CableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); // Remove knwon cable delay
+    int TrimLenIdentifier(std::vector<int> sampleList); // Identify number of samples in the first block
+    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); // Erase first block that currupted by trigger
+    void VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); // Converts ADC to Voltage using conversion table
+    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); // Inverts only RF channels = 0,4,8 in A3
+    void PedSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); // Subtracts pedestal from raw data
+    void BinWidthCalib(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); // Trims samples using fAtriSampleIndex table
 
     protected:
         static AraEventCalibrator *fgInstance;  ///< protect against multiple instances

@@ -52,6 +52,7 @@ UsefulAtriStationEvent::UsefulAtriStationEvent(RawAtriStationEvent *rawEvent, Ar
     fConditioner=AraEventConditioner::Instance();
     fConditioner->conditionEvent(this);
   }*/
+  // All the functions in the conditioner class are imported and available into the calibrateEvent() function -MK-
 }
 
 
