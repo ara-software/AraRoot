@@ -968,6 +968,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     if(hasCableDelays(calType)){
         CableDelay(theEvent, timeMapIt, unixtime, thisStationId);
     }
+    delete sampleList, capArrayList; // delete the pointer
+
     // fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG                        
 }
 
