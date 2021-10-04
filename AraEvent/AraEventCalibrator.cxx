@@ -19,6 +19,7 @@
 #include <zlib.h>
 #include <cstdlib>
 #include <sstream>
+#include <numeric>
 
 #include "araSoft.h"
 
