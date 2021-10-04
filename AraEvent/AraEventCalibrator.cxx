@@ -1724,7 +1724,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
             //double modAdcCounts=adcCounts;//-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
 
-            Double_t param_6; // Define the fit_const here (MK)
+            Double_t fit_const; // Define the fit_const here (MK)
             double adc_zero_def; // Define which value will be used to choose a positive or negative conversion
             if (stationId != 5) {
                 fit_const = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6];
