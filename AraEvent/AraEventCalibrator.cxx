@@ -1362,7 +1362,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
         std::cerr << "Can not allocate memory for pedestal file\n";
         exit(0);
     }
-           
+
     // now, we open and load the pedestal files
     gzFile inPed = gzopen(fAtriPedFile[calibIndex], "r");
     char buffer[6000000];
@@ -1378,7 +1378,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
     std::string block_buf;
     std::string chan_buf;
     std::string ped_buf;
-
+   
     while ( ss >> dda_buf >> block_buf >> chan_buf){
         // we cast the dda, block, and channels into integers
         int dda = std::stoi(dda_buf);
@@ -1391,7 +1391,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
             short pedVal = short(std::stoi(ped_buf));
             fAtriPeds[RawAtriStationEvent::getPedIndex(dda,block,chan,samp)]=pedVal;
         }
-    }  
+    }
     gzclose(inPed);
     
     // Now we set the gotPedFile flags to indicate which station we have in memory
@@ -1657,7 +1657,6 @@ Bool_t AraEventCalibrator::fileExists(char *fileName){
 
 
 Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
-    std::ifstream theFile(fileName);
     Int_t numPedVals=0;
     gzFile inPed = gzopen(fileName, "r");
     if(inPed){
