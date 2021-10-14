@@ -22,21 +22,27 @@
 #include <sstream>
 #include <numeric>
 
-//! Imported from the conditioner class, 27-09-2021 -MK-
+/*!
+    Returns if a calibration type should or should not trim the first block of a waveform., 27-09-2021 -MK-
+    The first block trimming is triggerred above kVoltageTime mode. 
+    So that, analyzers still can choose to see 1st block at least in ADC WF
+    If analyzers want to see 1st block with voltage value, uncommand out the return kFALSE;
+*/
 /*!
     \param calType A calibration mode listed in the EAraCalType
-    \return boolean True or False
+    \return boolean True: perform the first block trimming, False: skip it
 */
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 {
+    //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
 }
 
-//! Imported from the conditioner class, 27-09-2021 -MK-
+//! Returns if a calibration type should or should not invert the RF channels = 0,4,8 in A3, 27-09-2021 -MK-
 /*!
     \param calType A calibration mode listed in the EAraCalType
-    \return boolean True or False
+    \return boolean True: perform the inversion for only RF channels = 0,4,8 in A3, False: skip it
 */
 Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 {
@@ -44,10 +50,10 @@ Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
     return kTRUE;
 }
 
-//! Zeroing ADC WF by subtracting mean, 27-09-2021 -MK-
+//! Zeroing ADC WF by subtracting mean based on inputted calibration type, 27-09-2021 -MK-
 /*!
     \param calType A calibration mode listed in the EAraCalType
-    \return boolean True or False
+    \return boolean True: perform the ApplyMeanZero for ADC WF, False: skip it
 */
 Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 {
@@ -55,10 +61,10 @@ Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
     return kTRUE;    
 }
 
-//! Zeroing voltage WF by subtracting mean, 27-09-2021 -MK-
+//! Zeroing voltage WF by subtracting mean based on inputted calibration type, 27-09-2021 -MK-
 /*!
     \param calType A calibration mode listed in the EAraCalType
-    \return boolean True or False
+    \return boolean True: perform the ApplyMeanZero for voltage WF, False: skip it
 */
 Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
 {
@@ -924,15 +930,15 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     */
 
     //! 4th step. Erase first block that currupted by trigger
-    //! Apply conditioner function here for the correct ApplyZeroMean() and VoltageCalibration() performance
+    //! Apply conditioner function here
     if(hasTrimFirstBlock(calType)) {
         hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
     }
 
-    //! 5th step. Timing Calibration
+    //! 5th step. Timing calibration and bad sample removal
     //! This step calibrates the time of each sample and only selecting the samples that have good performance
     if(AraCalType::hasBinWidthCalib(calType)){ 
-        hasTimingCalib = TimingCalibration(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
+        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
     }
     
     //! 6th step. Pedestal subtraction
@@ -945,14 +951,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         CommonMode(theEvent, voltMapIt);
     }
 
-    //! 8th step. Inverts only RF channels = 0,4,8 in A3
-    //! Apply conditioner function here for correct VoltageCalibration() performance
-    if (hasInvertA3Chans(calType) && thisStationId ==3) {
-        InvertA3Chans(theEvent, voltMapIt, thisStationId);
-    }
-
     /*!
-        9th step. Zeroing ADC WF by subtracting mean
+        8th step. Zeroing ADC WF by subtracting mean
+        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
 
         Previous updates 
         RJN change 13-Feb-2013
@@ -967,23 +968,42 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 
         Latest updates
         MK added 27-09-2021
-        Adds back just for A2 and A3. Dealing with outlier events
-        Some of the WFs have ADC values that are far from the expected ADC from thermal noise
-        This outlier event needs to be treated by ApplyZeroMean()
-        The related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No. 6~7)
+        Adds back just for A2 and A3. Dealing with outlier events presented in this talk:
+        https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No. 6~7)
+        Some of the WFs have ADC values that are far from the expected ADC values from thermal noise
+        Even though we use the repeder pedestal, these WFs are not nicely centering in zero
+        The best solution we can have for now is applying ApplyZeroMean() before the conversion
+        In the future, we might need to apply some sort of filtering method to exclude these outlier events
+        
+        I'm not sure A5 has this kind of outlier event. so, I perserve original condition that not applying 'Zero meaning before conversion' just for A5
+        In the future, we might need to check whether A5 also has outlier event or not
     */
     if(hasADCZeroMean(calType) && thisStationId != 5) {
-        ApplyZeroMean(theEvent, voltMapIt);
+        ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
     }
 
-    //! 10th step. Voltage calibration
+    //! 9th step. Voltage calibration
     if(hasVoltCal(calType)) {
         VoltageCalibration(theEvent, voltMapIt, sampleList, thisStationId);
     }
    
-    //! 11th step. Zeroing voltage WF by subtracting mean
+    /*! 
+        10th step. Zeroing voltage WF by subtracting mean
+        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        
+        Even though WF is centering in zero before ADC conversion, sometimes mean of voltage WF has an offset from zero
+        Example is in this talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No.9)
+        It is mainly haeepning in A3 data. 2nd ApplyZeroMean() is required for this offset
+        In the future, we might need to perform recalibration to get a better conversion factor
+    */
     if(hasVoltZeroMean(calType)) {
-        ApplyZeroMean(theEvent, voltMapIt);
+        ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
+    }
+
+    //! 11th step. Inverts only RF channels = 0,4,8 in A3
+    //! Apply conditioner function here
+    if (hasInvertA3Chans(calType) && thisStationId ==3) {
+        InvertA3Chans(theEvent, voltMapIt, thisStationId);
     }
 
     //! 12th step. Remove knwon cable delay
@@ -1090,10 +1110,10 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
 }
 
 /*! 
-    Timing calibration
+    Timing calibration and bad sample removal
     This step calibrates the time of each sample and only selecting the samples that have good performance
     fAtriSampleIndex and fAtriSampleTimes stores the sample numbers and times that have good performance
-    WF will be trimmed by these tables
+    Based on the sample numbers in the tables, this step will remove bad samples from WF
     The sampleList that contains the sample number of WF will be updated by the good performance sample numbers 
     This sampleList will be used for calling the right pedestal subtraction samples and the conversion factor samples 
 */
@@ -1106,7 +1126,7 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
     \param hasTrimFirstBlk boolean statement that whether first block trimming is already performed or not
     \return boolean true or false
 */
-Bool_t AraEventCalibrator::TimingCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
+Bool_t AraEventCalibrator::TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
 {
  
     int capArrayNumber = 0;
@@ -1186,7 +1206,7 @@ void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, s
     }
 }
 
-//! Voltage calibration
+//! Voltage calibration. Converts ADC to voltage sample by sample
 /*!
     \param theEvent the useful atri event pointer
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
@@ -1278,14 +1298,13 @@ void AraEventCalibrator::ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::
 }
 
 //! Erase first block that currupted by trigger
-//! Apply conditioner function here for the correct ApplyZeroMean() and VoltageCalibration() performance
 /*!
     \param theEvent the useful atri event pointer
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
     \param timeMapIt the iterator referring to the time elements in the 2d map container
     \param sampleList the pointer of WF sample number
     \param capArrayList the pointer of  'block number' modulo 2
-    \param hasTimingCalib boolean statement that whether TimingCalibration is already performed or not
+    \param hasTimingCalib boolean statement that whether TimingCalibrationAndBadSampleReomval is already performed or not
     \return boolean true or false
 */
 Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib)
@@ -1316,7 +1335,7 @@ Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std:
         }
     }
     /*!
-        returning '!hasTooFewBlocks' for let TimingCalibration() know the block is trimmed or not.
+        returning '!hasTooFewBlocks' for let TimingCalibrationAndBadSampleReomval() know the block is trimmed or not.
         fAtriSampleTimes table doesn't know block is trimmed unless this return
     */
     if(hasTooFewBlocks) return !hasTooFewBlocks;
@@ -1324,7 +1343,7 @@ Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std:
     //! if number of samples in the WF is bigger than first block, perform first block trimming
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
         first_capNumber = capArrayList->at(dda)[0];
-        capArrayList->at(dda).erase(capArrayList->at(dda).begin(),capArrayList->at(dda).begin()+1); ///< delete the first block number. This trimming is needed for TimingCalibration()
+        capArrayList->at(dda).erase(capArrayList->at(dda).begin(),capArrayList->at(dda).begin()+1); ///< delete the first block number. This trimming is needed for TimingCalibrationAndBadSampleReomval()
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
             Int_t chanId=chan+RFCHAN_PER_DDA*dda;
             voltMapIt=theEvent->fVolts.find(chanId);
@@ -1372,24 +1391,45 @@ void AraEventCalibrator::CommonMode(UsefulAtriStationEvent *theEvent, std::map< 
     }
 }
 
-//! Make the mean of the voltage samples
-//! Apply Brian's conditioner inside of calibration
+/*! 
+    Make the mean of the voltage samples
+    Apply Brian's conditioner inside of calibration
+    If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+*/
 /*!
     \param theEvent the useful atri event pointer
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
     \return void
 */
-void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt)
+void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk, Bool_t hasTimingCalib)
 {
+    int first_block_len = 0;
+    int numPoints_for_mean = 0;
+    int first_capNumber = 0;
+    int samples_per_block = SAMPLES_PER_BLOCK;
+
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+        first_capNumber = capArrayList->at(dda)[0];
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
             Int_t chanId=chan+RFCHAN_PER_DDA*dda;
             voltMapIt=theEvent->fVolts.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
-                //! compute the mean, and let C++ help by doing the addition for us
-                Double_t mean = std::accumulate((voltMapIt->second).begin(), (voltMapIt->second).end(), 0.0);
                 Int_t numPoints=(voltMapIt->second).size();
-                mean /= numPoints;
+                if (!hasTrimFirstBlk) {
+                    if (hasTimingCalib) {
+                        first_block_len = fAtriNumSamples[dda][chan][first_capNumber]; ///< use the exact number of samples in the first if timing calibration has already happened
+                    } else { 
+                        first_block_len = samples_per_block;
+                    }
+                    numPoints_for_mean = numPoints - first_block_len;
+                } else {
+                    numPoints_for_mean = numPoints;
+                    first_block_len = 0;
+                }
+                //! compute the mean, and let C++ help by doing the addition for us
+                //! If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+                Double_t mean = std::accumulate((voltMapIt->second).begin() + first_block_len, (voltMapIt->second).end(), 0.0);
+                mean /= numPoints_for_mean;
                 for(int samp=0;samp<numPoints;samp++) {
                     voltMapIt->second[samp]-=mean;
                 }
@@ -1871,7 +1911,13 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
             }
 
-            if (stationId == 5 && volts > 800) volts=modAdcCounts; ///< It seems ADC values between -400 ~ 400 are not converted to over 800 millivolts on A2/3. Apply this option just for A5 (MK)
+            /*!
+                This condition is designed to exclude the conversion result that causing unusual high voltage from low ADC
+                If the voltage value is over 800, this condition decides to use just ADC value instead of the conversion result
+                It seems ADC values between -400 ~ 400 are not converted to over 800 millivolts on A2/3
+                I leave this condition just for A5 -MK-
+            */
+            if (stationId == 5 && volts > 800) volts=modAdcCounts;
 
         }
         else {
