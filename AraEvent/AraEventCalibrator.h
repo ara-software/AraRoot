@@ -133,17 +133,16 @@ class AraEventCalibrator : public TObject
     Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
     Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
 
-    //Modulates calibration step -MK-
-    void DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); // Converts DAQ data format to Electronic channel format
+    //! Modulates calibration step -MK-
+    void UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); ///< Converts DAQ data format to Electronic channel format
+    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib); ///< Erase first block that currupted by trigger
+    Bool_t TimingCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); ///< Trims samples using fAtriSampleTimes table
+    void PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); ///< Subtracts pedestal from raw data
     void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
-    void ZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt); // Zeroing WF by subtracting mean. ADC or Voltage
-    void CableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); // Remove knwon cable delay
-    int TrimLenIdentifier(std::vector<int> sampleList); // Identify number of samples in the first block
-    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); // Erase first block that currupted by trigger
-    void VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); // Converts ADC to Voltage using conversion table
-    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); // Inverts only RF channels = 0,4,8 in A3
-    void PedSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); // Subtracts pedestal from raw data
-    void BinWidthCalib(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); // Trims samples using fAtriSampleIndex table
+    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); ///< Inverts only RF channels = 0,4,8 in A3
+    void ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt); ///< Zeroing WF by subtracting mean. ADC or Voltage
+    void VoltageCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); ///< Converts ADC to Voltage using conversion table
+    void ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); ///< Remove knwon cable delay
 
     protected:
         static AraEventCalibrator *fgInstance;  ///< protect against multiple instances

@@ -22,35 +22,48 @@
 #include <sstream>
 #include <numeric>
 
-
+//! Imported from the conditioner class, 27-09-2021 -MK-
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True or False
+*/
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
-{// Imported from the conditioner class, 27-09-2021 -MK-
-    if(calType==kADC) return kFALSE;
-    if(calType<kJustPed) return kFALSE;
-    return kTRUE;
-
-}
-
-Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
-{// Imported from the conditioner class, 27-09-2021 -MK-
-    if(calType==kADC) return kFALSE;
-    if(calType<kJustPed) return kFALSE;
-    return kTRUE;
-}
-
-Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
-{// Zeroing ADC WF by subtracting mean, 27-09-2021 -MK-
-    if(calType==kADC) return kFALSE;
-    if(calType<kJustPed) return kFALSE;
-    return kTRUE;
-    
-}
-
-Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
-{// Zeroing voltage WF by subtracting mean, 27-09-2021 -MK-
+{
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
-    
+}
+
+//! Imported from the conditioner class, 27-09-2021 -MK-
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True or False
+*/
+Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
+{
+    if(calType<kVoltageTime) return kFALSE;
+    return kTRUE;
+}
+
+//! Zeroing ADC WF by subtracting mean, 27-09-2021 -MK-
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True or False
+*/
+Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
+{
+    if(calType<kVoltageTime) return kFALSE;
+    return kTRUE;    
+}
+
+//! Zeroing voltage WF by subtracting mean, 27-09-2021 -MK-
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True or False
+*/
+Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
+{
+    if(calType<kVoltageTime) return kFALSE;
+    return kTRUE;
 }
 
 //added, 12-Feb 2014 -THM-
@@ -58,7 +71,7 @@ Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
     if(calType==kLatestCalib14to20_Bug) return kFALSE;
     //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
-    if(calType<=kVoltageTime) return kFALSE;
+    if(calType<kVoltageTime) return kFALSE; ///< Need to be only kFALSE before voltage calibration
     return kTRUE;
 }
 
@@ -879,21 +892,22 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 {
     // fprintf(stderr, "begin calibrating event\n");//FIXME
 
-    // Modulates calibration step. MK added 27-09-2021
-    // 1st step. Configures basic information (station id, unixtime) and arrays (time,volt, sample index, etc.)
+    //! Modulates calibration step. MK added 27-09-2021
+    //! 1st step. Configures basic information (station id, unixtime) and arrays (time,volt, sample index, etc.)
     AraStationId_t thisStationId = theEvent->stationId;
-    Double_t unixtime = theEvent->unixTime; // The unixtime line was added by UAL 01/26/2019.
+    Double_t unixtime = theEvent->unixTime; ///< The unixtime line was added by UAL 01/26/2019.
     std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
     std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
-    std::vector<std::vector<int> > *sampleList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0));
-    std::vector<std::vector<int> > *capArrayList = new std::vector<std::vector<int> >(DDA_PER_ATRI, std::vector<int>(0));
+    std::vector<std::vector<int> > *sampleList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
+    std::vector<std::vector<int> > *capArrayList = new std::vector<std::vector<int> >(DDA_PER_ATRI, std::vector<int>(0)); ///< pointer for 'block number' modulo 2
     Bool_t hasTrimFirstBlk = false;
+    Bool_t hasTimingCalib = false; 
 
-    // 2nd step. Loads Tables (Pedestal, Conversion factor, Sample timing) 
+    //! 2nd step. Loads Tables (Pedestal, Conversion factor, Sample timing) 
     Int_t calibIndex = AraGeomTool::getStationCalibIndex(thisStationId);
-    // RJN debug
+    //! RJN debug
     // std::cout << "Station Id fun: " << (int)thisStationId << "\t" << calibIndex << "\n";
-    // Only load the pedestals / calib if they are not already loaded
+    //! Only load the pedestals / calib if they are not already loaded
     if(fGotAtriCalibFile[calibIndex]==0){
         loadAtriCalib(thisStationId);
     }
@@ -901,80 +915,99 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         loadAtriPedestals(thisStationId);
     }
 
-    // 3rd step. Converts DAQ data format to Electronic channel format
-    // Bin trimming and Pedestal subtraction are now in the seperate functions
-    DAQtoEleCh(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
+    //! 3rd step. Converts DAQ data format to Electronic channel format
+    UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
 
-    // From here, each function is independent. So, You can call the functiions at any step
-    // As a default, prioritizing the functions that reduce the number of samples
-    
-    // 4th step. Erase first block that currupted by trigger
-    // Apply conditioner function here for the correct ZeroMean() and VoltCal() performance
+    /*!
+        From here, each function is independent. So, You can call the functiions at any step
+        As a default, prioritizing the functions that reduce the number of samples
+    */
+
+    //! 4th step. Erase first block that currupted by trigger
+    //! Apply conditioner function here for the correct ApplyZeroMean() and VoltageCalibration() performance
     if(hasTrimFirstBlock(calType)) {
-        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
-    }    
+        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
+    }
 
-    // 5th step. Trims samples using fAtriSampleIndex table
-    // A trimmed sampleList will be used for calling the right pedestal subtraction samples and the conversion factor samples
+    //! 5th step. Timing Calibration
+    //! This step calibrates the time of each sample and only selecting the samples that have good performance
     if(AraCalType::hasBinWidthCalib(calType)){ 
-        BinWidthCalib(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
+        hasTimingCalib = TimingCalibration(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
     }
     
-    // 6th step. Pedestal subtraction
+    //! 6th step. Pedestal subtraction
     if(hasPedestalSubtraction(calType)) {
-        PedSubtraction(theEvent, voltMapIt, sampleList);
+        PedestalSubtraction(theEvent, voltMapIt, sampleList);
     }
     
-    // 7th step. Common mode
+    //! 7th step. Common mode
     if(hasCommonMode(calType)) {
         CommonMode(theEvent, voltMapIt);
     }
 
-    // 8th step. Inverts only RF channels = 0,4,8 in A3
-    // Apply conditioner function here for correct VoltCal() performance
+    //! 8th step. Inverts only RF channels = 0,4,8 in A3
+    //! Apply conditioner function here for correct VoltageCalibration() performance
     if (hasInvertA3Chans(calType) && thisStationId ==3) {
         InvertA3Chans(theEvent, voltMapIt, thisStationId);
     }
 
-    // 9th step. Zeroing ADC WF by subtracting mean
-    // RJN change 13-Feb-2013
-    // Now do zero mean,   
-    // THM added 12-Feb-2014
-    // After zeroMean (and only then!!) do voltage calibration,
-    // KAH added 09-15-2020
-    // first, need to do voltage calibration. if you zero-mean the block beforehand, the ADC values get screwed up and the resulting waveform looks bad.
-    // each sample needs to be individually calibrated. This requires knowing the dda, the channel, the block and the sample%64. 
-    // The below code loops over each of these.
-    // the previous version of the code did the zero mean before the votlage calibration. If there are issues with A2 or A3 calibration, try switching the order back.
-    // MK added 27-09-2021
-    // Adds back just for A2 and A3. Dealing with outlier events
+    /*!
+        9th step. Zeroing ADC WF by subtracting mean
+
+        Previous updates 
+        RJN change 13-Feb-2013
+        Now do zero mean,   
+        THM added 12-Feb-2014
+        After zeroMean (and only then!!) do voltage calibration,
+        KAH added 09-15-2020
+        first, need to do voltage calibration. if you zero-mean the block beforehand, the ADC values get screwed up and the resulting waveform looks bad.
+        each sample needs to be individually calibrated. This requires knowing the dda, the channel, the block and the sample%64. 
+        The below code loops over each of these.
+        the previous version of the code did the zero mean before the votlage calibration. If there are issues with A2 or A3 calibration, try switching the order back.
+
+        Latest updates
+        MK added 27-09-2021
+        Adds back just for A2 and A3. Dealing with outlier events
+        Some of the WFs have ADC values that are far from the expected ADC from thermal noise
+        This outlier event needs to be treated by ApplyZeroMean()
+        The related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No. 6~7)
+    */
     if(hasADCZeroMean(calType) && thisStationId != 5) {
-        ZeroMean(theEvent, voltMapIt);
+        ApplyZeroMean(theEvent, voltMapIt);
     }
 
-    // 10th step. Voltage calibration
+    //! 10th step. Voltage calibration
     if(hasVoltCal(calType)) {
-        VoltCal(theEvent, voltMapIt, sampleList, thisStationId);
+        VoltageCalibration(theEvent, voltMapIt, sampleList, thisStationId);
     }
    
-    // 11th step. Zeroing voltage WF by subtracting mean
+    //! 11th step. Zeroing voltage WF by subtracting mean
     if(hasVoltZeroMean(calType)) {
-        ZeroMean(theEvent, voltMapIt);
+        ApplyZeroMean(theEvent, voltMapIt);
     }
 
-    // 12th step. Remove knwon cable delay
-    // jpd change 25-03-13
-    // now subtract off the cable delays
+    //! 12th step. Remove knwon cable delay
+    //! jpd change 25-03-13
+    //! now subtract off the cable delays
     if(hasCableDelays(calType)){
-        CableDelay(theEvent, timeMapIt, unixtime, thisStationId);
+        ApplyCableDelay(theEvent, timeMapIt, unixtime, thisStationId);
     }
-    delete sampleList, capArrayList; // delete the pointer
+    delete sampleList, capArrayList; ///< delete the pointer
 
     // fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG                        
 }
 
-void AraEventCalibrator::DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList)
-{ // Converts DAQ data format to Electronic channel format
+//! Converts DAQ data format to Electronic channel format
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param timeMapIt the iterator referring to the time elements in the 2d map container
+    \param sampleList the pointer of WF sample numbers
+    \param capArrayList the pointer of 'block number' modulo 2
+    \return void
+*/
+void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList)
+{
 
     int samples_per_block = SAMPLES_PER_BLOCK;
 
@@ -982,11 +1015,11 @@ void AraEventCalibrator::DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< 
     std::vector< std::vector<UShort_t> >::iterator vecVecIt;
     std::vector< UShort_t >::iterator shortIt;
 
-    //Step one is loop over the blocks 
+    //! Step one is loop over the blocks 
     for(blockIt = theEvent->blockVec.begin();
             blockIt!=theEvent->blockVec.end();
             blockIt++) {
-        // Step two is determine the channel Ids
+        //! Step two is determine the channel Ids
         Int_t irsChan[8];
         Int_t numChans=0;
         for(Int_t bit=0;bit<8;bit++) {
@@ -1002,7 +1035,7 @@ void AraEventCalibrator::DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< 
         Int_t capArray=blockIt->getCapArray();
         capArrayList->at(dda).push_back(capArray);
 
-        // Step three is loop over the channels within a block
+        //! Step three is loop over the channels within a block
         Int_t uptoChan=0;
         for(vecVecIt=blockIt->data.begin();
             vecVecIt!=blockIt->data.end();
@@ -1014,41 +1047,41 @@ void AraEventCalibrator::DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< 
             // << dda << "\t" << block << "\t" << RawAtriStationEvent::getPedIndex(dda,block,chan,0) << "\n";
             uptoChan++;
 
-            // Step four is to check if we have already got this chanId
+            //! Step four is to check if we have already got this chanId
             timeMapIt=theEvent->fTimes.find(chanId);
             Double_t time=0;
             Int_t firstTime=1;
             if(timeMapIt==theEvent->fTimes.end()) {
-                // First time round for this channel
+                //! First time round for this channel
                 std::vector <Double_t> tempTimes;
                 std::vector <Double_t> tempVolts;
-                // Now need to insert empty vector into map
+                //! Now need to insert empty vector into map
                 theEvent->fTimes.insert( std::pair< Int_t, std::vector <Double_t> >(chanId,tempTimes));
                 theEvent->fVolts.insert( std::pair< Int_t, std::vector <Double_t> >(chanId,tempVolts));
                 theEvent->fNumChannels++;
             }
             else {
-                // Just get the last time
+                //! Just get the last time
                 time=timeMapIt->second.back();
                 // if(dda==1 &&chan==1)
                 // std::cout << "Last time " << time << "\t" << timeMapIt->second.size() << "\n";
                 firstTime=0;
             }
    
-            // Set the iterators to point to the correct channel in the map
+            //! Set the iterators to point to the correct channel in the map
             timeMapIt=theEvent->fTimes.find(chanId);
             voltMapIt=theEvent->fVolts.find(chanId);
 
             int samp=0;
-            // Now loop over the 64 samples
+            //! Now loop over the 64 samples
             for(shortIt=vecVecIt->begin();
                 shortIt!=vecVecIt->end();
                 shortIt++){
 
                 time+=NSPERSAMP_ATRI;
-                timeMapIt->second.push_back(time); ///<Filling with time
-                voltMapIt->second.push_back((*shortIt)); //Filling with volts
-                sampleList->at(chanId).push_back(block * samples_per_block + samp); //Filling with sample index. It is needed for pedestal subtraction and voltage calibration
+                timeMapIt->second.push_back(time); ///< Filling with time
+                voltMapIt->second.push_back((*shortIt)); ///< Filling with volts
+                sampleList->at(chanId).push_back(block * samples_per_block + samp); ///< Filling with sample number. It is needed for pedestal subtraction and voltage calibration
                 samp++;
 
             }
@@ -1056,21 +1089,38 @@ void AraEventCalibrator::DAQtoEleCh(UsefulAtriStationEvent *theEvent, std::map< 
     }
 }
 
-void AraEventCalibrator::BinWidthCalib(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
-{ // Trims samples using fAtriSampleIndex table. A trimmed sampleList will be used for calling the right pedestal subtraction samples and the conversion factor samples
+/*! 
+    Timing calibration
+    This step calibrates the time of each sample and only selecting the samples that have good performance
+    fAtriSampleIndex and fAtriSampleTimes stores the sample numbers and times that have good performance
+    WF will be trimmed by these tables
+    The sampleList that contains the sample number of WF will be updated by the good performance sample numbers 
+    This sampleList will be used for calling the right pedestal subtraction samples and the conversion factor samples 
+*/
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param timeMapIt the iterator referring to the time elements in the 2d map container
+    \param sampleList the pointer of WF sample numbers
+    \param capArrayList the pointer of 'block number' modulo 2
+    \param hasTrimFirstBlk boolean statement that whether first block trimming is already performed or not
+    \return boolean true or false
+*/
+Bool_t AraEventCalibrator::TimingCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
+{
  
     int capArrayNumber = 0;
     int samples_per_block = SAMPLES_PER_BLOCK;
 
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
-            Int_t chanId=chan+RFCHAN_PER_DDA*dda; // make electronic channel number
+            Int_t chanId=chan+RFCHAN_PER_DDA*dda; ///< make electronic channel number
             voltMapIt=theEvent->fVolts.find(chanId);
             timeMapIt=theEvent->fTimes.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
                 Int_t numPoints=(voltMapIt->second).size();
                
-                // copy the voltage and sample index in temperary array and clear them before filling with trimmed values
+                //! copy the voltage and sample index in temperary array and clear them before filling with calibrated values
                 std::vector<double> tempVolts;
                 tempVolts = voltMapIt->second;
                 voltMapIt->second.clear();
@@ -1083,39 +1133,44 @@ void AraEventCalibrator::BinWidthCalib(UsefulAtriStationEvent *theEvent, std::ma
                 for(int blk=0; blk<numBlock; blk++){
                     capArrayNumber = capArrayList->at(dda)[blk];
  
-                    // array that stores trimmed values based on the tables for each block
+                    //! array that stores trimmed values based on the sample indexes in the fAtriSampleIndex table
                     int voltIndex[samples_per_block];
                     Double_t tempTimes[samples_per_block];
 
                     for (int samp=0; samp<samples_per_block; samp++){
-                        // Select index and time from tables
+                        //! Select index and time of well calibrated samples from the tables
                         voltIndex[samp] = fAtriSampleIndex[dda][chan][capArrayNumber][samp] + blk * samples_per_block;
-                        // blk is the same as blockInEvent from previous version. 
-                        // hasTrimFirstBlk will tell you whether first block is trimmed or not
-                        tempTimes[samp] = (blk + hasTrimFirstBlk) * 20.0 + fAtriSampleTimes[dda][chan][capArrayNumber][samp] - 20.0*capArrayNumber;
+                        tempTimes[samp] = (blk + hasTrimFirstBlk) * 20.0 + fAtriSampleTimes[dda][chan][capArrayNumber][samp] - 20.0*capArrayNumber; ///< hasTrimFirstBlk will take into account whether first block is trimmed or not
                     }   
          
-                    Int_t numSamples=fAtriNumSamples[dda][chan][capArrayNumber]; // choose a range that have trimmed values
+                    Int_t numSamples=fAtriNumSamples[dda][chan][capArrayNumber]; ///< number of samples in each block after timing calibration
                     for (int trim=0; trim<numSamples; trim++){
-                        timeMapIt->second.push_back(tempTimes[trim]); ///<Filling with time
-                        voltMapIt->second.push_back(tempVolts[voltIndex[trim]]); ///<Filling with volt
-                        sampleList->at(chanId).push_back(tempSamps[voltIndex[trim]]); ///<Filling with sample index
+                        timeMapIt->second.push_back(tempTimes[trim]); ///< Filling with time
+                        voltMapIt->second.push_back(tempVolts[voltIndex[trim]]); ///< Filling with volt
+                        sampleList->at(chanId).push_back(tempSamps[voltIndex[trim]]); ///< Filling with sample index
                     }
                 }
             } 
         }
     }
+    return true;
 }
 
-void AraEventCalibrator::PedSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList)
-{ // Subtracts pedestal from raw data
+//! Pedestal subtraction
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param sampleList the pointer of WF sample numbers
+*/
+void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList)
+{
 
-    int sampleIndex, sampleNumber, blockIndex = 0; // capacitor sample index, block sample index, capacitor block index
+    int sampleIndex, sampleNumber, blockIndex = 0; ///< capacitor sample index, block sample index, capacitor block index
     int samples_per_block = SAMPLES_PER_BLOCK;
 
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
-            Int_t chanId=chan+RFCHAN_PER_DDA*dda; // make electronic channel number
+            Int_t chanId=chan+RFCHAN_PER_DDA*dda; ///< make electronic channel number
             voltMapIt=theEvent->fVolts.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
                 Int_t numPoints=(voltMapIt->second).size();
@@ -1123,7 +1178,7 @@ void AraEventCalibrator::PedSubtraction(UsefulAtriStationEvent *theEvent, std::m
                     sampleIndex = sampleList->at(chanId)[samp];
                     sampleNumber = sampleIndex%samples_per_block;
                     blockIndex = int(sampleIndex/samples_per_block);
-                    ///<Filling with ADC-Pedestal. Iunputted pedestal will be stored in fAtriPeds table
+                    ///< Filling with ADC-Pedestal. Iunputted pedestal will be stored in fAtriPeds table
                     voltMapIt->second[samp] -= (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)];
                 }
             }
@@ -1131,10 +1186,17 @@ void AraEventCalibrator::PedSubtraction(UsefulAtriStationEvent *theEvent, std::m
     }
 }
 
-void AraEventCalibrator::VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId)
+//! Voltage calibration
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param stationId id of the station
+    \return void
+*/
+void AraEventCalibrator::VoltageCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId)
 {
-    int blockIndex = 0;//This is now filled in the code below- KAH
-    int sampleIndex, sampleNumber = 0; //removed this and instead use "samp" variable below. //re-use this for the trimmed sample index -MK-
+    int blockIndex = 0;///< This is now filled in the code below- KAH
+    int sampleIndex, sampleNumber = 0; ///< removed this and instead use "samp" variable below. re-use this for the trimmed sample index -MK-
     int samples_per_block = SAMPLES_PER_BLOCK;
 
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
@@ -1144,11 +1206,11 @@ void AraEventCalibrator::VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int
             if(voltMapIt!=theEvent->fVolts.end()) {
                 Int_t numPoints=(voltMapIt->second).size();
                 for(int samp=0;samp<numPoints;samp++) {
-                    sampleIndex = sampleList->at(chanId)[samp]; // capacitor sample index
-                    sampleNumber = sampleIndex%samples_per_block; // block sample index
-                    blockIndex = int(sampleIndex/samples_per_block); // capacitor block index
-                    // Move to conversion function
-                    // Apply conversion parameter on each sample
+                    sampleIndex = sampleList->at(chanId)[samp]; ///< capacitor sample index
+                    sampleNumber = sampleIndex%samples_per_block; ///< block sample index
+                    blockIndex = int(sampleIndex/samples_per_block); ///< capacitor block index
+                    //! Move to conversion function
+                    //! Apply conversion parameter on each sample
                     voltMapIt->second[samp] = convertADCtoMilliVolts( voltMapIt->second[samp], dda, blockIndex, chan, sampleNumber, thisStationId);
                 }
             }
@@ -1156,17 +1218,25 @@ void AraEventCalibrator::VoltCal(UsefulAtriStationEvent *theEvent, std::map< Int
     }
 }
 
+//! Inverts only RF channels = 0,4,8 in A3
+//! Apply Brian's conditioner inside of calibration
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param stationId id of the station
+    \return void
+*/
 void AraEventCalibrator::InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId)
-{//Apply Brian's conditioner inside of calibration
+{
     
     std::vector<Int_t> list_to_invert;
     list_to_invert.push_back(0);
     list_to_invert.push_back(4);
     list_to_invert.push_back(8);
 
-    //loop over that list and invert them (multiply by -1)
+    //! loop over that list and invert them (multiply by -1)
     for(int i=0; i<list_to_invert.size(); i++){
-        //get the elec chan
+        //! get the elec chan
         Int_t rf_chan = list_to_invert[i];
         Int_t elec_chan = AraGeomTool::Instance()->getElecChanFromRFChan(rf_chan, thisStationId);
  
@@ -1174,7 +1244,7 @@ void AraEventCalibrator::InvertA3Chans(UsefulAtriStationEvent *theEvent, std::ma
         if(voltMapIt!=theEvent->fVolts.end()) {
             Int_t numPoints=(voltMapIt->second).size();
            
-            //perform inversion on every sample
+            //! perform inversion on every sample
             for(int samp=0;samp<numPoints;samp++) {
                 voltMapIt->second[samp]*=-1.;
             }
@@ -1182,12 +1252,19 @@ void AraEventCalibrator::InvertA3Chans(UsefulAtriStationEvent *theEvent, std::ma
     }
 }
 
-void AraEventCalibrator::CableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId)
-{ // Remove knwon cable delay
+//! Remove knwon cable delay
+/*!
+    \param theEvent the useful atri event pointer
+    \param timeMapIt the iterator referring to the time elements in the 2d map container
+    \param stationId id of the station
+    \return void
+*/
+void AraEventCalibrator::ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId)
+{
     
     for(int rfChan=0;rfChan<ANTS_PER_ATRI;rfChan++){
         AraGeomTool* tempGeom = AraGeomTool::Instance();
-        tempGeom->LoadSQLDbAtri(unixtime,thisStationId); // LoadSQLDbAtri() added by UAL 01/25/2019
+        tempGeom->LoadSQLDbAtri(unixtime,thisStationId); ///< LoadSQLDbAtri() added by UAL 01/25/2019
         Double_t delay=tempGeom->getStationInfo(thisStationId)->getCableDelay(rfChan);
         int chanId = tempGeom->getElecChanFromRFChan(rfChan, thisStationId);
         timeMapIt=theEvent->fTimes.find(chanId);
@@ -1200,71 +1277,84 @@ void AraEventCalibrator::CableDelay(UsefulAtriStationEvent *theEvent, std::map< 
     }
 }
 
-int AraEventCalibrator::TrimLenIdentifier(std::vector<int> sampleList)
-{ // A function for identifying number of sample in the first block. If BinWidthCalib() is performed before TrimFirstBlock(), It will be not 64
+//! Erase first block that currupted by trigger
+//! Apply conditioner function here for the correct ApplyZeroMean() and VoltageCalibration() performance
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param timeMapIt the iterator referring to the time elements in the 2d map container
+    \param sampleList the pointer of WF sample number
+    \param capArrayList the pointer of  'block number' modulo 2
+    \param hasTimingCalib boolean statement that whether TimingCalibration is already performed or not
+    \return boolean true or false
+*/
+Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib)
+{
 
-    int trim_len = 0;
-    int sampleNumber = -1;
-    int samples_per_block = SAMPLES_PER_BLOCK;
+    int first_block_len = 0;
+    int first_capNumber = 0;
 
-    Int_t numPoints=sampleList.size();
-    for(int samp=0;samp<numPoints;samp++){
-        //std::cout<<"sampleNumber:"<<sampleNumber<<", sampleList[samp]%samples_per_block:"<<sampleList[samp]%samples_per_block<<std::endl;
-        if (sampleNumber < sampleList[samp]%samples_per_block){ // stop before count the sample in second block
-            sampleNumber = sampleList[samp]%samples_per_block;
-            trim_len += 1;
-        } else {
-            //std::cout<<"trim_len:"<<trim_len<<std::endl;
-            return trim_len;
-        }
-    } return numPoints;
-}
-
-Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList)
-{// Erase first block that currupted by trigger. Apply conditioner function here for the correct ZeroMean() and VoltCal() performance
-
-    int samples_per_block = SAMPLES_PER_BLOCK;
+    //! check if number of total samples are smaller than number of samples in the first block
     bool hasTooFewBlocks=false;
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+        first_capNumber = capArrayList->at(dda)[0];
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
             Int_t chanId=chan+RFCHAN_PER_DDA*dda;
             voltMapIt=theEvent->fVolts.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
                 Int_t numPoints=(voltMapIt->second).size();
-                if (numPoints < samples_per_block){
+                if (hasTimingCalib){
+                    first_block_len = fAtriNumSamples[dda][chan][first_capNumber]; ///< use the exact number of samples in the first if timing calibration has already happened
+                } else {
+                    first_block_len = SAMPLES_PER_BLOCK;
+                }
+                if (numPoints < first_block_len){
                     hasTooFewBlocks=true;
                     break;
                 }
             }
         }
     }
-    // returning '!hasTooFewBlocks' for let BinWidthCalib() know the block is trimmed or not.
-    // fAtriSampleTimes table doesn't know block is trimmed unless this return
+    /*!
+        returning '!hasTooFewBlocks' for let TimingCalibration() know the block is trimmed or not.
+        fAtriSampleTimes table doesn't know block is trimmed unless this return
+    */
     if(hasTooFewBlocks) return !hasTooFewBlocks;
+
+    //! if number of samples in the WF is bigger than first block, perform first block trimming
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
-        capArrayList->at(dda).erase(capArrayList->at(dda).begin(),capArrayList->at(dda).begin()+1); //trims capArrayList. It is needed for BinWidthCalib()
+        first_capNumber = capArrayList->at(dda)[0];
+        capArrayList->at(dda).erase(capArrayList->at(dda).begin(),capArrayList->at(dda).begin()+1); ///< delete the first block number. This trimming is needed for TimingCalibration()
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
             Int_t chanId=chan+RFCHAN_PER_DDA*dda;
             voltMapIt=theEvent->fVolts.find(chanId);
             timeMapIt=theEvent->fTimes.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
-                int trim_len = TrimLenIdentifier(sampleList->at(chanId)); //in case first block trimming is performed after BinWidthCalib()
-                //int trim_len = samples_per_block;
-                voltMapIt->second.erase(voltMapIt->second.begin(),voltMapIt->second.begin()+trim_len);
-                timeMapIt->second.erase(timeMapIt->second.begin(),timeMapIt->second.begin()+trim_len);
-                sampleList->at(chanId).erase(sampleList->at(chanId).begin(),sampleList->at(chanId).begin()+trim_len); // delete sample index in the first block
+                if (hasTimingCalib){
+                    first_block_len = fAtriNumSamples[dda][chan][first_capNumber]; ///< use the exact number of samples in the first if timing calibration has already happened
+                } else {
+                    first_block_len = SAMPLES_PER_BLOCK;
+                }
+                voltMapIt->second.erase(voltMapIt->second.begin(),voltMapIt->second.begin()+first_block_len); ///< delete the times in the first block
+                timeMapIt->second.erase(timeMapIt->second.begin(),timeMapIt->second.begin()+first_block_len); ///< delete the ADC (or volt) in the first block
+                sampleList->at(chanId).erase(sampleList->at(chanId).begin(),sampleList->at(chanId).begin()+first_block_len); ///< delete the samples in the first block
             }
         }
     } return !hasTooFewBlocks;
 }
 
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \return void
+*/
 void AraEventCalibrator::CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt)
-{// Don't know what is this for... but it is working as same as previous version
-    /*
-    Then we need to do a common mode correction
-    loop over dda
-    loop over chan
-    loop over times and subtract one
+{
+    /*!
+        Then we need to do a common mode correction
+        loop over dda
+        loop over chan
+        loop over times and subtract one
     */
     std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt2;
 
@@ -1282,14 +1372,21 @@ void AraEventCalibrator::CommonMode(UsefulAtriStationEvent *theEvent, std::map< 
     }
 }
 
-void AraEventCalibrator::ZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt)
-{//Apply Brian's conditioner inside of calibration
+//! Make the mean of the voltage samples
+//! Apply Brian's conditioner inside of calibration
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \return void
+*/
+void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt)
+{
     for(int dda=0;dda<DDA_PER_ATRI;dda++) {
         for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
             Int_t chanId=chan+RFCHAN_PER_DDA*dda;
             voltMapIt=theEvent->fVolts.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
-                //compute the mean, and let C++ help by doing the addition for us
+                //! compute the mean, and let C++ help by doing the addition for us
                 Double_t mean = std::accumulate((voltMapIt->second).begin(), (voltMapIt->second).end(), 0.0);
                 Int_t numPoints=(voltMapIt->second).size();
                 mean /= numPoints;
@@ -1684,20 +1781,31 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
     return numPedVals;
 }
 
-
-Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int block, int chan, int sample, AraStationId_t stationId)
-{//-THM-, -MK- imports the station id to optimize conversion for each station
+//! Apply conversion parameter on each ADC sample
+/*!
+    \param adcCountsIn ADC value from the WF sample 
+    \param dda corresponding dda board number of adcCountsIn
+    \param block corresponding black number of adcCountsIn
+    \param chan corresponding dda channel number of adcCountsIn
+    \param sample corresponding sample number of adcCountsIn
+    \param stationId id of the station
+    \return void
+*/
+Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int block, int chan, int sample, AraStationId_t stationId) ///< -THM-, -MK- imports the station id to optimize conversion for each station
+{
     
     Double_t volts = 0.0;
     int samples_per_block = SAMPLES_PER_BLOCK;
     int blocks_per_dda = BLOCKS_PER_DDA;
     int samples_per_dda = SAMPLES_PER_DDA;
 
-    // There is an offset induced in the pedestal numbers, due to asymmetry of the chip. 
-    // From calibration files this offset with the given noise will be around 11 ADC counts.
-    // If it's not station 5, subtract an offset of 11. (THM)
-    double adc_offset;
-    int high_adc_limit; // Define the high ADC limit here (MK)
+    /*!
+       There is an offset induced in the pedestal numbers, due to asymmetry of the chip. 
+       From calibration files this offset with the given noise will be around 11 ADC counts.
+       If it's not station 5, subtract an offset of 11. (THM)
+    */
+    double adc_offset; 
+    int high_adc_limit; ///< Define the high ADC limit here (MK)
     if (stationId != 5){
         high_adc_limit = 400;
         adc_offset = -11.0;
@@ -1706,37 +1814,41 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
         adc_offset = 0.0;
     }
 
-    // Define neighboring sample and block offset. Based on Thomas's thesis p.69
-    int neighboring_samp = 2;
-    int neighboring_blk = 2;
+    //! Define neighboring sample or block offset. Based on Thomas's thesis p.69
+    int neighboring_index = 2;
 
-    // Each conversion parameter in fAtriSampleADCVoltsConversion: pos_fit_x, pos_fit_x^2, pos_fit_x^3, neg_fit_x, neg_fit_x^2, neg_fit_x^3, fit_const, zeroval, chi2
-    // Each conversion parameter in fAtriSampleHighADCVoltsConversion: pos_fit_const, pos_fit_x, neg_fit_const, neg_fit_x
+    /*! 
+        Each conversion parameter in fAtriSampleADCVoltsConversion: pos_fit_x, pos_fit_x^2, pos_fit_x^3, neg_fit_x, neg_fit_x^2, neg_fit_x^3, fit_const, zeroval, chi2
+        Each conversion parameter in fAtriSampleHighADCVoltsConversion: pos_fit_const, pos_fit_x, neg_fit_const, neg_fit_x
+    */
     //std::cout << chan << ", "<< block<<", " << sample << std::endl;
-    // Only apply calibration on calibrated channels (RF channels)!
+    //! Only apply calibration on calibrated channels (RF channels)!
     if( (dda==0 && chan<6)||(dda==1 && chan<4)||(dda==2 && chan<4)||(dda==3 && chan<6) ){
 
-        // Dumping even samples
-        // Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
+        /*! 
+            Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
+            For A2/3, If Chi^2/NDF is > 1.0, the conversion factor of the same sample number in a neighboring block, provided it has a better Chi^2/NDF value, will be used. -- Thomas's thesis p.69
+            For A5, the conversion factor of the neighboring sample, provided it has a better Chi^2/NDF value, will be used.
+        */
         if (stationId != 5){
-            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - neighboring_blk + blocks_per_dda)%blocks_per_dda; //based on Thomas's thesis p.69
+            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - neighboring_index + blocks_per_dda)%blocks_per_dda;
         } else {
-            if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_dda;
-            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_samp + samples_per_dda)%samples_per_dda;
+            if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_dda; ///< Dumping even samples
+            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_dda)%samples_per_dda;
         }
 
-        // Offset needs to be subtracted
+        //! Offset needs to be subtracted
         double adcCounts = adcCountsIn + adc_offset;
 
-        // Start ADC to voltage conversion
+        //! Start ADC to voltage conversion
         if(TMath::Abs(adcCounts)<high_adc_limit){
-            // conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
-            // RJN chnaged the below to remove calls to pow for code optimisation
+            //! conversion factors for higher ADC values have strong errors, therefore we need the alternative calibration (see below)
+            //! RJN chnaged the below to remove calls to pow for code optimisation
             double modAdcCounts=adcCounts-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
             //double modAdcCounts=adcCounts;//-fAtriSampleADCVoltsConversion[dda][chan][block][sample][7];
 
-            Double_t fit_const; // Define the fit_const here (MK)
-            double adc_zero_def; // Define which value will be used to choose a positive or negative conversion
+            Double_t fit_const; ///< Define the fit_const here (MK)
+            double adc_zero_def; ///< Define which value will be used to choose a positive or negative conversion
             if (stationId != 5) {
                 fit_const = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6];
                 adc_zero_def = adcCounts;
@@ -1746,7 +1858,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             }
 
             if(adc_zero_def>0){
-                //positive and negative values need different calibration constants
+                //! positive and negative values need different calibration constants
                 volts = fit_const
                     +modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][0] 
                     +modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][1] 
@@ -1759,11 +1871,11 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                     +modAdcCounts*modAdcCounts*modAdcCounts*fAtriSampleADCVoltsConversion[dda][chan][block][sample][5];
             }
 
-            if (stationId == 5 && volts > 800) volts=modAdcCounts; //maybe need to put abs??? (MK)
+            if (stationId == 5 && volts > 800) volts=modAdcCounts; ///< It seems ADC values between -400 ~ 400 are not converted to over 800 millivolts on A2/3. Apply this option just for A5 (MK)
 
         }
         else {
-            //here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
+            //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
             if(adcCounts>0) {
                 volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
                 + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
