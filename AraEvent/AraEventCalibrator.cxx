@@ -953,7 +953,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
 
     /*!
         8th step. Zeroing ADC WF by subtracting mean
-        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
 
         Previous updates 
         RJN change 13-Feb-2013
@@ -975,7 +975,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         The best solution we can have for now is applying ApplyZeroMean() before the conversion
         In the future, we might need to apply some sort of filtering method to exclude these outlier events
         
-        I'm not sure A5 has this kind of outlier event. so, I perserve original condition that not applying 'Zero meaning before conversion' just for A5
+        I'm not sure A5 has this kind of outlier event. so, I preserve original condition that not applying 'Zero meaning before conversion' just for A5
         In the future, we might need to check whether A5 also has outlier event or not
     */
     if(hasADCZeroMean(calType) && thisStationId != 5) {
@@ -989,7 +989,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
    
     /*! 
         10th step. Zeroing voltage WF by subtracting mean
-        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
         
         Even though WF is centering in zero before ADC conversion, sometimes mean of voltage WF has an offset from zero
         Example is in this talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No.9)
@@ -1394,7 +1394,7 @@ void AraEventCalibrator::CommonMode(UsefulAtriStationEvent *theEvent, std::map< 
 /*! 
     Make the mean of the voltage samples
     Apply Brian's conditioner inside of calibration
-    If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+    If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
 */
 /*!
     \param theEvent the useful atri event pointer
@@ -1427,7 +1427,7 @@ void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::ma
                     first_block_len = 0;
                 }
                 //! compute the mean, and let C++ help by doing the addition for us
-                //! If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+                //! If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
                 Double_t mean = std::accumulate((voltMapIt->second).begin() + first_block_len, (voltMapIt->second).end(), 0.0);
                 mean /= numPoints_for_mean;
                 for(int samp=0;samp<numPoints;samp++) {
@@ -1912,23 +1912,29 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             }
 
             /*!
-                This condition is designed to exclude the conversion result that causing unusual high voltage from low ADC
-                If the voltage value is over 800, this condition decides to use just ADC value instead of the conversion result
+                For A5, since there is no high ADC calibration data, use ADC count
+                If ADC count between -500 ~ 500 is converted to over 800 mV, this condition decides to use just ADC value instead of the conversion result
                 It seems ADC values between -400 ~ 400 are not converted to over 800 millivolts on A2/3
+                Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide 16 ~17)
                 I leave this condition just for A5 -MK-
             */
             if (stationId == 5 && volts > 800) volts=modAdcCounts;
 
         }
         else {
-            //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
-            if(adcCounts>0) {
-                volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
-                + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
-            }
-            else{
-                volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2] 
-                + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+            if (station != 5){
+                //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
+                if(adcCounts>0) {
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
+                }
+                else{
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2] 
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+                }
+            } else {
+                //! For A5, since there is no high ADC calibration data, use ADC count for conervison result in case A5 encount high ADC count
+                volts = adcCountsIn + adc_offset;
             }
         }
         
