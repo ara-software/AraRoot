@@ -1821,7 +1821,12 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
     return numPedVals;
 }
 
-//! Apply conversion parameter on each ADC sample
+/*! 
+    Apply conversion parameter on each ADC sample
+    Currently, that way to treat for the loaded conversion table is optimized for just A2/3 and A5 
+    And default treatment for the loaded conversion table is following A2/3 optimization
+    In the future, If the conversion table for A1/4 has a different number of parameters or need different treatment, It need to be updated 
+*/
 /*!
     \param adcCountsIn ADC value from the WF sample 
     \param dda corresponding dda board number of adcCountsIn
