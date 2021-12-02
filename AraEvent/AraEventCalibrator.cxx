@@ -924,33 +924,39 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! 3rd step. Converts DAQ data format to Electronic channel format
     UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
 
+    /*! 
+	4th step. Common mode
+	This function is subtracting DDA ch5 value from DDA ch1~4
+        But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
+	Since it will only work when the number of samples between DDA ch 1~4 and ch 5 is the same,
+	It is placed before TrimFirstBlock() and TimingCalibrationAndBadSampleReomval()
+    */
+    if(hasCommonMode(calType)) {
+        CommonMode(theEvent, voltMapIt);
+    }
+
     /*!
         From here, each function is independent. So, You can call the functiions at any step
         As a default, prioritizing the functions that reduce the number of samples
     */
 
-    //! 4th step. Erase first block that currupted by trigger
+    //! 5th step. Erase first block that currupted by trigger
     //! Apply conditioner function here
     if(hasTrimFirstBlock(calType)) {
         hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
     }
 
-    //! 5th step. Timing calibration and bad sample removal
+    //! 6th step. Timing calibration and bad sample removal
     //! This step calibrates the time of each sample and only selecting the samples that have good performance
     if(AraCalType::hasBinWidthCalib(calType)){ 
         hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
     }
     
-    //! 6th step. Pedestal subtraction
+    //! 7th step. Pedestal subtraction
     if(hasPedestalSubtraction(calType)) {
         PedestalSubtraction(theEvent, voltMapIt, sampleList);
     }
     
-    //! 7th step. Common mode
-    if(hasCommonMode(calType)) {
-        CommonMode(theEvent, voltMapIt);
-    }
-
     /*!
         8th step. Zeroing ADC WF by subtracting mean
         If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
