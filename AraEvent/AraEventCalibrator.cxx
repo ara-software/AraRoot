@@ -1933,7 +1933,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
 
         }
         else {
-            if (station != 5){
+            if (stationId != 5){
                 //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
                 if(adcCounts>0) {
                     volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
