@@ -924,36 +924,42 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! 3rd step. Converts DAQ data format to Electronic channel format
     UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
 
-    /*!
-        From here, each function is independent. So, You can call the functiions at any step
-        As a default, prioritizing the functions that reduce the number of samples
+    /*! 
+	4th step. Common mode
+	This function is subtracting DDA ch5 value from DDA ch1~4
+        But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
+	Since it will only work when the number of samples between DDA ch 1~4 and ch 5 is the same,
+	It is placed before TrimFirstBlock() and TimingCalibrationAndBadSampleReomval()
     */
-
-    //! 4th step. Erase first block that currupted by trigger
-    //! Apply conditioner function here
-    if(hasTrimFirstBlock(calType)) {
-        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
-    }
-
-    //! 5th step. Timing calibration and bad sample removal
-    //! This step calibrates the time of each sample and only selecting the samples that have good performance
-    if(AraCalType::hasBinWidthCalib(calType)){ 
-        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
-    }
-    
-    //! 6th step. Pedestal subtraction
-    if(hasPedestalSubtraction(calType)) {
-        PedestalSubtraction(theEvent, voltMapIt, sampleList);
-    }
-    
-    //! 7th step. Common mode
     if(hasCommonMode(calType)) {
         CommonMode(theEvent, voltMapIt);
     }
 
     /*!
+        From here, each function is independent. So, You can call the functiions at any step
+        As a default, prioritizing the functions that reduce the number of samples
+    */
+
+    //! 5th step. Erase first block that currupted by trigger
+    //! Apply conditioner function here
+    if(hasTrimFirstBlock(calType)) {
+        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
+    }
+
+    //! 6th step. Timing calibration and bad sample removal
+    //! This step calibrates the time of each sample and only selecting the samples that have good performance
+    if(AraCalType::hasBinWidthCalib(calType)){ 
+        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
+    }
+    
+    //! 7th step. Pedestal subtraction
+    if(hasPedestalSubtraction(calType)) {
+        PedestalSubtraction(theEvent, voltMapIt, sampleList);
+    }
+    
+    /*!
         8th step. Zeroing ADC WF by subtracting mean
-        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
 
         Previous updates 
         RJN change 13-Feb-2013
@@ -975,7 +981,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         The best solution we can have for now is applying ApplyZeroMean() before the conversion
         In the future, we might need to apply some sort of filtering method to exclude these outlier events
         
-        I'm not sure A5 has this kind of outlier event. so, I perserve original condition that not applying 'Zero meaning before conversion' just for A5
+        I'm not sure A5 has this kind of outlier event. so, I preserve original condition that not applying 'Zero meaning before conversion' just for A5
         In the future, we might need to check whether A5 also has outlier event or not
     */
     if(hasADCZeroMean(calType) && thisStationId != 5) {
@@ -989,7 +995,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
    
     /*! 
         10th step. Zeroing voltage WF by subtracting mean
-        If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
         
         Even though WF is centering in zero before ADC conversion, sometimes mean of voltage WF has an offset from zero
         Example is in this talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide No.9)
@@ -1394,7 +1400,7 @@ void AraEventCalibrator::CommonMode(UsefulAtriStationEvent *theEvent, std::map< 
 /*! 
     Make the mean of the voltage samples
     Apply Brian's conditioner inside of calibration
-    If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+    If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
 */
 /*!
     \param theEvent the useful atri event pointer
@@ -1427,7 +1433,7 @@ void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::ma
                     first_block_len = 0;
                 }
                 //! compute the mean, and let C++ help by doing the addition for us
-                //! If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+                //! If 1st block is still in the WF, exclude the samples in the 1st block from mean calculation
                 Double_t mean = std::accumulate((voltMapIt->second).begin() + first_block_len, (voltMapIt->second).end(), 0.0);
                 mean /= numPoints_for_mean;
                 for(int samp=0;samp<numPoints;samp++) {
@@ -1821,7 +1827,12 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
     return numPedVals;
 }
 
-//! Apply conversion parameter on each ADC sample
+/*! 
+    Apply conversion parameter on each ADC sample
+    Currently, the way to treat for the loaded conversion table is optimized for just A2/3 and A5 
+    And default treatment for the loaded conversion table is following A2/3 optimization
+    In the future, If the conversion table for A1/4 has a different number of parameters or need different treatment, It need to be updated 
+*/
 /*!
     \param adcCountsIn ADC value from the WF sample 
     \param dda corresponding dda board number of adcCountsIn
@@ -1912,23 +1923,29 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             }
 
             /*!
-                This condition is designed to exclude the conversion result that causing unusual high voltage from low ADC
-                If the voltage value is over 800, this condition decides to use just ADC value instead of the conversion result
+                For A5, since there is no high ADC calibration data, use ADC count
+                If ADC count between -500 ~ 500 is converted to over 800 mV, this condition decides to use just ADC value instead of the conversion result
                 It seems ADC values between -400 ~ 400 are not converted to over 800 millivolts on A2/3
+                Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide 16 ~17)
                 I leave this condition just for A5 -MK-
             */
             if (stationId == 5 && volts > 800) volts=modAdcCounts;
 
         }
         else {
-            //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
-            if(adcCounts>0) {
-                volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
-                + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
-            }
-            else{
-                volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2] 
-                + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+            if (stationId != 5){
+                //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
+                if(adcCounts>0) {
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
+                }
+                else{
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2] 
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+                }
+            } else {
+                //! For A5, since there is no high ADC calibration data, use ADC count for conervison result in case A5 encount high ADC count
+                volts = adcCountsIn + adc_offset;
             }
         }
         
