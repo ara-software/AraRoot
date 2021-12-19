@@ -35,6 +35,7 @@
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 {
     //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
+    if(calType==kJustUnwrap) return kTRUE;  ///< For raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -57,6 +58,7 @@ Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 {
+    if(calType==kLatestCalibWithOutZeroMean) return kFALSE; ///< Performs every calibration except the ADC and Voltage zero meaning, 19-12-2021 -MK-
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;    
 }
@@ -68,6 +70,7 @@ Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
 {
+    if(calType==kLatestCalibWithOutZeroMean) return kFALSE; ///< Performs every calibration except the ADC and Voltage zero meaning, 19-12-2021 -MK-
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -109,6 +112,7 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
 { 
+    if(calType==kJustUnwrap) return kTRUE; ///< For raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
     if(calType>=kFirstCalib)
         return kTRUE;
     return kFALSE;
@@ -129,6 +133,7 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 { 
+    if(calType==kJustUnwrap) return kFALSE; ///< For raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
     if(calType==kNoCalib) return kFALSE;
     return kTRUE;
 }
