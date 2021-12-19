@@ -89,7 +89,8 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
     if(calType==kFirstCalibPlusCables
         || calType==kSecondCalibPlusCables
         || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType ==kLatestCalib14to20_Bug){
+        || calType ==kLatestCalib14to20_Bug
+        || calType==kLatestCalibWithOutZeroMean){
 
         return kTRUE;
     }
@@ -103,7 +104,8 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType==kFirstCalib
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType==kLatestCalib14to20_Bug){
+        || calType==kLatestCalib14to20_Bug
+        || calType==kLatestCalibWithOutZeroMean){
 
         return kTRUE;
     }
@@ -124,7 +126,8 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
 
-        || calType==kLatestCalib14to20_Bug){
+        || calType==kLatestCalib14to20_Bug
+        || calType==kLatestCalibWithOutZeroMean){
 
         return kTRUE;
     }
@@ -148,7 +151,8 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
     if(calType==kSecondCalibPlusCablesUnDiplexed 
-        || calType==kLatestCalib14to20_Bug) return kTRUE;
+        || calType==kLatestCalib14to20_Bug
+        || calType==kLatestCalibWithOutZeroMean) return kTRUE;
 
     return kFALSE;
 }
