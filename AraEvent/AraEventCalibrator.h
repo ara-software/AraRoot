@@ -30,7 +30,7 @@
 namespace AraCalType {
     typedef enum EAraCalType {
         kNoCalib                        = 0x00, ///<The 260 samples straight from raw data
-        kJustUnwrap                     = 0x01, ///<The X good samples from raw data (260-hitbus), Also use this mode for printing out the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-   
+        kJustUnwrap                     = 0x01, ///<The X good samples from raw data (260-hitbus)   
         kJustPed                        = 0x02, ///<Just subtract peds
         kADC                            = 0x03, ///<Same as kNoCalib -- i.e. useless
         kVoltageTime                    = 0x04, ///<Using 1 and 2.6 
@@ -42,7 +42,11 @@ namespace AraCalType {
 
         kLatestCalib                    = 0x09, ///< Currenly this is kSecondCalibPlusCables
         kLatestCalib14to20_Bug          = 0x0A, ///<new calibration type: everything except voltage calibration. Will reproduce "kLatestCalib" bug present from between ~2014 to September 2020. Use with caution!
-        kLatestCalibWithOutZeroMean     = 0x0B ///< Performs every calibration except the ADC and Voltage zero meaning, 19-12-2021 -MK-
+
+        //! Useful CalType for debugging, 19-12-2021 -MK-
+        kLatestCalibWithOutZeroMean     = 0x0B, ///< Performs every calibration except the ADC and Voltage zero meaning
+        kOnlyGoodPed                    = 0X0C, ///< Get the only pedestal values for the corresponding raw WF without bad samples
+        kOnlyGoodADC                    = 0x0D  ///< Get the only raw ADC WF without bad samples and pedestal subtraction
 
     } AraCalType_t;
 
@@ -138,7 +142,7 @@ class AraEventCalibrator : public TObject
     void UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); ///< Converts DAQ data format to Electronic channel format
     Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib); ///< Erase first block that currupted by trigger
     Bool_t TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); ///< Trims samples using fAtriSampleTimes table
-    void PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); ///< Subtracts pedestal from raw data
+    void PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraCalType::AraCalType_t calType); ///< Subtracts pedestal from raw data
     void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
     void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); ///< Inverts only RF channels = 0,4,8 in A3
     void ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk, Bool_t hasTimingCalib); ///< Zeroing WF by subtracting mean. ADC or Voltage. If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
