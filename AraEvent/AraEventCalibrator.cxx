@@ -35,6 +35,7 @@
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 {
     //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
+    if(calType==kOnlyPed) return kFALSE; ///< Get the pedestal values for the corresponding raw WF, 19-12-2021 -MK-
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -46,8 +47,9 @@ Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 {
-    if(calType==kOnlyGoodADC ///< Get the only raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
-        || calType==kOnlyGoodPed) ///< Get the only pedestal values for the corresponding raw WF without bad samples
+    if(calType==kOnlyGoodADC      ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
+        || calType==kOnlyPed      ///< Get the pedestal values for the corresponding raw WF
+        || calType==kOnlyGoodPed) ///< Get the pedestal values for the corresponding raw WF without bad samples
     {
         return kFALSE;
     }
@@ -63,8 +65,9 @@ Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 {
     if(calType==kLatestCalibWithOutZeroMean ///< Performs every calibration except the ADC and Voltage zero meaning, 19-12-2021 -MK-
-        || calType==kOnlyGoodADC ///< Get the only raw ADC WF without bad samples and pedestal subtraction
-        || calType==kOnlyGoodPed) ///< Get the only pedestal values for the corresponding raw WF without bad samples
+        || calType==kOnlyGoodADC            ///< Get the raw ADC WF without bad samples and pedestal subtraction
+        || calType==kOnlyPed                ///< Get the pedestal values for the corresponding raw WF
+        || calType==kOnlyGoodPed)           ///< Get the pedestal values for the corresponding raw WF without bad samples
     {
         return kFALSE;
     }
@@ -80,8 +83,9 @@ Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
 {
     if(calType==kLatestCalibWithOutZeroMean ///< Performs every calibration except the ADC and Voltage zero meaning, 19-12-2021 -MK-
-        || calType==kOnlyGoodADC ///< Get the only raw ADC WF without bad samples and pedestal subtraction
-        || calType==kOnlyGoodPed) ///< Get the only pedestal values for the corresponding raw WF without bad samples
+        || calType==kOnlyGoodADC            ///< Get the raw ADC WF without bad samples and pedestal subtraction
+        || calType==kOnlyPed                ///< Get the pedestal values for the corresponding raw WF
+        || calType==kOnlyGoodPed)           ///< Get the pedestal values for the corresponding raw WF without bad samples
     {
         return kFALSE;
     }
@@ -93,8 +97,9 @@ Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
     if(calType==kLatestCalib14to20_Bug
-        || calType==kOnlyGoodADC ///< Get the only raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
-        || calType==kOnlyGoodPed) ///< Get the only pedestal values for the corresponding raw WF without bad samples
+        || calType==kOnlyGoodADC  ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
+        || calType==kOnlyPed      ///< Get the pedestal values for the corresponding raw WF
+        || calType==kOnlyGoodPed) ///< Get the pedestal values for the corresponding raw WF without bad samples
     {
         return kFALSE;
     }
@@ -133,7 +138,8 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 }
 
 Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
-{ 
+{
+    if(calType==kOnlyPed) return kFALSE; ///< Get the pedestal values for the corresponding raw WF, 19-12-2021 -MK- 
     if(calType>=kFirstCalib)
         return kTRUE;
     return kFALSE;
@@ -154,7 +160,7 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 { 
-    if(calType==kOnlyGoodADC) return kFALSE; ///< Get the only raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
+    if(calType==kOnlyGoodADC) return kFALSE; ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
     if(calType==kNoCalib) return kFALSE;
     return kTRUE;
 }
@@ -1230,8 +1236,8 @@ void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, s
                     sampleIndex = sampleList->at(chanId)[samp];
                     sampleNumber = sampleIndex%samples_per_block;
                     blockIndex = int(sampleIndex/samples_per_block);
-                    //! Filling with the only pedestal values for the corresponding raw WF, 19-12-2021 -MK-
-                    if(calType==AraCalType::kOnlyGoodPed) { voltMapIt->second[samp] = (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)];
+                    //! Filling with the pedestal values for the corresponding raw WF, 19-12-2021 -MK-
+                    if(calType==AraCalType::kOnlyPed || calType==AraCalType::kOnlyGoodPed) { voltMapIt->second[samp] = (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)];
                     //! Filling with ADC-Pedestal. Iunputted pedestal will be stored in fAtriPeds table
                     } else { voltMapIt->second[samp] -= (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)]; }
                 }

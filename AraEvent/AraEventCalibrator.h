@@ -45,8 +45,9 @@ namespace AraCalType {
 
         //! Useful CalType for debugging, 19-12-2021 -MK-
         kLatestCalibWithOutZeroMean     = 0x0B, ///< Performs every calibration except the ADC and Voltage zero meaning
-        kOnlyGoodPed                    = 0X0C, ///< Get the only pedestal values for the corresponding raw WF without bad samples
-        kOnlyGoodADC                    = 0x0D  ///< Get the only raw ADC WF without bad samples and pedestal subtraction
+        kOnlyPed                        = 0X0C, ///< Get the pedestal values for the corresponding raw WF
+        kOnlyGoodPed                    = 0X0D, ///< Get the pedestal values for the corresponding raw WF without bad samples
+        kOnlyGoodADC                    = 0x0E  ///< Get the raw ADC WF without bad samples and pedestal subtraction
 
     } AraCalType_t;
 
