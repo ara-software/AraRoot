@@ -42,14 +42,24 @@ namespace AraCalType {
 
         kLatestCalib                    = 0x09, ///< Currenly this is kSecondCalibPlusCables
         kLatestCalib14to20_Bug          = 0x0A, ///<new calibration type: everything except voltage calibration. Will reproduce "kLatestCalib" bug present from between ~2014 to September 2020. Use with caution!
+        kLatestCalibWithOutZeroMean     = 0x0B, ///< Performs kLatestCalib except the ADC and Voltage zero meaning, 19-12-2021 -MK-
+        
+        /*!
+            Useful CalType for raw data debugging, 19-12-2021 -MK- 
+            kOnlyADC~: Get the raw ADC WF
+            kOnlyPed~: Get the pedestal values for the corresponding WF.
+                       If user selects kOnlyPed~, PedestalSubtraction() will replace voltMapIt iterator as a pedestal values
 
-        //! Useful CalType for debugging, 19-12-2021 -MK-
-        kLatestCalibWithOutZeroMean          = 0x0B, ///< Performs every calibration except the ADC and Voltage zero meaning
-        kOnlyPed                             = 0X0C, ///< Get the pedestal values for the corresponding raw WF
-        kOnlyPedWithOut1stBlock              = 0x0D, ///< Get the pedestal values for the corresponding raw WF without 1st block. It is required when user makes pedestal by their onw custom repeder scripts
-        kOnlyPedWithOut1stBlockAndBadSamples = 0X0E, ///< Get the pedestal values for the corresponding raw WF without 1st block and bad samples
-        kOnlyADCWithOut1stBlock              = 0x0F, ///< Get the raw ADC WF without 1st block
-        kOnlyADCWithOut1stBlockAndBadSamples = 0x10  ///< Get the raw ADC WF without 1st block and bad samples
+            ~WithOut1stBlock: Remove 1st block by applying TrimFirstBlock()
+            ~WithOut1stBlockAndBadSamples:  Remove 1st block and bad samples by applying TrimFirstBlock(), TimingCalibrationAndBadSampleReomval(), and ApplyCableDelay() 
+                                            Number of samples and time width betweens samples will be same as fully calibrated WF (kLatestCalib). So, user can easy to compare with it. 
+        */ 
+        kOnlyPed                             = 0X0C, 
+        kOnlyPedWithOut1stBlock              = 0x0D, ///< It is useful when user makes pedestal by their own custom repeder scripts
+        kOnlyPedWithOut1stBlockAndBadSamples = 0x0E,
+        kOnlyADC                             = 0x0F, ///< Same as kNoCalib
+        kOnlyADCWithOut1stBlock              = 0x10,
+        kOnlyADCWithOut1stBlockAndBadSamples = 0x11
 
     } AraCalType_t;
 
