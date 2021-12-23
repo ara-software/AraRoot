@@ -52,7 +52,7 @@ namespace AraCalType {
 
             ~WithOut1stBlock: Remove 1st block by applying TrimFirstBlock()
             ~WithOut1stBlockAndBadSamples:  Remove 1st block and bad samples by applying TrimFirstBlock(), TimingCalibrationAndBadSampleReomval(), and ApplyCableDelay() 
-                                            Number of samples and time width betweens samples will be same as fully calibrated WF (kLatestCalib). So, user can easy to compare with it. 
+                                            The number of samples and time width betweens samples will be the same as fully calibrated WF (kLatestCalib). So, users can easy to compare with it.  
         */ 
         kOnlyPed                             = 0X0C, 
         kOnlyPedWithOut1stBlock              = 0x0D, ///< It is useful when user makes pedestal by their own custom repeder scripts
