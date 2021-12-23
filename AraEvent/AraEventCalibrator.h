@@ -44,10 +44,12 @@ namespace AraCalType {
         kLatestCalib14to20_Bug          = 0x0A, ///<new calibration type: everything except voltage calibration. Will reproduce "kLatestCalib" bug present from between ~2014 to September 2020. Use with caution!
 
         //! Useful CalType for debugging, 19-12-2021 -MK-
-        kLatestCalibWithOutZeroMean     = 0x0B, ///< Performs every calibration except the ADC and Voltage zero meaning
-        kOnlyPed                        = 0X0C, ///< Get the pedestal values for the corresponding raw WF
-        kOnlyGoodPed                    = 0X0D, ///< Get the pedestal values for the corresponding raw WF without bad samples
-        kOnlyGoodADC                    = 0x0E  ///< Get the raw ADC WF without bad samples and pedestal subtraction
+        kLatestCalibWithOutZeroMean          = 0x0B, ///< Performs every calibration except the ADC and Voltage zero meaning
+        kOnlyPed                             = 0X0C, ///< Get the pedestal values for the corresponding raw WF
+        kOnlyPedWithOut1stBlock              = 0x0D, ///< Get the pedestal values for the corresponding raw WF without 1st block. It is required when user makes pedestal by their onw custom repeder scripts
+        kOnlyPedWithOut1stBlockAndBadSamples = 0X0E, ///< Get the pedestal values for the corresponding raw WF without 1st block and bad samples
+        kOnlyADCWithOut1stBlock              = 0x0F, ///< Get the raw ADC WF without 1st block
+        kOnlyADCWithOut1stBlockAndBadSamples = 0x10  ///< Get the raw ADC WF without 1st block and bad samples
 
     } AraCalType_t;
 
