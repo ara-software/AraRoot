@@ -1214,6 +1214,11 @@ void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, s
             voltMapIt=theEvent->fVolts.find(chanId);
             if(voltMapIt!=theEvent->fVolts.end()) {
                 Int_t numPoints=(voltMapIt->second).size();
+                if(calType==AraCalType::kOnlyPed
+                    || calType==AraCalType::kOnlyPedWithOut1stBlock
+                    || calType==AraCalType::kOnlyPedWithOut1stBlockAndBadSamples)
+                { voltMapIt->second.clear(); } ///< clear voltMapIt iterator before filling with pedestal values
+
                 for(int samp=0;samp<numPoints;samp++) {
                     sampleIndex = sampleList->at(chanId)[samp];
                     sampleNumber = sampleIndex%samples_per_block;
@@ -1222,8 +1227,7 @@ void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, s
                     if(calType==AraCalType::kOnlyPed 
                         || calType==AraCalType::kOnlyPedWithOut1stBlock 
                         || calType==AraCalType::kOnlyPedWithOut1stBlockAndBadSamples) 
-                    {
-                        voltMapIt->second[samp] = (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)];
+                    { voltMapIt->second.push_back((Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)]);
                     //! Filling with ADC-Pedestal. Iunputted pedestal will be stored in fAtriPeds table 
                     } else { voltMapIt->second[samp] -= (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)]; }
                 }
