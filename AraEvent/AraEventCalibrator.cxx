@@ -929,7 +929,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     // std::cout << "Station Id fun: " << (int)thisStationId << "\t" << calibIndex << "\n";
     //! Only load the pedestals / calib if they are not already loaded
     if(fGotAtriCalibFile[calibIndex]==0){
-        loadAtriCalib(thisStationId);
+        loadAtriCalib(thisStationId, unixtime); ///< Adds unix time to select the new timing table for A3 2019 data. MK added 08-02-2022
     }
     if(fGotAtriPedFile[calibIndex]==0){
         loadAtriPedestals(thisStationId);
@@ -1581,7 +1581,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 }
 
 
-void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
+void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId, Double_t unixtime)
 {
     Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
     // std::cout << "Loading calibration info for station: " << (int)stationId << "\t" << calibIndex << "\n";
@@ -1628,7 +1628,20 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId)
     } //end modification -THM-
 
     // sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTiming.txt",calibDir, stationId);
-    sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTimingNew.txt",calibDir, stationId); // opening the new calibration file -THM-
+    /*!    
+        MK added 08-02-2022
+        WFs that recorded from A3 string 4 show ADC counts duplication from December 2018
+        It looks like every even group of 16 samples is duplicated (overwriting) to an odd group of 16 samples
+        In order to remove duplicate samples, a new timing table for the 2019 data set are implemented 
+        It will exclude the samples that contain duplicated ADC
+        Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2535
+    */
+    if (stationId==3 && unixtime > 1544125405){ ///< use new timing table from A3 Run12866 2018/12/21
+        sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTimingNew_2019DataSet.txt",calibDir, stationId);
+    }
+    else {
+        sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTimingNew.txt",calibDir, stationId); // opening the new calibration file -THM-
+    }
     fprintf(stdout, "AraEventCalibrator::loadAtriCalib(): INFO - Calibration file = %s\n", calibFile);//DEBUG
 
     std::ifstream SampleFile(calibFile);

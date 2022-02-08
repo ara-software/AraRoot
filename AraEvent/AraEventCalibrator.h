@@ -146,7 +146,7 @@ class AraEventCalibrator : public TObject
     Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample, AraStationId_t stationId); //A conversion module from ADC counts to millivolts  -THM-
     void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
     void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
-    void loadAtriCalib(AraStationId_t stationId); ///< Internally used fuction that loads the calibration values into memory.
+    void loadAtriCalib(AraStationId_t stationId, Double_t unixtime); ///< Internally used fuction that loads the calibration values into memory. ///< Adds unix time to select the new timing table for A3 2019 data. MK added 08-02-2022
      
     Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
     Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
