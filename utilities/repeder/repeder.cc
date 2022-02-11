@@ -259,6 +259,10 @@ int main (int nargs, char ** args)
   //! Input quality cut results. -MK added 11-02-2022
   std::ifstream qualFile(qual_file);
   if (qual_file) {
+    if(!qualFile.is_open()) {
+        std::cout << "Can not open: " << qual_file << "\n";
+        abort();
+    }
     std::cout<<"Applied quality cut file: "<<qual_file<<std::endl;
   }
 
