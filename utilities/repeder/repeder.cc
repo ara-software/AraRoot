@@ -357,10 +357,6 @@ int main (int nargs, char ** args)
           median_difference_hists[ich]->Fill(median-mean);
           if (use_median)
           {
-            //if (median < 0 or median == NaN) {
-            //std::cout<<"Minus median!: "<<median<<std::endl;
-            //median = 0;
-            //}
             pf << " " <<  median;
           }
         }
