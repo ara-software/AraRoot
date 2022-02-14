@@ -32,6 +32,7 @@ const char * input_file = 0;
 const char * pedestal_file = 0;
 bool use_median = false;
 const char * root_output = 0;
+const char * qual_file = 0;
 
 bool use_calpulsers = false;
 int cache_size = 100;
@@ -53,6 +54,7 @@ void usage()
   std::cout << "-t :  Enable multithreading (in TTree reading). Specify number of threads (or 0 to choose automatically) " << std::endl;
   std::cout << "-C :  Size in megabytes of TTreeCache" << std::endl;
   std::cout << "-m,-M,-b :   Set histogram bounds /binning.  " << std::endl;
+  std::cout << "-q :  Input clean event list (txt file) by quality cut results" << std::endl; ///< -MK added 11-02-2022
 }
 
 int get_median_slice(const TH2S * h, int bin)
@@ -70,7 +72,13 @@ int get_median_slice(const TH2S * h, int bin)
   {
     partial_sum += array[ bin * (n_adu_bins+2) + i++];
   }
-  return floor(h->GetXaxis()->GetBinCenter(i-1)); //this makes sense if anything is binned..
+
+  //! return 0 if bin_center is nagative. -MK added 11-02-2022
+  double bin_center = h->GetXaxis()->GetBinCenter(i-1);
+  int median_estimation = 0;
+  if (bin_center > 0) median_estimation = floor(bin_center);
+  return median_estimation;
+  //return floor(h->GetXaxis()->GetBinCenter(i-1)); //this makes sense if anything is binned..
 }
 
 
@@ -86,6 +94,12 @@ int parse(int nargs, char ** args)
     if (!strcmp(args[iarg],"-o"))
     {
       root_output = args[++iarg];
+      continue;
+    }
+
+    if (!strcmp(args[iarg],"-q"))
+    {
+      qual_file = args[++iarg];
       continue;
     }
 
@@ -242,6 +256,16 @@ int main (int nargs, char ** args)
   chain.AddBranchToCache("event",true);
   chain.StopCacheLearningPhase();
 
+  //! Input quality cut results. -MK added 11-02-2022
+  std::ifstream qualFile(qual_file);
+  if (qual_file) {
+    if(!qualFile.is_open()) {
+        std::cout << "Can not open: " << qual_file << "\n";
+        abort();
+    }
+    std::cout<<"Applied quality cut file: "<<qual_file<<std::endl;
+  }
+
   int nhundred = 0;
 
   int nev = max < 0 ? chain.GetEntries()+1+max : TMath::Min(max, chain.GetEntries());
@@ -254,6 +278,14 @@ int main (int nargs, char ** args)
       std::cout << iev << "/"  <<  nev << "\r";
       std::cout << std::flush;
       nhundred++;
+    }
+
+    //! pass the event by quality cut results. -MK added 11-02-2022
+    if (qual_file) {
+      int passed_evt;
+      qualFile >> passed_evt;
+      if (passed_evt != 1) continue;
+      //std::cout<<passed_evt<<std::endl; ///< debug
     }
 
     if (ev->isCalpulserEvent() && !use_calpulsers)  continue;
@@ -297,6 +329,8 @@ int main (int nargs, char ** args)
     }
   }
 
+  qualFile.close();
+
   std::cout << std::endl;
 
   //write out pedestal file. This probably isn't in the normal order but the way it's read in, it doesn't matter.
@@ -314,7 +348,9 @@ int main (int nargs, char ** args)
       for (int isamp = 0; isamp < samp_per_block; isamp++)
       {
         int idx= isamp+blk*samp_per_block;
-        int mean =  int(round( sum[ich][idx] / num[ich][idx]));
+        //! return mean = 0 if it is zero division. -MK added 11-02-2022
+        int mean = 0;
+        if (sum[ich][idx] != 0 || num[ich][idx] != 0) mean = int(round( sum[ich][idx] / num[ich][idx]));
         if (full_hists[ich])
         {
           int median = get_median_slice(full_hists[ich], idx+1);
@@ -356,8 +392,11 @@ int main (int nargs, char ** args)
 
       for (int isamp = 0; isamp < nsamp; isamp++)
       {
-        g->SetPoint(isamp,isamp, sum[ich][isamp]/ num[ich][isamp]);
-        g->SetPointError(isamp, 0, sqrt(sum2[ich][isamp]/ num[ich][isamp] - g->GetY()[isamp]*g->GetY()[isamp] ));
+        //! return mean = 0 if it is zero division. -MK added 11-02-2022
+        double mean = 0;
+        if (sum[ich][isamp] != 0 || num[ich][isamp] != 0) mean = sum[ich][isamp] / num[ich][isamp];
+        g->SetPoint(isamp,isamp, mean);
+        g->SetPointError(isamp, 0, sqrt(mean - g->GetY()[isamp]*g->GetY()[isamp] ));
       }
       g->SetTitle(Form("Channel %d mean/rms",ich));
       g->GetXaxis()->SetTitle("Sample");
