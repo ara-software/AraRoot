@@ -30,14 +30,19 @@ class RayTraceCorrelator : public TObject
         void SetAngularConfig(double angularSize);
         void SetTablePaths(const std::string &dirPath, const std::string &refPath);
 
-        // a high-dimensional vector to store the arrival times at antennats
+        // a high-dimensional vector to store the arrival times at antennas
         // first index is direct/reflected
         // second index is theta bins
         // third index is phi bins
         // fourth index is number of antennas
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalTimes_;
+
+        // same dimensions and explanations, just for theta and phi
+        std::vector < std::vector < std::vector < std::vector < double > > > > arrivalThetas_;
+        std::vector < std::vector < std::vector < std::vector < double > > > > arrivalPhis_;
+
         
-        void ConfigureArrivalTimesVector(); ///< Function to set the dimensions of arrivalTimes_ correctly
+        void ConfigureArrivalVectors(); ///< Function to set the dimensions of arrivalTimes_, arrivalThetas_, etc. correctly
 
     public:
 
@@ -93,6 +98,36 @@ class RayTraceCorrelator : public TObject
             std::map<int, std::vector<int> > pairs,
             std::map<int, TGraph*> interpolatedWaveforms,
             bool applyHilbertEnvelope = true
+        );
+
+
+        //! function to get lookup the antenna arrival information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param thetaBin the theta bin desired (bin space, not angle space!!)
+            \param phiBin the phi bin desired (bin space, not angle space!!)
+            \param arrivalTheta passed by reference, content is replaced with the arrival theta angle (where the signal is COMING FROM)
+            \param arrivalPhi passed by reference, content is replaced with the arrival phi angle (where the signal is COMING FROM)
+            \return void
+        */
+        void LookupArrivalAngles(
+            int ant, int solNum,
+            int thetaBin, int phiBin,
+            double &arrivalTheta, double &arrivalPhi
+        );
+
+        //! function to get lookup the bin numbers of a source hypothesis direction
+        /*!
+            \param theta source hypothesis direction up/down angle, from -90 to 90
+            \param theta source hypothesis direction left/right angle, from -180 to 180
+            \param thetaBin the angular bin corresponding to theta, passed by reference (is replaced by the bin value)
+            \param phiBin the angular bin corresponding to phi, passed by reference (is replaced by the bin value)
+            \return void
+        */
+        void ConvertAngleToBins(
+            double theta, double phi,
+            int &thetaBin, int &phiBin
         );
 
 

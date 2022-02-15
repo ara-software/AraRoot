@@ -54,6 +54,29 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     }
 }
 
+void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi, 
+    int &thetaBin, int &phiBin
+    ){
+
+    // if(theta<-91 || theta > 91 || isnan(theta)){
+    if(abs(theta) > 91 || isnan(theta)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -91 to 91\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    // if(theta<-181 || theta > 181 || isnan(theta)){
+    if(abs(phi)>181 || isnan(phi)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -181 to 181\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    double angularSize = this->GetAngularSize();
+    thetaBin = int((theta + 90. - (0.5 * angularSize))/angularSize);
+    phiBin = int((phi + 180. - (0.5 * angularSize))/angularSize);
+}
+
 void RayTraceCorrelator::SetRadius(double radius){
     if(radius<0 || isnan(radius)){
         char errorMessage[400];
@@ -85,17 +108,24 @@ void RayTraceCorrelator::SetTablePaths(const std::string &dirPath, const std::st
 }
 
 
-
-void RayTraceCorrelator::ConfigureArrivalTimesVector(){
+void RayTraceCorrelator::ConfigureArrivalVectors(){
     arrivalTimes_.resize(2);
+    arrivalThetas_.resize(2);
+    arrivalPhis_.resize(2);
     for(int sol=0; sol<2; sol++){
         arrivalTimes_[sol].resize(numThetaBins_);
+        arrivalThetas_[sol].resize(numThetaBins_);
+        arrivalPhis_[sol].resize(numThetaBins_);
         for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
             arrivalTimes_[sol][thetaBin].resize(numPhiBins_);
+            arrivalThetas_[sol][thetaBin].resize(numPhiBins_);
+            arrivalPhis_[sol][thetaBin].resize(numPhiBins_);
         }
         for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
             for(int phiBin=0; phiBin<numPhiBins_; phiBin++){
                 arrivalTimes_[sol][thetaBin][phiBin].resize(numAntennas_);
+                arrivalThetas_[sol][thetaBin][phiBin].resize(numAntennas_);
+                arrivalPhis_[sol][thetaBin][phiBin].resize(numAntennas_);
             }
         }
     }
@@ -121,11 +151,14 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
 
     // if the file is good, load the variables from the branches
     int ant, phiBin, thetaBin;
-    double arrivalTime, phi, theta;
+    double phi, theta;
+    double arrivalTime, arrivalTheta, arrivalPhi;
     tTree -> SetBranchAddress("ant", & ant);
     tTree -> SetBranchAddress("phiBin", & phiBin);
     tTree -> SetBranchAddress("thetaBin", & thetaBin);
     tTree -> SetBranchAddress("arrivalTime", & arrivalTime);
+    tTree -> SetBranchAddress("arrivalTheta", & arrivalTheta);
+    tTree -> SetBranchAddress("arrivalPhi", & arrivalPhi);
     tTree -> SetBranchAddress("phi", & phi);
     tTree -> SetBranchAddress("theta", & theta);
 
@@ -134,6 +167,8 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
     for (int i = 0; i < nEntries; i++) {
         tTree -> GetEntry(i);
         arrivalTimes_[solNum][thetaBin][phiBin][ant] = arrivalTime;
+        arrivalThetas_[solNum][thetaBin][phiBin][ant] = arrivalTheta;
+        arrivalPhis_[solNum][thetaBin][phiBin][ant] = arrivalPhi;
     }
 
     // close up
@@ -166,7 +201,7 @@ void RayTraceCorrelator::LoadTables(){
     char errorMessage[400];
     
     // load the arrival time tables
-    this->ConfigureArrivalTimesVector();
+    this->ConfigureArrivalVectors();
     this->LoadArrivalTimeTables(dirSolTablePath_, 0);
     this->LoadArrivalTimeTables(refSolTablePath_, 1);
 }
@@ -267,6 +302,15 @@ std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
         }
     }
     return corrFunctions;
+}
+
+void RayTraceCorrelator::LookupArrivalAngles(
+    int ant, int solNum,
+    int thetaBin, int phiBin,
+    double &arrivalTheta, double &arrivalPhi
+){
+    arrivalTheta = this->arrivalThetas_[solNum][thetaBin][phiBin][ant];
+    arrivalPhi = this->arrivalPhis_[solNum][thetaBin][phiBin][ant];
 }
 
 
