@@ -59,7 +59,7 @@ void usage()
 
 int get_median_slice(const TH2S * h, int bin)
 {
-  int sum = 0;
+  double sum = 0; ///< Need to be double to get half of cumulative frequency
   const short * array = h->GetArray();
   for (int i = 1; i <=n_adu_bins; i++)
   {
@@ -75,9 +75,9 @@ int get_median_slice(const TH2S * h, int bin)
 
   //! return 0 if bin_center is nagative. -MK added 11-02-2022
   double bin_center = h->GetXaxis()->GetBinCenter(i-1);
-  int median_estimation = 0;
-  if (bin_center > 0) median_estimation = floor(bin_center);
-  return median_estimation;
+  int median = 0;
+  if (bin_center > 0) median = floor(bin_center);
+  return median;
   //return floor(h->GetXaxis()->GetBinCenter(i-1)); //this makes sense if anything is binned..
 }
 
@@ -285,13 +285,12 @@ int main (int nargs, char ** args)
       int passed_evt;
       qualFile >> passed_evt;
       if (passed_evt != 1) continue;
-      //std::cout<<passed_evt<<std::endl; ///< debug
     }
 
     if (ev->isCalpulserEvent() && !use_calpulsers)  continue;
 
-    //skip the first block!
-    for (unsigned iblk = 1; iblk < ev->blockVec.size(); iblk++)
+    //skip the first block from all 4 DDA board!
+    for (unsigned iblk = 4; iblk < ev->blockVec.size(); iblk++)
     {
 
       int chan_idx = 0;
