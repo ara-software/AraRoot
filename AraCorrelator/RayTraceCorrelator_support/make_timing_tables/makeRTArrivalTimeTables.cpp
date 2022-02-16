@@ -15,6 +15,7 @@
 
 // AraSim includes
 #include "Position.h"
+#include "Vector.h"
 #include "IceModel.h"
 #include "RaySolver.h"
 #include "Settings.h"
@@ -22,12 +23,14 @@
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel);
 void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir);
 Position CalculateStationCOG(std::map<int, Position> antennaLocations);
-double CalculateArrivalTime(
+void CalculateArrivalInformation(
     RaySolver *raySolver,
     IceModel *iceModel,
     Settings *settings,
     Position antennaLocation, Position stationCOG,
-    double phiWave, double thetaWave, double R, int solNum);
+    double phiWave, double thetaWave, double R, int solNum,
+    double &arrivalTime, double &arrivalTheta, double &arrivalPhi
+    );
 
 int main(int argc, char **argv)
 {
@@ -72,11 +75,14 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     tArrivalTimes = new TTree("tArrivalTimes", "tArrivalTimes");
 
     int ant, phiBin, thetaBin;
-    double arrivalTime, phi, theta;
+    double phi, theta;
+    double arrivalTime, arrivalTheta, arrivalPhi;
     tArrivalTimes -> Branch("ant", & ant);
     tArrivalTimes -> Branch("phiBin", & phiBin);
     tArrivalTimes -> Branch("thetaBin", & thetaBin);
     tArrivalTimes -> Branch("arrivalTime", & arrivalTime);
+    tArrivalTimes -> Branch("arrivalTheta", & arrivalTheta);
+    tArrivalTimes -> Branch("arrivalPhi", & arrivalPhi);
     tArrivalTimes -> Branch("phi", & phi);
     tArrivalTimes -> Branch("theta", & theta);
 
@@ -130,14 +136,24 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
 
                 Position antPosition = antennaLocations.find(ant_temp)->second;
 
-                double arrivalTime_temp = CalculateArrivalTime(
+                double arrivalTime_temp;
+                double arrivalTheta_temp;
+                double arrivalPhi_temp;
+                CalculateArrivalInformation(
                     raySolver, iceModel, settings,
                     antPosition, stationCOG,
-                    phiAngles[phiBin_temp], thetaAngles[thetaBin_temp], radius, solNum
+                    phiAngles[phiBin_temp], thetaAngles[thetaBin_temp], radius, solNum,
+                    arrivalTime_temp, arrivalTheta_temp, arrivalPhi_temp
 
                 );
                 
                 arrivalTime = arrivalTime_temp;
+                arrivalTheta = arrivalTheta_temp;
+                arrivalPhi = arrivalPhi_temp;
+                // printf("  Phi %d, Ant %d, Arrival Time %.2f, Arrival Theta %.2f, Arrival Phi %.2f \n",
+                //     phiBin_temp, ant_temp, arrivalTime_temp, 
+                //     TMath::RadToDeg()*arrivalTheta_temp, TMath::RadToDeg()*arrivalPhi_temp
+                // );
                 ant = ant_temp;
                 phiBin = phiBin_temp;
                 thetaBin = thetaBin_temp;
@@ -151,12 +167,14 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     outfile->Close();
 }
 
-double CalculateArrivalTime(
+void CalculateArrivalInformation(
     RaySolver *raySolver,
     IceModel *iceModel,
     Settings *settings,
     Position antennaLocation, Position stationCOG,
-    double phiWave, double thetaWave, double R, int solNum){
+    double phiWave, double thetaWave, double R, int solNum,
+    double &arrivalTime, double  &arrivalTheta, double &arrivalPhi
+    ){
 
     // first, configure the source position relative to detector center of gravity (COG)
     double xs = R * TMath::Cos(thetaWave) * TMath::Cos(phiWave);
@@ -177,7 +195,6 @@ double CalculateArrivalTime(
     vector < vector < vector <double> > > RayStep;
     raySolver->Solve_Ray(source, target, iceModel, outputs, settings, RayStep);
 
-    double arrivalTime;
     if ((outputs.size() > 0)) {
         if (outputs[4].size() > solNum) {
             arrivalTime = outputs[4][solNum];
@@ -185,15 +202,30 @@ double CalculateArrivalTime(
             if (arrivalTime != arrivalTime) {
                 arrivalTime = -2000;
             }
+
+            // need to do math
+            double receiveAngle = outputs[2][solNum];
+            Vector receive_vector = target.Rotate( receiveAngle, source.Cross(target) ).Unit();
+            // receive_vector = receive_vector.Unit();
+            // receive_vector tells you where the signal is *going*
+            // flip it around so that it specifies where the signal *came from*
+            // which is more intuitive for calculating things like the gain
+            Vector flip_receive_vector = -1. * receive_vector;
+            arrivalTheta = flip_receive_vector.Theta();
+            arrivalPhi = flip_receive_vector.Phi();
+
         }
         else{
             arrivalTime = -1500;
+            arrivalTheta = -1500;
+            arrivalPhi = -1500;
         }
     }
     else{
         arrivalTime = -1000;
+        arrivalTheta = -1500;
+        arrivalPhi = -1500;
     }
-    return arrivalTime;
 }
 
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel){
