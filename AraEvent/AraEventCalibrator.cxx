@@ -95,7 +95,8 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
         || calType==kLatestCalib14to20_Bug
         || calType==kLatestCalibWithOutZeroMean
         || calType==kOnlyPedWithOut1stBlockAndBadSamples
-        || calType==kOnlyADCWithOut1stBlockAndBadSamples){
+        || calType==kOnlyADCWithOut1stBlockAndBadSamples
+        || calType==kJustPedWithOut1stBlockAndBadSamples){
 
         return kTRUE;
     }
@@ -121,7 +122,8 @@ Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
     if(calType==kOnlyPed
         || calType==kOnlyPedWithOut1stBlock
         || calType==kOnlyADC
-        || calType==kOnlyADCWithOut1stBlock) return kFALSE;
+        || calType==kOnlyADCWithOut1stBlock
+        || calType==kJustPedWithOut1stBlock) return kFALSE;
     if(calType>=kFirstCalib)
         return kTRUE;
     return kFALSE;
@@ -142,6 +144,8 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 { 
+    if(calType==kJustPedWithOut1stBlock
+        || calType==kJustPedWithOut1stBlockAndBadSamples) return kTRUE;
     if(calType>kOnlyPedWithOut1stBlockAndBadSamples) return kFALSE; ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
     if(calType==kNoCalib) return kFALSE;
     return kTRUE;

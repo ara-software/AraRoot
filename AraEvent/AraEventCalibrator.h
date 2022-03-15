@@ -59,7 +59,9 @@ namespace AraCalType {
         kOnlyPedWithOut1stBlockAndBadSamples = 0x0E,
         kOnlyADC                             = 0x0F, ///< Same as kNoCalib
         kOnlyADCWithOut1stBlock              = 0x10,
-        kOnlyADCWithOut1stBlockAndBadSamples = 0x11
+        kOnlyADCWithOut1stBlockAndBadSamples = 0x11,
+        kJustPedWithOut1stBlock              = 0x12, ///< subtract peds and remove first block , 05-03-2022 -MK-
+        kJustPedWithOut1stBlockAndBadSamples = 0x13 ///< subtract peds and remove first block and bad sampeles. useful for checking the wf that has large offet from ped
 
     } AraCalType_t;
 
