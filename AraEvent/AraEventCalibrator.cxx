@@ -1543,12 +1543,12 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 
     // now, we open and load the pedestal files
     gzFile inPed = gzopen(fAtriPedFile[calibIndex], "r");
-    char buffer[6000000];
-    int nRead = gzread(inPed, &buffer, sizeof(buffer)/sizeof(buffer[0])-1);
+    std::vector<char> buffer(6000000);
+    int nRead = gzread(inPed, &buffer[0], sizeof(char)*6000000);
 
     // we then put the buffer (which are characters at this point)
     // into a string object that we can manipulate
-    std::string string_buffer(buffer);
+    std::string string_buffer(buffer.begin(), buffer.end()); // convert the vector of chars to a string    
     std::stringstream ss(string_buffer);
 
     // to do this, we need "buffer" variables
@@ -1851,10 +1851,10 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
     Int_t numPedVals=0;
     gzFile inPed = gzopen(fileName, "r");
     if(inPed){
-        char buffer[6000000];
-        int nRead = gzread(inPed, &buffer, sizeof(buffer)/sizeof(buffer[0])-1);
-        std::string string_buffer(buffer); // shove this back into a string
-        std::stringstream ss(string_buffer); // and then convert to stringstream
+        std::vector<char> buffer(6000000);
+        int nRead = gzread(inPed, &buffer[0], sizeof(char)*6000000);
+        std::string string_buffer(buffer.begin(), buffer.end()); // convert the vector of chars to a string
+        std::stringstream ss(string_buffer); // and then convert the string to a stringstream
 
         std::string dummy;
         while( ss >> dummy >> dummy >> dummy){
