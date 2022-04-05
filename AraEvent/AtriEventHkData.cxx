@@ -115,16 +115,18 @@ Double_t AtriEventHkData::getSingleChannelRateHz(Int_t tda, Int_t channel){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
   if(channel>= ANTS_PER_TDA || tda <0) return -1;
   uint8_t preScale=32;
+  Double_t preScaledl1Scaler = l1Scaler[tda*ANTS_PER_TDA+channel] * preScale;
 
-  return l1Scaler[tda*ANTS_PER_TDA+channel] * preScale;
+  return preScaledl1Scaler;
   
 }
 Double_t AtriEventHkData::getOneOfFourRateHz(Int_t tda){
   if(tda >= TDA_PER_ATRI || tda < 0) return -1;
   uint8_t preScale=1;
   if(firmwareVersionMaj > 0 || firmwareVersionMid > 9 || firmwareVersionMin >= 40) preScale=64; 
+  Double_t preScaledl2Scaler = l2Scaler[tda*4] * preScale;
 
-  return l2Scaler[tda*4]*preScale;
+  return preScaledl2Scaler;
 
 
 }
