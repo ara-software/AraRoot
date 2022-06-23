@@ -48,7 +48,7 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
             else { yrtime = 1; } ///< The 2018 SQliteDB will be available until the year 3000. It needs to be updated if ARA will use new channel mapping in the future, 2022-06-22 -MK-
         }
         else if ( unixtime > 3000 ) { ///< check by unixtime
-            if ( unixtime <= 1515974400 ){ yrtime = 0; }
+            if ( unixtime <= 1515974400 ){ yrtime = 0; } ///< Technically, the new channel mapping is implemented on January 15th 2018
             else { yrtime = 1; } 
         }
         else { ///< unixtime argument is not set by user. print recommended way to use AraGeomTool::getStationInfo()
