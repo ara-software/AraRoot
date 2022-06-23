@@ -41,36 +41,36 @@ AraStationInfo::AraStationInfo(AraStationId_t stationId, Int_t unixtime)
     else {
 
         Int_t yrtime=0;
-        /////These if statements check if the run is before December 1st or not
-        if(unixtime==2017){
-            std::cout<<"Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-            yrtime=0;
-        }
-        if(unixtime>=2018 && unixtime<=3000){ ///< The 2018 SQliteDB will be only available between the years 2018 and 3000, 2022-06-22 -MK-
-            std::cout<<"Opening 2018 SQliteDB using AraGeomTool::getStationInfo()"<<std::endl;
-            yrtime=1;
-        }
-        
-        if(unixtime<=1515974400 && unixtime>3000){
-            std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is before January 15th 2018"<<std::endl;
-            yrtime=0;
-        }
 
-        if(unixtime>1515974400){
-            std::cout<<"Unixtime of the first event is "<<unixtime<<" and it is after January 15th 2018"<<std::endl;
-            yrtime=1;
+        //! choose SQliteDB based on unixtime argument
+        if ( unixtime > 0 && unixtime <= 3000 ){ ///< check per year values
+            if ( unixtime <= 2017 ){ yrtime = 0; }
+            else { yrtime = 1; } ///< The 2018 SQliteDB will be available until the year 3000. It needs to be updated if ARA will use new channel mapping in the future, 2022-06-22 -MK-
         }
-
-        if(unixtime==0){
-            std::cout<<"***NOTE***: Opening default SQLite database for 2013-2017. Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 & ARA01 for 2018 & after please specify either: "<<std::endl;
+        else if ( unixtime > 3000 ) { ///< check by unixtime
+            if ( unixtime <= 1515974400 ){ yrtime = 0; }
+            else { yrtime = 1; } 
+        }
+        else { ///< unixtime argument is not set by user. print recommended way to use AraGeomTool::getStationInfo()
+            std::cout<<"***NOTE***: Year/Unixtime argument is "<<unixtime<<". If you want the correct channel mappings for ARA03 & ARA01 for 2018 & after please specify either: "<<std::endl;
             std::cout<<"a) The right year when you call AraGeomTool::getStationInfo(3,2017) where 3 is stationID and 2017 is DB year"<<std::endl;
-            std::cout<<"b) The unixtime of the first event when you call AraGeomTool::getStationInfo(3,1000000000) where 3 is stationID and 100000000 is unixtime"<<std::endl;
+            std::cout<<"b) The Unixtime of any event at the chosen run when you call AraGeomTool::getStationInfo(3,1000000000) where 3 is stationID and 1000000000 is unixtime"<<std::endl;
             std::cout<<"OR"<<std::endl;
             std::cout<<"c) Call UsefulAtriStationEvent *realAtriEvPtr = new UsefulAtriStationEvent(rawAtriEvPtr, AraCalType::kLatestCalib); ***BEFORE*** "<<std::endl;
             std::cout<<"AraGeomTool::getStationInfo(3,2017)"<<std::endl;
-            yrtime=0;
+            yrtime = 0;
         }
-        
+
+        //! peint which SQliteDB is used
+        if( yrtime == 0 ) {
+            if ( unixtime > 3000 ) std::cout << "Unixtime of the chosen event is " << unixtime << " and it is before January 15th 2018" << std::endl;
+            std::cout << "Opening 2013-2017 SQliteDB using AraGeomTool::getStationInfo()" << std::endl;
+        }
+        else {
+            if ( unixtime > 3000 ) std::cout << "Unixtime of the chosen event is " << unixtime << " and it is after January 15th 2018" << std::endl;
+            std::cout << "Opening 2018 SQliteDB using AraGeomTool::getStationInfo()" << std::endl;
+        }
+
         readChannelMapDbAtri_2(yrtime);
         //    readChannelMapDbAtri();
 
