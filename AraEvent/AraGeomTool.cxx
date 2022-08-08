@@ -1037,7 +1037,7 @@ Double_t AraGeomTool::getGeometricRadius(){
 
     Double_t radius = fGeoidC+fIceThicknessSP;
 
-    return radius
+    return radius;
 
 }
 
@@ -1045,7 +1045,7 @@ Double_t AraGeomTool::getGeographicRadius(){
 
     Double_t radius = fGeoidA+fIceThicknessSP;
 
-    return radius
+    return radius;
 
 }
 
