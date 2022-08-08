@@ -1032,6 +1032,23 @@ Double_t AraGeomTool::getLongitudeFromArrayCoords(Double_t Northing, Double_t Ea
 
 }
 
+//! MK -- add the functions to return Geometric/Geographic Radius
+Double_t AraGeomTool::getGeometricRadius(){
+
+    Double_t radius = fGeoidC+fIceThicknessSP;
+
+    return radius
+
+}
+
+Double_t AraGeomTool::getGeographicRadius(){
+
+    Double_t radius = fGeoidA+fIceThicknessSP;
+
+    return radius
+
+}
+
 Double_t AraGeomTool::getNorthingFromLatLong(Double_t Latitude, Double_t Longitude){
     
     Double_t tanLatitude = TMath::Tan(TMath::DegToRad()*Latitude);
