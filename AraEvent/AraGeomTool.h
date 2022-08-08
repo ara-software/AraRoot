@@ -119,6 +119,10 @@ class AraGeomTool
         static Double_t getGeometricLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year=2011);
         static Double_t getGeographicLatitudeFromArrayCoords(Double_t Northing, Double_t Easting, Int_t year=2011);
 
+        //! MK -- add the functions to return Geometric/Geographic Radius
+        static Double_t getGeometricRadius(); 
+        static Double_t getGeographicRadius(); 
+
         // Maybe these will be useful one day
         static Double_t getNorthingFromLatLong(Double_t Latitude, Double_t Longitude);
         static Double_t getEastingFromLatLong(Double_t Latitude, Double_t Longitude);
