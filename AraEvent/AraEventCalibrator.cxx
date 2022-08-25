@@ -31,6 +31,7 @@ Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
     if(calType==kLatestCalib14to20_Bug) return kFALSE;
     //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
+    if(calType==kLatestTime ) return kFALSE;
     if(calType<=kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -40,6 +41,7 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
     if(calType==kFirstCalibPlusCables
         || calType==kSecondCalibPlusCables
         || calType==kSecondCalibPlusCablesUnDiplexed
+        || calType ==kLatestTime
         || calType ==kLatestCalib14to20_Bug){
 
         return kTRUE;
@@ -74,7 +76,7 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
     if(calType==kSecondCalibPlusCables
         || calType==kSecondCalib
         || calType==kSecondCalibPlusCablesUnDiplexed
-
+        || calType==kLatestTime
         || calType==kLatestCalib14to20_Bug){
 
         return kTRUE;
@@ -100,7 +102,8 @@ Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
     if(calType==kSecondCalibPlusCablesUnDiplexed 
-        || calType==kLatestCalib14to20_Bug) return kTRUE;
+        || calType==kLatestCalib14to20_Bug 
+        || calType ==kLatestCalib) return kTRUE;
 
     return kFALSE;
 }
@@ -1482,7 +1485,12 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
     int block = inBlock;
 
     int sample = samp%64;
-    //std::cout << chan << ", "<< block<<", " << samp << std::endl;
+    if(dda==0 and chan==2){
+        std::cout << chan << ", "<< block<<", " << samp << std::endl;
+        std::cout << fAtriSampleADCVoltsConversion[dda][chan][block][sample][3] << ", "<< fAtriSampleADCVoltsConversion[dda][chan][block][sample][0]<<", " << fAtriSampleADCVoltsConversion[dda][chan][block][sample][9] << std::endl;
+
+    }
+    
     // Only apply calibration on calibrated channels (RF channels)!
     if( (dda==0 && chan<6)||(dda==1 && chan<4)||(dda==2 && chan<4)||(dda==3 && chan<6) ){
         // Check if the fit worked out well parameter[8] is the Chi^2/NDF of the fit. Normally it is very good if <1.0.
@@ -1532,5 +1540,9 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
     else{
         volts = adcCountsIn;
     }
+    if(dda==0 and chan==2){
+        std::cout << adcCountsIn << ", "<< volts<< std::endl;
+    }
+    
     return volts;
 }
