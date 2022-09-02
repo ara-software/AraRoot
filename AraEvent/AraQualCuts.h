@@ -31,6 +31,7 @@ class AraQualCuts
         bool hasBlockGap(RawAtriStationEvent *rawEvent); ///< Detects block gaps
         bool hasTimingError(UsefulAtriStationEvent *realEvent); ///< Detects timing errors
         bool hasTooFewBlocks(UsefulAtriStationEvent *realEvent); ///< Detects too few block cases
+        bool hasTooFewSamples(UsefulAtriStationEvent *realEvent); ///< Detects too few waveform samples
         bool hasFirstEventCorruption(RawAtriStationEvent *rawEvent); ///<Checks for event corruption in A2 and A3
 
         /*
