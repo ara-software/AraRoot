@@ -1643,8 +1643,12 @@ void AraEventCalibrator::loadAtriCalib(AraStationId_t stationId, Double_t unixti
         In order to remove duplicate samples, a new timing table for the 2019 data set are implemented 
         It will exclude the samples that contain duplicated ADC
         Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2535
+    
+        MK added 10-09-2022
+        It looks like duplication is disappeared from 2019-2020 pole season
+        The new timing table will be only used between Run12866 and Run16481
     */
-    if (stationId==3 && unixtime > 1544125405){ ///< use new timing table from A3 Run12866 2018/12/21
+    if (stationId==3 && unixtime > 1544125405 && unixtime < 1576210568){ ///< use new timing table from A3 Run12866 (2018/12/21) until Run16481 (2019/12/13)
         sprintf(calibFile,"%s/ATRI/araAtriStation%iSampleTimingNew_2019DataSet.txt",calibDir, stationId);
     }
     else {
