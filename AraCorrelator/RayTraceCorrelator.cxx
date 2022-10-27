@@ -19,7 +19,7 @@ void RayTraceCorrelator::SetupStationInfo(int stationID, int numAntennas) {
     char errorMessage[400];
 
     // set station ID
-    if(stationID>5 || stationID<0 || isnan(stationID)){ // testbed through A5 is supported
+    if((stationID>5 || stationID<0 || isnan(stationID)) && stationID!=100){ // testbed through A5 is supported, as well as 2018 redeployment of A1 (stationID=100)
         sprintf(errorMessage,"Requested station (%d) is not supported\n", stationID);
         throw std::invalid_argument(errorMessage);
     }
