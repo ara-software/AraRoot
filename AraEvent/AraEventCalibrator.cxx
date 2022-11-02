@@ -35,7 +35,7 @@
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 {
     //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
-    if(calType==kOnlyPed
+    if(calType ==kOnlyPed
         || calType==kOnlyADC) return kFALSE;
     if(calType<kVoltageTime) return kFALSE;
     return kTRUE;
