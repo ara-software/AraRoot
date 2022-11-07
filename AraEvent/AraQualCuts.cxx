@@ -61,8 +61,9 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
     bool this_hasBlockGap = hasBlockGap(realEvent);
     bool this_hasTimingError = hasTimingError(realEvent);
     bool this_hasTooFewBlocks = hasTooFewBlocks(realEvent);
+    bool this_hasTooFewSamples = hasTooFewSamples(realEvent);
     bool this_hasOffsetBlocks = false;
-    if(!this_hasBlockGap && !this_hasTimingError && !this_hasTooFewBlocks){
+    if(!this_hasBlockGap && !this_hasTimingError && !this_hasTooFewBlocks && !this_hasTooFewSamples){
         this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
     }
     
@@ -70,7 +71,8 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
 
     if(this_hasBlockGap 
         || this_hasTimingError 
-        || this_hasTooFewBlocks 
+        || this_hasTooFewBlocks
+        || this_hasTooFewSamples
         || this_hasOffsetBlocks
         || this_hasFirstEventCorruption){
         isGoodEvent=false;
@@ -344,6 +346,33 @@ bool AraQualCuts::hasTooFewBlocks(UsefulAtriStationEvent *realEvent)
         }
     }
     return hasTooFewBlocks;
+}
+
+//! Returns if a real atri event contains a waveform whose number of samples is less than 500.
+/*!
+    \param realEvent the useful atri event pointer
+    \return if the event contains a waveform that has too few samples (<500) to be analyzed
+*/
+bool AraQualCuts::hasTooFewSamples(UsefulAtriStationEvent *realEvent)
+{
+
+    /*
+        In an analyzable waveform, the number of samples should be greater than 500.
+        If not, we shouldn't analyze this event
+    */
+
+    const int numSampThreshold = 500; 
+    bool hasTooFewSamples=false;
+    for(int chan=0; chan<realEvent->getNumRFChannels(); chan++){
+        TGraph* gr = realEvent->getGraphFromRFChan(chan); //get the waveform
+        int N = gr->GetN();
+        delete gr;
+        if(N<numSampThreshold){
+            hasTooFewSamples=true;
+            break;
+        }
+    }
+    return hasTooFewSamples;
 }
 
 //! Returns if a real atri event has first event corruption issues
