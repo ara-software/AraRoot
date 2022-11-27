@@ -35,9 +35,10 @@
 Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 {
     //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
-    if(calType==kOnlyPed
-        || calType==kOnlyADC) return kFALSE;
-    if(calType<kVoltageTime) return kFALSE;
+    if(calType == kOnlyPed
+        || calType == kOnlyADC
+        || calType == kOnlySamp) return kFALSE;
+    if(calType < kVoltageTime) return kFALSE;
     return kTRUE;
 }
 
@@ -90,13 +91,30 @@ Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
     if(calType==kFirstCalibPlusCables
-        || calType==kSecondCalibPlusCables
-        || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType==kLatestCalib14to20_Bug
-        || calType==kLatestCalibWithOutZeroMean
-        || calType==kOnlyPedWithOut1stBlockAndBadSamples
-        || calType==kOnlyADCWithOut1stBlockAndBadSamples
-        || calType==kJustPedWithOut1stBlockAndBadSamples){
+        || calType == kSecondCalibPlusCables
+        || calType == kSecondCalibPlusCablesUnDiplexed
+        || calType == kLatestCalib14to20_Bug
+        || calType == kLatestCalibWithOutZeroMean
+        || calType == kOnlyPedWithOut1stBlockAndBadSamples
+        || calType == kOnlyADCWithOut1stBlockAndBadSamples
+        || calType == kJustPedWithOut1stBlockAndBadSamples
+        || calType == kOnlySampWithOut1stBlockAndBadSamples){
+
+        return kTRUE;
+    }
+    return kFALSE;
+}
+
+//! Returns if a calibration type should or should not replace voltage value to sample index, 26-11-2021 -MK-
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True: peform replacing voltage value to sample index
+*/
+Bool_t AraCalType::hasSampleIndex(AraCalType::AraCalType_t calType)
+{
+    if(calType==kOnlySamp
+        || calType==kOnlySampWithOut1stBlock
+        || calType==kOnlySampWithOut1stBlockAndBadSamples){
 
         return kTRUE;
     }
@@ -123,7 +141,9 @@ Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
         || calType==kOnlyPedWithOut1stBlock
         || calType==kOnlyADC
         || calType==kOnlyADCWithOut1stBlock
-        || calType==kJustPedWithOut1stBlock) return kFALSE;
+        || calType==kJustPedWithOut1stBlock
+        || calType==kOnlySamp
+        || calType==kOnlySampWithOut1stBlock) return kFALSE;
     if(calType>=kFirstCalib)
         return kTRUE;
     return kFALSE;
@@ -1039,6 +1059,12 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     if(hasCableDelays(calType)){
         ApplyCableDelay(theEvent, timeMapIt, unixtime, thisStationId);
     }
+
+    //! extra step. return sample index
+    if(hasSampleIndex(calType)){
+        ReturnSampleIndex(theEvent, voltMapIt, sampleList);
+    }
+ 
     delete sampleList, capArrayList; ///< delete the pointer
 
     // fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG                        
@@ -1237,6 +1263,32 @@ void AraEventCalibrator::PedestalSubtraction(UsefulAtriStationEvent *theEvent, s
                     { voltMapIt->second.push_back((Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)]);
                     //! Filling with ADC-Pedestal. Iunputted pedestal will be stored in fAtriPeds table 
                     } else { voltMapIt->second[samp] -= (Int_t)fAtriPeds[RawAtriStationEvent::getPedIndex(dda,blockIndex,chan,sampleNumber)]; }
+                }
+            }
+        }
+    }
+}
+
+//! Return sample index. If user use below options, user can check which analog buffer regions were used to record the event. 26-11-2022 -MK-
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param sampleList the pointer of WF sample numbers
+*/
+void AraEventCalibrator::ReturnSampleIndex(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList)
+{
+    int sampleIndex = 0; ///< capacitor sample index
+
+    for(int dda=0;dda<DDA_PER_ATRI;dda++) {
+        for(Int_t chan=0;chan<RFCHAN_PER_DDA;chan++) {
+            Int_t chanId=chan+RFCHAN_PER_DDA*dda; ///< make electronic channel number
+            voltMapIt=theEvent->fVolts.find(chanId);
+            if(voltMapIt!=theEvent->fVolts.end()) {
+                Int_t numPoints=(voltMapIt->second).size();
+                voltMapIt->second.clear(); ///< clear voltMapIt iterator before filling with sample index values
+                for(int samp=0;samp<numPoints;samp++) {
+                    sampleIndex = sampleList->at(chanId)[samp];
+                    voltMapIt->second.push_back(sampleIndex);
                 }
             }
         }

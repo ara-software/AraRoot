@@ -61,7 +61,19 @@ namespace AraCalType {
         kOnlyADCWithOut1stBlock              = 0x10,
         kOnlyADCWithOut1stBlockAndBadSamples = 0x11,
         kJustPedWithOut1stBlock              = 0x12, ///< subtract peds and remove first block , 05-03-2022 -MK-
-        kJustPedWithOut1stBlockAndBadSamples = 0x13 ///< subtract peds and remove first block and bad sampeles. useful for checking the wf that has large offet from ped
+        kJustPedWithOut1stBlockAndBadSamples = 0x13, ///< subtract peds and remove first block and bad sampeles. useful for checking the wf that has large offet from ped
+
+        /*! 
+            Get sample index. 
+            If user use below options, voltage values will replaced to smaple index.
+            User can check which analog buffer regions were used to record the event 
+            and debug which elements of timing / voltage calibration were used to calibrate the event
+            26-11-2022 -MK-
+        */
+        kOnlySamp                             = 0x14,
+        kOnlySampWithOut1stBlock              = 0x15,
+        kOnlySampWithOut1stBlockAndBadSamples = 0x16
+
 
     } AraCalType_t;
 
@@ -77,6 +89,7 @@ namespace AraCalType {
     Bool_t hasADCZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the ADC waveform -MK-
     Bool_t hasVoltZeroMean(AraCalType::AraCalType_t calType); ///< Does the calibration type zero mean the voltage waveform -MK-
     Bool_t hasVoltCal(AraCalType::AraCalType_t calType); ///< Does the calibration type convert ADC to volts-THM-
+    Bool_t hasSampleIndex(AraCalType::AraCalType_t calType); ///< Does return sample index -MK-
 } 
 
 class UsefulAtriStationEvent;
@@ -163,6 +176,7 @@ class AraEventCalibrator : public TObject
     void ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk, Bool_t hasTimingCalib); ///< Zeroing WF by subtracting mean. ADC or Voltage. If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
     void VoltageCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); ///< Converts ADC to Voltage using conversion table
     void ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); ///< Remove knwon cable delay
+    void ReturnSampleIndex(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); ///< Return sample index.
 
     protected:
         static AraEventCalibrator *fgInstance;  ///< protect against multiple instances
