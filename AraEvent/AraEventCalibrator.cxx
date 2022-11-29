@@ -1024,7 +1024,10 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
             
         Latest update :: 6th Nov 2022, by Paramita Dasgupta(PDG)
         In A4, applied calibration to each sample and did nt do zero-mean before voltage calibration ( similar to ARA5. So, adding  && thisStationId != 4 to the following condition so that we "DO NOT" zero mean before Voltage calibration. In the future, we might need to check if A4 also has outlier event or not, but for now, we are not zero-meaning before v calib.
-    */
+        latest update : 29th Nov2022, PDG is debugging ! 
+
+
+    */ //do not zero mean if station==4, station==5 
     if(hasADCZeroMean(calType) && thisStationId != 5 && thisStationId != 4) {
         ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
     }
@@ -1959,16 +1962,31 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
     */
     double adc_offset; 
     int high_adc_limit; ///< Define the high ADC limit here (MK)
+    /*
     if (stationId != 5 && stationId != 4){
         high_adc_limit = 400;
         adc_offset = -11.0;
-    } else if (stationId == 5) {
+    } 
+    if (stationId == 5) {
         high_adc_limit = 500;
         adc_offset = 0.0;
-    } else if (stationId == 4) {
+    }
+    if (stationId == 4) {
         high_adc_limit = 800; // only for ARA 4
         adc_offset = 0.0; // only for ARA 4 
     }
+    */
+    if (stationId == 4) {
+        high_adc_limit = 600; // only for ARA 4
+        adc_offset = 0.0; // only for ARA 4 
+    } else if (stationId == 5) {
+        high_adc_limit = 500;
+        adc_offset = 0.0;
+    } else {
+        high_adc_limit = 400;
+        adc_offset = -11.0;
+    }
+
     //! Define neighboring sample or block offset. Based on Thomas's thesis p.69
     int neighboring_index = 2;
 
@@ -1985,13 +2003,23 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             For A2/3, If Chi^2/NDF is > 1.0, the conversion factor of the same sample number in a neighboring block, provided it has a better Chi^2/NDF value, will be used. -- Thomas's thesis p.69
             For A5 and A4, the conversion factor of the neighboring sample, provided it has a better Chi^2/NDF value, will be used.
          update by PDG 6th Nov 2022, adding A4 condition here for sample to be considered */ 
+        /*
         if (stationId != 5 && stationId != 4){
             while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - neighboring_index + blocks_per_dda)%blocks_per_dda;
-        } else if (stationId == 5 || stationId != 4) {
+        } else if (stationId == 5 || stationId == 4) {
             if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_dda; ///< Dumping even samples
             while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_dda)%samples_per_dda;
         }
-
+        */
+        //new PDG 29th Nov correcting bug here 
+        if (stationId == 5 || stationId == 4) {
+            if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_dda; ///< Dumping even samples
+            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_dda)%samples_per_dda;
+        } 
+        else {
+            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - neighboring_index + blocks_per_dda)%blocks_per_dda;
+        }
+        //
         //! Offset needs to be subtracted
         double adcCounts = adcCountsIn + adc_offset;
 
@@ -2004,14 +2032,24 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
 
             Double_t fit_const; ///< Define the fit_const here (MK)
             double adc_zero_def; ///< Define which value will be used to choose a positive or negative conversion
+            /* commenting this 29th Nov 2022
             if (stationId != 5 && stationId != 4) {
                 fit_const = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6];
                 adc_zero_def = adcCounts;
             } else {
-                fit_const = 0.0; // fit const for A5 and A4 (? *** )
+                fit_const = 0.0; // fit const for A5 and A4 ( intercept)
                 adc_zero_def = modAdcCounts;
             }
-
+            */
+            // new  29th Nov2022
+            if (stationId == 5 || stationId == 4) {
+                fit_const = 0.0; // fit const for A5 and A4
+                adc_zero_def = modAdcCounts;
+            } else {
+                fit_const = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6];
+                adc_zero_def = adcCounts;
+            }
+            
             if(adc_zero_def>0){
                 //! positive and negative values need different calibration constants
                 volts = fit_const
@@ -2034,9 +2072,10 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 I leave this condition just for A5 -MK-
             */
             if (stationId == 5 && volts > 800) volts=modAdcCounts;
-            else if (stationId == 4 && volts > 800) volts=modAdcCounts;
+            if (stationId == 4 && volts > 800) volts=modAdcCounts;
             
         }
+        /*
         else {
             if (stationId != 5 && stationId != 4){
                 //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
@@ -2053,9 +2092,23 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 // Similarly for A4, since no high ADC calib data is available, we use ADC count for the corresponding voltage result for high ADC count
                 volts = adcCountsIn + adc_offset;
             }
+        }*/ // below for higher ADC count 
+        else {
+            if (stationId == 5 || stationId == 4){
+                volts = adcCountsIn + adc_offset;
+            } 
+            else {
+                if(adcCounts>0) {
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][0] 
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][1];
+                } 
+                else {
+                    volts = fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][2]
+                    + adcCounts*fAtriSampleHighADCVoltsConversion[dda][chan][block][sample][3];
+                }
+            }    
         }
-        
-    }
+    }    
     else{
         volts = adcCountsIn + adc_offset;
     }
