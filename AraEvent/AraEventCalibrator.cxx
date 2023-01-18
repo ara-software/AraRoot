@@ -2007,12 +2007,10 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             Double_t fit_const; ///< Define the fit_const here (MK)
             double adc_zero_def; ///< Define which value will be used to choose a positive or negative conversion
             //! new  29th Nov2022
-/// HERE
             if (stationId == 5 || stationId == 4) {
                 fit_const = 0.0; // fit const for A5 and A4
                 adc_zero_def = modAdcCounts;
             } else {
-/// END
                 fit_const = fAtriSampleADCVoltsConversion[dda][chan][block][sample][6];
                 adc_zero_def = adcCounts;
             }
@@ -2038,13 +2036,10 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide 16 ~17)
                 I leave this condition just for A5 -MK-
             */
-/// HERE
             if ((stationId == 4 || stationId == 5) && volts > 800) volts=modAdcCounts;
-/// END      
       
         } // below for higher ADC count 
         else { ///< for higher ADC count
-/// HERE
             if (stationId == 5 || stationId == 4){
                 /*!
                     For A5, since there is no high ADC calibration data, use ADC count for conervison result in case A5 encount high ADC count
@@ -2052,7 +2047,6 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 */
                 volts = adcCountsIn + adc_offset;
             }
-/// END 
             else {
                 //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
                 if(adcCounts>0) {
