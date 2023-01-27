@@ -61,7 +61,7 @@ bool AraQualCuts::isGoodEvent(UsefulAtriStationEvent *realEvent)
     bool this_hasBlockGap = hasBlockGap(realEvent);
     bool this_hasTimingError = hasTimingError(realEvent);
     bool this_hasTooFewBlocks = hasTooFewBlocks(realEvent);
-    bool this_hasTooFewSamples = hasTooFewSamples(realEvent);
+    bool this_hasTooFewSamples = hasTooFewSamples(realEvent) && !realEvent->isSoftwareTrigger();
     bool this_hasOffsetBlocks = false;
     if(!this_hasBlockGap && !this_hasTimingError && !this_hasTooFewBlocks && !this_hasTooFewSamples){
         this_hasOffsetBlocks = hasOffsetBlocks(realEvent);
