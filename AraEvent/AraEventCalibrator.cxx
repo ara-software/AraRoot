@@ -1987,8 +1987,8 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             update by PDG 6th Nov 2022, adding A4 condition here for sample to be considered
         */ 
         if (stationId == 5 || stationId == 4) {
-            if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_dda; ///< Dumping even samples
-            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_dda)%samples_per_dda;
+            if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_block; ///< Dumping even samples
+            while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_block)%samples_per_block;
         } 
         else {
             while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) block = (block - neighboring_index + blocks_per_dda)%blocks_per_dda;
@@ -2037,7 +2037,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 I leave this condition just for A5 -MK-
             */
             if ((stationId == 4 || stationId == 5) && volts > 800) volts=modAdcCounts;
-            
+      
         } // below for higher ADC count 
         else { ///< for higher ADC count
             if (stationId == 5 || stationId == 4){
@@ -2046,7 +2046,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                     Similarly for A4, since no high ADC calib data is available, we use ADC count for the corresponding voltage result for high ADC count
                 */
                 volts = adcCountsIn + adc_offset;
-            } 
+            }
             else {
                 //! here is the alternative calibration (used only for A2 and A3) if the ADC count exceeds 400
                 if(adcCounts>0) {
