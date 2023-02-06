@@ -48,7 +48,7 @@ namespace AraCalType {
             Useful CalType for raw data debugging, 19-12-2021 -MK- 
             kOnlyADC~: Get the raw ADC WF
             kOnlyPed~: Get the pedestal values for the corresponding WF.
-                       If user selects kOnlyPed~, PedestalSubtraction() will replace voltMapIt iterator as a pedestal values
+                       If user selects kOnlyPed~, PedestalSubtraction() will replace voltMapIt iterator with a pedestal values
 
             ~WithOut1stBlock: Remove 1st block by applying TrimFirstBlock()
             ~WithOut1stBlockAndBadSamples:  Remove 1st block and bad samples by applying TrimFirstBlock(), TimingCalibrationAndBadSampleReomval(), and ApplyCableDelay() 
@@ -65,14 +65,17 @@ namespace AraCalType {
 
         /*! 
             Get sample index. 
-            If user use below options, voltage values will replaced to smaple index.
+            If user use below options, voltage values will be replaced to smaple index.
             User can check which analog buffer regions were used to record the event 
             and debug which elements of timing / voltage calibration were used to calibrate the event
             26-11-2022 -MK-
         */
         kOnlySamp                             = 0x14,
         kOnlySampWithOut1stBlock              = 0x15,
-        kOnlySampWithOut1stBlockAndBadSamples = 0x16
+        kOnlySampWithOut1stBlockAndBadSamples = 0x16,
+
+        //! full calibration without 1st block triming, 06-02-2023 -MK-
+        kLatestCalibWithOutTrimFirstBlock     = 0x17   
 
 
     } AraCalType_t;
