@@ -37,7 +37,8 @@ Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
     //return kFALSE; ///< Just in case, analyzers want to see 1st block on kLatestCalib
     if(calType == kOnlyPed
         || calType == kOnlyADC
-        || calType == kOnlySamp) return kFALSE;
+        || calType == kOnlySamp
+        || calType == kLatestCalibWithOutTrimFirstBlock) return kFALSE;
     if(calType < kVoltageTime) return kFALSE;
     return kTRUE;
 }
@@ -49,8 +50,9 @@ Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 {
-    if(calType>kLatestCalibWithOutZeroMean) return kFALSE;  
-    if(calType<kVoltageTime) return kFALSE;
+    if(calType == kLatestCalibWithOutTrimFirstBlock) return kTRUE;
+    if(calType > kLatestCalibWithOutZeroMean) return kFALSE;  
+    if(calType < kVoltageTime) return kFALSE;
     return kTRUE;
 }
 
@@ -61,8 +63,9 @@ Bool_t AraCalType::hasInvertA3Chans(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 {
-    if(calType>kLatestCalib14to20_Bug) return kFALSE;
-    if(calType<kVoltageTime) return kFALSE;
+    if(calType == kLatestCalibWithOutTrimFirstBlock) return kTRUE;
+    if(calType > kLatestCalib14to20_Bug) return kFALSE;
+    if(calType < kVoltageTime) return kFALSE;
     return kTRUE;    
 }
 
@@ -73,32 +76,36 @@ Bool_t AraCalType::hasADCZeroMean(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasVoltZeroMean(AraCalType::AraCalType_t calType)
 {
-    if(calType>kLatestCalib14to20_Bug) return kFALSE;
-    if(calType<kVoltageTime) return kFALSE;
+    if(calType == kLatestCalibWithOutTrimFirstBlock) return kTRUE;
+    if(calType > kLatestCalib14to20_Bug) return kFALSE;
+    if(calType < kVoltageTime) return kFALSE;
     return kTRUE;
 }
 
 //added, 12-Feb 2014 -THM-
 Bool_t AraCalType::hasVoltCal(AraCalType::AraCalType_t calType)
 {
-    if(calType>kLatestCalibWithOutZeroMean) return kFALSE;
-    if(calType==kLatestCalib14to20_Bug)return kFALSE;
+    if(calType == kLatestCalibWithOutTrimFirstBlock) return kTRUE;
+    if(calType > kLatestCalibWithOutZeroMean) return kFALSE;
+    if(calType == kLatestCalib14to20_Bug) return kFALSE;
     //return kFALSE; //RJN hackcd .. un-hacked KAH 09152020
-    if(calType<kVoltageTime) return kFALSE; ///< Need to be only kFALSE before voltage calibration
+    if(calType < kVoltageTime) return kFALSE; ///< Need to be only kFALSE before voltage calibration
     return kTRUE;
 }
 
 Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 { 
-    if(calType==kFirstCalibPlusCables
+    if(calType == kFirstCalibPlusCables
         || calType == kSecondCalibPlusCables
         || calType == kSecondCalibPlusCablesUnDiplexed
+        || calType == kLatestCalib
         || calType == kLatestCalib14to20_Bug
         || calType == kLatestCalibWithOutZeroMean
         || calType == kOnlyPedWithOut1stBlockAndBadSamples
         || calType == kOnlyADCWithOut1stBlockAndBadSamples
         || calType == kJustPedWithOut1stBlockAndBadSamples
-        || calType == kOnlySampWithOut1stBlockAndBadSamples){
+        || calType == kOnlySampWithOut1stBlockAndBadSamples
+        || calType == kLatestCalibWithOutTrimFirstBlock){
 
         return kTRUE;
     }
@@ -112,9 +119,9 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasSampleIndex(AraCalType::AraCalType_t calType)
 {
-    if(calType==kOnlySamp
-        || calType==kOnlySampWithOut1stBlock
-        || calType==kOnlySampWithOut1stBlockAndBadSamples){
+    if(calType == kOnlySamp
+        || calType == kOnlySampWithOut1stBlock
+        || calType == kOnlySampWithOut1stBlockAndBadSamples){
 
         return kTRUE;
     }
@@ -123,12 +130,14 @@ Bool_t AraCalType::hasSampleIndex(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 { 
-    if(calType==kFirstCalibPlusCables
-        || calType==kSecondCalibPlusCables
-        || calType==kFirstCalib
-        || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed
-        || calType==kLatestCalib14to20_Bug){
+    if(calType == kFirstCalibPlusCables
+        || calType == kSecondCalibPlusCables
+        || calType == kFirstCalib
+        || calType == kSecondCalib
+        || calType == kSecondCalibPlusCablesUnDiplexed
+        || calType == kLatestCalib
+        || calType == kLatestCalib14to20_Bug
+        || calType == kLatestCalibWithOutTrimFirstBlock){
 
         return kTRUE;
     }
@@ -137,25 +146,24 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasBinWidthCalib(AraCalType::AraCalType_t calType)
 {
-    if(calType==kOnlyPed
-        || calType==kOnlyPedWithOut1stBlock
-        || calType==kOnlyADC
-        || calType==kOnlyADCWithOut1stBlock
-        || calType==kJustPedWithOut1stBlock
-        || calType==kOnlySamp
-        || calType==kOnlySampWithOut1stBlock) return kFALSE;
-    if(calType>=kFirstCalib)
+    if(calType == kOnlyPed
+        || calType == kOnlyPedWithOut1stBlock
+        || calType == kOnlyADC
+        || calType == kOnlyADCWithOut1stBlock
+        || calType == kJustPedWithOut1stBlock
+        || calType == kOnlySamp
+        || calType == kOnlySampWithOut1stBlock) return kFALSE;
+    if(calType >= kFirstCalib)
         return kTRUE;
     return kFALSE;
 }
 
 Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 { 
-    if(calType==kSecondCalibPlusCables
-        || calType==kSecondCalib
-        || calType==kSecondCalibPlusCablesUnDiplexed
-
-        || calType==kLatestCalib14to20_Bug){
+    if(calType == kSecondCalibPlusCables
+        || calType == kSecondCalib
+        || calType == kSecondCalibPlusCablesUnDiplexed
+        || calType == kLatestCalib14to20_Bug){
 
         return kTRUE;
     }
@@ -164,24 +172,25 @@ Bool_t AraCalType::hasClockAlignment(AraCalType::AraCalType_t calType)
 
 Bool_t AraCalType::hasPedestalSubtraction(AraCalType::AraCalType_t calType)
 { 
-    if(calType==kJustPedWithOut1stBlock
-        || calType==kJustPedWithOut1stBlockAndBadSamples) return kTRUE;
-    if(calType>kOnlyPedWithOut1stBlockAndBadSamples) return kFALSE; ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
-    if(calType==kNoCalib) return kFALSE;
+    if(calType == kJustPedWithOut1stBlock
+        || calType == kJustPedWithOut1stBlockAndBadSamples
+        || calType == kLatestCalibWithOutTrimFirstBlock) return kTRUE;
+    if(calType > kOnlyPedWithOut1stBlockAndBadSamples) return kFALSE; ///< Get the raw ADC WF without bad samples and pedestal subtraction, 19-12-2021 -MK-
+    if(calType == kNoCalib) return kFALSE;
     return kTRUE;
 }
 
 Bool_t AraCalType::hasCommonMode(AraCalType::AraCalType_t calType)
 {
     return kFALSE;
-    if(calType==kNoCalib) return kFALSE;
+    if(calType == kNoCalib) return kFALSE;
     return kTRUE;
 }
 
 Bool_t AraCalType::hasUnDiplexing(AraCalType::AraCalType_t calType)
 {
-    if(calType==kSecondCalibPlusCablesUnDiplexed 
-        || calType==kLatestCalib14to20_Bug) return kTRUE;
+    if(calType == kSecondCalibPlusCablesUnDiplexed 
+        || calType == kLatestCalib14to20_Bug) return kTRUE;
 
     return kFALSE;
 }
@@ -965,8 +974,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     /*! 
 	4th step. Common mode
 	This function is subtracting DDA ch5 value from DDA ch1~4
-        But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
-	Since it will only work when the number of samples between DDA ch 1~4 and ch 5 is the same,
+    But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
+	Since it will only work when the number of samples between DDA ch 1~4 and ch 5 are the same,
 	It is placed before TrimFirstBlock() and TimingCalibrationAndBadSampleReomval()
     */
     if(hasCommonMode(calType)) {
