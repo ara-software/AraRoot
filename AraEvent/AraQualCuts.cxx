@@ -415,37 +415,64 @@ bool AraQualCuts::hasFirstEventCorruption(RawAtriStationEvent *rawEvent)
 int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId) 
 {
 
-
-    int start, end, config;
     if(stationId == 100) // simplify ARA1 station id
       stationId = 1;
-
-    char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
-    char configLogFileName[256];
-    sprintf(configLogFileName,"%s/share/livetimeConfigs/a%d_livetimeConfigs.txt",utilEnv,stationId);
+    
+    int start, end, config;
 
     std::vector<int> configStart;
     std::vector<int> configNum;
 
+    // read in log file
+    char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+    char configLogFileName[256];
+    sprintf(configLogFileName,"%s/share/livetimeConfigs/a%d_livetimeConfigs.txt",utilEnv,stationId);
+
     std::ifstream configLogFile(configLogFileName);
     if(!configLogFile.is_open())
       throw std::runtime_error("Livetime configuration log not found!");
-    while(configLogFile >> start >> config) {
+    std::string line;
+    while(getline(configLogFile, line)) {
+      std::stringstream str(line);
+      std::string word;
+      std::vector<std::string> words;
+      
+      while(getline(str, word, ','))
+        words.push_back(word);
+      if(words.size() != 2)
+        throw std::runtime_error("Livetime config log file not formatted correctly! \
+                                  \nSee AraEvent/livetimeConfigs/README.md");
+      start = std::stoi(words[0]);  
+      config = std::stoi(words[1]);
+      
+      // check for unexpected data types
+      //// check for entries like: "1.5" and "11x" that might have silently converted to int
+      if(std::to_string(start) != words[0] || std::to_string(config) != words[1]) // should be able to convert back fine if this was an integer
+        throw std::runtime_error("Unexpected data type in livetime config log file! \
+                                 \nSee AraEvent/livetimeConfigs/README.md");
+      //// check for negative entries
+      if(start < 0 || config < 0)
+        throw std::runtime_error("Livetime config log file has a negative entry! \
+                                 \nSee AraEvent/livetimeConfigs/README.md");
+
+      // if everything looks okay append and move on!
       configStart.push_back(start);
       configNum.push_back(config);
     }
     configLogFile.close();
 
+    // find the right configuration
     for(unsigned int i = 0; i < configStart.size(); ++i) {
       start = configStart[i];
-      if(i+1 == configStart.size())
+      if(i+1 == configStart.size()) // if this is the last config start assume all future runs are part of the last config
         end = int(1e10);
-      else
-        end = configStart[i+1];
+      else // if this isn't the last config start, assume this config continues until the next config begins 
+        end = configStart[i+1]; 
 
       if(end <= start)
         throw std::runtime_error("Something is wrong in the livetime configuration log \
-                                  file: " + std::string(configLogFileName));
+                                  file: " + std::string(configLogFileName) +
+                                  "\nSee AraEvent/livetimeConfigs/README.md");
 
       if(runNumber >= start && runNumber < end) {
         config = configNum[i]; 
