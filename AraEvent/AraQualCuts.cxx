@@ -405,3 +405,53 @@ bool AraQualCuts::hasFirstEventCorruption(RawAtriStationEvent *rawEvent)
     }
     return hasFirstEventCorruption;
 }
+
+//! Returns the livetime configuration number corresponding to a given run number and station 
+/*!
+    \param runNumber the station run number
+    \param stationId the station Id number 
+    \return config the livetime configuration number 
+*/
+int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId) 
+{
+
+
+    int start, end, config;
+    if(stationId == 100) // simplify ARA1 station id
+      stationId = 1;
+
+    char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+    char configLogFileName[256];
+    sprintf(configLogFileName,"%s/share/livetimeConfigs/a%d_livetimeConfigs.txt",utilEnv,stationId);
+
+    std::vector<int> configStart;
+    std::vector<int> configNum;
+
+    std::ifstream configLogFile(configLogFileName);
+    if(!configLogFile.is_open())
+      throw std::runtime_error("Livetime configuration log not found!");
+    while(configLogFile >> start >> config) {
+      configStart.push_back(start);
+      configNum.push_back(config);
+    }
+    configLogFile.close();
+
+    for(unsigned int i = 0; i < configStart.size(); ++i) {
+      start = configStart[i];
+      if(i+1 == configStart.size())
+        end = int(1e10);
+      else
+        end = configStart[i+1];
+
+      if(end <= start)
+        throw std::runtime_error("Something is wrong in the livetime configuration log \
+                                  file: " + std::string(configLogFileName));
+
+      if(runNumber >= start && runNumber < end) {
+        config = configNum[i]; 
+        break;
+      }
+    }
+
+    return config;
+}
