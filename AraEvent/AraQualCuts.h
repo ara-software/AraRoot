@@ -53,7 +53,11 @@ class AraQualCuts
         double getMax(TGraph *gr, double *maxTime); ///< gets the max of waveform
         double getMean(TGraph *gr); ///< gets the mean of a waveform
         TGraph* getRollingMean(TGraph *grInt, int samplePerBlock); ///< gets the rolling average of a waveform
-    
+
+        int getLivetimeConfiguration(const int runNumber, int stationId);
+        int getLivetimeConfiguration(const int runNumber, RawAtriStationEvent *realEvent)
+          { return getLivetimeConfiguration(runNumber, realEvent->getStationId()); }
+ 
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
         

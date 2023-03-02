@@ -44,6 +44,7 @@ FILE(GLOB antennaFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/*.sqlite")
 FILE(GLOB atriCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ATRI/*.txt")
 FILE(GLOB icrrTestBedCalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/TestBed/*.dat")
 FILE(GLOB icrrStation1CalibFiles "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.txt" "${CMAKE_CURRENT_SOURCE_DIR}/calib/ICRR/Station1/*.dat")
+FILE(GLOB livetimeConfigFiles "${CMAKE_CURRENT_SOURCE_DIR}/livetimeConfigs/*.txt")
 
 install(TARGETS AraEvent DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
 install(FILES ${${libname}Headers} DESTINATION ${ARAROOT_INSTALL_PATH}/include)
@@ -52,6 +53,7 @@ install(FILES ${antennaFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib
 install(FILES ${atriCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ATRI)
 install(FILES ${icrrTestBedCalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/TestBed)
 install(FILES ${icrrStation1CalibFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/araCalib/ICRR/Station1)
+install(FILES ${livetimeConfigFiles} DESTINATION ${ARAROOT_INSTALL_PATH}/share/livetimeConfigs)
 
 if( ${ROOT_VERSION} VERSION_GREATER "5.99/99")
   install (FILES ${PROJECT_BINARY_DIR}/${libname}/${DICTNAME}_rdict.pcm DESTINATION ${ARAROOT_INSTALL_PATH}/lib)
