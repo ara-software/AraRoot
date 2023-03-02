@@ -442,6 +442,8 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
       if(words.size() != 2)
         throw std::runtime_error("Livetime config log file not formatted correctly! \
                                   \nSee AraEvent/livetimeConfigs/README.md");
+      if(words[0] == "RunNo") // header, skip this line
+        continue;
       start = std::stoi(words[0]);  
       config = std::stoi(words[1]);
       

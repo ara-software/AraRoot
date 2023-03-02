@@ -9,6 +9,7 @@
   - `configStart`: The run number at which the configuration begins (inclusive) in ascending order
   - `configNum`: The corresponding livetime configuration number (should correspond to the config number used
                  for noise and gain models)
+- The file should have a header to label each column: `RunNo,Config`
 - All file entries should be non-negative integers
 - Example:
           0,1 
