@@ -434,6 +434,9 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
     std::string line;
     while(getline(configLogFile, line)) {
       std::stringstream str(line);
+      if(line[0] == '#') // comment, skip this line
+        continue;
+      
       std::string word;
       std::vector<std::string> words;
       
