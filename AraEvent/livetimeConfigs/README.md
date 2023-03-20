@@ -11,11 +11,11 @@
                  for noise and gain models)
 - The file should have a header to label each column: `RunNo,Config`
 - All file entries should be non-negative integers
-- Example:
-          0,1 
-          135,2
-          233,3
-          501,1
+- Example:  
+          0,1  
+          135,2  
+          233,3  
+          501,1  
   - The above file would correspond to the station being in:
     - Config 1 for runs 0-134
     - Config 2 for runs 135-232
