@@ -126,6 +126,10 @@ class AraGeomTool
         // Maybe these will be useful one day
         static Double_t getNorthingFromLatLong(Double_t Latitude, Double_t Longitude);
         static Double_t getEastingFromLatLong(Double_t Latitude, Double_t Longitude);
+        
+        // JCF -- Add functions to convert lat/lon into array coordinates
+        static Double_t getArrayEastingFromLatLong(Double_t Latitude, Double_t Longitude, Int_t year=2011);
+        static Double_t getArrayNorthingFromLatLong(Double_t Latitude, Double_t Longitude, Int_t year=2011);
 
     protected:
         static AraGeomTool *fgInstance;  

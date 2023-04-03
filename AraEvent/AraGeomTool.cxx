@@ -1032,6 +1032,39 @@ Double_t AraGeomTool::getLongitudeFromArrayCoords(Double_t Northing, Double_t Ea
 
 }
 
+//Added functions to convert latitude and longitude to array coordinates - JCF 4/1/2023
+Double_t AraGeomTool::getArrayEastingFromLatLong(Double_t Latitude, Double_t Longitude, Int_t year){
+    
+    Double_t alpha = (fGeoidC+fIceThicknessSP)*(TMath::Power((fGeoidA/fGeoidC),2));  //Defining this as constant to save space.
+    Double_t sinLongitude = TMath::Sin(TMath::DegToRad()*Longitude);
+    Double_t tanLatitude = TMath::Tan(-TMath::DegToRad()*Latitude);  //Note that this has a minus sign
+    
+    Double_t deltaEasting = alpha*sinLongitude/tanLatitude;
+
+    if(year==2011) deltaEasting += fSouthPole2010_11[0];
+    else if(year==2012) deltaEasting += fSouthPole2011_12[0];
+    else deltaEasting += fSouthPole2010_11[0];
+    
+    return deltaEasting;
+    
+}
+
+Double_t AraGeomTool::getArrayNorthingFromLatLong(Double_t Latitude, Double_t Longitude, Int_t year){
+    
+    Double_t alpha = (fGeoidC+fIceThicknessSP)*(TMath::Power((fGeoidA/fGeoidC),2));  //Defining this as constant to save space.
+    Double_t cosLongitude = TMath::Cos(TMath::DegToRad()*Longitude);
+    Double_t tanLatitude = TMath::Tan(-TMath::DegToRad()*Latitude);  //Note that this has a minus sign
+    
+    Double_t deltaNorthing = alpha*cosLongitude/tanLatitude;
+    
+    if(year==2011) deltaNorthing += fSouthPole2010_11[1];
+    else if(year==2012) deltaNorthing += fSouthPole2011_12[1];
+    else deltaNorthing += fSouthPole2010_11[1];
+
+    return deltaNorthing;
+    
+}
+
 //! MK -- add the functions to return Geometric/Geographic Radius
 Double_t AraGeomTool::getGeometricRadius(){
 
