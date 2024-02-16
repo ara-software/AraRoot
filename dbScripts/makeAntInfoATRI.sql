@@ -727,88 +727,89 @@ insert into ARA04 VALUES(19, "S4", "SA4", "kSurface",
 -- Updated by MSM (01/30/2023). Reconciled RFChan mapping and station coordinates with existing db. 
 -- Updated by MSM (03/23/2023). Fixed swapped locations/boreholes among some channels and updated their RFChan mappings to reflect this.
 -- Updated by MSM (02/05/2024). Updated x, y coordinates so that the average A5 borehole position is the origin (previously the PA borehole was the origin).
+-- Updated by MSM (02/15/2024). Rotated coordinate axes from easting/northing to local statio coordinate axes.
 
 insert into ARA05 VALUES(0 , "BH2", "TVPol", "kVertical", 
 0, 9, 1, 0, 2, "kBicone",
-21.9949,3.74415,-165.0948,23.571,
+-10.7667,-20.6606,-165.0948,23.571,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA05 VALUES(1 , "BH1", "TVPol", "kVertical", 
 1, 1, 5, 0, 2, "kBicone",
--6.09404,22.7033,-166.5366,20.61152,
+21.8338,-8.7099,-166.5366,20.61152,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(2 , "BH4", "TVPol", "kVertical", 
 3, 17, 13, 0, 2, "kBicone",
--20.6038,-1.60345,-147.2081,21.9055,
+11.0500,17.4638,-147.2081,21.9055,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(3 , "BH3", "TVPol", "kVertical", 
 2, 25, 9, 0, 2, "kBicone",
-4.70297,-24.844,-161.02376,12.4532,
+-22.7158,11.1056,-161.02376,12.4532,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(4 , "BH2", "BVPol", "kVertical", 
 4, 8, 0, 0, 4, "kBicone",
-21.9949,3.74415,-194.739,138.6438,
+-10.7667,-20.6606,-194.739,138.6438,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(5 , "BH1", "BVPol", "kVertical", 
 5, 0, 4, 0, 4, "kBicone",
--6.09404,22.7033,-196.2045,141.5849,
+21.8338,-8.7099,-196.2045,141.5849,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(6 , "BH4", "BVPol", "kVertical", 
 7, 16, 12, 0, 4, "kBicone",
--20.6038,-1.60345,-177.7466,140.1052,
+11.0500,17.4638,-177.7466,140.1052,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(7 , "BH3", "BVPol", "kVertical", 
 6, 24, 8, 0, 4, "kBicone",
-4.70297,-24.844,-190.8559,130.5,
+-22.7158,11.1056,-190.8559,130.5,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(8, "BH2", "THPol", "kHorizontal", 
 0, 11, 3, 0, 1, "kQuadSlot",
-21.9949,3.74415,-161.75,6.86,
+-10.7667,-20.6606,-161.75,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(9 , "BH1", "THPol", "kHorizontal", 
 1, 3, 7, 0, 1, "kQuadSlot",
--6.09404,22.7033,-162.53,6.86,
+21.8338,-8.7099,-162.53,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(10, "BH4", "THPol", "kHorizontal", 
 3, 19, 15, 0, 1, "kQuadSlot",
--20.6038,-1.60345,-145.01,6.86,
+11.0500,17.4638,-145.01,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(11 , "BH3", "THPol", "kHorizontal", 
 2, 27, 11, 0, 1, "kQuadSlot",
-4.70297,-24.844,-158.39,6.86,
+-22.7158,11.1056,-158.39,6.86,
 0,0,0,0,  
 0,0,0,140,800,0);
 
 insert into ARA05 VALUES(12, "BH2", "BHPol", "kHorizontal", 
 4, 10, 2, 0, 3, "kQuadSlot",
-21.9949,3.74415,-191.37,120.54,
+-10.7667,-20.6606,-191.37,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(13, "BH1", "BHPol", "kHorizontal", 
 5, 2, 6, 0, 3, "kQuadSlot",
--6.09404,22.7033,-192.35,120.54,
+21.8338,-8.7099,-192.35,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(14, "BH4", "BHPol", "kHorizontal", 
 7, 18, 14, 0, 3, "kQuadSlot",
--20.6038,-1.60345,-174.74,120.54,
+11.0500,17.4638,-174.74,120.54,
 0,0,0,0,  
 0,0,0,140,800,0);
 insert into ARA05 VALUES(15, "BH3", "BHPol", "kHorizontal", 
 6, 26, 10, 0, 3, "kQuadSlot",
-4.70297,-24.844,-188.12,120.54,
+-22.7158,11.1056,-188.12,120.54,
 0,0,0,0, 
 0,0,0,140,800,0);
 
