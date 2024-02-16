@@ -664,33 +664,51 @@ void AraGeomTool::readAraArrayCoords() {
         }
 
         if(isIcrrStation(thisStationId)) {
-            fStationToArrayRotationICRR[calibIndex] = new TRotation();      
-            TVector3 localx(fStationLocalCoordsICRR[calibIndex][0]);
-            TVector3 globale(1,0,0);
-            Double_t angleRotate=globale.Angle(localx);
-            TVector3 axisRotate=globale.Cross(localx);
-            fStationToArrayRotationICRR[calibIndex]->Rotate(angleRotate,axisRotate);
-            fArrayToStationRotationICRR[calibIndex]=new TRotation(fStationToArrayRotationICRR[calibIndex]->Inverse());
+            const Double_t stationE = fStationCoordsAtri[calibIndex][0]; // station center easting
+            const Double_t stationN = fStationCoordsAtri[calibIndex][1]; // station center northing
+            const Double_t geoLat = TMath::DegToRad()*getGeographicLatitudeFromArrayCoords(stationN, stationE);
+            const Double_t lon = TMath::DegToRad()*getLongitudeFromArrayCoords(stationN, stationE);
+            
+            // NOTE --  there is a sign flip in the convention for geographic latitude used in Amy's note https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2995 
+            // so formulas need to be updated with lg --> -1*lg
 
+            // correct spherical earth version
+            const Double_t rad90 = TMath::DegToRad()*90.0;
+            const Double_t rad180 = TMath::DegToRad()*180.0;
+            const Double_t phi = lon+rad90;
+            const Double_t theta = rad90+geoLat; 
+            const Double_t psi = fIceFlowLon-lon+rad180;
+            fArrayToStationRotationATRI[calibIndex] = new TRotation();
+            fArrayToStationRotationATRI[calibIndex]->RotateYEulerAngles(phi, theta, psi);
+            fStationToArrayRotationATRI[calibIndex] = new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
         }
         else {
-            fStationToArrayRotationATRI[calibIndex] = new TRotation();     
-
             //In the end this remarkably simple bit of code is all we need to define the matrix rotations necessary to switch
             // between array centric and station centric coordinates 
             // The basic idea is simply:
-            // a) Find the angle between the array centric easting(x) and the station centric x
-            // b) Find the vector that is perpendiculat to both of them using a cross product
-            // c) Create a rotation matrix by rotating the identity matrix by this angle about this axis
-            // d) Create the invere rotation to go the other way
+            // a) Find the station longitude & geographic latitude 
+            // b) Calculate Euler angles necessary for rotation (see https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2995) 
+            // c) Create a rotation matrix by performing an Euler angle rotation in the y-convention 
+            // d) Create the inverse rotation to go the other way
             // e) Remember we also need to translate to actually convert between station and array and vice-versa
-            TVector3 localx(fStationLocalCoordsATRI[calibIndex][0]);
-            TVector3 globale(1,0,0);
-            Double_t angleRotate=globale.Angle(localx);
-            TVector3 axisRotate=globale.Cross(localx);
-            fStationToArrayRotationATRI[calibIndex]->Rotate(angleRotate,axisRotate);
+            
+            const Double_t stationE = fStationCoordsAtri[calibIndex][0]; // station center easting
+            const Double_t stationN = fStationCoordsAtri[calibIndex][1]; // station center northing
+            const Double_t geoLat = TMath::DegToRad()*getGeographicLatitudeFromArrayCoords(stationN, stationE);
+            const Double_t lon = TMath::DegToRad()*getLongitudeFromArrayCoords(stationN, stationE);
+            
+            // NOTE --  there is a sign flip in the convention for geographic latitude used in Amy's note [https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2995] 
+            // so formulas need to be updated with lg --> -1*lg
 
-            fArrayToStationRotationATRI[calibIndex]=new TRotation(fStationToArrayRotationATRI[calibIndex]->Inverse());
+            // correct spherical earth version
+            const Double_t rad90 = TMath::DegToRad()*90.0;
+            const Double_t rad180 = TMath::DegToRad()*180.0;
+            const Double_t phi = lon+rad90;
+            const Double_t theta = rad90+geoLat; 
+            const Double_t psi = fIceFlowLon-lon+rad180;
+            fArrayToStationRotationATRI[calibIndex] = new TRotation();
+            fArrayToStationRotationATRI[calibIndex]->RotateYEulerAngles(phi, theta, psi);
+            fStationToArrayRotationATRI[calibIndex] = new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
 
             // fArrayToStationRotationATRI[calibIndex]->Dump();
         }

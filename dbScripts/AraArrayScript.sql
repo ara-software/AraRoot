@@ -1,4 +1,5 @@
 --Updated by UAL (01/25/2019). Updated the X,Y and Z coordinates of ARA4 and ARA5
+--Note: local* entries are no longer used as of PR#59 https://github.com/ara-software/AraRoot/pull/59 -- MSM (02/15/2024)
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 CREATE TABLE ARA(stationId integer primary key, stationName text, electronicsType text, stationEasting real, stationNorthing real, stationElevation real, local00 real, local01 real, local02 real, local10 real, local11 real, local12 real, local20 real, local21 real, local22 real);
