@@ -137,12 +137,14 @@ class AraGeomTool
 
     private:
 
+        Double_t fIceFlowLon = TMath::DegToRad()*-1*(36. + 46./60. + 23./60./60.); // ice flow longitude
+
         AraStationInfo *fStationInfoICRR[ICRR_NO_STATIONS]; ///< Station info contains the antenna info and station information
         AraStationInfo *fStationInfoATRI[ATRI_NO_STATIONS]; ///< Station info contains the antenna info and station information
         
         //Here are the ARA station coordinates
-        Double_t fStationCoordsICRR[ICRR_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
-        Double_t fStationCoordsAtri[ATRI_NO_STATIONS][3];  ///<Station coordinates in Northing, Easting, Elevation
+        Double_t fStationCoordsICRR[ICRR_NO_STATIONS][3];  ///<Station coordinates in Easting, Northing, Elevation
+        Double_t fStationCoordsAtri[ATRI_NO_STATIONS][3];  ///<Station coordinates in Easting, Northing, Elevation
         Double_t fStationLocalCoordsICRR[ICRR_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
         Double_t fStationLocalCoordsATRI[ATRI_NO_STATIONS][3][3]; ///< Station x, y, z directions in array coords
 
