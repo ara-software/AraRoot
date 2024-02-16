@@ -135,14 +135,15 @@ insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 
 --ARA05 Calpulers
 -- Updated by MSM (02/05/2024). Updated coordinates to calibrated calpulser position with the average A5 borehole position as the origin.
+-- Updated by MSM (02/16/2024). Updated coordinates by rotating from global coordinates to station coordinates.
 
 insert into ARA05 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
--29.251825,-39.41445,-171.07,0,
--29.251825,-39.41445,-171.07,0
+-14.0600,47.0264,-171.07,0,
+-14.0600,47.0264,-171.07,0
 );
 insert into ARA05 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
--29.251825,-39.41445,-173.28,0,
--29.251825,-39.41445,-173.28,0
+-14.0600,47.0264,-173.28,0,
+-14.0600,47.0264,-173.28,0
 );
 insert into ARA05 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
 0,0,0,0,
