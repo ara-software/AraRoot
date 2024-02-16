@@ -678,9 +678,9 @@ void AraGeomTool::readAraArrayCoords() {
             const Double_t phi = lon+rad90;
             const Double_t theta = rad90+geoLat; 
             const Double_t psi = fIceFlowLon-lon+rad180;
-            fArrayToStationRotationATRI[calibIndex]=new TRotation();
+            fArrayToStationRotationATRI[calibIndex] = new TRotation();
             fArrayToStationRotationATRI[calibIndex]->RotateYEulerAngles(phi, theta, psi);
-            fStationToArrayRotationATRI[calibIndex]= new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
+            fStationToArrayRotationATRI[calibIndex] = new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
         }
         else {
             //In the end this remarkably simple bit of code is all we need to define the matrix rotations necessary to switch
@@ -706,9 +706,9 @@ void AraGeomTool::readAraArrayCoords() {
             const Double_t phi = lon+rad90;
             const Double_t theta = rad90+geoLat; 
             const Double_t psi = fIceFlowLon-lon+rad180;
-            fArrayToStationRotationATRI[calibIndex]=new TRotation();
+            fArrayToStationRotationATRI[calibIndex] = new TRotation();
             fArrayToStationRotationATRI[calibIndex]->RotateYEulerAngles(phi, theta, psi);
-            fStationToArrayRotationATRI[calibIndex]= new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
+            fStationToArrayRotationATRI[calibIndex] = new TRotation(fArrayToStationRotationATRI[calibIndex]->Inverse());
 
             // fArrayToStationRotationATRI[calibIndex]->Dump();
         }
