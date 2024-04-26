@@ -313,12 +313,11 @@ void RayTraceCorrelator::LookupArrivalAngles(
     arrivalPhi = this->arrivalPhis_[solNum][thetaBin][phiBin][ant];
 }
 
-void RayTraceCorrelator::LookupArrivalTimes(
+double RayTraceCorrelator::LookupArrivalTimes(
     int ant, int solNum,
-    int thetaBin, int phiBin,
-    double &arrivalTime
+    int thetaBin, int phiBin
 ){
-    arrivalTime = this->arrivalTimes_[solNum][thetaBin][phiBin][ant];
+    return this->arrivalTimes_[solNum][thetaBin][phiBin][ant];
 }
 
 
@@ -377,10 +376,8 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
             for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
                 
                 int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-                double arrival_time1;
-                double arrival_time2;
-                LookupArrivalTimes(ant1, solNum, thetaBin, phiBin, arrival_time1);
-                LookupArrivalTimes(ant2, solNum, thetaBin, phiBin, arrival_time2);
+                double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
+                double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
                 double dt = arrival_time1 - arrival_time2;
 
                 // sanity check

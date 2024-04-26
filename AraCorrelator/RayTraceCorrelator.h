@@ -117,10 +117,18 @@ class RayTraceCorrelator : public TObject
             double &arrivalTheta, double &arrivalPhi
         );
         
-        void LookupArrivalTimes(
+        
+        //! function to get lookup the arrival time information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param thetaBin the theta bin desired (bin space, not angle space!!)
+            \param phiBin the phi bin desired (bin space, not angle space!!)
+            \return arrival time
+        */        
+        double LookupArrivalTimes(
             int ant, int solNum,
-            int thetaBin, int phiBin,
-            double &arrivalTime
+            int thetaBin, int phiBin
         );        
 
         //! function to get lookup the bin numbers of a source hypothesis direction
