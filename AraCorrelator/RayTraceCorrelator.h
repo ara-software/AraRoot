@@ -116,6 +116,12 @@ class RayTraceCorrelator : public TObject
             int thetaBin, int phiBin,
             double &arrivalTheta, double &arrivalPhi
         );
+        
+        void LookupArrivalTimes(
+            int ant, int solNum,
+            int thetaBin, int phiBin,
+            double &arrivalTime
+        );        
 
         //! function to get lookup the bin numbers of a source hypothesis direction
         /*!
