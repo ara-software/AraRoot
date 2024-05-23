@@ -1552,6 +1552,19 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
         fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- ERROR Unknown stationId %i\n", stationId);
         exit(0);
     }
+
+    // check if a pedestal file is set by user but this is trying to load a different one
+    // unfortunately this isn't foolproof since calibIndex isn't unique for each station but maybe good enough?
+    for(int i = 0; i < ATRI_NO_STATIONS; ++i) {
+      if(fGotAtriPedFile[i]==1 && i!=calibIndex) {
+        std::string errMsg;
+        errMsg = "AraEventCalibrator::loadAtriPedestals -- ERROR Trying to load pedestal for stationId ";
+        errMsg += std::to_string(stationId) + ", but a different station's pedestal was requested by the user!\n"; 
+        errMsg += "Are you sure you are setting the pedestal file for the right station?";
+        throw std::runtime_error(errMsg.c_str());
+      }
+    }
+
     if(fGotAtriPedFile[calibIndex]==1){
         if(!fileExists(fAtriPedFile[calibIndex])){
             fGotAtriPedFile[calibIndex]=0;
