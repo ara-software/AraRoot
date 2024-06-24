@@ -113,7 +113,7 @@ insert into ARA03 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --updated 15-07-13
 
 --ARA04 Calpulers
-
+-- ARA04 Calpulsers updated by Paramita DG on 05/26/2024
 insert into ARA04 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
 0,0,0,0,
 0,0,0,0
@@ -123,12 +123,12 @@ insert into ARA04 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
 0,0,0,0
 );
 insert into ARA04 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
-47.8648,-13.8235,-184.46,0,
-47.8648,-13.8235,-184.46,0
+49.73993866,-15.07675222,-184.4708,0,
+49.73993866,-15.07675222,-184.4708,0
 );
 insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
-47.8648,-13.8235,-187.51,0,
-47.8648,-13.8235,-187.51,0
+49.73993866,-15.07675222,-187.4708,0,
+49.73993866,-15.07675222,-187.4708,0
 );
 
 --updated 17-05-17
