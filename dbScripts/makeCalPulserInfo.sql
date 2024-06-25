@@ -51,11 +51,11 @@ insert into TESTBED VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --delay unkown (and not needed?)
 
 insert into ARA01 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
-16.41430296,34.8273624,-36.1239816,0,
-16.41430296,34.8273624,-36.1239816,0);
+16.40, 34.82, -40.14, 0,
+16.40, 34.82, -40.14, 0);
 insert into ARA01 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
-16.41430296,34.8273624,-36.1239816,0,
-16.41430296,34.8273624,-36.1239816,0);
+16.40, 34.82, -40.14, 0,
+16.40, 34.82, -40.14, 0);
 insert into ARA01 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
 36.585144,-18.2905908,-42.141648,0,
 36.585144,-18.2905908,-42.141648,0);
@@ -113,7 +113,8 @@ insert into ARA03 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 --updated 15-07-13
 
 --ARA04 Calpulers
--- ARA04 Calpulsers updated by Paramita DG on 05/26/2024
+-- ARA04 Calpulser positions updated by Paramita DG on 05/26/2024
+
 insert into ARA04 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
 0,0,0,0,
 0,0,0,0
@@ -133,15 +134,17 @@ insert into ARA04 VALUES(3,"BH6","CV2","P2","kBicone","kVertical",
 
 --updated 17-05-17
 
---ARA04 Calpulers
+--ARA05 Calpulers
+-- Updated by MSM (02/05/2024). Updated coordinates to calibrated calpulser position with the average A5 borehole position as the origin.
+-- Updated by MSM (02/16/2024). Updated coordinates by rotating from global coordinates to station coordinates.
 
 insert into ARA05 VALUES(0,"BH5","CH1","P1","kQuadSlot","kHorizontal",
--16.4944,52.8174,-171.07,0,
--16.4944,52.8174,-171.07,0
+-14.0600,47.0264,-171.07,0,
+-14.0600,47.0264,-171.07,0
 );
 insert into ARA05 VALUES(1,"BH5","CV1","P1","kBicone","kVertical",
--16.4944,52.8174,-174.06,0,
--16.4944,52.8174,-174.06,0
+-14.0600,47.0264,-173.28,0,
+-14.0600,47.0264,-173.28,0
 );
 insert into ARA05 VALUES(2,"BH6","CH2","P2","kQuadSlot","kHorizontal",
 0,0,0,0,
