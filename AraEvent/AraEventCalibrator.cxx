@@ -1542,7 +1542,7 @@ void AraEventCalibrator::setAtriPedFile(char *filename, AraStationId_t stationId
     Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId); // stationId typically provided by user
     strncpy(fAtriPedFile[calibIndex],filename,FILENAME_MAX);
     fGotAtriPedFile[calibIndex]=1; //Protects us from loading the default pedfile
-    fGotAtriPedStationId[calibIndex]=stationId;
+    fGotAtriPedStationId[calibIndex]=stationId; // tracks user-intended stationId
     loadAtriPedestals(stationId);
 }
 
