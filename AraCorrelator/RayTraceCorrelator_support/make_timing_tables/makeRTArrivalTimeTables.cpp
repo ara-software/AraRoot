@@ -126,7 +126,6 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     settings->Z_TOLERANCE = 0.05;
     
     settings->NOFZ=1; // make sure n(z) is turned on
-    // settings->NOFZ=0; // debugging
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
 
     for (int thetaBin_temp = 0; thetaBin_temp < numThetaBins; thetaBin_temp++) {
