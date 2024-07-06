@@ -40,6 +40,8 @@ class RayTraceCorrelator : public TObject
         // same dimensions and explanations, just for theta and phi
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalThetas_;
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalPhis_;
+        std::vector < std::vector < std::vector < std::vector < double > > > > launchThetas_;
+        std::vector < std::vector < std::vector < std::vector < double > > > > launchPhis_;        
 
         
         void ConfigureArrivalVectors(); ///< Function to set the dimensions of arrivalTimes_, arrivalThetas_, etc. correctly
@@ -116,6 +118,22 @@ class RayTraceCorrelator : public TObject
             int thetaBin, int phiBin,
             double &arrivalTheta, double &arrivalPhi
         );
+        
+        //! function to get lookup the launch angle information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param thetaBin the theta bin desired (bin space, not angle space!!)
+            \param phiBin the phi bin desired (bin space, not angle space!!)
+            \param launchTheta passed by reference, content is replaced with the launch theta angle (in a coordinate where z-axis is along the Earth's radius)
+            \param launchPhi passed by reference, content is replaced with the launch phi angle (in a coordinate where z-axis is along the Earth's radius)
+            \return void
+        */
+        void LookupLaunchAngles(
+            int ant, int solNum,
+            int thetaBin, int phiBin,
+            double &launchTheta, double &launchPhi
+        );        
         
         
         //! function to get lookup the arrival time information

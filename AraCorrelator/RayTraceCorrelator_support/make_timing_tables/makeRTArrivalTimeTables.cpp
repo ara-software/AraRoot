@@ -29,7 +29,7 @@ void CalculateArrivalInformation(
     Settings *settings,
     Position antennaLocation, Position stationCOG,
     double phiWave, double thetaWave, double R, int solNum,
-    double &arrivalTime, double &arrivalTheta, double &arrivalPhi
+    double &arrivalTime, double &arrivalTheta, double &arrivalPhi, double &launchTheta, double &launchPhi
     );
 
 int main(int argc, char **argv)
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     double radius = atof(argv[2]);
     
     double angular_size = 1.;
-    int iceModelidx = 0;
+    int iceModelidx = 50;
     int unixTime = 0;
     int numAntennas = 16;
 
@@ -76,7 +76,7 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
 
     int ant, phiBin, thetaBin;
     double phi, theta;
-    double arrivalTime, arrivalTheta, arrivalPhi;
+    double arrivalTime, arrivalTheta, arrivalPhi, launchTheta, launchPhi;
     tArrivalTimes -> Branch("ant", & ant);
     tArrivalTimes -> Branch("phiBin", & phiBin);
     tArrivalTimes -> Branch("thetaBin", & thetaBin);
@@ -85,6 +85,8 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     tArrivalTimes -> Branch("arrivalPhi", & arrivalPhi);
     tArrivalTimes -> Branch("phi", & phi);
     tArrivalTimes -> Branch("theta", & theta);
+    tArrivalTimes -> Branch("launchTheta", & launchTheta);
+    tArrivalTimes -> Branch("launchPhi", & launchPhi);
 
     int numThetaBins = theCorrelator->GetNumThetaBins();
     int numPhiBins = theCorrelator->GetNumPhiBins();
@@ -124,6 +126,7 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     settings->Z_TOLERANCE = 0.05;
     
     settings->NOFZ=1; // make sure n(z) is turned on
+    // settings->NOFZ=0; // debugging
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
 
     for (int thetaBin_temp = 0; thetaBin_temp < numThetaBins; thetaBin_temp++) {
@@ -139,17 +142,21 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
                 double arrivalTime_temp;
                 double arrivalTheta_temp;
                 double arrivalPhi_temp;
+                double launchTheta_temp;
+                double launchPhi_temp;
                 CalculateArrivalInformation(
                     raySolver, iceModel, settings,
                     antPosition, stationCOG,
                     phiAngles[phiBin_temp], thetaAngles[thetaBin_temp], radius, solNum,
-                    arrivalTime_temp, arrivalTheta_temp, arrivalPhi_temp
+                    arrivalTime_temp, arrivalTheta_temp, arrivalPhi_temp, launchTheta_temp, launchPhi_temp
 
                 );
                 
                 arrivalTime = arrivalTime_temp;
                 arrivalTheta = arrivalTheta_temp;
                 arrivalPhi = arrivalPhi_temp;
+                launchTheta = launchTheta_temp;
+                launchPhi = launchPhi_temp;
                 // printf("  Phi %d, Ant %d, Arrival Time %.2f, Arrival Theta %.2f, Arrival Phi %.2f \n",
                 //     phiBin_temp, ant_temp, arrivalTime_temp, 
                 //     TMath::RadToDeg()*arrivalTheta_temp, TMath::RadToDeg()*arrivalPhi_temp
@@ -173,7 +180,7 @@ void CalculateArrivalInformation(
     Settings *settings,
     Position antennaLocation, Position stationCOG,
     double phiWave, double thetaWave, double R, int solNum,
-    double &arrivalTime, double  &arrivalTheta, double &arrivalPhi
+    double &arrivalTime, double  &arrivalTheta, double &arrivalPhi, double &launchTheta, double &launchPhi
     ){
 
     // first, configure the source position relative to detector center of gravity (COG)
@@ -213,7 +220,11 @@ void CalculateArrivalInformation(
             Vector flip_receive_vector = -1. * receive_vector;
             arrivalTheta = flip_receive_vector.Theta();
             arrivalPhi = flip_receive_vector.Phi();
-
+            
+            double launchAngle = outputs[1][solNum];
+            Vector launchVector = target.Rotate( launchAngle, source.Cross(target) ).Unit();
+            launchTheta = launchVector.Theta();
+            launchPhi = launchVector.Phi();
         }
         else{
             arrivalTime = -1500;

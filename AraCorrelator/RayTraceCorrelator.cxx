@@ -112,20 +112,28 @@ void RayTraceCorrelator::ConfigureArrivalVectors(){
     arrivalTimes_.resize(2);
     arrivalThetas_.resize(2);
     arrivalPhis_.resize(2);
+    launchThetas_.resize(2);
+    launchPhis_.resize(2);    
     for(int sol=0; sol<2; sol++){
         arrivalTimes_[sol].resize(numThetaBins_);
         arrivalThetas_[sol].resize(numThetaBins_);
         arrivalPhis_[sol].resize(numThetaBins_);
+        launchThetas_[sol].resize(numThetaBins_);
+        launchPhis_[sol].resize(numThetaBins_);        
         for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
             arrivalTimes_[sol][thetaBin].resize(numPhiBins_);
             arrivalThetas_[sol][thetaBin].resize(numPhiBins_);
             arrivalPhis_[sol][thetaBin].resize(numPhiBins_);
+            launchThetas_[sol][thetaBin].resize(numPhiBins_);
+            launchPhis_[sol][thetaBin].resize(numPhiBins_);            
         }
         for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
             for(int phiBin=0; phiBin<numPhiBins_; phiBin++){
                 arrivalTimes_[sol][thetaBin][phiBin].resize(numAntennas_);
                 arrivalThetas_[sol][thetaBin][phiBin].resize(numAntennas_);
                 arrivalPhis_[sol][thetaBin][phiBin].resize(numAntennas_);
+                launchThetas_[sol][thetaBin][phiBin].resize(numAntennas_);
+                launchPhis_[sol][thetaBin][phiBin].resize(numAntennas_);                
             }
         }
     }
@@ -152,13 +160,15 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
     // if the file is good, load the variables from the branches
     int ant, phiBin, thetaBin;
     double phi, theta;
-    double arrivalTime, arrivalTheta, arrivalPhi;
+    double arrivalTime, arrivalTheta, arrivalPhi, launchTheta, launchPhi;
     tTree -> SetBranchAddress("ant", & ant);
     tTree -> SetBranchAddress("phiBin", & phiBin);
     tTree -> SetBranchAddress("thetaBin", & thetaBin);
     tTree -> SetBranchAddress("arrivalTime", & arrivalTime);
     tTree -> SetBranchAddress("arrivalTheta", & arrivalTheta);
     tTree -> SetBranchAddress("arrivalPhi", & arrivalPhi);
+    tTree -> SetBranchAddress("launchTheta", & launchTheta);
+    tTree -> SetBranchAddress("launchPhi", & launchPhi);    
     tTree -> SetBranchAddress("phi", & phi);
     tTree -> SetBranchAddress("theta", & theta);
 
@@ -169,6 +179,8 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
         arrivalTimes_[solNum][thetaBin][phiBin][ant] = arrivalTime;
         arrivalThetas_[solNum][thetaBin][phiBin][ant] = arrivalTheta;
         arrivalPhis_[solNum][thetaBin][phiBin][ant] = arrivalPhi;
+        launchThetas_[solNum][thetaBin][phiBin][ant] = launchTheta;
+        launchPhis_[solNum][thetaBin][phiBin][ant] = launchPhi;        
     }
 
     // close up
@@ -311,6 +323,15 @@ void RayTraceCorrelator::LookupArrivalAngles(
 ){
     arrivalTheta = this->arrivalThetas_[solNum][thetaBin][phiBin][ant];
     arrivalPhi = this->arrivalPhis_[solNum][thetaBin][phiBin][ant];
+}
+
+void RayTraceCorrelator::LookupLaunchAngles(
+    int ant, int solNum,
+    int thetaBin, int phiBin,
+    double &launchTheta, double &launchPhi
+){
+    launchTheta = this->launchThetas_[solNum][thetaBin][phiBin][ant];
+    launchPhi = this->launchPhis_[solNum][thetaBin][phiBin][ant];
 }
 
 double RayTraceCorrelator::LookupArrivalTimes(
