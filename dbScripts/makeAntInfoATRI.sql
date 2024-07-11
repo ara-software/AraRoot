@@ -620,19 +620,19 @@ insert into ARA03_2018 VALUES(19, "S4", "SA4", "kSurface",
 -- 05/26/2024 Note that :  "The relative cable delay for Hpol are same as default araroot from deployment time... These numbers yet to be  updated "
 --05/26/2024 PDG also updated the calpulser locations (X,Y,Z) in the file "makeCalPulserInfo.sql"
 
-insert into ARA04 VALUES(0 , "BH1", "TVPol", "kVertical",
-0, 17, 1, 0, 2, "kBicone",
--11.34,20.979,-162.7681,45.1048,
-0,0,0,0,
-0,0,0,140,800,0);
-insert into ARA04 VALUES(1 , "BH3", "TVPol", "kVertical",
-1, 9, 5, 0, 2, "kBicone",
+insert into ARA04 VALUES(0 , "BH3", "TVPol", "kVertical",
+0, 9, 5, 0, 2, "kBicone",
 10.87,-23.027,-164.558,42.8398,
 0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA04 VALUES(2 , "BH2", "TVPol", "kVertical",
-2, 1, 9, 0, 2, "kBicone",
+insert into ARA04 VALUES(1 , "BH2", "TVPol", "kVertical",
+1, 1, 9, 0, 2, "kBicone",
 13.23,3.91,-159.692,42.579,
+0,0,0,0,
+0,0,0,140,800,0);
+insert into ARA04 VALUES(2 , "BH1", "TVPol", "kVertical",
+2, 17, 1, 0, 2, "kBicone",
+-11.34,20.979,-162.7681,45.1048,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA04 VALUES(3 , "BH4", "TVPol", "kVertical",
@@ -641,20 +641,19 @@ insert into ARA04 VALUES(3 , "BH4", "TVPol", "kVertical",
 0,0,0,0,
 0,0,0,140,800,0);
 
-
-insert into ARA04 VALUES(4 , "BH1", "BVPol", "kVertical",
-4, 16, 0, 0, 4, "kBicone",
--11.34,20.979,-189.14056,156.692,
-0,0,0,0,
-0,0,0,140,800,0);
-insert into ARA04 VALUES(5 , "BH3", "BVPol", "kVertical",
-5, 8, 4, 0, 4, "kBicone",
+insert into ARA04 VALUES(4 , "BH3", "BVPol", "kVertical",
+4, 8, 4, 0, 4, "kBicone",
 10.87,-23.027,-192.95,161.8289,
 0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA04 VALUES(6 , "BH2", "BVPol", "kVertical",
-6, 0, 8, 0, 4, "kBicone",
+insert into ARA04 VALUES(5 , "BH2", "BVPol", "kVertical",
+5, 0, 8, 0, 4, "kBicone",
 13.23,3.91,-188.756,158.766,
+0,0,0,0,
+0,0,0,140,800,0);
+insert into ARA04 VALUES(6 , "BH1", "BVPol", "kVertical",
+6, 16, 0, 0, 4, "kBicone",
+-11.34,20.979,-189.14056,156.692,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA04 VALUES(7 , "BH4", "BVPol", "kVertical",
@@ -663,19 +662,19 @@ insert into ARA04 VALUES(7 , "BH4", "BVPol", "kVertical",
 0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA04 VALUES(8, "BH1", "THPol", "kHorizontal",
-0, 19, 3, 0, 1, "kQuadSlot",
--11.34,20.979,-159.7581,6.86,
-0,0,0,0,
-0,0,0,140,800,0);
-insert into ARA04 VALUES(9 , "BH3", "THPol", "kHorizontal",
-1, 11, 7, 0, 1, "kQuadSlot",
+insert into ARA04 VALUES(8 , "BH3", "THPol", "kHorizontal",
+0, 11, 7, 0, 1, "kQuadSlot",
 10.87,-23.027,-161.578,6.86,
 0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA04 VALUES(10 , "BH2", "THPol", "kHorizontal",
-2, 3, 11, 0, 1, "kQuadSlot",
+insert into ARA04 VALUES(9 , "BH2", "THPol", "kHorizontal",
+1, 3, 11, 0, 1, "kQuadSlot",
 13.23,3.91,-156.732,6.86,
+0,0,0,0,
+0,0,0,140,800,0);
+insert into ARA04 VALUES(10, "BH1", "THPol", "kHorizontal",
+2, 19, 3, 0, 1, "kQuadSlot",
+-11.34,20.979,-159.7581,6.86,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA04 VALUES(11, "BH4", "THPol", "kHorizontal",
@@ -684,20 +683,19 @@ insert into ARA04 VALUES(11, "BH4", "THPol", "kHorizontal",
 0,0,0,0,
 0,0,0,140,800,0);
 
-
-insert into ARA04 VALUES(12, "BH1", "BHPol", "kHorizontal",
-4, 18, 2, 0, 3, "kQuadSlot",
--11.34,20.979,-186.1906,120.54,
-0,0,0,0,
-0,0,0,140,800,0);
-insert into ARA04 VALUES(13, "BH3", "BHPol", "kHorizontal",
-5, 10, 6, 0, 3, "kQuadSlot",
+insert into ARA04 VALUES(12, "BH3", "BHPol", "kHorizontal",
+4, 10, 6, 0, 3, "kQuadSlot",
 10.87,-23.027,-189.9,120.54,
 0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA04 VALUES(14, "BH2", "BHPol", "kHorizontal",
-6, 2, 10, 0, 3, "kQuadSlot",
+insert into ARA04 VALUES(13, "BH2", "BHPol", "kHorizontal",
+5, 2, 10, 0, 3, "kQuadSlot",
 13.23,3.91,-185.686,120.54,
+0,0,0,0,
+0,0,0,140,800,0);
+insert into ARA04 VALUES(14, "BH1", "BHPol", "kHorizontal",
+6, 18, 2, 0, 3, "kQuadSlot",
+-11.34,20.979,-186.1906,120.54,
 0,0,0,0,
 0,0,0,140,800,0);
 insert into ARA04 VALUES(15, "BH4", "BHPol", "kHorizontal",
