@@ -614,11 +614,9 @@ insert into ARA03_2018 VALUES(19, "S4", "SA4", "kSurface",
 -- Updated by UAL (01/25/2019). Updated the X, Y and Z coordinates of the station, the foamChanNum, the channel mappings and the cable delays. I used Yue Pan's AntennaInfoV3.sqlite to get the right channel mappings (daqChanNum) and cable delays (which I am not sure about). Used this file: https://www.overleaf.com/read/bpvxgfrhqhzh  to get the surveyor coordinates which I then converted Ara Station Centric Coordinate system.
 -- Updated by BAC (04/24/2019). Updated the cable delays for all deep channels.
 -- Updated by BAC (04/24/2019). Updated the cable delays for all deep channels.
-
 -- Updated by Paramita DG (05/26/2024). Updated the antenna depth, X-Y , cable delay, channel map ( Araroot channel map was incorrect, so the channel map has been updated below). 
 -- PDG found the fitted positions and cable delay in Surveyed coord. system, and Pawan Giri converted those numbers into station-centric coordinate. Below are the numbers that Pawan calculated using PDG's fitted coordinate. 
 -- 05/26/2024 Note that :  "The relative cable delay for Hpol are same as default araroot from deployment time... These numbers yet to be  updated "
---05/26/2024 PDG also updated the calpulser locations (X,Y,Z) in the file "makeCalPulserInfo.sql"
 
 insert into ARA04 VALUES(0 , "BH3", "TVPol", "kVertical",
 0, 9, 5, 0, 2, "kBicone",
