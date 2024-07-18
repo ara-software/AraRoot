@@ -208,6 +208,7 @@ AraEventCalibrator::AraEventCalibrator()
     // Loop through and set the got ped / calib flags to zero. This assumes stationId's first n elements
     // are for ICRR stations and the remaining N-n are ATRI
     memset(fGotAtriPedFile,0,sizeof(Int_t)*ATRI_NO_STATIONS);
+    memset(fGotAtriPedStationId,0,sizeof(Int_t)*ATRI_NO_STATIONS);
     memset(fGotAtriCalibFile,0,sizeof(Int_t)*ATRI_NO_STATIONS);
     memset(gotIcrrPedFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
     memset(gotIcrrCalibFile,0,sizeof(Int_t)*ICRR_NO_STATIONS);
@@ -1538,20 +1539,38 @@ void AraEventCalibrator::ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::ma
 
 void AraEventCalibrator::setAtriPedFile(char *filename, AraStationId_t stationId)
 {
-    Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+    Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId); // stationId typically provided by user
     strncpy(fAtriPedFile[calibIndex],filename,FILENAME_MAX);
     fGotAtriPedFile[calibIndex]=1; //Protects us from loading the default pedfile
+    fGotAtriPedStationId[calibIndex]=stationId; // tracks user-intended stationId
     loadAtriPedestals(stationId);
 }
 
 void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
 {  
-    Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId);
+    Int_t calibIndex = AraGeomTool::getStationCalibIndex(stationId); // stationId typically determined from data file
     Int_t stationNumber = AraGeomTool::getStationNumber(stationId);
     if(calibIndex==-1){
         fprintf(stderr, "AraEventCalibrator::loadAtriPedestals -- ERROR Unknown stationId %i\n", stationId);
         exit(0);
     }
+
+    // check if a pedestal file is set by user but this is trying to load a different one which wasn't requested
+    // unfortunately this isn't foolproof since calibIndex isn't unique for each station but maybe good enough?
+    for(int i = 0; i < ATRI_NO_STATIONS; ++i) {
+      // index i has user specified pedestal loaded which isn't index calibIndex and index calibIndex has no user requested pedestal
+      // this set of conditions allows for multistation scripts AS LONG AS all pedestals are explicitly requested (i.e. defaults aren't 
+      // loaded automatically for some stations)
+      if(fGotAtriPedFile[i]==1 && i!=calibIndex && fGotAtriPedFile[calibIndex] != 1) {
+        std::string errMsg;
+        errMsg = "AraEventCalibrator::loadAtriPedestals -- ERROR Trying to load pedestal for stationId ";
+        errMsg += std::to_string(stationId) + ", but user requested pedestal was intended for stationId ";
+        errMsg += std::to_string(fGotAtriPedStationId[i]) + ": " + std::string(fAtriPedFile[i]) + "\n"; 
+        errMsg += "Are you sure you are setting the pedestal file for the right station (i.e. matching the stationId in data)?";
+        throw std::runtime_error(errMsg.c_str());
+      }
+    }
+
     if(fGotAtriPedFile[calibIndex]==1){
         if(!fileExists(fAtriPedFile[calibIndex])){
             fGotAtriPedFile[calibIndex]=0;

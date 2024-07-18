@@ -114,72 +114,73 @@ class AraEventCalibrator : public TObject
         static AraEventCalibrator*  Instance(); ///< Generates an instance of AraEventCalibrator to use
      
 
-    //Icrr calibrations
-    void setPedFile(char fileName[], AraStationId_t stationId); ///< Manually sets the pedestal file
-    void calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulIcrrStationEvent, called from UsefulIcrrStationEvent constructor
-    int doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
-    void fillRCOGuessArray(UsefulIcrrStationEvent *theEvent, int rcoGuess[LAB3_PER_ICRR]); ///< Utility function called by UsefulIcrrStationEvent
-    Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
-    void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
-    Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
-    void loadIcrrPedestals(AraStationId_t stationId); ///< Loads the pedestals from a file
-    void loadIcrrCalib(AraStationId_t stationId); ///< Loads the various calibration constants according to stationId -- only does it once
-    int gotIcrrCalibFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's calib file has been loaded
-    int gotIcrrPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's pedestal file has been loaded
-    char IcrrPedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedestal file
- 
-    float pedestalData[ICRR_NO_STATIONS][LAB3_PER_ICRR][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
-    double binWidths[ICRR_NO_STATIONS][LAB3_PER_ICRR][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
-    double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_ICRR][2]; ///<Array to hold the wrap-around calibration constants
-    double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
-    double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //Well by default clock align 0 is 0
-    double clockLagVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //For debugging
-
-    ///These are just utility arrays that are used in the calibration
-    double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped
-    double calwv[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated unwrapped
-    double rawadc[MAX_NUMBER_SAMPLES_LAB3]; //Uncalibrated unwrapped
-    double pedsubadc[MAX_NUMBER_SAMPLES_LAB3]; //Pedestal subtracted unwrapped
-    double sampNums[MAX_NUMBER_SAMPLES_LAB3]; //Sample numbers as doubles
-    double timeNums[MAX_NUMBER_SAMPLES_LAB3]; /// time numbers
-    double tempTimeNums[MAX_NUMBER_SAMPLES_LAB3]; ///temporary array
-    double calTimeNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated time numbers
-    double calVoltNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated volt numbers
-    int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
-
-    //Atri Calibrations
-    UShort_t *fAtriPeds; ///< Storage array to hold the ATRI pedestal data
-    Int_t fGotAtriPedFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI pedestals have been loaded and for which station
-    Int_t fGotAtriCalibFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI calib have been loaded and for which station
-    char fAtriPedFile[ATRI_NO_STATIONS][FILENAME_MAX]; ///< Filename of the ATRI pedestal file
-    Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
-    Double_t fAtriSampleADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][9];//added for voltage conversion -THM-
-    Double_t fAtriSampleHighADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][5];//added for high voltages -THM-
-    Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
-    Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
-    Int_t fAtriNumSamples[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The number of samples per block in a particular dda, chan, capArray
-
-    void checkAtriSampleTiming();
-    void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
-    Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample, AraStationId_t stationId); //A conversion module from ADC counts to millivolts  -THM-
-    void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
-    void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
-    void loadAtriCalib(AraStationId_t stationId, Double_t unixtime); ///< Internally used fuction that loads the calibration values into memory. ///< Adds unix time to select the new timing table for A3 2019 data. MK added 08-02-2022
+        //Icrr calibrations
+        void setPedFile(char fileName[], AraStationId_t stationId); ///< Manually sets the pedestal file
+        void calibrateEvent(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kJustUnwrap); ///< Apply the calibration to a UsefulIcrrStationEvent, called from UsefulIcrrStationEvent constructor
+        int doBinCalibration(UsefulIcrrStationEvent *theEvent, int chanIndex,int overrideRCO=-1); ///<This sorts out the bin calibration for the channel, overrideRCO is used in the RCO guess part
+        void fillRCOGuessArray(UsefulIcrrStationEvent *theEvent, int rcoGuess[LAB3_PER_ICRR]); ///< Utility function called by UsefulIcrrStationEvent
+        Double_t estimateClockPeriod(Int_t numPoints,Double_t &rms);
+        void calcClockAlignVals(UsefulIcrrStationEvent *theEvent, AraCalType::AraCalType_t calType); ///< Calculate the clock alignment calibration values
+        Double_t estimateClockLag(TGraph *grClock); ///< Worker function used in the clock alignment
+        void loadIcrrPedestals(AraStationId_t stationId); ///< Loads the pedestals from a file
+        void loadIcrrCalib(AraStationId_t stationId); ///< Loads the various calibration constants according to stationId -- only does it once
+        int gotIcrrCalibFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's calib file has been loaded
+        int gotIcrrPedFile[ICRR_NO_STATIONS]; ///<Flag to indicate whether a station's pedestal file has been loaded
+        char IcrrPedFile[ICRR_NO_STATIONS][FILENAME_MAX]; ///< Filename of the pedestal file
      
-    Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
-    Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
+        float pedestalData[ICRR_NO_STATIONS][LAB3_PER_ICRR][CHANNELS_PER_LAB3][MAX_NUMBER_SAMPLES_LAB3]; ///<Array to hold the pedestal data
+        double binWidths[ICRR_NO_STATIONS][LAB3_PER_ICRR][2][MAX_NUMBER_SAMPLES_LAB3]; ///< Array to hold the bin width calibration constants
+        double epsilonVals[ICRR_NO_STATIONS][LAB3_PER_ICRR][2]; ///<Array to hold the wrap-around calibration constants
+        double interleaveVals[ICRR_NO_STATIONS][8]; ///< There are only 8 interleaved channels
+        double clockAlignVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //Well by default clock align 0 is 0
+        double clockLagVals[ICRR_NO_STATIONS][LAB3_PER_ICRR]; //For debugging
 
-    //! Modulates calibration step -MK-
-    void UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); ///< Converts DAQ data format to Electronic channel format
-    Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib); ///< Erase first block that currupted by trigger
-    Bool_t TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); ///< Trims samples using fAtriSampleTimes table
-    void PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraCalType::AraCalType_t calType); ///< Subtracts pedestal from raw data
-    void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
-    void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); ///< Inverts only RF channels = 0,4,8 in A3
-    void ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk, Bool_t hasTimingCalib); ///< Zeroing WF by subtracting mean. ADC or Voltage. If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
-    void VoltageCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); ///< Converts ADC to Voltage using conversion table
-    void ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); ///< Remove knwon cable delay
-    void ReturnSampleIndex(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); ///< Return sample index.
+        ///These are just utility arrays that are used in the calibration
+        double v[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated wrapped
+        double calwv[MAX_NUMBER_SAMPLES_LAB3]; //Calibrated unwrapped
+        double rawadc[MAX_NUMBER_SAMPLES_LAB3]; //Uncalibrated unwrapped
+        double pedsubadc[MAX_NUMBER_SAMPLES_LAB3]; //Pedestal subtracted unwrapped
+        double sampNums[MAX_NUMBER_SAMPLES_LAB3]; //Sample numbers as doubles
+        double timeNums[MAX_NUMBER_SAMPLES_LAB3]; /// time numbers
+        double tempTimeNums[MAX_NUMBER_SAMPLES_LAB3]; ///temporary array
+        double calTimeNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated time numbers
+        double calVoltNums[MAX_NUMBER_SAMPLES_LAB3]; /// calibrated volt numbers
+        int indexNums[MAX_NUMBER_SAMPLES_LAB3]; /// for time sorting
+
+        //Atri Calibrations
+        UShort_t *fAtriPeds; ///< Storage array to hold the ATRI pedestal data
+        Int_t fGotAtriPedFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI pedestals have been loaded and for which station
+        Int_t fGotAtriCalibFile[ATRI_NO_STATIONS]; ///< Flag to indicate whether the ATRI calib have been loaded and for which station
+        Int_t fGotAtriPedStationId[ATRI_NO_STATIONS]; ///< Keeps track of the stationId the user has associated each pedestal file with
+        char fAtriPedFile[ATRI_NO_STATIONS][FILENAME_MAX]; ///< Filename of the ATRI pedestal file
+        Int_t fAtriSampleIndex[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample order
+        Double_t fAtriSampleADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][9];//added for voltage conversion -THM-
+        Double_t fAtriSampleHighADCVoltsConversion[DDA_PER_ATRI][RFCHAN_PER_DDA][512][64][5];//added for high voltages -THM-
+        Double_t fAtriSampleTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2][SAMPLES_PER_BLOCK]; ///<The sample timings
+        Double_t fAtriEpsilonTimes[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The timing between blocks the capArray number is the number of the second block
+        Int_t fAtriNumSamples[DDA_PER_ATRI][RFCHAN_PER_DDA][2]; ///< The number of samples per block in a particular dda, chan, capArray
+
+        void checkAtriSampleTiming();
+        void calibrateEvent(UsefulAtriStationEvent *theEvent, AraCalType::AraCalType_t calType=AraCalType::kVoltageTime); ///< Apply the calibration to a UsefulAtriStationEvent, called from UsefulAtriStationEvent constructor
+        Double_t convertADCtoMilliVolts(Double_t adcCountsIn, int dda, int inBlock, int chan, int sample, AraStationId_t stationId); //A conversion module from ADC counts to millivolts  -THM-
+        void setAtriPedFile(char *filename, AraStationId_t stationId); ///< Allows the user to force a specific pedestal file into the calibrator instead of the default. The pedestals may vary as a function of time so using a pedestal file from a time close the the event / run is a good idea
+        void loadAtriPedestals(AraStationId_t stationId); ///< Internally used function that loads the pedestals into memory.
+        void loadAtriCalib(AraStationId_t stationId, Double_t unixtime); ///< Internally used fuction that loads the calibration values into memory. ///< Adds unix time to select the new timing table for A3 2019 data. MK added 08-02-2022
+         
+        Bool_t fileExists(char *fileName); ///< Helper function to check whether a file exists
+        Int_t numberOfPedestalValsInFile(char *fileName); ///< Helper function to check number of pedestal values in a pedestal file. This is to identify corrupted pedestal files
+
+        //! Modulates calibration step -MK-
+        void UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList); ///< Converts DAQ data format to Electronic channel format
+        Bool_t TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib); ///< Erase first block that currupted by trigger
+        Bool_t TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk); ///< Trims samples using fAtriSampleTimes table
+        void PedestalSubtraction(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraCalType::AraCalType_t calType); ///< Subtracts pedestal from raw data
+        void CommonMode(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt);
+        void InvertA3Chans(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, AraStationId_t thisStationId); ///< Inverts only RF channels = 0,4,8 in A3
+        void ApplyZeroMean(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk, Bool_t hasTimingCalib); ///< Zeroing WF by subtracting mean. ADC or Voltage. If 1st block is still in the WF, exclude the samplesin the 1st block from mean calculation
+        void VoltageCalibration(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList, AraStationId_t thisStationId); ///< Converts ADC to Voltage using conversion table
+        void ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, Double_t unixtime, AraStationId_t thisStationId); ///< Remove knwon cable delay
+        void ReturnSampleIndex(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::vector<std::vector<int> > *sampleList); ///< Return sample index.
 
     protected:
         static AraEventCalibrator *fgInstance;  ///< protect against multiple instances
