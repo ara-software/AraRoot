@@ -8,3 +8,6 @@ That is, you should do both command right after eachother (the file will not ove
 
 sqlite3 AntennaInfo.sqlite < makeAntInfoATRI.sql
 sqlite3 AntennaInfo.sqlite < makeAntInfoICRR.sql
+
+
+To ensure that AraRoot uses the resulting sql database, copy the databases to AraRoot/AraEvent/calib (or otherwise appropriate directory).
