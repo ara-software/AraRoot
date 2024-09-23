@@ -33,6 +33,8 @@ AraQualCuts::AraQualCuts()
     _HOffsetThresh=-12.;
     _OffsetBlocksTimeWindowCut=10.;
     //for the moment, this doesn't do anything intelligent...
+    
+    loadedStationId = -1;
 }
 
 AraQualCuts::~AraQualCuts() {
@@ -469,6 +471,8 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
     }
     configLogFile.close();
 
+    loadedStationId = stationId;
+
     return;
 }
 
@@ -480,7 +484,7 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
 */
 int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId) 
 {
-    if(configStart.empty())
+    if(configStart.empty() || loadedStationId != stationId)
       loadLivetimeConfiguration(stationId);
 
     int start, end, config;
@@ -519,7 +523,7 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
 int AraQualCuts::getLivetimeConfigurationYear(const int configNumber, int stationId) 
 {
     
-    if(configStart.empty())
+    if(configStart.empty() || loadedStationId != stationId)
       loadLivetimeConfiguration(stationId);
 
     // find the right configuration

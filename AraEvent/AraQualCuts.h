@@ -65,6 +65,7 @@ class AraQualCuts
         static AraQualCuts *fgInstance; // protect against multiple instances
         
     private:
+        int loadedStationId;
         std::vector<int> configStart;
         std::vector<int> configNum;
         std::vector<int> repYear;
