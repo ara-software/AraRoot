@@ -17,10 +17,10 @@ The makefile is provided. Compile like:
 make makeRTArrivalTimeTables -f makeRTArrivalTimeTables.mk
 ```
 
-To execute, you must provide (1) a station and (2) an output directory.
+To execute, you must provide (1) a station, (2) a radius, and (3) an output directory.
 
 ```sh
-./makeRTArrivalTimeTables 2 /path/to/output/folder
+./makeRTArrivalTimeTables 2 300 /path/to/output/folder
 ```
 
 Because this code relies on the AraSim IceModel class,
