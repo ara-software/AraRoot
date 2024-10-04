@@ -57,13 +57,20 @@ class AraQualCuts
         int getLivetimeConfiguration(const int runNumber, int stationId);
         int getLivetimeConfiguration(const int runNumber, RawAtriStationEvent *realEvent)
           { return getLivetimeConfiguration(runNumber, realEvent->getStationId()); }
+        int getLivetimeConfigurationYear(const int configNumber, int stationId);
+        int getLivetimeConfigurationYear(const int configNumber, RawAtriStationEvent *realEvent)
+          { return getLivetimeConfigurationYear(configNumber, realEvent->getStationId()); }
  
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
         
     private:
+        int loadedStationId;
+        std::vector<int> configStart;
+        std::vector<int> configNum;
+        std::vector<int> repYear;
 
-
+        void loadLivetimeConfiguration(int stationId);
 };
 
 #endif //ARAQUALCUTS_H

@@ -33,6 +33,8 @@ AraQualCuts::AraQualCuts()
     _HOffsetThresh=-12.;
     _OffsetBlocksTimeWindowCut=10.;
     //for the moment, this doesn't do anything intelligent...
+    
+    loadedStationId = -1;
 }
 
 AraQualCuts::~AraQualCuts() {
@@ -406,22 +408,21 @@ bool AraQualCuts::hasFirstEventCorruption(RawAtriStationEvent *rawEvent)
     return hasFirstEventCorruption;
 }
 
-//! Returns the livetime configuration number corresponding to a given run number and station 
+//! Loads the livetime configuration data for a given run number and station 
 /*!
-    \param runNumber the station run number
     \param stationId the station Id number 
-    \return config the livetime configuration number 
 */
-int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId) 
+void AraQualCuts::loadLivetimeConfiguration(int stationId) 
 {
 
     if(stationId == 100) // simplify ARA1 station id
       stationId = 1;
     
-    int start, end, config;
+    int start, config, year;
 
-    std::vector<int> configStart;
-    std::vector<int> configNum;
+    configStart.clear();
+    configNum.clear();
+    repYear.clear();
 
     // read in log file
     char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
@@ -442,30 +443,51 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
       
       while(getline(str, word, ','))
         words.push_back(word);
-      if(words.size() != 2)
+      if(words.size() != 3)
         throw std::runtime_error("Livetime config log file not formatted correctly! \
                                   \nSee AraEvent/livetimeConfigs/README.md");
       if(words[0] == "RunNo") // header, skip this line
         continue;
       start = std::stoi(words[0]);  
       config = std::stoi(words[1]);
-      
+      year = std::stoi(words[2]);     
+ 
       // check for unexpected data types
       //// check for entries like: "1.5" and "11x" that might have silently converted to int
-      if(std::to_string(start) != words[0] || std::to_string(config) != words[1]) // should be able to convert back fine if this was an integer
+      if(std::to_string(start) != words[0] || 
+          std::to_string(config) != words[1] ||
+          std::to_string(year) != words[2]) // should be able to convert back fine if this was an integer
         throw std::runtime_error("Unexpected data type in livetime config log file! \
                                  \nSee AraEvent/livetimeConfigs/README.md");
       //// check for negative entries
-      if(start < 0 || config < 0)
+      if(start < 0 || config < 0 || year < 0)
         throw std::runtime_error("Livetime config log file has a negative entry! \
                                  \nSee AraEvent/livetimeConfigs/README.md");
 
       // if everything looks okay append and move on!
       configStart.push_back(start);
       configNum.push_back(config);
+      repYear.push_back(year);
     }
     configLogFile.close();
 
+    loadedStationId = stationId;
+
+    return;
+}
+
+//! Returns the livetime configuration number corresponding to a given run number and station 
+/*!
+    \param runNumber the station run number
+    \param stationId the station Id number 
+    \return config the livetime configuration number 
+*/
+int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId) 
+{
+    if(configStart.empty() || loadedStationId != stationId)
+      loadLivetimeConfiguration(stationId);
+
+    int start, end, config;
     // find the right configuration
     for(unsigned int i = 0; i < configStart.size(); ++i) {
       start = configStart[i];
@@ -474,10 +496,14 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
       else // if this isn't the last config start, assume this config continues until the next config begins 
         end = configStart[i+1]; 
 
-      if(end <= start)
+      if(end <= start) {
+        char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+        char configLogFileName[256];
+        sprintf(configLogFileName,"%s/share/livetimeConfigs/a%d_livetimeConfigs.txt",utilEnv,stationId);
         throw std::runtime_error("Something is wrong in the livetime configuration log \
                                   file: " + std::string(configLogFileName) +
                                   "\nSee AraEvent/livetimeConfigs/README.md");
+      }
 
       if(runNumber >= start && runNumber < end) {
         config = configNum[i]; 
@@ -486,4 +512,29 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
     }
 
     return config;
+}
+
+//! Returns the representative year for a given livetime configuration and station 
+/*!
+    \param configNumber the livetime configuration number
+    \param stationId the station Id number 
+    \return year the representative year 
+*/
+int AraQualCuts::getLivetimeConfigurationYear(const int configNumber, int stationId) 
+{
+    
+    if(configStart.empty() || loadedStationId != stationId)
+      loadLivetimeConfiguration(stationId);
+
+    // find the right configuration
+    int year = -1;
+    for(unsigned int i = 0; i < configNum.size(); ++i) {
+      if(configNum[i] == configNumber)
+        year = repYear[i];       
+    }
+
+    if(year == -1)
+      throw std::runtime_error("Livetime configuration year not found!");
+
+    return year;
 }
