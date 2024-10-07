@@ -137,7 +137,7 @@ insert into ARA01 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,25,116,0);
 
 ------------------------New ARA01 2018 table------------------------
-
+-- Pre 2018 table is exactly the same as post 2018 table in A1 -- Mohammad
 -- VPol Calibrated
 insert into ARA01_2018 VALUES(0 , "BH1", "TVPol", "kVertical",
 0, 0, 1, 1, 4, "kBicone",
