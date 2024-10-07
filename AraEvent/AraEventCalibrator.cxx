@@ -1035,9 +1035,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         In the future, we might need to check if A4 also has outlier event or not, but for now, we are not zero-meaning before v calib.
         latest update : 29th Nov2022, PDG is debugging ! 
     
-        Station A1 followed same calibration procedure as A4 and A5. Not applying zero-mean for A1 (stationID 100 or 1) --Mohammad
+        Station A1 followed same calibration procedure as A4 and A5. Not applying zero-mean for A1 (stationID 100) --Mohammad
     */ //do not zero mean if station==4, station==5 
-    if(hasADCZeroMean(calType) && thisStationId != 5 && thisStationId != 4 && thisStationId != 100 && thisStationId != 1) {
+    if(hasADCZeroMean(calType) && thisStationId != 5 && thisStationId != 4 && thisStationId != 100) {
         ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
     }
 
@@ -1995,7 +1995,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
     } else if (stationId == 5) {
         high_adc_limit = 500;
         adc_offset = 0.0;
-    } else if (stationId == 100 || stationId == 1) {
+    } else if (stationId == 100) {
         high_adc_limit = 800; // A1 is calibrated with a high adc CW wave --Mohammad 
         adc_offset = -11.0; // subtracting 11 adc counts for A1 --Mohammad
 
@@ -2024,7 +2024,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_block; ///< Dumping even samples
             while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>1.0) sample = (sample - neighboring_index + samples_per_block)%samples_per_block;
         }
-        else if (stationId == 100 || stationId == 1) {
+        else if (stationId == 100) {
              if (sample%2==0 && chan>0) sample=(sample+1)%samples_per_block; ///< Dumping even samples
              while(fAtriSampleADCVoltsConversion[dda][chan][block][sample][8]>2.5){//psedo chi2/ndf threshold is set diiferent for A1 --Mohammad
                                                                                   sample = (sample - neighboring_index + samples_per_block)%samples_per_block;}
@@ -2046,7 +2046,7 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
             Double_t fit_const; ///< Define the fit_const here (MK)
             double adc_zero_def; ///< Define which value will be used to choose a positive or negative conversion
             //! new  29th Nov2022
-            if (stationId == 5 || stationId == 4 || stationId == 100 || stationId == 1) {
+            if (stationId == 5 || stationId == 4 || stationId == 100) {
                 fit_const = 0.0; // fit const for A1, A5 and A4
                 adc_zero_def = modAdcCounts;
             } else {
@@ -2075,11 +2075,11 @@ Double_t AraEventCalibrator::convertADCtoMilliVolts(Double_t adcCountsIn, int dd
                 Related talk: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=2464 (slide 16 ~17)
                 I leave this condition just for A5 -MK-
             */
-            if ((stationId == 4 || stationId == 5 || stationId == 100 || stationId == 1) && volts > 800) volts=modAdcCounts;
+            if ((stationId == 4 || stationId == 5 || stationId == 100) && volts > 800) volts=modAdcCounts;
       
         } // below for higher ADC count 
         else { ///< for higher ADC count
-            if (stationId == 5 || stationId == 4 || stationId == 100 || stationId == 1){
+            if (stationId == 5 || stationId == 4 || stationId == 100){
                 /*!
                     For A5, since there is no high ADC calibration data, use ADC count for conervison result in case A5 encount high ADC count
                     Similarly for A4, since no high ADC calib data is available, we use ADC count for the corresponding voltage result for high ADC count
