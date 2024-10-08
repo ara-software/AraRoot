@@ -297,11 +297,14 @@ std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
             throw std::invalid_argument(errorMessage);
         }
 
-        // get the correlation function
-        TGraph *grCorr = getCorrelationGraph_WFweight(
-            gr1_iter->second, 
-            gr2_iter->second
-            );
+        // It's a bit inefficient to reget the normalized traces every time,
+        // and not push this into the waveform getter. But shouldn't be a huge waste.
+        auto graph1_normed = getNormalisedGraphByRMS(gr1_iter->second);
+        auto graph2_normed = getNormalisedGraphByRMS(gr2_iter->second);
+
+        // get the correlation graph
+        TGraph *grCorr = FFTtools::getCorrelationGraph(graph1_normed, graph2_normed);
+        delete graph1_normed, graph2_normed;
 
         // store the correlation function, with a hilbert envelope applied (if requested)
         if(applyHilbertEnvelope){

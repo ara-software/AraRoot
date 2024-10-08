@@ -16,6 +16,20 @@ double RayTraceCorrelator::fastEvalForEvenSampling(TGraph * grIn, double xvalue)
     return FFTtools::simpleInterploate(xVals[p0], yVals[p0], xVals[p0 + 1], yVals[p0 + 1], xvalue);
 }
 
+TGraph* RayTraceCorrelator::getNormalisedGraphByRMS(TGraph *grIn){
+    Double_t rms=grIn->GetRMS(2);
+    Double_t *xVals = grIn->GetX();
+    Double_t *yVals = grIn->GetY();
+    Int_t numPoints = grIn->GetN();
+    Double_t *newY = new Double_t [numPoints];
+    for(int i=0;i<numPoints;i++) {
+        newY[i]=(yVals[i])/rms;
+    }
+    TGraph *grOut = new TGraph(numPoints,xVals,newY);
+    delete [] newY;
+    return grOut;    
+}
+
 double* RayTraceCorrelator::getCorrelation_NoNorm(int length, double * oldY1, double * oldY2) {
 
     FFTWComplex * theFFT1 = FFTtools::doFFT(length, oldY1);

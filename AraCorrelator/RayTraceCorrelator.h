@@ -231,6 +231,16 @@ class RayTraceCorrelator : public TObject
         */
         double fastEvalForEvenSampling(TGraph* grIn, double xvalue);
 
+
+        //! a function to normalize a waveform by it's RMS
+        /*!
+            \param grIn the graph to be normalized
+            \return TGraph* the normalized graph (a new object)
+        */
+        TGraph* getNormalisedGraphByRMS(TGraph* grIn);
+
+
+
     ClassDef(RayTraceCorrelator,0);
 
 };
