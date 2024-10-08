@@ -299,8 +299,8 @@ std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
 
         // It's a bit inefficient to reget the normalized traces every time,
         // and not push this into the waveform getter. But shouldn't be a huge waste.
-        auto temp1 = getNormalisedGraph(gr1_iter->second);
-        auto temp2 = getNormalisedGraph(gr2_iter->second);
+        auto temp1 = getNormalisedGraphByRMS(gr1_iter->second);
+        auto temp2 = getNormalisedGraphByRMS(gr2_iter->second);
 
         // get the correlation graph
         TGraph *grCorr = FFTtools::getCorrelationGraph(temp1, temp2);

@@ -16,7 +16,7 @@ double RayTraceCorrelator::fastEvalForEvenSampling(TGraph * grIn, double xvalue)
     return FFTtools::simpleInterploate(xVals[p0], yVals[p0], xVals[p0 + 1], yVals[p0 + 1], xvalue);
 }
 
-TGraph* RayTraceCorrelator::getNormalisedGraph(TGraph *grIn){
+TGraph* RayTraceCorrelator::getNormalisedGraphByRMS(TGraph *grIn){
     Double_t rms=grIn->GetRMS(2);
     Double_t *xVals = grIn->GetX();
     Double_t *yVals = grIn->GetY();

@@ -237,7 +237,7 @@ class RayTraceCorrelator : public TObject
             \param grIn the graph to be normalized
             \return TGraph* the normalized graph (a new object)
         */
-        TGraph* getNormalisedGraph(TGraph* grIn);
+        TGraph* getNormalisedGraphByRMS(TGraph* grIn);
 
 
 
