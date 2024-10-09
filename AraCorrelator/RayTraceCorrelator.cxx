@@ -310,6 +310,7 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
             std::unique_ptr<TGraph> grCorrHil{FFTtools::getHilbertEnvelope(grCorr.get())};
 
             // drop this into a non-pointered object
+            // unique pointer will clean up grCorrHil for us!
             std::vector<double> tVals;
             std::vector<double> vVals;
             double *xvals = grCorrHil->GetX();
@@ -326,6 +327,7 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
         else{
             
             // drop this into a non-pointered object
+            // unique pointer will clean up grCorr for us
             std::vector<double> tVals;
             std::vector<double> vVals;
             double *xvals = grCorr->GetX();
