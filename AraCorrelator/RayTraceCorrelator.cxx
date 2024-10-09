@@ -264,7 +264,7 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     return pairs;
 }
 
-std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
+std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
     std::map<int, std::vector<int> > pairs,
     std::map<int, TGraph*> interpolatedWaveforms,
     bool applyHilbertEnvelope
@@ -275,7 +275,7 @@ std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
     // first, calculate all of the correlation functions
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
-    std::vector<TGraph*> corrFunctions;
+    std::vector<TGraph> corrFunctions;
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
         int ant1 = iter->second[0];
@@ -303,17 +303,43 @@ std::vector<TGraph*> RayTraceCorrelator::GetCorrFunctions(
         auto graph2_normed = getNormalisedGraphByRMS(gr2_iter->second);
 
         // get the correlation graph
-        TGraph *grCorr = FFTtools::getCorrelationGraph(graph1_normed, graph2_normed);
-        delete graph1_normed, graph2_normed;
+        std::unique_ptr<TGraph> grCorr{FFTtools::getCorrelationGraph(graph1_normed.get(), graph2_normed.get())};
 
         // store the correlation function, with a hilbert envelope applied (if requested)
         if(applyHilbertEnvelope){
-            TGraph *grCorrHil = FFTtools::getHilbertEnvelope(grCorr);
-            corrFunctions.push_back(grCorrHil);
-            delete grCorr;
+            std::unique_ptr<TGraph> grCorrHil{FFTtools::getHilbertEnvelope(grCorr.get())};
+
+            // drop this into a non-pointered object
+            // unique pointer will clean up grCorrHil for us!
+            std::vector<double> tVals;
+            std::vector<double> vVals;
+            double *xvals = grCorrHil->GetX();
+            double *yvals = grCorrHil->GetY();
+            int nPoints = grCorrHil->GetN();
+            for (int isamp=0; isamp<nPoints; isamp++){
+                tVals.push_back(xvals[isamp]);
+                vVals.push_back(yvals[isamp]);
+            }
+            TGraph grCorrHilOut(nPoints, &tVals[0], &vVals[0]);
+            
+            corrFunctions.push_back(grCorrHilOut);
         }
         else{
-            corrFunctions.push_back(grCorr);
+            
+            // drop this into a non-pointered object
+            // unique pointer will clean up grCorr for us
+            std::vector<double> tVals;
+            std::vector<double> vVals;
+            double *xvals = grCorr->GetX();
+            double *yvals = grCorr->GetY();
+            int nPoints = grCorr->GetN();
+            for (int isamp=0; isamp<nPoints; isamp++){
+                tVals.push_back(xvals[isamp]);
+                vVals.push_back(yvals[isamp]);
+            }
+            TGraph grCorrOut(nPoints, &tVals[0], &vVals[0]);
+            
+            corrFunctions.push_back(grCorrOut);
         }
     }
     return corrFunctions;
@@ -345,9 +371,9 @@ double RayTraceCorrelator::LookupArrivalTimes(
 }
 
 
-TH2D* RayTraceCorrelator::GetInterferometricMap(
+TH2D RayTraceCorrelator::GetInterferometricMap(
     std::map<int, std::vector<int> > pairs,
-    std::vector<TGraph*> corrFunctions,
+    std::vector<TGraph> corrFunctions,
     int solNum,
     std::map<int, double> weights
     ){
@@ -376,11 +402,7 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         throw std::invalid_argument(errorMessage);
     }
 
-    // create output histogram
-    TH2D *histMap = new TH2D("", "", 
-        this->numPhiBins_, -180, 180, 
-        this->numThetaBins_, -90, 90
-    );
+    TH2D histMap("", "", this->numPhiBins_, -180, 180, this->numThetaBins_, -90, 90);
 
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
@@ -396,6 +418,21 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
         }
         double scale = weight_iter->second;
 
+        // for performance reasons, we do the correlation right here
+        // so we draw out the x and y values of the correlation function to be used later
+        int numPoints = corrFunctions[pairNum].GetN();
+        if (numPoints < 2){
+            sprintf(errorMessage,"Number of points in the corr function %d is not valid\n",pairNum);
+            throw std::invalid_argument(errorMessage);
+        }
+        auto xVals = corrFunctions[pairNum].GetX();
+        auto yVals = corrFunctions[pairNum].GetY();
+        double dx = xVals[1] - xVals[0];
+        if (dx <= 0){
+            sprintf(errorMessage,"dx of the correlation function %f is not valid\n",pairNum);
+            throw std::invalid_argument(errorMessage);
+        }
+
         for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
             for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
                 
@@ -405,15 +442,27 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
                 double dt = arrival_time1 - arrival_time2;
 
                 // sanity check
-                if (arrival_time1 < -100 || arrival_time2 < -100 || histMap -> GetBinContent(globalBin) == -1000) {
-                    histMap -> SetBinContent(globalBin, -1000);
+                if (arrival_time1 < -100 || arrival_time2 < -100 || histMap.GetBinContent(globalBin) == -1000) {
+                    histMap.SetBinContent(globalBin, -1000);
                 }
                 else{
-                    double corrVal = fastEvalForEvenSampling(corrFunctions[pairNum], dt);
+
+                    // work out the index we want
+                    int p0 = int((dt - xVals[0]) / dx);
+                    if (p0 < 0) p0 = 0;
+                    if (p0 >= numPoints) p0 = numPoints - 2;
+
+                    // and do a simple linear interpolation
+                    // which has the form (y2 - y1)* ((x - x1) / (x2-x1)) + y1
+                    // double corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+                    // actually, FFTtools can do it for us, seemingly without a major hit in performance
+                    // (the compiler might be pulling that in behind the scenes, the function is so simple...)
+                    double corrVal = FFTtools::simpleInterploate(xVals[p0], yVals[p0], xVals[p0 + 1], yVals[p0 + 1], dt);
+
                     corrVal *= scale;
-                    double binVal = histMap -> GetBinContent(globalBin);
+                    double binVal = histMap.GetBinContent(globalBin);
                     if (corrVal == corrVal){ // not a nan
-                        histMap -> SetBinContent(globalBin, binVal + corrVal);
+                        histMap.SetBinContent(globalBin, binVal + corrVal);
                     }
                 }
             }
@@ -424,8 +473,8 @@ TH2D* RayTraceCorrelator::GetInterferometricMap(
     for (int phiBin = 0; phiBin < this->numPhiBins_; phiBin++) {
         for (int thetaBin = 0; thetaBin < this->numThetaBins_; thetaBin++) {
             Int_t globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-            if (histMap -> GetBinContent(globalBin) == -1000) {
-                histMap -> SetBinContent(globalBin, 0);
+            if (histMap.GetBinContent(globalBin) == -1000) {
+                histMap.SetBinContent(globalBin, 0);
             }
         }
     }

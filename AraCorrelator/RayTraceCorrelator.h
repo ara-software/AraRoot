@@ -2,6 +2,7 @@
 #define RAYTRACECORRELATOR_H
 
 #include <map>
+#include <memory>
 class TGraph;
 class TH2D;
 class AraGeomTool;
@@ -96,7 +97,7 @@ class RayTraceCorrelator : public TObject
             \param applyHilbertEnvelope whether or not to apply hilbert enveloping to the correlation functions
             \return a std::vector of the correlation functions (one for each pair)
         */
-        std::vector<TGraph*> GetCorrFunctions(
+        std::vector<TGraph> GetCorrFunctions(
             std::map<int, std::vector<int> > pairs,
             std::map<int, TGraph*> interpolatedWaveforms,
             bool applyHilbertEnvelope = true
@@ -171,9 +172,9 @@ class RayTraceCorrelator : public TObject
             \param weights weights to apply to each map; default = equal weights, or 1/pairs.size()
             \return a 2D histogram with the values filled with the interferometric sums
         */
-        TH2D* GetInterferometricMap(
+        TH2D GetInterferometricMap(
             std::map<int, std::vector<int> > pairs,
-            std::vector<TGraph*> corrFunctions,
+            std::vector<TGraph> corrFunctions,
             int solNum,
             std::map<int, double> weights = {}
         );
@@ -223,22 +224,12 @@ class RayTraceCorrelator : public TObject
         double * getCorrelation_NoNorm(int length, double * oldY1, double * oldY2);
 
 
-        //! a function to get the linearly interpolated value of a function at a time
-        /*!
-            \param grIn the TGraph to be evaluated
-            \param xvalue the point at which to get the interpolated value
-            \return the interpolated value of grIn at point xalue
-        */
-        double fastEvalForEvenSampling(TGraph* grIn, double xvalue);
-
-
         //! a function to normalize a waveform by it's RMS
         /*!
             \param grIn the graph to be normalized
             \return TGraph* the normalized graph (a new object)
         */
-        TGraph* getNormalisedGraphByRMS(TGraph* grIn);
-
+        std::unique_ptr<TGraph> getNormalisedGraphByRMS(TGraph *grIn);
 
 
     ClassDef(RayTraceCorrelator,0);
