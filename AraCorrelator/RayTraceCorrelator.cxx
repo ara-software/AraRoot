@@ -73,8 +73,8 @@ void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi,
     }
 
     double angularSize = this->GetAngularSize();
-    thetaBin = int((theta + 90. - (0.5 * angularSize))/angularSize);
-    phiBin = int((phi + 180. - (0.5 * angularSize))/angularSize);
+    thetaBin = int((theta + 90. + (0.5 * angularSize))/angularSize);
+    phiBin = int((phi + 180. + (0.5 * angularSize))/angularSize);
 }
 
 void RayTraceCorrelator::SetRadius(double radius){
