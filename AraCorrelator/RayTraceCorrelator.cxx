@@ -367,6 +367,11 @@ std::pair<
                 for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
                     
                     int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
+
+                    if ((globalBin<0) or (globalBin > 65522)){
+                        std::cout<<"Naughty constructor bin " <<globalBin<<std::endl;
+                    }
+
                     double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
                     double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
                     double dt = arrival_time1 - arrival_time2;
@@ -476,8 +481,13 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         throw std::invalid_argument(errorMessage);
     }
 
-    int numGlobalBins = arrivalDelays.first[solNum][0].size();
-    std::vector<double> summedCorr(numGlobalBins);
+    int numGlobalBins = int((this->numThetaBins_+2)*(this->numPhiBins_+2));
+    std::vector<double> summedCorr(numGlobalBins, 0.);
+
+    // this is NOT the same thing
+    // since the number of bins in the 2D hist is different than the number of bins we have cached
+    // because of overflow bins
+    int nGlobalBinsToIter = arrivalDelays.first[0][0].size();
 
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
@@ -496,16 +506,17 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         auto& it_delays = arrivalDelays.second[solNum][pairNum];
         auto the_corr = corrFunctions[pairNum].get();
 
-        for(int iterBin = 0; iterBin < numGlobalBins; iterBin++){
-            int& globalBin = it_bins[iterBin];
+        for(int iterBin = 0; iterBin < nGlobalBinsToIter; iterBin++){
+            int globalBin = it_bins[iterBin];
             double& dt = it_delays[iterBin];
             summedCorr[globalBin]+=the_corr->Eval(dt)*scale;
         }
     }
 
     TH2D histMap("", "", this->numPhiBins_, -180, 180, this->numThetaBins_, -90, 90);
+
     for(int iterBin=0; iterBin < numGlobalBins; iterBin++){
-        histMap.SetBinContent(iterBin+1, summedCorr[iterBin]);
+        histMap.SetBinContent(iterBin, summedCorr[iterBin]);
     }
 
     return histMap;
