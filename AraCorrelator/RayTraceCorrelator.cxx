@@ -58,14 +58,12 @@ void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi,
     int &thetaBin, int &phiBin
     ){
 
-    // if(theta<-91 || theta > 91 || isnan(theta)){
     if(abs(theta) > 91 || isnan(theta)){
         char errorMessage[400];
         sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -91 to 91\n", theta);
         throw std::invalid_argument(errorMessage);
     }
 
-    // if(theta<-181 || theta > 181 || isnan(theta)){
     if(abs(phi)>181 || isnan(phi)){
         char errorMessage[400];
         sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -181 to 181\n", theta);
@@ -218,7 +216,8 @@ void RayTraceCorrelator::LoadTables(){
     this->LoadArrivalTimeTables(refSolTablePath_, 1);
 }
 
-// FIXME
+
+
 std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     int stationID,
     AraGeomTool *geomTool,
@@ -264,7 +263,7 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     return pairs;
 }
 
-std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
+std::vector< std::unique_ptr<ROOT::Math::Interpolator>> RayTraceCorrelator::GetCorrFunctions(
     std::map<int, std::vector<int> > pairs,
     std::map<int, TGraph*> interpolatedWaveforms,
     bool applyHilbertEnvelope
@@ -275,7 +274,7 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
     // first, calculate all of the correlation functions
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
-    std::vector<TGraph> corrFunctions;
+    std::vector<std::unique_ptr<ROOT::Math::Interpolator>> corrFunctions;
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
         int ant1 = iter->second[0];
@@ -320,9 +319,9 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
                 tVals.push_back(xvals[isamp]);
                 vVals.push_back(yvals[isamp]);
             }
-            TGraph grCorrHilOut(nPoints, &tVals[0], &vVals[0]);
-            
-            corrFunctions.push_back(grCorrHilOut);
+            std::unique_ptr<ROOT::Math::Interpolator> interper{new ROOT::Math::Interpolator(tVals, vVals, ROOT::Math::Interpolation::kLINEAR)};
+            corrFunctions.push_back(std::move(interper));
+
         }
         else{
             
@@ -337,13 +336,87 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
                 tVals.push_back(xvals[isamp]);
                 vVals.push_back(yvals[isamp]);
             }
-            TGraph grCorrOut(nPoints, &tVals[0], &vVals[0]);
-            
-            corrFunctions.push_back(grCorrOut);
+            std::unique_ptr<ROOT::Math::Interpolator> interper{new ROOT::Math::Interpolator(tVals, vVals, ROOT::Math::Interpolation::kLINEAR)};
+            corrFunctions.push_back(std::move(interper));
         }
     }
     return corrFunctions;
 }
+
+std::pair< 
+    std::vector< std::vector< std::vector< int > > >,
+    std::vector< std::vector< std::vector< double > > > > RayTraceCorrelator::GetArrivalDelays(std::map<int, std::vector<int > > pairs){
+
+    std::vector< std::vector< std::vector< double > > > delays;
+    std::vector< std::vector< std::vector< int > > > bins;
+
+    for(int solNum=0; solNum<2; solNum++){
+
+        std::vector< std::vector<double> > delays_this_sol;
+        std::vector< std::vector<int> > bins_this_sol;
+
+        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+            int pairNum = iter->first;
+            int ant1 = iter->second[0];
+            int ant2 = iter->second[1];
+
+            std::vector<double> this_delays;
+            std::vector<int> this_global_bins;
+
+            for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
+                for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
+                    
+                    int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
+                    double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
+                    double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
+                    double dt = arrival_time1 - arrival_time2;
+
+                    // sanity check
+                    if (arrival_time1 < -100 || arrival_time2 < -100) {
+                        dt = -1E6;  // large negative number
+                    }
+
+                    this_global_bins.push_back(globalBin);
+                    this_delays.push_back(dt);
+                }
+            }
+
+            // follow this method (https://stackoverflow.com/questions/17074324/how-can-i-sort-two-vectors-in-the-same-way-with-criteria-that-uses-only-one-of)
+            // for reordering the vectors
+
+            // first, work out the permutation p that is required to reorder 
+            // the delay array from smallest to largest
+            std::vector<std::size_t> p(this_delays.size());
+            std::iota(p.begin(), p.end(), 0);
+            std::sort(p.begin(), p.end(),
+                    [&](std::size_t i, std::size_t j) { return this_delays[i] < this_delays[j]; });
+
+            // and now reorder both the bin indices and the delays by that permutation
+            std::vector<int> sorted_global_bins(this_global_bins.size());
+            std::transform(p.begin(), p.end(), sorted_global_bins.begin(),
+                [&](std::size_t i){return this_global_bins[i];});
+            std::vector<double> sorted_delays(this_delays.size());
+            std::transform(p.begin(), p.end(), sorted_delays.begin(),
+                [&](std::size_t i){return this_delays[i];});
+
+            delays_this_sol.push_back(sorted_delays);
+            bins_this_sol.push_back(sorted_global_bins);
+
+        }
+        delays.push_back(delays_this_sol);
+        bins.push_back(bins_this_sol);
+    }
+
+    std::pair< 
+        std::vector< std::vector< std::vector< int > > >,
+        std::vector< std::vector< std::vector< double > > > > delay_info;
+
+    delay_info.first = bins;
+    delay_info.second = delays;
+    return delay_info;
+
+}
+
 
 void RayTraceCorrelator::LookupArrivalAngles(
     int ant, int solNum,
@@ -373,7 +446,8 @@ double RayTraceCorrelator::LookupArrivalTimes(
 
 TH2D RayTraceCorrelator::GetInterferometricMap(
     std::map<int, std::vector<int> > pairs,
-    std::vector<TGraph> corrFunctions,
+    std::vector<std::unique_ptr<ROOT::Math::Interpolator>> &corrFunctions,
+    std::pair< std::vector< std::vector< std::vector< int > > >, std::vector< std::vector< std::vector< double > > > > &arrivalDelays,
     int solNum,
     std::map<int, double> weights
     ){
@@ -407,8 +481,6 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
-        int ant1 = iter->second[0];
-        int ant2 = iter->second[1];
 
         // get the weight for this pair
         auto weight_iter = weights.find(pairNum);
@@ -418,64 +490,17 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         }
         double scale = weight_iter->second;
 
-        // for performance reasons, we do the correlation right here
-        // so we draw out the x and y values of the correlation function to be used later
-        int numPoints = corrFunctions[pairNum].GetN();
-        if (numPoints < 2){
-            sprintf(errorMessage,"Number of points in the corr function %d is not valid\n",pairNum);
-            throw std::invalid_argument(errorMessage);
-        }
-        auto xVals = corrFunctions[pairNum].GetX();
-        auto yVals = corrFunctions[pairNum].GetY();
-        double dx = xVals[1] - xVals[0];
-        if (dx <= 0){
-            sprintf(errorMessage,"dx of the correlation function %f is not valid\n",pairNum);
-            throw std::invalid_argument(errorMessage);
-        }
+        // get the global bins and delays for this solution
+        auto& it_bins = arrivalDelays.first;
+        auto& it_delays = arrivalDelays.second;
+        auto the_corr = corrFunctions[pairNum].get();
 
-        for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
-            for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
-                
-                int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-                double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
-                double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
-                double dt = arrival_time1 - arrival_time2;
-
-                // sanity check
-                if (arrival_time1 < -100 || arrival_time2 < -100 || histMap.GetBinContent(globalBin) == -1000) {
-                    histMap.SetBinContent(globalBin, -1000);
-                }
-                else{
-
-                    // work out the index we want
-                    int p0 = int((dt - xVals[0]) / dx);
-                    if (p0 < 0) p0 = 0;
-                    if (p0 >= numPoints) p0 = numPoints - 2;
-
-                    // and do a simple linear interpolation
-                    // which has the form (y2 - y1)* ((x - x1) / (x2-x1)) + y1
-                    // double corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
-                    // actually, FFTtools can do it for us, seemingly without a major hit in performance
-                    // (the compiler might be pulling that in behind the scenes, the function is so simple...)
-                    double corrVal = FFTtools::simpleInterploate(xVals[p0], yVals[p0], xVals[p0 + 1], yVals[p0 + 1], dt);
-
-                    corrVal *= scale;
-                    double binVal = histMap.GetBinContent(globalBin);
-                    if (corrVal == corrVal){ // not a nan
-                        histMap.SetBinContent(globalBin, binVal + corrVal);
-                    }
-                }
-            }
-        }
-    }
-
-    // bit of sanity checking
-    for (int phiBin = 0; phiBin < this->numPhiBins_; phiBin++) {
-        for (int thetaBin = 0; thetaBin < this->numThetaBins_; thetaBin++) {
-            Int_t globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-            if (histMap.GetBinContent(globalBin) == -1000) {
-                histMap.SetBinContent(globalBin, 0);
-            }
+        for(int iterBin = 0; iterBin < it_bins[solNum][pairNum].size(); iterBin++){
+            
+            int& globalBin = it_bins[solNum][pairNum][iterBin];
+            double& dt = it_delays[solNum][pairNum][iterBin];
+            histMap.SetBinContent(globalBin, histMap.GetBinContent(globalBin)+(the_corr->Eval(dt)*scale));
+        
         }
     }
 

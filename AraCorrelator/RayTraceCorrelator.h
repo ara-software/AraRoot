@@ -6,6 +6,9 @@
 class TGraph;
 class TH2D;
 class AraGeomTool;
+#include "Math/Interpolator.h"
+#include "Math/InterpolationTypes.h"
+
 
 class RayTraceCorrelator : public TObject
 {
@@ -42,8 +45,7 @@ class RayTraceCorrelator : public TObject
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalThetas_;
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalPhis_;
         std::vector < std::vector < std::vector < std::vector < double > > > > launchThetas_;
-        std::vector < std::vector < std::vector < std::vector < double > > > > launchPhis_;        
-
+        std::vector < std::vector < std::vector < std::vector < double > > > > launchPhis_;
         
         void ConfigureArrivalVectors(); ///< Function to set the dimensions of arrivalTimes_, arrivalThetas_, etc. correctly
 
@@ -59,6 +61,10 @@ class RayTraceCorrelator : public TObject
         std::vector<double> GetPhiAngles(){ return phiAngles_; }
         std::vector<double> GetThetaAngles(){ return thetaAngles_; }
 
+
+        std::pair< 
+    std::vector< std::vector< std::vector< int > > >,
+    std::vector< std::vector< std::vector< double > > > > GetArrivalDelays(std::map<int, std::vector<int > > pairs);
 
         //! function to load the arrival time tables
         void LoadArrivalTimeTables(const std::string &filename, int solNum);
@@ -97,7 +103,7 @@ class RayTraceCorrelator : public TObject
             \param applyHilbertEnvelope whether or not to apply hilbert enveloping to the correlation functions
             \return a std::vector of the correlation functions (one for each pair)
         */
-        std::vector<TGraph> GetCorrFunctions(
+        std::vector<std::unique_ptr<ROOT::Math::Interpolator>> GetCorrFunctions(
             std::map<int, std::vector<int> > pairs,
             std::map<int, TGraph*> interpolatedWaveforms,
             bool applyHilbertEnvelope = true
@@ -174,7 +180,8 @@ class RayTraceCorrelator : public TObject
         */
         TH2D GetInterferometricMap(
             std::map<int, std::vector<int> > pairs,
-            std::vector<TGraph> corrFunctions,
+            std::vector<std::unique_ptr<ROOT::Math::Interpolator>> &corrFunctions,
+            std::pair< std::vector< std::vector< std::vector< int > > >, std::vector< std::vector< std::vector< double > > > > &arrivalDelays,
             int solNum,
             std::map<int, double> weights = {}
         );
