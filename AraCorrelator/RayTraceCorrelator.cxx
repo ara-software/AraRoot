@@ -263,7 +263,7 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     return pairs;
 }
 
-std::vector< std::unique_ptr<ROOT::Math::Interpolator>> RayTraceCorrelator::GetCorrFunctions(
+std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
     std::map<int, std::vector<int> > pairs,
     std::map<int, TGraph*> interpolatedWaveforms,
     bool applyHilbertEnvelope
@@ -274,7 +274,8 @@ std::vector< std::unique_ptr<ROOT::Math::Interpolator>> RayTraceCorrelator::GetC
     // first, calculate all of the correlation functions
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
-    std::vector<std::unique_ptr<ROOT::Math::Interpolator>> corrFunctions;
+    // std::vector<std::unique_ptr<ROOT::Math::Interpolator>> corrFunctions;
+    std::vector<TGraph> corrFunctions;
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
         int ant1 = iter->second[0];
@@ -319,9 +320,8 @@ std::vector< std::unique_ptr<ROOT::Math::Interpolator>> RayTraceCorrelator::GetC
                 tVals.push_back(xvals[isamp]);
                 vVals.push_back(yvals[isamp]);
             }
-            std::unique_ptr<ROOT::Math::Interpolator> interper{new ROOT::Math::Interpolator(tVals, vVals, ROOT::Math::Interpolation::kLINEAR)};
-            corrFunctions.push_back(std::move(interper));
-
+            TGraph grCorrHilOut(nPoints, &tVals[0], &vVals[0]);
+            corrFunctions.push_back(grCorrHilOut);
         }
         else{
             
@@ -335,9 +335,9 @@ std::vector< std::unique_ptr<ROOT::Math::Interpolator>> RayTraceCorrelator::GetC
             for (int isamp=0; isamp<nPoints; isamp++){
                 tVals.push_back(xvals[isamp]);
                 vVals.push_back(yvals[isamp]);
-            }
-            std::unique_ptr<ROOT::Math::Interpolator> interper{new ROOT::Math::Interpolator(tVals, vVals, ROOT::Math::Interpolation::kLINEAR)};
-            corrFunctions.push_back(std::move(interper));
+            }            
+            TGraph grCorrOut(nPoints, &tVals[0], &vVals[0]);
+            corrFunctions.push_back(grCorrOut);
         }
     }
     return corrFunctions;
@@ -450,10 +450,10 @@ double RayTraceCorrelator::LookupArrivalTimes(
 
 
 TH2D RayTraceCorrelator::GetInterferometricMap(
-    std::map<int, std::vector<int> > pairs,
-    std::vector<std::unique_ptr<ROOT::Math::Interpolator>> &corrFunctions,
-    std::pair< std::vector< std::vector< std::vector< int > > >, std::vector< std::vector< std::vector< double > > > > &arrivalDelays,
-    int solNum,
+    const std::map<int, std::vector<int> > pairs,
+    const std::vector<TGraph> &corrFunctions,
+    const std::pair< std::vector< std::vector< std::vector< int > > >, std::vector< std::vector< std::vector< double > > > > &arrivalDelays,
+    const int solNum,
     std::map<int, double> weights
     ){
 
@@ -481,35 +481,50 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         throw std::invalid_argument(errorMessage);
     }
 
-    int numGlobalBins = int((this->numThetaBins_+2)*(this->numPhiBins_+2));
-    std::vector<double> summedCorr(numGlobalBins, 0.);
+    const int numGlobalBins = int((this->numThetaBins_+2)*(this->numPhiBins_+2));
 
-    // this is NOT the same thing
+    // a variable to store the summed correlation value
+    // this needs to have the same size as the eventual TH2D
+    std::vector<double> summedCorr(numGlobalBins, 0);
+
+    // and a variable to control the loop over bins we actually populated
+    // this is NOT the same thing as the number of bins in the TH2D
     // since the number of bins in the 2D hist is different than the number of bins we have cached
     // because of overflow bins
-    int nGlobalBinsToIter = arrivalDelays.first[0][0].size();
+    const int nGlobalBinsToIter = arrivalDelays.first[0][0].size();
 
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
 
         // get the weight for this pair
-        auto weight_iter = weights.find(pairNum);
-        if(weight_iter==weights.end()){
-            sprintf(errorMessage,"Weights for pair %d not found\n",pairNum);
-            throw std::invalid_argument(errorMessage);
-        }
-        double scale = weight_iter->second;
+        const double scale = weights.at(pairNum);
+
+        // for performance reasons, we do the correlation right here
+        // so we draw out the x and y values of the correlation function to be used later
+        int numPoints = corrFunctions[pairNum].GetN();
+        auto xVals = corrFunctions[pairNum].GetX();
+        auto yVals = corrFunctions[pairNum].GetY();
+        double dx = xVals[1] - xVals[0];
 
         // get the global bins and delays for this solution
         auto& it_bins = arrivalDelays.first[solNum][pairNum];
         auto& it_delays = arrivalDelays.second[solNum][pairNum];
-        auto the_corr = corrFunctions[pairNum].get();
+
+        int p0 = 0;
+        double corrVal = 0;
 
         for(int iterBin = 0; iterBin < nGlobalBinsToIter; iterBin++){
+            
             int globalBin = it_bins[iterBin];
-            double& dt = it_delays[iterBin];
-            summedCorr[globalBin]+=the_corr->Eval(dt)*scale;
+            double dt = it_delays[iterBin];
+
+            p0 = int((dt - xVals[0]) / dx);
+            if (p0 < 0) p0 = 0;
+            if (p0 >= numPoints) p0 = numPoints - 2;
+            corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+            summedCorr[globalBin]+=corrVal *scale;
+
         }
     }
 

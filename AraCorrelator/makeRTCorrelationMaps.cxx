@@ -16,6 +16,12 @@
 #include "FFTtools.h"
 RawAtriStationEvent *rawAtriEvPtr;
 
+double getUnixTime(void){
+    struct timespec tv;
+    if(clock_gettime(CLOCK_REALTIME, &tv) != 0) return 0;
+    return (tv.tv_sec + (tv.tv_nsec/1000000000.0));
+}
+
 int main(int argc, char **argv)
 {
     double interpV = 0.4;
@@ -87,7 +93,7 @@ int main(int argc, char **argv)
     eventTree->SetBranchAddress("event", &rawAtriEvPtr);
     Long64_t numEntries=eventTree->GetEntries();
 
-    numEntries=100;
+    numEntries=500;
     for(Long64_t event=0;event<numEntries;event++) {
         eventTree->GetEntry(event);
 
@@ -109,8 +115,13 @@ int main(int argc, char **argv)
         auto corrFunctions = theCorrelator->GetCorrFunctions(pairs, interpolatedWaveforms); // apply Hilbert envelope is default
 
         // get the map
+        double start_time = getUnixTime();
         auto dirMap = theCorrelator->GetInterferometricMap(pairs, corrFunctions, arrivalDelays, 0); // direct solution
-
+        double stop_time = getUnixTime();
+        double difference = stop_time - start_time;
+        std::cout<<"Time to make single map is "<<difference<<std::endl;  
+    
+        
         // draw and save the map
         gStyle->SetOptStat(0);
         TCanvas *c = new TCanvas("", "", 2200, 850);
