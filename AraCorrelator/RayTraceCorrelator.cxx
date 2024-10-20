@@ -478,6 +478,8 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
 
     TH2D histMap("", "", this->numPhiBins_, -180, 180, this->numThetaBins_, -90, 90);
 
+    int numGlobalBins = arrivalDelays.first[solNum][0].size();
+
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
@@ -491,14 +493,14 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         double scale = weight_iter->second;
 
         // get the global bins and delays for this solution
-        auto& it_bins = arrivalDelays.first;
-        auto& it_delays = arrivalDelays.second;
+        auto& it_bins = arrivalDelays.first[solNum][pairNum];
+        auto& it_delays = arrivalDelays.second[solNum][pairNum];
         auto the_corr = corrFunctions[pairNum].get();
 
-        for(int iterBin = 0; iterBin < it_bins[solNum][pairNum].size(); iterBin++){
+        for(int iterBin = 0; iterBin < numGlobalBins; iterBin++){
             
-            int& globalBin = it_bins[solNum][pairNum][iterBin];
-            double& dt = it_delays[solNum][pairNum][iterBin];
+            int& globalBin = it_bins[iterBin];
+            double& dt = it_delays[iterBin];
             histMap.SetBinContent(globalBin, histMap.GetBinContent(globalBin)+(the_corr->Eval(dt)*scale));
         
         }
