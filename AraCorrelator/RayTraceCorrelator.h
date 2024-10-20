@@ -6,9 +6,6 @@
 class TGraph;
 class TH2D;
 class AraGeomTool;
-#include "Math/Interpolator.h"
-#include "Math/InterpolationTypes.h"
-
 
 class RayTraceCorrelator : public TObject
 {

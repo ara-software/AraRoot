@@ -1,5 +1,6 @@
 //C/C++ includes
 #include <iostream>
+#include <numeric>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdexcept>
