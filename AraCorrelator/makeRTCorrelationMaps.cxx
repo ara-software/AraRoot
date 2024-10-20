@@ -106,12 +106,6 @@ int main(int argc, char **argv)
             delete gr;
         }
 
-        // std::vector<ROOT::Math::Interpolator> vecy;
-        // std::vector<double> stuff_t; stuff_t.push_back(0); stuff_t.push_back(1);
-        // std::vector<double> stuff_v; stuff_v.push_back(0); stuff_v.push_back(1);
-        // ROOT::Math::Interpolator me(stuff_t, stuff_v, ROOT::Math::Interpolation::kLINEAR);
-        // vecy.push_back(me);
-
         auto corrFunctions = theCorrelator->GetCorrFunctions(pairs, interpolatedWaveforms); // apply Hilbert envelope is default
 
         // get the map
