@@ -476,9 +476,8 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         throw std::invalid_argument(errorMessage);
     }
 
-    TH2D histMap("", "", this->numPhiBins_, -180, 180, this->numThetaBins_, -90, 90);
-
     int numGlobalBins = arrivalDelays.first[solNum][0].size();
+    std::vector<double> summedCorr(numGlobalBins);
 
     // now, make the map
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
@@ -498,12 +497,15 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
         auto the_corr = corrFunctions[pairNum].get();
 
         for(int iterBin = 0; iterBin < numGlobalBins; iterBin++){
-            
             int& globalBin = it_bins[iterBin];
             double& dt = it_delays[iterBin];
-            histMap.SetBinContent(globalBin, histMap.GetBinContent(globalBin)+(the_corr->Eval(dt)*scale));
-        
+            summedCorr[globalBin]+=the_corr->Eval(dt)*scale;
         }
+    }
+
+    TH2D histMap("", "", this->numPhiBins_, -180, 180, this->numThetaBins_, -90, 90);
+    for(int iterBin=0; iterBin < numGlobalBins; iterBin++){
+        histMap.SetBinContent(iterBin+1, summedCorr[iterBin]);
     }
 
     return histMap;
