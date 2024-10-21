@@ -275,7 +275,6 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
     // first, calculate all of the correlation functions
     // for performance reasons, it's actually better to store
     // the correlation functions as a vector
-    // std::vector<std::unique_ptr<ROOT::Math::Interpolator>> corrFunctions;
     std::vector<TGraph> corrFunctions;
     for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
         int pairNum = iter->first;
@@ -368,10 +367,6 @@ std::pair<
                 for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
                     
                     int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-
-                    if ((globalBin<0) or (globalBin > 65522)){
-                        std::cout<<"Naughty constructor bin " <<globalBin<<std::endl;
-                    }
 
                     double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
                     double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
@@ -491,7 +486,7 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
     // and a variable to control the loop over bins we actually populated
     // this is NOT the same thing as the number of bins in the TH2D
     // since the number of bins in the 2D hist is different than the number of bins we have cached
-    // because of overflow bins
+    // because of overflow and underflow bins
     const int nGlobalBinsToIter = arrivalDelays.first[0][0].size();
 
     // now, make the map
