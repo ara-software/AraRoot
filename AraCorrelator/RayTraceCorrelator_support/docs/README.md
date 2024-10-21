@@ -30,12 +30,14 @@ theCorrelator->LoadTables();
 
 The interferometer takes as inputs (1) pairs of antennas which
 are to be included in the map, (2) correlation functions, 
-and (3) the solution hypothesis (direct or reflected/refracted).
+(3) a table of arrival delays between the pairs,
+and (4) the solution hypothesis (direct or reflected/refracted).
 The map making routine returns a ROOT TH2D, and can be called like:
 
 ```c++
 std::vector<TGraph*> corr_funcs = theCorrelator->GetCorrFunctions(pairs, wavforms);
-TH2D *map = theCorrelator->GetInterferometricMap(pairs, corr_funcs, solution);
+auto arrival_delays = theCorrelator->GetArrivalDelays(pairs);
+TH2D *map = theCorrelator->GetInterferometricMap(pairs, corr_funcs, arrival_delays, solution);
 ```
 
 For more detailed discussion, see below, or see the example.
@@ -69,14 +71,12 @@ In particular:
 
 Calculating the correlation functions is actually separate
 from calling the map making rountines. This is on purpose.
-The caluclation of the correlation function is the most expensive
-part of the routine by about a factor of 3-4.
-Meaning that 70%-ish of the time is spent creating the correlation
-functions, not on actually sampling them on the spatial grid.
 So if you need to make >=1 map (e.g. D and R, multiple radii, etc.),
 it is always in our favor to "cache" the waveforms in this way.
 This also makes it easier to examing the correlation functions
 directly for debugging purposes.
+The arrival delays between pairs is also cached, as this doesn't change
+from event to event.
 
 ### History
 The "original" RayTraceCorrelator was developed by Eugene Hong and Carl Pfender
@@ -93,6 +93,12 @@ The correlator requires user provided timing tables, and that's it.
 In practice, most people will want to use AraSim to calculate the delay tables.
 But as it's written now, we avoid making AraSim a dependency of AraRoot,
 which was a *major* drawback to the original OSU correltaor.
+
+This underwent significant optimization in Oct 2024 by Brian Clark and Marco Muzio.
+We added caching of the arrival delays, and were much more careful about the GetMap function,
+and use of refernces instead of passing objects in memory, etc.
+We managed to speed things up by about a factor of 5-6, albiet at the cost
+of slightly lowered readability, and less safety (fewer if statements).
 
 ## Documentation
 
