@@ -25,88 +25,92 @@ CREATE TABLE ARA06(antId integer primary key, holeName text, antName text, polTy
 -- not clear which Hole corresponds to which FOAM. FOAM+T/B+H/V+daqChan OK
 -- which hole which trigChan?
 
-insert into ARA01 VALUES(0 , "BH1", "TVPol", "kVertical", 
-0, 1, 1, 1, 4, "kBicone",
--3.8242, 6.6507, -62.8374, 13.714,  
-0,0,0,0,  
+-- Pre 2018 table is exactly the same as post 2018 table in A1 -- Mohammad
+
+-- VPol Calibrated
+insert into ARA01 VALUES(0 , "BH1", "TVPol", "kVertical",
+0, 0, 1, 1, 4, "kBicone",
+-4.723530629289786, 6.662151862410533, -59.294452621852656, 18.75834846874593,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(1 , "BH2", "TVPol", "kVertical", 
+insert into ARA01 VALUES(1 , "BH2", "TVPol", "kVertical",
 1, 9, 5, 2, 4, "kBicone",
-7.361, 1.1178, -63.6749, 13.714,  
-0,0,0,0,  
+7.546106860532129, 0.462745992675436, -61.19677534370688, 18.707291803991595,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(2 , "BH3", "TVPol", "kVertical", 
-2, 17, 9, 3, 4, "kBicone",
--10.2376, -4.5956, -55.252, 13.714,  
-0,0,0,0,  
+insert into ARA01 VALUES(2 , "BH3", "TVPol", "kVertical",
+2, 16, 9, 3, 4, "kBicone",
+-8.729738743571378, -4.902328765426568, -57.15756240053563, 8.686012870849746,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(3 , "BH4", "TVPol", "kVertical", 
-3, 25, 13, 3, 4, "kBicone",
-2.2583, -10.4733, -59.8173, 13.714,  
-0,0,0,0,  
+insert into ARA01 VALUES(3 , "BH4", "TVPol", "kVertical",
+3, 24, 13, 3, 4, "kBicone",
+2.8710039221454253, -9.92759713198006, -61.65897045960078, 8.697370722349651,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01 VALUES(4 , "BH1", "BVPol", "kVertical", 
-4, 0, 0, 1, 2, "kBicone",
--4.227, 6.8997, -81.498, 85.8187,  
-0,0,0,0,  
+insert into ARA01 VALUES(4 , "BH1", "BVPol", "kVertical",
+4, 1, 0, 1, 2, "kBicone",
+-4.638275330528526, 6.311655328770542, -81.30350109416544, 80.82911486393992,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(5 , "BH2", "BVPol", "kVertical", 
+insert into ARA01 VALUES(5 , "BH2", "BVPol", "kVertical",
 5, 8, 4, 2, 2, "kBicone",
-7.725, 0.2184, -80.3446, 81.94,  
-0,0,0,0,  
+7.578874172345894, 0.40277267926680715, -81.07877116620143, 76.94696871816556,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(6 , "BH3", "BVPol", "kVertical", 
-6, 16, 8, 3, 2, "kBicone",
--10.2306, -4.5885, -73.9255, 85.8187,  
-0,0,0,0,  
+insert into ARA01 VALUES(6 , "BH3", "BVPol", "kVertical",
+6, 17, 8, 3, 2, "kBicone",
+-8.772965055222278, -4.768747316323455, -71.34443275152898, 90.79201315221765,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(7 , "BH4", "BVPol", "kVertical", 
-7, 24, 12, 4, 2, "kBicone",
-2.7963, -10.6906, -77.1157, 80.7578,  
-0,0,0,0,  
+insert into ARA01 VALUES(7 , "BH4", "BVPol", "kVertical",
+7, 25, 12, 4, 2, "kBicone",
+2.6891978366651625, -9.574807533351018, -77.51516422536584, 75.73873371477006,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01 VALUES(8, "BH1", "THPol", "kHorizontal", 
+-- HPol Calibrated
+insert into ARA01 VALUES(8, "BH1", "THPol", "kHorizontal",
 0, 2, 2, 1, 1, "kQuadSlot",
--3.8242, 6.6507, -60.8374, 2.19432,  
-0,0,0,0,  
+-4.723530629289786, 6.662151862410533, -57.735953608626225, 7.262116839535381,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(9, "BH2", "THPol", "kHorizontal", 
+insert into ARA01 VALUES(9, "BH2", "THPol", "kHorizontal",
 1, 10, 6, 2, 1, "kQuadSlot",
-7.361, 1.1178, -61.6749, 2.19432,  
-0,0,0,0,  
+7.546106860532129, 0.462745992675436, -59.463375669638694, 5.485582140155802,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(10, "BH3", "THPol", "kHorizontal", 
+insert into ARA01 VALUES(10, "BH3", "THPol", "kHorizontal",
 2, 18, 10, 3, 1, "kQuadSlot",
--10.2376, -4.5956, -53.252, 2.19432,  
-0,0,0,0,  
+-8.729738743571378, -4.902328765426568, -54.600162421543864, 1.6943201067890215,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(11, "BH4", "THPol", "kHorizontal", 
+insert into ARA01 VALUES(11, "BH4", "THPol", "kHorizontal",
 3, 26, 14, 4, 1, "kQuadSlot",
-2.2583, -10.4733, -57.8173, 2.19432,  
-0,0,0,0,  
+2.8710039221454253, -9.92759713198006, -59.10157046395337, 1.694320224190091,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01 VALUES(12, "BH1", "BHPol", "kHorizontal", 
+insert into ARA01 VALUES(12, "BH1", "BHPol", "kHorizontal",
 4, 3, 3, 1, 3, "kQuadSlot",
--4.227, 6.8997, -79.498, 72.5466,  
-0,0,0,0,  
+-4.638275330528526, 6.311655328770542, -78.21898958232835, 79.60388008528658,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(13 , "BH2", "BHPol", "kHorizontal", 
+insert into ARA01 VALUES(13 , "BH2", "BHPol", "kHorizontal",
 5, 11, 7, 2, 3, "kQuadSlot",
-7.725, 0.2184, -78.3446, 68.668,  
-0,0,0,0,  
+7.578874172345894, 0.40277267926680715, -77.12437160901453, 68.16800143805973,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(14 , "BH3", "BHPol", "kHorizontal", 
+insert into ARA01 VALUES(14 , "BH3", "BHPol", "kHorizontal",
 6, 19, 11, 3, 3, "kQuadSlot",
--10.2306, -4.5885, -71.9255, 72.5466,  
-0,0,0,0,  
+-8.772965055222278, -4.768747316323455, -68.10404650104135 , 79.77191854390931,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01 VALUES(15 , "BH4", "BHPol", "kHorizontal", 
+insert into ARA01 VALUES(15 , "BH4", "BHPol", "kHorizontal",
 7, 27, 15, 4, 3, "kQuadSlot",
-2.7963, -10.6906, -75.1157, 68.668,  
-0,0,0,0,  
+2.6891978366651625, -9.574807533351018, -74.8655642245048, 78.66799999811364,
+0,0,0,0,
 0,0,0,140,800,0);
 
 --Surface Positions incorrect
@@ -133,89 +137,91 @@ insert into ARA01 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,25,116,0);
 
 ------------------------New ARA01 2018 table------------------------
-
-insert into ARA01_2018 VALUES(0 , "BH1", "TVPol", "kVertical", 
+-- Pre 2018 table is exactly the same as post 2018 table in A1 -- Mohammad
+-- VPol Calibrated
+insert into ARA01_2018 VALUES(0 , "BH1", "TVPol", "kVertical",
 0, 0, 1, 1, 4, "kBicone",
--3.8242, 6.6507, -62.8374, 13.714,  
-0,0,0,0,  
+-4.723530629289786, 6.662151862410533, -59.294452621852656, 18.75834846874593,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(1 , "BH2", "TVPol", "kVertical", 
+insert into ARA01_2018 VALUES(1 , "BH2", "TVPol", "kVertical",
 1, 9, 5, 2, 4, "kBicone",
-7.361, 1.1178, -63.6749, 13.714,  
-0,0,0,0,  
+7.546106860532129, 0.462745992675436, -61.19677534370688, 18.707291803991595,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(2 , "BH3", "TVPol", "kVertical", 
+insert into ARA01_2018 VALUES(2 , "BH3", "TVPol", "kVertical",
 2, 16, 9, 3, 4, "kBicone",
--10.2376, -4.5956, -55.252, 13.714,  
-0,0,0,0,  
+-8.729738743571378, -4.902328765426568, -57.15756240053563, 8.686012870849746,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(3 , "BH4", "TVPol", "kVertical", 
+insert into ARA01_2018 VALUES(3 , "BH4", "TVPol", "kVertical",
 3, 24, 13, 3, 4, "kBicone",
-2.2583, -10.4733, -59.8173, 13.714,  
-0,0,0,0,  
+2.8710039221454253, -9.92759713198006, -61.65897045960078, 8.697370722349651,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01_2018 VALUES(4 , "BH1", "BVPol", "kVertical", 
+insert into ARA01_2018 VALUES(4 , "BH1", "BVPol", "kVertical",
 4, 1, 0, 1, 2, "kBicone",
--4.227, 6.8997, -81.498, 85.8187,  
-0,0,0,0,  
+-4.638275330528526, 6.311655328770542, -81.30350109416544, 80.82911486393992,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(5 , "BH2", "BVPol", "kVertical", 
+insert into ARA01_2018 VALUES(5 , "BH2", "BVPol", "kVertical",
 5, 8, 4, 2, 2, "kBicone",
-7.725, 0.2184, -80.3446, 81.94,  
-0,0,0,0,  
+7.578874172345894, 0.40277267926680715, -81.07877116620143, 76.94696871816556,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(6 , "BH3", "BVPol", "kVertical", 
+insert into ARA01_2018 VALUES(6 , "BH3", "BVPol", "kVertical",
 6, 17, 8, 3, 2, "kBicone",
--10.2306, -4.5885, -73.9255, 85.8187,  
-0,0,0,0,  
+-8.772965055222278, -4.768747316323455, -71.34443275152898, 90.79201315221765,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(7 , "BH4", "BVPol", "kVertical", 
+insert into ARA01_2018 VALUES(7 , "BH4", "BVPol", "kVertical",
 7, 25, 12, 4, 2, "kBicone",
-2.7963, -10.6906, -77.1157, 80.7578,  
-0,0,0,0,  
+2.6891978366651625, -9.574807533351018, -77.51516422536584, 75.73873371477006,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01_2018 VALUES(8, "BH1", "THPol", "kHorizontal", 
+-- HPol Calibrated
+insert into ARA01_2018 VALUES(8, "BH1", "THPol", "kHorizontal",
 0, 2, 2, 1, 1, "kQuadSlot",
--3.8242, 6.6507, -60.8374, 2.19432,  
-0,0,0,0,  
+-4.723530629289786, 6.662151862410533, -57.735953608626225, 7.262116839535381,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(9, "BH2", "THPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(9, "BH2", "THPol", "kHorizontal",
 1, 10, 6, 2, 1, "kQuadSlot",
-7.361, 1.1178, -61.6749, 2.19432,  
-0,0,0,0,  
+7.546106860532129, 0.462745992675436, -59.463375669638694, 5.485582140155802,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(10, "BH3", "THPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(10, "BH3", "THPol", "kHorizontal",
 2, 18, 10, 3, 1, "kQuadSlot",
--10.2376, -4.5956, -53.252, 2.19432,  
-0,0,0,0,  
+-8.729738743571378, -4.902328765426568, -54.600162421543864, 1.6943201067890215,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(11, "BH4", "THPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(11, "BH4", "THPol", "kHorizontal",
 3, 26, 14, 4, 1, "kQuadSlot",
-2.2583, -10.4733, -57.8173, 2.19432,  
-0,0,0,0,  
+2.8710039221454253, -9.92759713198006, -59.10157046395337, 1.694320224190091,
+0,0,0,0,
 0,0,0,140,800,0);
 
-insert into ARA01_2018 VALUES(12, "BH1", "BHPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(12, "BH1", "BHPol", "kHorizontal",
 4, 3, 3, 1, 3, "kQuadSlot",
--4.227, 6.8997, -79.498, 72.5466,  
-0,0,0,0,  
+-4.638275330528526, 6.311655328770542, -78.21898958232835, 79.60388008528658,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(13 , "BH2", "BHPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(13 , "BH2", "BHPol", "kHorizontal",
 5, 11, 7, 2, 3, "kQuadSlot",
-7.725, 0.2184, -78.3446, 68.668,  
-0,0,0,0,  
+7.578874172345894, 0.40277267926680715, -77.12437160901453, 68.16800143805973,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(14 , "BH3", "BHPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(14 , "BH3", "BHPol", "kHorizontal",
 6, 19, 11, 3, 3, "kQuadSlot",
--10.2306, -4.5885, -71.9255, 72.5466,  
-0,0,0,0,  
+-8.772965055222278, -4.768747316323455, -68.10404650104135 , 79.77191854390931,
+0,0,0,0,
 0,0,0,140,800,0);
-insert into ARA01_2018 VALUES(15 , "BH4", "BHPol", "kHorizontal", 
+insert into ARA01_2018 VALUES(15 , "BH4", "BHPol", "kHorizontal",
 7, 27, 15, 4, 3, "kQuadSlot",
-2.7963, -10.6906, -75.1157, 68.668,  
-0,0,0,0,  
+2.6891978366651625, -9.574807533351018, -74.8655642245048, 78.66799999811364,
+0,0,0,0,
 0,0,0,140,800,0);
 
 --Surface Positions incorrect

@@ -946,9 +946,13 @@ void AraStationInfo::readChannelMapDbAtri_2(Int_t yrtime){
 
     ////These two if statements were added by UAL 01/25/2019
     if(yrtime==0){
+        // one more print out does not harm! rather very useful for A1 & A3 -- Mohammad
+        std::cout<<"Pre 2018: AraStationInfo::readChannelMapDbAtri_2(): INFO - "<<fileName<<std::endl; 
         std::cout<<"Opening default 2013-2017 SQLite tables for all stations "<<std::endl;
     }
     if(yrtime==1){
+        // one more print out does not harm! rather very useful for A1 & A3 -- Mohammad
+        std::cout<<"Post 2018: AraStationInfo::readChannelMapDbAtri_2(): INFO - "<<fileName<<std::endl;
         std::cout<<"Opening the database with new channel mappings for ARA03 & ARA01 and default mappings for all the other stations "<<std::endl;
     }
     

@@ -9,8 +9,7 @@
   - `configStart`: The run number at which the configuration begins (inclusive) in ascending order
   - `configNum`: The corresponding livetime configuration number (should correspond to the config number used
                  for noise and gain models)
-  - `repYear`: A representative year during which the station was in this configuration (e.g. station had the
-            channel mappings assumed for this configuration). Each `configNum` should have a unique `repYear` associated with it.
+  - `repYear`: A representative year during which the station was in this configuration (in order to ensure the appropriate AraRoot SQL database is applied). Each `configNum` should have a unique `repYear` associated with it.
 - The file should have a header to label each column: `RunNo,Config,RepYear`
 - All file entries should be non-negative integers
 - Example:

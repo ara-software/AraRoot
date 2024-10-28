@@ -16,6 +16,12 @@
 #include "FFTtools.h"
 RawAtriStationEvent *rawAtriEvPtr;
 
+double getUnixTime(void){
+    struct timespec tv;
+    if(clock_gettime(CLOCK_REALTIME, &tv) != 0) return 0;
+    return (tv.tv_sec + (tv.tv_nsec/1000000000.0));
+}
+
 int main(int argc, char **argv)
 {
     double interpV = 0.4;
@@ -38,10 +44,10 @@ int main(int argc, char **argv)
     // setup the paths to our ray tracing tables
     double radius = 300.;
     double angular_size = 1.;
-    int iceModel = 0;
+    int iceModel = 40;
     char dirPath[500];
     char refPath[500];
-    std::string topDir = "/cvmfs/ara.opensciencegrid.org/data/raytrace_tables/";
+    std::string topDir = "/cvmfs/icecube.osgstorage.org/icecube/PUBLIC/groups/arasoft/raytrace_timing_tables/";
     sprintf(dirPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
         topDir.c_str(), station, iceModel, radius, angular_size
     );
@@ -72,6 +78,7 @@ int main(int argc, char **argv)
 
     printf("------------------\n");
 
+    auto arrivalDelays = theCorrelator->GetArrivalDelays(pairs);
 
     /////////////////////////////////////////////////
     /////////////////////////////////////////////////
@@ -86,7 +93,7 @@ int main(int argc, char **argv)
     eventTree->SetBranchAddress("event", &rawAtriEvPtr);
     Long64_t numEntries=eventTree->GetEntries();
 
-    numEntries=10;
+    numEntries=500;
     for(Long64_t event=0;event<numEntries;event++) {
         eventTree->GetEntry(event);
 
@@ -104,23 +111,29 @@ int main(int argc, char **argv)
             interpolatedWaveforms[i] = grInt;
             delete gr;
         }
-        std::vector<TGraph*> corrFunctions = theCorrelator->GetCorrFunctions(pairs, interpolatedWaveforms); // apply Hilbert envelope is default
+
+        auto corrFunctions = theCorrelator->GetCorrFunctions(pairs, interpolatedWaveforms); // apply Hilbert envelope is default
 
         // get the map
-        TH2D *dirMap = theCorrelator->GetInterferometricMap(pairs, corrFunctions, 0); // direct solution
-
+        double start_time = getUnixTime();
+        auto dirMap = theCorrelator->GetInterferometricMap(pairs, corrFunctions, arrivalDelays, 0); // direct solution
+        double stop_time = getUnixTime();
+        double difference = stop_time - start_time;
+        std::cout<<"Time to make single map is "<<difference<<std::endl;  
+    
+        
         // draw and save the map
         gStyle->SetOptStat(0);
         TCanvas *c = new TCanvas("", "", 2200, 850);
         c->Divide(2,1);
             c->cd(1);
-            dirMap->Draw("colz"); // standard colz projection
-            dirMap->GetXaxis()->SetTitle("Phi [deg]");
-            dirMap->GetYaxis()->SetTitle("Theta [deg]");
-            dirMap->GetZaxis()->SetTitle("Summed Correlation");
-            dirMap->SetTitle("Standard colz Projection");
+            dirMap.Draw("colz"); // standard colz projection
+            dirMap.GetXaxis()->SetTitle("Phi [deg]");
+            dirMap.GetYaxis()->SetTitle("Theta [deg]");
+            dirMap.GetZaxis()->SetTitle("Summed Correlation");
+            dirMap.SetTitle("Standard colz Projection");
             gPad->SetRightMargin(0.15);
-        TH2D *dirMap_copy = (TH2D*) dirMap->Clone();
+        auto dirMap_copy = (TH2D*) dirMap.Clone();
             c->cd(2);
             dirMap_copy->Draw("z aitoff"); // aitoff projection
             dirMap_copy->GetXaxis()->SetTitle("Phi [deg]");
@@ -131,14 +144,11 @@ int main(int argc, char **argv)
         sprintf(title,"maps_ev%d.png", event);
         c->SaveAs(title);
         delete c;
+        delete dirMap_copy;
 
         // cleanup
-        delete dirMap;
         for(int i=0; i<16; i++){
             delete interpolatedWaveforms[i];
-        }
-        for(int i=0; i<corrFunctions.size(); i++){
-            delete corrFunctions[i];
         }
         delete realAtriEvPtr;
 

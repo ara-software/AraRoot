@@ -2,6 +2,7 @@
 #define RAYTRACECORRELATOR_H
 
 #include <map>
+#include <memory>
 class TGraph;
 class TH2D;
 class AraGeomTool;
@@ -41,8 +42,7 @@ class RayTraceCorrelator : public TObject
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalThetas_;
         std::vector < std::vector < std::vector < std::vector < double > > > > arrivalPhis_;
         std::vector < std::vector < std::vector < std::vector < double > > > > launchThetas_;
-        std::vector < std::vector < std::vector < std::vector < double > > > > launchPhis_;        
-
+        std::vector < std::vector < std::vector < std::vector < double > > > > launchPhis_;
         
         void ConfigureArrivalVectors(); ///< Function to set the dimensions of arrivalTimes_, arrivalThetas_, etc. correctly
 
@@ -58,6 +58,25 @@ class RayTraceCorrelator : public TObject
         std::vector<double> GetPhiAngles(){ return phiAngles_; }
         std::vector<double> GetThetaAngles(){ return thetaAngles_; }
 
+
+        //! Get the arrival delays
+        /*!
+            \param pairs the pairs of antennas for which you want us to compute delays
+            \return a complicated data structure; see more information below
+
+            In this refactorization of the RTC, we want to cache the arrival *delays* for a give pair.
+            And we want to store them time ordered, for potential future performance reasons (e.g. wanting to use a GSL interpolatino accelerator).
+            For this reason, for a given solution/pair we need to keep track of *both* the TH2D bin it belongs to, and, the actual time delay.
+            So this function returns a std::pair.
+            pair->first is the bins, pair->second are the delays
+            So pair->first[solNum][pair][iterator] gives you the TH2D bin number for a given solution and pair and global "iterator" variable.
+            while pair->second[solNum][pair] gives you the delay in ns for a given solution, pair, and global "iterator" variable.
+            The TH2D bin it belongs to is in pair->first.
+        */
+
+        std::pair< 
+            std::vector< std::vector< std::vector< int > > >,
+            std::vector< std::vector< std::vector< double > > > > GetArrivalDelays(std::map<int, std::vector<int > > pairs);
 
         //! function to load the arrival time tables
         void LoadArrivalTimeTables(const std::string &filename, int solNum);
@@ -96,7 +115,7 @@ class RayTraceCorrelator : public TObject
             \param applyHilbertEnvelope whether or not to apply hilbert enveloping to the correlation functions
             \return a std::vector of the correlation functions (one for each pair)
         */
-        std::vector<TGraph*> GetCorrFunctions(
+        std::vector<TGraph>GetCorrFunctions(
             std::map<int, std::vector<int> > pairs,
             std::map<int, TGraph*> interpolatedWaveforms,
             bool applyHilbertEnvelope = true
@@ -167,14 +186,16 @@ class RayTraceCorrelator : public TObject
         /*!
             \param pairs a std::map of antenna pairs
             \param corrFunctions a std::vector of correlation functions, one for each pair in pairs (in that order!)
+            \param arrivalDelays a std::pair; the arrival delays; this is the output of GetArrivalDelays
             \param solNum whether to have the first or second (0 or 1) solution hypothesis
             \param weights weights to apply to each map; default = equal weights, or 1/pairs.size()
             \return a 2D histogram with the values filled with the interferometric sums
         */
-        TH2D* GetInterferometricMap(
-            std::map<int, std::vector<int> > pairs,
-            std::vector<TGraph*> corrFunctions,
-            int solNum,
+        TH2D GetInterferometricMap(
+            const std::map<int, std::vector<int> > pairs,
+            const std::vector<TGraph> &corrFunctions,
+            const std::pair< std::vector< std::vector< std::vector< int > > >, std::vector< std::vector< std::vector< double > > > > &arrivalDelays,
+            const int solNum,
             std::map<int, double> weights = {}
         );
 
@@ -223,13 +244,13 @@ class RayTraceCorrelator : public TObject
         double * getCorrelation_NoNorm(int length, double * oldY1, double * oldY2);
 
 
-        //! a function to get the linearly interpolated value of a function at a time
+        //! a function to normalize a waveform by it's RMS
         /*!
-            \param grIn the TGraph to be evaluated
-            \param xvalue the point at which to get the interpolated value
-            \return the interpolated value of grIn at point xalue
+            \param grIn the graph to be normalized
+            \return TGraph* the normalized graph (a new object)
         */
-        double fastEvalForEvenSampling(TGraph* grIn, double xvalue);
+        std::unique_ptr<TGraph> getNormalisedGraphByRMS(TGraph *grIn);
+
 
     ClassDef(RayTraceCorrelator,0);
 
