@@ -42,38 +42,36 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     angularSize_ = angularSize;
     numPhiBins_ = int(360. / angularSize);
     numThetaBins_ = int(180. / angularSize);
+    this->internalMap = std::unique_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
 
-    // now fill up the phi and theta angles
-    double PhiWaveDeg, ThetaWaveDeg;
-    for (int i = 0; i < numPhiBins_; i++) {
-        PhiWaveDeg = -180 + 0.5 * angularSize_ + angularSize_ * i;
-        phiAngles_.push_back(PhiWaveDeg * TMath::DegToRad());
+    // start loop at 0, but ask for GetBinCenter(i+1)
+    // This is not an accident!
+    // This is because ROOT documentation says bin=0 is underflow
+    // See https://root.cern.ch/doc/master/classTH1.html#ac70dcb4082bd510f5aa3e6efeb043f39
+    for(int i=0; i<this->internalMap->GetNbinsX(); i++){
+        phiAngles_.push_back(this->internalMap->GetXaxis()->GetBinCenter(i+1));
     }
-    for (int i = 0; i < numThetaBins_; i++) {
-        ThetaWaveDeg = -90 + 0.5 * angularSize_ + angularSize_ * i;
-        thetaAngles_.push_back(ThetaWaveDeg * TMath::DegToRad());
+    for(int i=0; i<this->internalMap->GetNbinsY(); i++){
+        thetaAngles_.push_back(this->internalMap->GetYaxis()->GetBinCenter(i+1));
     }
 }
 
-void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi, 
-    int &thetaBin, int &phiBin
-    ){
+int RayTraceCorrelator::ConvertAngleToTH2DGlobalBin(double theta, double phi){
 
-    if(abs(theta) > 91 || isnan(theta)){
+    if(abs(theta) > 90 || isnan(theta)){
         char errorMessage[400];
         sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -91 to 91\n", theta);
         throw std::invalid_argument(errorMessage);
     }
 
-    if(abs(phi)>181 || isnan(phi)){
+    if(abs(phi)>180 || isnan(phi)){
         char errorMessage[400];
         sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -181 to 181\n", theta);
         throw std::invalid_argument(errorMessage);
     }
 
-    double angularSize = this->GetAngularSize();
-    thetaBin = int((theta + 90. - (0.5 * angularSize))/angularSize);
-    phiBin = int((phi + 180. - (0.5 * angularSize))/angularSize);
+    int globalBin = this->internalMap->FindBin(phi, theta);
+    return globalBin;
 }
 
 void RayTraceCorrelator::SetRadius(double radius){
@@ -366,8 +364,6 @@ std::pair<
             for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
                 for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
                     
-                    int globalBin = (phiBin + 1) + (thetaBin + 1) * (this->numPhiBins_ + 2);
-
                     double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
                     double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
                     double dt = arrival_time1 - arrival_time2;
@@ -376,6 +372,10 @@ std::pair<
                     if (arrival_time1 < -100 || arrival_time2 < -100) {
                         dt = -1E6;  // large negative number
                     }
+
+                    double this_theta = this->thetaAngles_[thetaBin];
+                    double this_phi = this->phiAngles_[phiBin];
+                    int globalBin = this->ConvertAngleToTH2DGlobalBin(this_theta, this_phi);
 
                     this_global_bins.push_back(globalBin);
                     this_delays.push_back(dt);
