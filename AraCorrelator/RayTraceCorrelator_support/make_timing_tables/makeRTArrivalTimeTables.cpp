@@ -165,12 +165,12 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
             }
         }
 
-        TCanvas *c = new TCanvas("", "", 1100, 850);
-        arrivalTimeMaps[ant_temp].Draw("colz"); // standard colz projection
-        char title[500];
-        sprintf(title,"timing_ant%d_%d.png", ant_temp,solNum);
-        c->SaveAs(title);
-        delete c;
+        // TCanvas *c = new TCanvas("", "", 1100, 850);
+        // arrivalTimeMaps[ant_temp].Draw("colz"); // standard colz projection
+        // char title[500];
+        // sprintf(title,"timing_ant%d_%d.png", ant_temp,solNum);
+        // c->SaveAs(title);
+        // delete c;
 
     }
 
