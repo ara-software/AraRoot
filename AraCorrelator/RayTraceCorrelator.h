@@ -6,6 +6,7 @@
 class TGraph;
 class TH2D;
 class AraGeomTool;
+#include "TH2D.h"
 
 class RayTraceCorrelator : public TObject
 {
@@ -33,11 +34,11 @@ class RayTraceCorrelator : public TObject
         // containers
         // outer map layer has "key" of solution (0 or 1)
         // inner map layer has "key" of antenna (0->N), with "value" of the timing TH2D
-        // std::map<int, std::map<int, TH2D> > arrvialTimes_;
-        // std::map<int, std::map<int, TH2D> > arrivalThetas_;
-        // std::map<int, std::map<int, TH2D> > arrivalPhis_;
-        // std::map<int, std::map<int, TH2D> > launchThetas_;
-        // std::map<int, std::map<int, TH2D> > launchPhis_;
+        std::map<int, std::map<int, TH2D > > arrvialTimes_;
+        std::map<int, std::map<int, TH2D > > arrivalThetas_;
+        std::map<int, std::map<int, TH2D > > arrivalPhis_;
+        std::map<int, std::map<int, TH2D > > launchThetas_;
+        std::map<int, std::map<int, TH2D > > launchPhis_;
        
     public:
 
@@ -74,6 +75,9 @@ class RayTraceCorrelator : public TObject
             \return void
         */
         void LoadTables();
+
+        //! function to load the arrival time tables
+        void LoadArrivalTimeTables(const std::string &filename, int solNum);
 
     ClassDef(RayTraceCorrelator,1);
 

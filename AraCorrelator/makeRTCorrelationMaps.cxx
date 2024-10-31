@@ -35,34 +35,34 @@ int main(int argc, char **argv)
 
     int station = atoi(argv[1]);
 
-    // /////////////////////////////////////////////////
-    // /////////////////////////////////////////////////
-    // //// Initialize the correlator
-    // /////////////////////////////////////////////////
-    // /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    //// Initialize the correlator
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
 
-    // // setup the paths to our ray tracing tables
-    // double radius = 300.;
-    // double angular_size = 1.;
-    // int iceModel = 40;
-    // char dirPath[500];
-    // char refPath[500];
-    // std::string topDir = "/cvmfs/icecube.osgstorage.org/icecube/PUBLIC/groups/arasoft/raytrace_timing_tables/";
-    // sprintf(dirPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
-    //     topDir.c_str(), station, iceModel, radius, angular_size
-    // );
-    // sprintf(refPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_1.root",
-    //     topDir.c_str(), station, iceModel, radius, angular_size
-    // );
+    // setup the paths to our ray tracing tables
+    double radius = 300.;
+    double angular_size = 5.;
+    int iceModel = 50;
+    char dirPath[500];
+    char refPath[500];
+    std::string topDir = "/home/brianclark/ARA/software_deps/custom_araroot/src_araroot/AraCorrelator/RayTraceCorrelator_support/make_timing_tables/";
+    sprintf(dirPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_0.root",
+        topDir.c_str(), station, iceModel, radius, angular_size
+    );
+    sprintf(refPath, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_1.root",
+        topDir.c_str(), station, iceModel, radius, angular_size
+    );
 
-    // int numAntennas = 16;
-    // // initialize a correlator
-    // RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas,
-    //     radius, angular_size, dirPath, refPath
-    // );
+    int numAntennas = 16;
+    // initialize a correlator
+    RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas,
+        radius, angular_size, dirPath, refPath
+    );
 
-    // // and tell it to load up the arrival times tables
-    // theCorrelator->LoadTables();
+    // and tell it to load up the arrival times tables
+    theCorrelator->LoadTables();
 
     // // How you set up the pairs is up to you!
     // // There are a few helper functions;

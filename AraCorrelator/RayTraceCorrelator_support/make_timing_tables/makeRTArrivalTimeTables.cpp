@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     int station = atoi(argv[1]);
     double radius = atof(argv[2]);
     
-    double angular_size = 30.;
+    double angular_size = 5.;
     int iceModelidx = 50;
     int unixTime = 0;
     int numAntennas = 16;
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     );
 
     CalculateTables(theCorrelator, 0, iceModelidx, argv[3]);
-    // CalculateTables(theCorrelator, 1, iceModelidx, argv[3]);
+    CalculateTables(theCorrelator, 1, iceModelidx, argv[3]);
 
 }
 
@@ -165,12 +165,12 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
             }
         }
 
-        // TCanvas *c = new TCanvas("", "", 1100, 850);
-        // arrivalTimeMaps[ant_temp].Draw("colz"); // standard colz projection
-        // char title[500];
-        // sprintf(title,"timing_ant%d.png", ant_temp);
-        // c->SaveAs(title);
-        // delete c;
+        TCanvas *c = new TCanvas("", "", 1100, 850);
+        arrivalTimeMaps[ant_temp].Draw("colz"); // standard colz projection
+        char title[500];
+        sprintf(title,"timing_ant%d_%d.png", ant_temp,solNum);
+        c->SaveAs(title);
+        delete c;
 
     }
 
