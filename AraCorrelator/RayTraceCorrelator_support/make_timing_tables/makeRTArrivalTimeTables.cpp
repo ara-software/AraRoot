@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     int station = atoi(argv[1]);
     double radius = atof(argv[2]);
     
-    double angular_size = 5.;
+    double angular_size = 1.;
     int iceModelidx = 50;
     int unixTime = 0;
     int numAntennas = 16;
