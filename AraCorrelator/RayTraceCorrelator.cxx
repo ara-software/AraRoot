@@ -42,18 +42,15 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     angularSize_ = angularSize;
     numPhiBins_ = int(360. / angularSize);
     numThetaBins_ = int(180. / angularSize);
-    this->internalMap = std::unique_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
+    internalMap = std::unique_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
 
-    // start loop at 0, but ask for GetBinCenter(i+1)
-    // This is not an accident!
-    // This is because ROOT documentation says bin=0 is underflow
-    // See https://root.cern.ch/doc/master/classTH1.html#ac70dcb4082bd510f5aa3e6efeb043f39
-    for(int i=0; i<this->internalMap->GetNbinsX(); i++){
-        phiAngles_.push_back(this->internalMap->GetXaxis()->GetBinCenter(i+1));
+    for(int i=this->internalMap->GetXaxis()->GetFirst(); i<=this->internalMap->GetXaxis()->GetLast(); i++){
+        phiAngles_.push_back(this->internalMap->GetXaxis()->GetBinCenter(i));
     }
-    for(int i=0; i<this->internalMap->GetNbinsY(); i++){
-        thetaAngles_.push_back(this->internalMap->GetYaxis()->GetBinCenter(i+1));
+    for(int i=this->internalMap->GetYaxis()->GetFirst(); i<=this->internalMap->GetYaxis()->GetLast(); i++){
+        thetaAngles_.push_back(this->internalMap->GetYaxis()->GetBinCenter(i));
     }
+
 }
 
 int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
