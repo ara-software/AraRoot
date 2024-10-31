@@ -21,6 +21,7 @@ class RayTraceCorrelator : public TObject
         std::vector<double> thetaAngles_; ///< Vector of the theta points to be sampled (in radians!)
         std::string dirSolTablePath_;     ///< Full path to the direct solution tables
         std::string refSolTablePath_;     ///< Full path to the reflected/refracted solution tables
+        std::unique_ptr<TH2D> internalMap;///< An internal TH2D to help us keep track of binning
 
         // The following setter functions (which nominally do trivial things)
         // are included to enable sanity checks on the arguments 
@@ -176,10 +177,15 @@ class RayTraceCorrelator : public TObject
             \param phiBin the angular bin corresponding to phi, passed by reference (is replaced by the bin value)
             \return void
         */
-        void ConvertAngleToBins(
-            double theta, double phi,
-            int &thetaBin, int &phiBin
-        );
+        void ConvertAngleToBins(double theta, double phi, int &thetaBin, int &phiBin);
+
+        //! function to get lookup the TH2D global bin number of a source hypothesis direction
+        /*!
+            \param theta source hypothesis direction up/down angle, from -90 to 90
+            \param theta source hypothesis direction left/right angle, from -180 to 180
+            \return int
+        */
+        int ConvertAnglesToTH2DGlobalBin(double theta, double phi);
 
 
         //! function to get an interferometric map
