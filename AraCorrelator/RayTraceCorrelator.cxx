@@ -52,6 +52,26 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     }
 
 }
+void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi, 
+    int &thetaBin, int &phiBin
+    ){
+
+    if(abs(theta) > 90 || isnan(theta)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -90 to 90\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    if(abs(phi)>180 || isnan(phi)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -180 to 180\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+    
+    double angularSize = this->GetAngularSize();
+    thetaBin = int((theta + 90. - (0.5 * angularSize))/angularSize);
+    phiBin = int((phi + 180. - (0.5 * angularSize))/angularSize);
+}
 
 int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
 

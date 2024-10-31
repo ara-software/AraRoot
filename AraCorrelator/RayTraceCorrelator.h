@@ -177,6 +177,14 @@ class RayTraceCorrelator : public TObject
             \param phiBin the angular bin corresponding to phi, passed by reference (is replaced by the bin value)
             \return void
         */
+        void ConvertAngleToBins(double theta, double phi, int &thetaBin, int &phiBin);
+
+        //! function to get lookup the TH2D global bin number of a source hypothesis direction
+        /*!
+            \param theta source hypothesis direction up/down angle, from -90 to 90
+            \param theta source hypothesis direction left/right angle, from -180 to 180
+            \return int
+        */
         int ConvertAnglesToTH2DGlobalBin(double theta, double phi);
 
 
