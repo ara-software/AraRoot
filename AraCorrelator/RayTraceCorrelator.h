@@ -177,7 +177,7 @@ class RayTraceCorrelator : public TObject
             \param phiBin the angular bin corresponding to phi, passed by reference (is replaced by the bin value)
             \return void
         */
-        int ConvertAngleToTH2DGlobalBin(double theta, double phi);
+        int ConvertAnglesToTH2DGlobalBin(double theta, double phi);
 
 
         //! function to get an interferometric map
