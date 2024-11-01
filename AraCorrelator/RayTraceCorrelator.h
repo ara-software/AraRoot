@@ -146,6 +146,60 @@ class RayTraceCorrelator : public TObject
             std::map<int, double> weights = {}
         );
 
+        //! function to make sure the user is asking for a reasonable theta/phi, and return the global bin number in the TH2D
+        /*!
+            \param theta the theta desired (angle! in degrees!)
+            \param phi the phi desired (angle! in degrees!)
+            \return globalBin the TH2D global bin number, found with TH2D::FindBin(theta,phi)
+        */        
+        int ValidateAnglesGetGlobalBinNumber(double theta, double phi);
+
+        //! function to get lookup the arrival time information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param theta the theta desired (angle! in degrees!)
+            \param phi the phi desired (angle! in degrees!)
+            \return arrival time
+        */        
+        double LookupArrivalTime(
+            int ant, int solNum,
+            double theta, double phi
+        );
+
+        //! function to get lookup the antenna arrival information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param theta the theta desired (angle! in degrees!)
+            \param phi the phi desired (angle! in degrees!)
+            \param arrivalTheta passed by reference, content is replaced with the arrival theta angle (where the signal is COMING FROM)
+            \param arrivalPhi passed by reference, content is replaced with the arrival phi angle (where the signal is COMING FROM)
+            \return void
+        */
+        void LookupArrivalAngles(
+            int ant, int solNum,
+            double theta, double phi,
+            double &arrivalTheta, double &arrivalPhi
+        );
+
+        //! function to get lookup the ray launch information
+        /*!
+            \param ant antenna index
+            \param solNum which solution number (0 = direct, 1 = reflected/refracted)
+            \param theta the theta desired (angle! in degrees!)
+            \param phi the phi desired (angle! in degrees!)
+            \param launchTheta passed by reference, content is replaced with the launch theta angle (in a coordinate where z-axis is along the Earth's radius)
+            \param launchPhi passed by reference, content is replaced with the launch phi angle (in a coordinate where z-axis is along the Earth's radius)
+            \return void
+        */
+        void LookupLaunchAngles(
+            int ant, int solNum,
+            double theta, double phi,
+            double &launchTheta, double &launchPhi
+        );
+
+
         ////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////
         /// This part is the header declaration for the _detail file

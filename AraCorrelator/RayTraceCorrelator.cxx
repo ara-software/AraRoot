@@ -131,19 +131,19 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
 
         ss.str(""); ss << "arrival_theta_ch" << i;
         TH2D *hArrivalTheta = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
-        this_arrivalThetas[i] = *hArrivalTheta; // wrap in unique ptr for safety
+        this_arrivalThetas[i] = *hArrivalTheta; // de ref the pointer; give me the memory
 
         ss.str(""); ss << "arrival_phi_ch" << i;
         TH2D *hArrivalPhi = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
-        this_arrivalThetas[i] = *hArrivalPhi; // wrap in unique ptr for safety
+        this_arrivalPhis[i] = *hArrivalPhi; // de ref the pointer; give me the memory
 
         ss.str(""); ss << "launch_theta_ch" << i;
         TH2D *hLaunchTheta = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
-        this_launchThetas[i] = *hLaunchTheta; // wrap in unique ptr for safety
-
+        this_launchThetas[i] = *hLaunchTheta;// de ref the pointer; give me the memory
+        
         ss.str(""); ss << "launch_phi_ch" << i;
         TH2D *hLaunchPhi = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
-        this_launchPhis[i] = *hLaunchPhi; // wrap in unique ptr for safety
+        this_launchPhis[i] = *hLaunchPhi; // de ref the pointer; give me the memory
     }
     arrvialTimes_[solNum] = this_arrvialTimes;
     arrivalThetas_[solNum] = this_arrivalThetas;
@@ -154,6 +154,7 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
     // close up
     infile->Close();
 
+    // useful to have this around for debugging
     // for(int i=0; i<numAntennas_; i++){
     //     std::cout<<"i"<<i<<std::endl;
     //     TCanvas *c = new TCanvas("", "", 1100, 850);
@@ -163,7 +164,6 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
     //     c->SaveAs(title);
     //     delete c;
     // }
-
 }
 std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     int stationID,
@@ -416,7 +416,7 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
 
         // for performance reasons, we do the correlation right here
         // so we draw out the x and y values of the correlation function to be used later
-        int numPoints = corrFunctions[pairNum].GetN();
+        const int numPoints = corrFunctions[pairNum].GetN(); // this won't change for as long as it's alive
         auto xVals = corrFunctions[pairNum].GetX();
         auto yVals = corrFunctions[pairNum].GetY();
         double dx = xVals[1] - xVals[0];
@@ -434,9 +434,13 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
             double dt = it_delays[iterBin];
 
             p0 = int((dt - xVals[0]) / dx);
-            if (p0 < 0) p0 = 0;
-            if (p0 >= numPoints) p0 = numPoints - 2;
-            corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+            if(p0<0 || p0>=numPoints){
+                // outside the region of support, force it to zero
+                corrVal = 0;
+            }
+            else{
+                corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+            }
             summedCorr[globalBin]+=corrVal *scale;
 
         }
@@ -449,4 +453,50 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
     }
 
     return histMap;
+}
+
+int RayTraceCorrelator::ValidateAnglesGetGlobalBinNumber(double theta, double phi){
+    if(abs(theta) > 90 || isnan(theta)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -90 to 90\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    if(abs(phi)>180 || isnan(phi)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -180 to 180\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    int globalBin  = dummyMap->FindBin(phi, theta);
+    return globalBin;
+}
+
+double RayTraceCorrelator::LookupArrivalTime(
+    int ant, int solNum,
+    double theta, double phi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    double arrival_time = arrvialTimes_.at(solNum).at(ant).GetBinContent(globalBin);
+    return arrival_time;
+}
+
+void RayTraceCorrelator::LookupArrivalAngles(
+    int ant, int solNum,
+    double theta, double phi,
+    double &arrivalTheta, double &arrivalPhi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    arrivalTheta = arrivalThetas_.at(solNum).at(ant).GetBinContent(globalBin);
+    arrivalPhi = arrivalPhis_.at(solNum).at(ant).GetBinContent(globalBin);
+}
+
+void RayTraceCorrelator::LookupLaunchAngles(
+    int ant, int solNum,
+    double theta, double phi,
+    double &launchTheta, double &launchPhi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    launchTheta = launchThetas_.at(solNum).at(ant).GetBinContent(globalBin);
+    launchPhi = launchPhis_.at(solNum).at(ant).GetBinContent(globalBin);
 }
