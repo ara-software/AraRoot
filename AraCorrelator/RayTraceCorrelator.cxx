@@ -134,7 +134,7 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
         throw std::runtime_error(errorMessage);
     }
 
-    std::map<int, TH2D> this_arrvialTimes;
+    std::map<int, TH2D> this_arrivalTimes;
     std::map<int, TH2D> this_arrivalThetas;
     std::map<int, TH2D> this_arrivalPhis;
     std::map<int, TH2D> this_launchThetas;
@@ -145,7 +145,7 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
 
         ss.str(""); ss << "arrival_time_ch_" << i;
         TH2D *hArrivalTime = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
-        this_arrvialTimes[i] = *hArrivalTime; // de ref the pointer; give me the memory
+        this_arrivalTimes[i] = *hArrivalTime; // de ref the pointer; give me the memory
 
         ss.str(""); ss << "arrival_theta_ch" << i;
         TH2D *hArrivalTheta = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
@@ -163,7 +163,7 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
         TH2D *hLaunchPhi = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
         this_launchPhis[i] = *hLaunchPhi; // de ref the pointer; give me the memory
     }
-    arrvialTimes_[solNum] = this_arrvialTimes;
+    arrivalTimes_[solNum] = this_arrivalTimes;
     arrivalThetas_[solNum] = this_arrivalThetas;
     arrivalPhis_[solNum] = this_arrivalPhis;
     launchThetas_[solNum] = this_launchThetas;
@@ -176,7 +176,7 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
     // for(int i=0; i<numAntennas_; i++){
     //     std::cout<<"i"<<i<<std::endl;
     //     TCanvas *c = new TCanvas("", "", 1100, 850);
-    //     arrvialTimes_.at(solNum).at(i).Draw("colz"); // standard colz projection
+    //     arrivalTimes_.at(solNum).at(i).Draw("colz"); // standard colz projection
     //     char title[500];
     //     sprintf(title,"timing_ant%d_%d.png", i,solNum);
     //     c->SaveAs(title);
@@ -252,8 +252,8 @@ std::pair<
                 for(int thetaBin = dummyMap->GetYaxis()->GetFirst(); thetaBin <= dummyMap->GetYaxis()->GetLast(); thetaBin++){
 
                     int globalBin  = dummyMap->GetBin(phiBin, thetaBin);
-                    double arrival_time1 = arrvialTimes_.at(solNum).at(ant1).GetBinContent(globalBin);
-                    double arrival_time2 = arrvialTimes_.at(solNum).at(ant2).GetBinContent(globalBin);
+                    double arrival_time1 = arrivalTimes_.at(solNum).at(ant1).GetBinContent(globalBin);
+                    double arrival_time2 = arrivalTimes_.at(solNum).at(ant2).GetBinContent(globalBin);
                     double dt = arrival_time1 - arrival_time2;
 
                     // sanity check
@@ -495,7 +495,7 @@ double RayTraceCorrelator::LookupArrivalTime(
     double theta, double phi
 ){
     int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
-    double arrival_time = arrvialTimes_.at(solNum).at(ant).GetBinContent(globalBin);
+    double arrival_time = arrivalTimes_.at(solNum).at(ant).GetBinContent(globalBin);
     return arrival_time;
 }
 

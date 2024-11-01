@@ -35,7 +35,7 @@ class RayTraceCorrelator : public TObject
         // containers
         // outer map layer has "key" of solution (0 or 1)
         // inner map layer has "key" of antenna (0->N), with "value" of the timing TH2D
-        std::map<int, std::map<int, TH2D > > arrvialTimes_;
+        std::map<int, std::map<int, TH2D > > arrivalTimes_;
         std::map<int, std::map<int, TH2D > > arrivalThetas_;
         std::map<int, std::map<int, TH2D > > arrivalPhis_;
         std::map<int, std::map<int, TH2D > > launchThetas_;
