@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <sys/stat.h>
 
 // ROOT Includes
@@ -34,6 +35,8 @@ void CalculateArrivalInformation(
 
 int main(int argc, char **argv)
 {
+
+    gStyle->SetOptStat(0);
     
     if(argc<4) {
         std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location>\n";
@@ -62,52 +65,12 @@ int main(int argc, char **argv)
 
 void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir){
 
-    char fileName[500];
-    sprintf(fileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_%d.root",
-        tableDir.c_str(), theCorrelator->GetStationID(), iceModelidx,
-        theCorrelator->GetRadius(), theCorrelator->GetAngularSize(), solNum
-    );
-
-    TFile *outfile = 0;
-    TTree *tArrivalTimes = 0;
-
-    outfile = new TFile(fileName, "RECREATE");
-    tArrivalTimes = new TTree("tArrivalTimes", "tArrivalTimes");
-
-    int ant, phiBin, thetaBin;
-    double phi, theta;
-    double arrivalTime, arrivalTheta, arrivalPhi, launchTheta, launchPhi;
-    tArrivalTimes -> Branch("ant", & ant);
-    tArrivalTimes -> Branch("phiBin", & phiBin);
-    tArrivalTimes -> Branch("thetaBin", & thetaBin);
-    tArrivalTimes -> Branch("arrivalTime", & arrivalTime);
-    tArrivalTimes -> Branch("arrivalTheta", & arrivalTheta);
-    tArrivalTimes -> Branch("arrivalPhi", & arrivalPhi);
-    tArrivalTimes -> Branch("phi", & phi);
-    tArrivalTimes -> Branch("theta", & theta);
-    tArrivalTimes -> Branch("launchTheta", & launchTheta);
-    tArrivalTimes -> Branch("launchPhi", & launchPhi);
-
     int numThetaBins = theCorrelator->GetNumThetaBins();
     int numPhiBins = theCorrelator->GetNumPhiBins();
     int numAnts = theCorrelator->GetNumAntennas();
     double radius = theCorrelator->GetRadius();
-    std::vector<double> phiAngles = theCorrelator->GetPhiAngles();
-    std::vector<double> thetaAngles = theCorrelator->GetThetaAngles();
+    auto templateMap = theCorrelator->GetTemplateMap();
 
-    /*
-    Set up ice model
-    To load the AraSim ice model, it has to read some bedmap/depth files 
-    located in the AraSim "data" directory
-    If those files are missing, it errors out *very* unhelpfully.
-    So we implement a check here, waiting for the day when AraSim handles
-    this more intelligently.
-    */
-    struct stat buffer;
-    bool dirExists = (stat("data", &buffer) == 0);
-    if(!dirExists){
-        throw std::runtime_error("The AraSim data directory is missing! Please make it, e.g. ln -s /path/to/AraSim/data data");
-    }
     // need ice model
     IceModel *iceModel = new IceModel(0 + 1*10, 0, 0);
 
@@ -128,15 +91,59 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     settings->NOFZ=1; // make sure n(z) is turned on
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
 
-    for (int thetaBin_temp = 0; thetaBin_temp < numThetaBins; thetaBin_temp++) {
+    // open output file BEFORE making root containers
+    char fileName[500];
+    sprintf(fileName, "%s/arrivaltimes_station_%d_icemodel_%d_radius_%.2f_angle_%.2f_solution_%d.root",
+        tableDir.c_str(), theCorrelator->GetStationID(), iceModelidx,
+        theCorrelator->GetRadius(), theCorrelator->GetAngularSize(), solNum
+    );
 
-        printf("Solving theta strip at %.2f deg \n",thetaAngles[thetaBin_temp]*TMath::RadToDeg());
+    TFile *outfile = 0;
+    TTree *tArrivalTimes = 0;
+    outfile = new TFile(fileName, "RECREATE");
+    // tArrivalTimes = new TTree("tArrivalTimes", "tArrivalTimes");
 
-        for (int phiBin_temp = 0; phiBin_temp < numPhiBins; phiBin_temp++) {
+    // make containers
+    std::vector<TH2D> arrivalTimeMaps;
+    std::vector<TH2D> arrivalThetaMaps;
+    std::vector<TH2D> arrivalPhiMaps;
+    std::vector<TH2D> launchThetaMaps;
+    std::vector<TH2D> launchPhiMaps;
 
-            for (int ant_temp = 0; ant_temp < numAnts; ant_temp++) {
+    for(int i=0; i<numAnts; i++){
+        stringstream ss;
 
-                Position antPosition = antennaLocations.find(ant_temp)->second;
+        ss.str(""); ss << "arrival_time_ch_" << i;
+        arrivalTimeMaps.push_back(TH2D(ss.str().c_str(), ss.str().c_str(), numPhiBins, -180, 180, numThetaBins, -90, 90));
+
+        ss.str(""); ss << "arrival_theta_ch" << i;
+        arrivalThetaMaps.push_back(TH2D(ss.str().c_str(), ss.str().c_str(), numPhiBins, -180, 180, numThetaBins, -90, 90));
+
+        ss.str(""); ss << "arrival_phi_ch" << i;
+        arrivalPhiMaps.push_back(TH2D(ss.str().c_str(), ss.str().c_str(), numPhiBins, -180, 180, numThetaBins, -90, 90));
+
+        ss.str(""); ss << "launch_theta_ch" << i;
+        launchThetaMaps.push_back(TH2D(ss.str().c_str(), ss.str().c_str(), numPhiBins, -180, 180, numThetaBins, -90, 90));
+
+        ss.str(""); ss << "launch_phi_ch" << i;
+        launchPhiMaps.push_back(TH2D(ss.str().c_str(), ss.str().c_str(), numPhiBins, -180, 180, numThetaBins, -90, 90));
+    }
+
+    // fill up the containers
+    for (int ant_temp = 0; ant_temp < numAnts; ant_temp++) {
+
+        std::cout<<"Solving antenna " << ant_temp<<std::endl;
+        Position antPosition = antennaLocations.find(ant_temp)->second;
+
+        for(int phiBin = templateMap->GetXaxis()->GetFirst(); phiBin <= templateMap->GetXaxis()->GetLast(); phiBin++){
+        
+            double phi = templateMap->GetXaxis()->GetBinCenter(phiBin);
+            // printf("  Solving phi Bin %d, Phi Bin Center %.2f\n", phiBin, phi);
+
+            for(int thetaBin = templateMap->GetYaxis()->GetFirst(); thetaBin <= templateMap->GetYaxis()->GetLast(); thetaBin++){
+            
+                double theta = templateMap->GetYaxis()->GetBinCenter(thetaBin);
+                // printf("    Solving theta bin %d, theta bin center %.2f\n", thetaBin, theta);
 
                 double arrivalTime_temp;
                 double arrivalTheta_temp;
@@ -146,31 +153,37 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
                 CalculateArrivalInformation(
                     raySolver, iceModel, settings,
                     antPosition, stationCOG,
-                    phiAngles[phiBin_temp], thetaAngles[thetaBin_temp], radius, solNum,
+                    phi * TMath::DegToRad(), theta*TMath::DegToRad(), radius, solNum,
                     arrivalTime_temp, arrivalTheta_temp, arrivalPhi_temp, launchTheta_temp, launchPhi_temp
-
                 );
-                
-                arrivalTime = arrivalTime_temp;
-                arrivalTheta = arrivalTheta_temp;
-                arrivalPhi = arrivalPhi_temp;
-                launchTheta = launchTheta_temp;
-                launchPhi = launchPhi_temp;
-                // printf("  Phi %d, Ant %d, Arrival Time %.2f, Arrival Theta %.2f, Arrival Phi %.2f \n",
-                //     phiBin_temp, ant_temp, arrivalTime_temp, 
-                //     TMath::RadToDeg()*arrivalTheta_temp, TMath::RadToDeg()*arrivalPhi_temp
-                // );
-                ant = ant_temp;
-                phiBin = phiBin_temp;
-                thetaBin = thetaBin_temp;
-                phi = phiAngles[phiBin];
-                theta = thetaAngles[thetaBin];
-                tArrivalTimes -> Fill();
+                arrivalTimeMaps[ant_temp].SetBinContent(phiBin,thetaBin,arrivalTime_temp);
+                arrivalThetaMaps[ant_temp].SetBinContent(phiBin,thetaBin,arrivalTheta_temp);
+                arrivalPhiMaps[ant_temp].SetBinContent(phiBin,thetaBin,arrivalPhi_temp);
+                launchThetaMaps[ant_temp].SetBinContent(phiBin,thetaBin,launchTheta_temp);
+                launchPhiMaps[ant_temp].SetBinContent(phiBin,thetaBin,launchPhi_temp);
+
             }
         }
+
+        // TCanvas *c = new TCanvas("", "", 1100, 850);
+        // arrivalTimeMaps[ant_temp].Draw("colz"); // standard colz projection
+        // char title[500];
+        // sprintf(title,"timing_ant%d_%d.png", ant_temp,solNum);
+        // c->SaveAs(title);
+        // delete c;
+
     }
-    outfile->Write();
+
+    for (int ant_temp = 0; ant_temp < numAnts; ant_temp++) {
+        arrivalTimeMaps[ant_temp].Write();
+        arrivalThetaMaps[ant_temp].Write();
+        arrivalPhiMaps[ant_temp].Write();
+        launchThetaMaps[ant_temp].Write();
+        launchPhiMaps[ant_temp].Write();
+    }
+
     outfile->Close();
+
 }
 
 void CalculateArrivalInformation(

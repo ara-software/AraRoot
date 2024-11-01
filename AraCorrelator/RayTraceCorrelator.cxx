@@ -4,17 +4,41 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdexcept>
+#include <sstream>
 #include <math.h>
 
 //ROOT includes
 #include "TFile.h"
 #include "TTree.h"
 #include "TH2D.h"
+#include "TCanvas.h"
 
 // AraRoot includes
 #include "AraGeomTool.h"
 #include "RayTraceCorrelator.h"
 #include "RayTraceCorrelator_detail.h"
+
+RayTraceCorrelator::RayTraceCorrelator(int stationID,
+    int numAntennas,
+    double radius, 
+    double angularSize,
+    const std::string &dirSolTablePath, 
+    const std::string &refSolTablePath
+    ){
+
+    // initialize and sanitize the input immediately
+    // afterwards, we can (safely!) only refer to private variables
+    this->SetupStationInfo(stationID, numAntennas);
+    this->SetAngularConfig(angularSize);
+    this->SetRadius(radius);
+    this->SetTablePaths(dirSolTablePath, refSolTablePath);
+
+}
+
+RayTraceCorrelator::~RayTraceCorrelator()
+{
+	//Default destructor
+}
 
 void RayTraceCorrelator::SetupStationInfo(int stationID, int numAntennas) { 
     char errorMessage[400];
@@ -42,35 +66,7 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     angularSize_ = angularSize;
     numPhiBins_ = int(360. / angularSize);
     numThetaBins_ = int(180. / angularSize);
-    internalMap = std::unique_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
-
-    for(int i=this->internalMap->GetXaxis()->GetFirst(); i<=this->internalMap->GetXaxis()->GetLast(); i++){
-        phiAngles_.push_back(this->internalMap->GetXaxis()->GetBinCenter(i));
-    }
-    for(int i=this->internalMap->GetYaxis()->GetFirst(); i<=this->internalMap->GetYaxis()->GetLast(); i++){
-        thetaAngles_.push_back(this->internalMap->GetYaxis()->GetBinCenter(i));
-    }
-
-}
-void RayTraceCorrelator::ConvertAngleToBins(double theta, double phi, 
-    int &thetaBin, int &phiBin
-    ){
-
-    if(abs(theta) > 90 || isnan(theta)){
-        char errorMessage[400];
-        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -90 to 90\n", theta);
-        throw std::invalid_argument(errorMessage);
-    }
-
-    if(abs(phi)>180 || isnan(phi)){
-        char errorMessage[400];
-        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -180 to 180\n", theta);
-        throw std::invalid_argument(errorMessage);
-    }
-    
-    double angularSize = this->GetAngularSize();
-    thetaBin = int((theta + 90. - (0.5 * angularSize))/angularSize);
-    phiBin = int((phi + 180. - (0.5 * angularSize))/angularSize);
+    dummyMap = std::shared_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
 }
 
 int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
@@ -87,7 +83,7 @@ int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
         throw std::invalid_argument(errorMessage);
     }
 
-    int globalBin = this->internalMap->FindBin(phi, theta);
+    int globalBin = this->dummyMap->FindBin(phi, theta);
     return globalBin;
 }
 
@@ -121,36 +117,11 @@ void RayTraceCorrelator::SetTablePaths(const std::string &dirPath, const std::st
     refSolTablePath_ = refPath;
 }
 
-
-void RayTraceCorrelator::ConfigureArrivalVectors(){
-    arrivalTimes_.resize(2);
-    arrivalThetas_.resize(2);
-    arrivalPhis_.resize(2);
-    launchThetas_.resize(2);
-    launchPhis_.resize(2);    
-    for(int sol=0; sol<2; sol++){
-        arrivalTimes_[sol].resize(numThetaBins_);
-        arrivalThetas_[sol].resize(numThetaBins_);
-        arrivalPhis_[sol].resize(numThetaBins_);
-        launchThetas_[sol].resize(numThetaBins_);
-        launchPhis_[sol].resize(numThetaBins_);        
-        for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
-            arrivalTimes_[sol][thetaBin].resize(numPhiBins_);
-            arrivalThetas_[sol][thetaBin].resize(numPhiBins_);
-            arrivalPhis_[sol][thetaBin].resize(numPhiBins_);
-            launchThetas_[sol][thetaBin].resize(numPhiBins_);
-            launchPhis_[sol][thetaBin].resize(numPhiBins_);            
-        }
-        for(int thetaBin=0; thetaBin<numThetaBins_; thetaBin++){
-            for(int phiBin=0; phiBin<numPhiBins_; phiBin++){
-                arrivalTimes_[sol][thetaBin][phiBin].resize(numAntennas_);
-                arrivalThetas_[sol][thetaBin][phiBin].resize(numAntennas_);
-                arrivalPhis_[sol][thetaBin][phiBin].resize(numAntennas_);
-                launchThetas_[sol][thetaBin][phiBin].resize(numAntennas_);
-                launchPhis_[sol][thetaBin][phiBin].resize(numAntennas_);                
-            }
-        }
-    }
+void RayTraceCorrelator::LoadTables(){
+    
+    // load the arrival time tables
+    this->LoadArrivalTimeTables(dirSolTablePath_, 0);
+    this->LoadArrivalTimeTables(refSolTablePath_, 1);
 }
 
 void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int solNum){
@@ -162,78 +133,56 @@ void RayTraceCorrelator::LoadArrivalTimeTables(const std::string &filename, int 
         sprintf(errorMessage, "Opening of the table (%s) was unsuccessful\n",filename.c_str());
         throw std::runtime_error(errorMessage);
     }
-    
-    // then, try to load the arrival times tables
-    TTree * tTree = (TTree*) infile->Get("tArrivalTimes");
-    if(!tTree){
-        infile->Close();
-        sprintf(errorMessage, "Arrival time tables could not be found in the file (%s)\n",filename.c_str());
-        throw std::runtime_error(errorMessage);
-    }
 
-    // if the file is good, load the variables from the branches
-    int ant, phiBin, thetaBin;
-    double phi, theta;
-    double arrivalTime, arrivalTheta, arrivalPhi, launchTheta, launchPhi;
-    tTree -> SetBranchAddress("ant", & ant);
-    tTree -> SetBranchAddress("phiBin", & phiBin);
-    tTree -> SetBranchAddress("thetaBin", & thetaBin);
-    tTree -> SetBranchAddress("arrivalTime", & arrivalTime);
-    tTree -> SetBranchAddress("arrivalTheta", & arrivalTheta);
-    tTree -> SetBranchAddress("arrivalPhi", & arrivalPhi);
-    tTree -> SetBranchAddress("launchTheta", & launchTheta);
-    tTree -> SetBranchAddress("launchPhi", & launchPhi);    
-    tTree -> SetBranchAddress("phi", & phi);
-    tTree -> SetBranchAddress("theta", & theta);
+    std::map<int, TH2D> this_arrvialTimes;
+    std::map<int, TH2D> this_arrivalThetas;
+    std::map<int, TH2D> this_arrivalPhis;
+    std::map<int, TH2D> this_launchThetas;
+    std::map<int, TH2D> this_launchPhis;
 
-    // and put those values into the vector
-    int nEntries = tTree -> GetEntries();
-    for (int i = 0; i < nEntries; i++) {
-        tTree -> GetEntry(i);
-        arrivalTimes_[solNum][thetaBin][phiBin][ant] = arrivalTime;
-        arrivalThetas_[solNum][thetaBin][phiBin][ant] = arrivalTheta;
-        arrivalPhis_[solNum][thetaBin][phiBin][ant] = arrivalPhi;
-        launchThetas_[solNum][thetaBin][phiBin][ant] = launchTheta;
-        launchPhis_[solNum][thetaBin][phiBin][ant] = launchPhi;        
+    for(int i=0; i<numAntennas_; i++){
+        std::   stringstream ss;
+
+        ss.str(""); ss << "arrival_time_ch_" << i;
+        TH2D *hArrivalTime = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
+        this_arrvialTimes[i] = *hArrivalTime; // de ref the pointer; give me the memory
+
+        ss.str(""); ss << "arrival_theta_ch" << i;
+        TH2D *hArrivalTheta = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
+        this_arrivalThetas[i] = *hArrivalTheta; // de ref the pointer; give me the memory
+
+        ss.str(""); ss << "arrival_phi_ch" << i;
+        TH2D *hArrivalPhi = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
+        this_arrivalPhis[i] = *hArrivalPhi; // de ref the pointer; give me the memory
+
+        ss.str(""); ss << "launch_theta_ch" << i;
+        TH2D *hLaunchTheta = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
+        this_launchThetas[i] = *hLaunchTheta;// de ref the pointer; give me the memory
+        
+        ss.str(""); ss << "launch_phi_ch" << i;
+        TH2D *hLaunchPhi = (TH2D*)((TH2D*)infile->Get(ss.str().c_str())->Clone()); // clone, so this survives the file closure
+        this_launchPhis[i] = *hLaunchPhi; // de ref the pointer; give me the memory
     }
+    arrvialTimes_[solNum] = this_arrvialTimes;
+    arrivalThetas_[solNum] = this_arrivalThetas;
+    arrivalPhis_[solNum] = this_arrivalPhis;
+    launchThetas_[solNum] = this_launchThetas;
+    launchPhis_[solNum] = this_launchPhis;
 
     // close up
     infile->Close();
+
+    // useful to have this around for debugging
+    // for(int i=0; i<numAntennas_; i++){
+    //     std::cout<<"i"<<i<<std::endl;
+    //     TCanvas *c = new TCanvas("", "", 1100, 850);
+    //     arrvialTimes_.at(solNum).at(i).Draw("colz"); // standard colz projection
+    //     char title[500];
+    //     sprintf(title,"timing_ant%d_%d.png", i,solNum);
+    //     c->SaveAs(title);
+    //     delete c;
+    // }
 }
-
-RayTraceCorrelator::~RayTraceCorrelator()
-{
-	//Default destructor
-}
-
-RayTraceCorrelator::RayTraceCorrelator(int stationID,
-    int numAntennas,
-    double radius, 
-    double angularSize,
-    const std::string &dirSolTablePath, 
-    const std::string &refSolTablePath
-    ){
-
-    // initialize and sanitize the input immediately
-    // afterwards, we can (safely!) only refer to private variables
-    this->SetAngularConfig(angularSize);
-    this->SetupStationInfo(stationID, numAntennas);
-    this->SetRadius(radius);
-    this->SetTablePaths(dirSolTablePath, refSolTablePath);
-
-}
-
-void RayTraceCorrelator::LoadTables(){
-    char errorMessage[400];
-    
-    // load the arrival time tables
-    this->ConfigureArrivalVectors();
-    this->LoadArrivalTimeTables(dirSolTablePath_, 0);
-    this->LoadArrivalTimeTables(refSolTablePath_, 1);
-}
-
-
-
 std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     int stationID,
     AraGeomTool *geomTool,
@@ -277,6 +226,80 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
         }
     }
     return pairs;
+}
+
+std::pair< 
+    std::vector< std::vector< std::vector< int > > >,
+    std::vector< std::vector< std::vector< double > > > > RayTraceCorrelator::GetArrivalDelays(std::map<int, std::vector<int > > pairs){
+
+    std::vector< std::vector< std::vector< double > > > delays;
+    std::vector< std::vector< std::vector< int > > > bins;
+
+    for(int solNum=0; solNum<2; solNum++){
+
+        std::vector< std::vector<double> > delays_this_sol;
+        std::vector< std::vector<int> > bins_this_sol;
+
+        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
+            int pairNum = iter->first;
+            int ant1 = iter->second[0];
+            int ant2 = iter->second[1];
+
+            std::vector<double> this_delays;
+            std::vector<int> this_global_bins;
+
+            for(int phiBin = dummyMap->GetXaxis()->GetFirst(); phiBin <= dummyMap->GetXaxis()->GetLast(); phiBin++){
+                for(int thetaBin = dummyMap->GetYaxis()->GetFirst(); thetaBin <= dummyMap->GetYaxis()->GetLast(); thetaBin++){
+
+                    int globalBin  = dummyMap->GetBin(phiBin, thetaBin);
+                    double arrival_time1 = arrvialTimes_.at(solNum).at(ant1).GetBinContent(globalBin);
+                    double arrival_time2 = arrvialTimes_.at(solNum).at(ant2).GetBinContent(globalBin);
+                    double dt = arrival_time1 - arrival_time2;
+
+                    // sanity check
+                    if (arrival_time1 < -100 || arrival_time2 < -100) {
+                        dt = -1E6;  // large negative number
+                    }
+
+                    this_global_bins.push_back(globalBin);
+                    this_delays.push_back(dt);
+                }
+            }
+
+            // follow this method (https://stackoverflow.com/questions/17074324/how-can-i-sort-two-vectors-in-the-same-way-with-criteria-that-uses-only-one-of)
+            // for reordering the vectors
+
+            // first, work out the permutation p that is required to reorder 
+            // the delay array from smallest to largest
+            std::vector<std::size_t> p(this_delays.size());
+            std::iota(p.begin(), p.end(), 0);
+            std::sort(p.begin(), p.end(),
+                    [&](std::size_t i, std::size_t j) { return this_delays[i] < this_delays[j]; });
+
+            // and now reorder both the bin indices and the delays by that permutation
+            std::vector<int> sorted_global_bins(this_global_bins.size());
+            std::transform(p.begin(), p.end(), sorted_global_bins.begin(),
+                [&](std::size_t i){return this_global_bins[i];});
+            std::vector<double> sorted_delays(this_delays.size());
+            std::transform(p.begin(), p.end(), sorted_delays.begin(),
+                [&](std::size_t i){return this_delays[i];});
+
+            delays_this_sol.push_back(sorted_delays);
+            bins_this_sol.push_back(sorted_global_bins);
+
+        }
+        delays.push_back(delays_this_sol);
+        bins.push_back(bins_this_sol);
+    }
+
+    std::pair< 
+        std::vector< std::vector< std::vector< int > > >,
+        std::vector< std::vector< std::vector< double > > > > delay_info;
+
+    delay_info.first = bins;
+    delay_info.second = delays;
+    return delay_info;
+
 }
 
 std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
@@ -358,110 +381,6 @@ std::vector<TGraph> RayTraceCorrelator::GetCorrFunctions(
     return corrFunctions;
 }
 
-std::pair< 
-    std::vector< std::vector< std::vector< int > > >,
-    std::vector< std::vector< std::vector< double > > > > RayTraceCorrelator::GetArrivalDelays(std::map<int, std::vector<int > > pairs){
-
-    std::vector< std::vector< std::vector< double > > > delays;
-    std::vector< std::vector< std::vector< int > > > bins;
-
-    for(int solNum=0; solNum<2; solNum++){
-
-        std::vector< std::vector<double> > delays_this_sol;
-        std::vector< std::vector<int> > bins_this_sol;
-
-        for(auto iter = pairs.begin(); iter != pairs.end(); ++iter){
-            int pairNum = iter->first;
-            int ant1 = iter->second[0];
-            int ant2 = iter->second[1];
-
-            std::vector<double> this_delays;
-            std::vector<int> this_global_bins;
-
-            for(int phiBin=0; phiBin < this->numPhiBins_; phiBin++){
-                for(int thetaBin=0; thetaBin < this->numThetaBins_; thetaBin++){
-                    
-                    double arrival_time1 = LookupArrivalTimes(ant1, solNum, thetaBin, phiBin);
-                    double arrival_time2 = LookupArrivalTimes(ant2, solNum, thetaBin, phiBin);
-                    double dt = arrival_time1 - arrival_time2;
-
-                    // sanity check
-                    if (arrival_time1 < -100 || arrival_time2 < -100) {
-                        dt = -1E6;  // large negative number
-                    }
-
-                    double this_theta = this->thetaAngles_[thetaBin];
-                    double this_phi = this->phiAngles_[phiBin];
-                    int globalBin = this->ConvertAnglesToTH2DGlobalBin(this_theta, this_phi);
-
-                    this_global_bins.push_back(globalBin);
-                    this_delays.push_back(dt);
-                }
-            }
-
-            // follow this method (https://stackoverflow.com/questions/17074324/how-can-i-sort-two-vectors-in-the-same-way-with-criteria-that-uses-only-one-of)
-            // for reordering the vectors
-
-            // first, work out the permutation p that is required to reorder 
-            // the delay array from smallest to largest
-            std::vector<std::size_t> p(this_delays.size());
-            std::iota(p.begin(), p.end(), 0);
-            std::sort(p.begin(), p.end(),
-                    [&](std::size_t i, std::size_t j) { return this_delays[i] < this_delays[j]; });
-
-            // and now reorder both the bin indices and the delays by that permutation
-            std::vector<int> sorted_global_bins(this_global_bins.size());
-            std::transform(p.begin(), p.end(), sorted_global_bins.begin(),
-                [&](std::size_t i){return this_global_bins[i];});
-            std::vector<double> sorted_delays(this_delays.size());
-            std::transform(p.begin(), p.end(), sorted_delays.begin(),
-                [&](std::size_t i){return this_delays[i];});
-
-            delays_this_sol.push_back(sorted_delays);
-            bins_this_sol.push_back(sorted_global_bins);
-
-        }
-        delays.push_back(delays_this_sol);
-        bins.push_back(bins_this_sol);
-    }
-
-    std::pair< 
-        std::vector< std::vector< std::vector< int > > >,
-        std::vector< std::vector< std::vector< double > > > > delay_info;
-
-    delay_info.first = bins;
-    delay_info.second = delays;
-    return delay_info;
-
-}
-
-
-void RayTraceCorrelator::LookupArrivalAngles(
-    int ant, int solNum,
-    int thetaBin, int phiBin,
-    double &arrivalTheta, double &arrivalPhi
-){
-    arrivalTheta = this->arrivalThetas_[solNum][thetaBin][phiBin][ant];
-    arrivalPhi = this->arrivalPhis_[solNum][thetaBin][phiBin][ant];
-}
-
-void RayTraceCorrelator::LookupLaunchAngles(
-    int ant, int solNum,
-    int thetaBin, int phiBin,
-    double &launchTheta, double &launchPhi
-){
-    launchTheta = this->launchThetas_[solNum][thetaBin][phiBin][ant];
-    launchPhi = this->launchPhis_[solNum][thetaBin][phiBin][ant];
-}
-
-double RayTraceCorrelator::LookupArrivalTimes(
-    int ant, int solNum,
-    int thetaBin, int phiBin
-){
-    return this->arrivalTimes_[solNum][thetaBin][phiBin][ant];
-}
-
-
 TH2D RayTraceCorrelator::GetInterferometricMap(
     const std::map<int, std::vector<int> > pairs,
     const std::vector<TGraph> &corrFunctions,
@@ -515,7 +434,7 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
 
         // for performance reasons, we do the correlation right here
         // so we draw out the x and y values of the correlation function to be used later
-        int numPoints = corrFunctions[pairNum].GetN();
+        const int numPoints = corrFunctions[pairNum].GetN(); // this won't change for as long as it's alive
         auto xVals = corrFunctions[pairNum].GetX();
         auto yVals = corrFunctions[pairNum].GetY();
         double dx = xVals[1] - xVals[0];
@@ -533,9 +452,13 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
             double dt = it_delays[iterBin];
 
             p0 = int((dt - xVals[0]) / dx);
-            if (p0 < 0) p0 = 0;
-            if (p0 >= numPoints) p0 = numPoints - 2;
-            corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+            if(p0<0 || p0>=numPoints){
+                // outside the region of support, force it to zero
+                corrVal = 0;
+            }
+            else{
+                corrVal = (yVals[p0 + 1] - yVals[p0]) * ((dt - xVals[p0]) / (xVals[p0 + 1]-xVals[p0])) + yVals[p0];
+            }
             summedCorr[globalBin]+=corrVal *scale;
 
         }
@@ -548,4 +471,50 @@ TH2D RayTraceCorrelator::GetInterferometricMap(
     }
 
     return histMap;
+}
+
+int RayTraceCorrelator::ValidateAnglesGetGlobalBinNumber(double theta, double phi){
+    if(abs(theta) > 90 || isnan(theta)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -90 to 90\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    if(abs(phi)>180 || isnan(phi)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -180 to 180\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    int globalBin  = dummyMap->FindBin(phi, theta);
+    return globalBin;
+}
+
+double RayTraceCorrelator::LookupArrivalTime(
+    int ant, int solNum,
+    double theta, double phi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    double arrival_time = arrvialTimes_.at(solNum).at(ant).GetBinContent(globalBin);
+    return arrival_time;
+}
+
+void RayTraceCorrelator::LookupArrivalAngles(
+    int ant, int solNum,
+    double theta, double phi,
+    double &arrivalTheta, double &arrivalPhi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    arrivalTheta = arrivalThetas_.at(solNum).at(ant).GetBinContent(globalBin);
+    arrivalPhi = arrivalPhis_.at(solNum).at(ant).GetBinContent(globalBin);
+}
+
+void RayTraceCorrelator::LookupLaunchAngles(
+    int ant, int solNum,
+    double theta, double phi,
+    double &launchTheta, double &launchPhi
+){
+    int globalBin = ValidateAnglesGetGlobalBinNumber(theta, phi);
+    launchTheta = launchThetas_.at(solNum).at(ant).GetBinContent(globalBin);
+    launchPhi = launchPhis_.at(solNum).at(ant).GetBinContent(globalBin);
 }
