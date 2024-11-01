@@ -22,6 +22,7 @@ class RayTraceCorrelator : public TObject
         std::string refSolTablePath_;               ///< Full path to the reflected/refracted solution tables
         std::shared_ptr<TH2D> dummyMap;             ///< A dummy 2D histogram
 
+
         // The following setter functions (which nominally do trivial things)
         // are included to enable sanity checks on the arguments 
         // e.g. ensuring radii are positive, station IDs are supported, etc.

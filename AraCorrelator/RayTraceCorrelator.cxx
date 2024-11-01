@@ -69,6 +69,24 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     dummyMap = std::shared_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
 }
 
+int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
+
+    if(abs(theta) > 90 || isnan(theta)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested theta angle (%e) is not supported. Range should be -90 to 90\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    if(abs(phi)>180 || isnan(phi)){
+        char errorMessage[400];
+        sprintf(errorMessage,"Requested phi angle (%e) is not supported. Range should be -180 to 180\n", theta);
+        throw std::invalid_argument(errorMessage);
+    }
+
+    int globalBin = this->internalMap->FindBin(phi, theta);
+    return globalBin;
+}
+
 void RayTraceCorrelator::SetRadius(double radius){
     if(radius<0 || isnan(radius)){
         char errorMessage[400];
