@@ -83,7 +83,7 @@ int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
         throw std::invalid_argument(errorMessage);
     }
 
-    int globalBin = this->internalMap->FindBin(phi, theta);
+    int globalBin = this->dummyMap->FindBin(phi, theta);
     return globalBin;
 }
 

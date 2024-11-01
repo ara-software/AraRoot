@@ -155,6 +155,9 @@ class RayTraceCorrelator : public TObject
         */        
         int ValidateAnglesGetGlobalBinNumber(double theta, double phi);
 
+        int ConvertAnglesToTH2DGlobalBin(double theta, double phi);
+
+
         //! function to get lookup the arrival time information
         /*!
             \param ant antenna index

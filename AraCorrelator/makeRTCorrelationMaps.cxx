@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
     // setup the paths to our ray tracing tables
     double radius = 300.;
-    double angular_size = 5.;
+    double angular_size = 1.;
     int iceModel = 50;
     char dirPath[500];
     char refPath[500];
