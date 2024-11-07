@@ -66,7 +66,7 @@ void RayTraceCorrelator::SetAngularConfig(double angularSize){
     angularSize_ = angularSize;
     numPhiBins_ = int(360. / angularSize);
     numThetaBins_ = int(180. / angularSize);
-    dummyMap = std::shared_ptr<TH2D>(new TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
+    dummyMap = std::make_shared<TH2D>(TH2D("","",numPhiBins_, -180, 180, numThetaBins_, -90, 90));
 }
 
 int RayTraceCorrelator::ConvertAnglesToTH2DGlobalBin(double theta, double phi){
@@ -518,3 +518,5 @@ void RayTraceCorrelator::LookupLaunchAngles(
     launchTheta = launchThetas_.at(solNum).at(ant).GetBinContent(globalBin);
     launchPhi = launchPhis_.at(solNum).at(ant).GetBinContent(globalBin);
 }
+
+
