@@ -50,7 +50,7 @@ class RayTraceCorrelator : public TObject
         double GetAngularSize(){ return angularSize_; }
         double GetRadius(){ return radius_; }
         double GetNumAntennas(){ return numAntennas_; }
-        std::shared_ptr<TH2D> GetTemplateMap(){return dummyMap;}
+        std::weak_ptr<TH2D> GetTemplateMap(){return dummyMap;}
 
 
         //! constructor for the RayTraceCorrelator
@@ -249,3 +249,6 @@ class RayTraceCorrelator : public TObject
 
 };
 #endif //RAYTRACECORRELATOR_H
+
+
+
