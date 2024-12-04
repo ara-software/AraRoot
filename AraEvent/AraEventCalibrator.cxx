@@ -1614,24 +1614,27 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 TDecompSVD svd(M);
                 Bool_t ok;
                 TVectorD A = svd.Solve(b, ok);
-
-                // ensure we don't change the mean of the trace
-                double blockMean = 0.;
-                for(int blk = 0; blk < num_block; ++blk)
-                    blockMean += A(blk);
-                blockMean /= num_block;
-                A -= blockMean;   
             
                 // cleanup
                 delete gr;
                 delete grInt;
                 delete [] spec;
 
+                // get mean of original trace
+                const double oldMean = std::accumulate(voltMapIt->second.begin(),
+                                                       voltMapIt->second.end(), 0.0) / (double)total_samples;
+
                 // remove block offsets from original trace
                 for(int i = 0; i < total_samples; ++i) {
                     const int blk = blkList[i] - blkList.front();
                     voltMapIt->second[i] -= A(blk);                   
                 }
+
+                // restore the trace's mean
+                const double newMean = std::accumulate(voltMapIt->second.begin(),
+                                                       voltMapIt->second.end(), 0.0) / (double)total_samples;
+                for(int i = 0; i < total_samples; ++i)
+                    voltMapIt->second[i] += oldMean - newMean;
                     
             } 
         }
