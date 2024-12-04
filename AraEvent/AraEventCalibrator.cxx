@@ -1614,7 +1614,14 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 TDecompSVD svd(M);
                 Bool_t ok;
                 TVectorD A = svd.Solve(b, ok);
-                
+
+                // ensure we don't change the mean of the trace
+                double blockMean = 0.;
+                for(int blk = 0; blk < num_block; ++blk)
+                    blockMean += A(blk);
+                blockMean /= num_block;
+                A -= blockMean;   
+            
                 // cleanup
                 delete gr;
                 delete grInt;
