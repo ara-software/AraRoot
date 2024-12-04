@@ -1182,6 +1182,8 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
             voltMapIt=theEvent->fVolts.find(chanId);
 
             int samp=0;
+            const int blockIndex = (blockList->at(chanId).size() > 0)?
+                                      blockList->at(chanId).back()+1 : 0; //< Increment the block index (need to do this since block numbers aren't always ordered, surprisingly...)
             //! Now loop over the 64 samples
             for(shortIt=vecVecIt->begin();
                 shortIt!=vecVecIt->end();
@@ -1191,7 +1193,7 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
                 timeMapIt->second.push_back(time); ///< Filling with time
                 voltMapIt->second.push_back((*shortIt)); ///< Filling with volts
                 sampleList->at(chanId).push_back(block * samples_per_block + samp); ///< Filling with sample number. It is needed for pedestal subtraction and voltage calibration
-                blockList->at(chanId).push_back(block); ///< Filling with the block number of sample. Needed for block offset correction
+                blockList->at(chanId).push_back(blockIndex); ///< Filling with the block number of sample. Needed for block offset correction
                 samp++;
 
             }
@@ -1536,7 +1538,7 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 
                 const int num_block = int(blockStarts.size());
                 std::vector<double> dT(num_block); // width of block
-                for(int i = 0; i < num_block; ++i)
+                for(int i = 0; i < num_block; ++i) 
                     dT[i] = blockEnds[i] - blockStarts[i]; 
 
                 // interpolate onto regular 0.5 ns timestep
@@ -1613,7 +1615,7 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 // now we solve the equation M*A = b, where A is a vector of block offset amplitudes
                 TDecompSVD svd(M);
                 Bool_t ok;
-                TVectorD A = svd.Solve(b, ok);
+                const TVectorD A = svd.Solve(b, ok);
             
                 // cleanup
                 delete gr;
@@ -1626,7 +1628,7 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
 
                 // remove block offsets from original trace
                 for(int i = 0; i < total_samples; ++i) {
-                    const int blk = blkList[i] - blkList.front();
+                    const int blk = blkList[i] - blkList[0];
                     voltMapIt->second[i] -= A(blk);                   
                 }
 
