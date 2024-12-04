@@ -13,6 +13,9 @@
 #include "araSoft.h"
 #include "TMath.h"
 #include "TGraph.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "TDecompSVD.h"
 #include "FFTtools.h"
 #include <iostream>
 #include <fstream>
@@ -41,6 +44,19 @@ Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
         || calType == kLatestCalibWithOutTrimFirstBlock) return kFALSE;
     if(calType < kVoltageTime) return kFALSE;
     return kTRUE;
+}
+
+/*!
+    Returns if a calibration type should or should not correct block offsets in a waveform.
+*/
+/*!
+    \param calType A calibration mode listed in the EAraCalType
+    \return boolean True: perform the block offset correction, False: skip it
+*/
+Bool_t AraCalType::hasBlockOffsetCorrection(AraCalType::AraCalType_t calType)
+{
+    if(calType == kLatestCalib) return kTRUE;
+    return kFALSE;
 }
 
 //! Returns if a calibration type should or should not invert the RF channels = 0,4,8 in A3, 27-09-2021 -MK-
@@ -953,6 +969,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
     std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
     std::vector<std::vector<int> > *sampleList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
+    std::vector<std::vector<int> > *blockList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
     std::vector<std::vector<int> > *capArrayList = new std::vector<std::vector<int> >(DDA_PER_ATRI, std::vector<int>(0)); ///< pointer for 'block number' modulo 2
     Bool_t hasTrimFirstBlk = false;
     Bool_t hasTimingCalib = false; 
@@ -970,14 +987,14 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     }
 
     //! 3rd step. Converts DAQ data format to Electronic channel format
-    UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList);
+    UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList);
 
     /*! 
-	4th step. Common mode
-	This function is subtracting DDA ch5 value from DDA ch1~4
-    But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
-	Since it will only work when the number of samples between DDA ch 1~4 and ch 5 are the same,
-	It is placed before TrimFirstBlock() and TimingCalibrationAndBadSampleReomval()
+    4th step. Common mode
+    This function is subtracting DDA ch5 value from DDA ch1~4
+      But the purpose of this function is unknown. And the return of the hasCommonMode (calType) is always kFalse
+    Since it will only work when the number of samples between DDA ch 1~4 and ch 5 are the same,
+    It is placed before TrimFirstBlock() and TimingCalibrationAndBadSampleReomval()
     */
     if(hasCommonMode(calType)) {
         CommonMode(theEvent, voltMapIt);
@@ -991,13 +1008,13 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! 5th step. Erase first block that currupted by trigger
     //! Apply conditioner function here
     if(hasTrimFirstBlock(calType)) {
-        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTimingCalib);
+        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList, hasTimingCalib);
     }
 
     //! 6th step. Timing calibration and bad sample removal
     //! This step calibrates the time of each sample and only selecting the samples that have good performance
     if(hasBinWidthCalib(calType)){ 
-        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, capArrayList, hasTrimFirstBlk);    
+        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList, hasTrimFirstBlk);    
     }
     
     //! 7th step. Pedestal subtraction
@@ -1072,12 +1089,18 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         ApplyCableDelay(theEvent, timeMapIt, unixtime, thisStationId);
     }
 
+    //! 13th step. Block offset correction
+    //! This step corrects any remaining offset between blocks
+    if(hasBlockOffsetCorrection(calType)) {
+        CorrectBlockOffset(theEvent, voltMapIt, timeMapIt, blockList);
+    }
+    
     //! extra step. return sample index
     if(hasSampleIndex(calType)){
         ReturnSampleIndex(theEvent, voltMapIt, sampleList);
     }
  
-    delete sampleList, capArrayList; ///< delete the pointer
+    delete sampleList, capArrayList, blockList; ///< delete the pointer
 
     // fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG                        
 }
@@ -1088,10 +1111,11 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
     \param timeMapIt the iterator referring to the time elements in the 2d map container
     \param sampleList the pointer of WF sample numbers
+    \param blockList the pointer of block number of each sample
     \param capArrayList the pointer of 'block number' modulo 2
     \return void
 */
-void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList)
+void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *blockList, std::vector<std::vector<int> > *capArrayList)
 {
 
     int samples_per_block = SAMPLES_PER_BLOCK;
@@ -1158,6 +1182,8 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
             voltMapIt=theEvent->fVolts.find(chanId);
 
             int samp=0;
+            const int blockIndex = (blockList->at(chanId).size() > 0)?
+                                      blockList->at(chanId).back()+1 : 0; //< Increment the block index (need to do this since block numbers aren't always ordered, surprisingly...)
             //! Now loop over the 64 samples
             for(shortIt=vecVecIt->begin();
                 shortIt!=vecVecIt->end();
@@ -1167,6 +1193,7 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
                 timeMapIt->second.push_back(time); ///< Filling with time
                 voltMapIt->second.push_back((*shortIt)); ///< Filling with volts
                 sampleList->at(chanId).push_back(block * samples_per_block + samp); ///< Filling with sample number. It is needed for pedestal subtraction and voltage calibration
+                blockList->at(chanId).push_back(blockIndex); ///< Filling with the block number of sample. Needed for block offset correction
                 samp++;
 
             }
@@ -1188,10 +1215,11 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
     \param timeMapIt the iterator referring to the time elements in the 2d map container
     \param sampleList the pointer of WF sample numbers
     \param capArrayList the pointer of 'block number' modulo 2
+    \param blockList the pointer of block number of each sample
     \param hasTrimFirstBlk boolean statement that whether first block trimming is already performed or not
     \return boolean true or false
 */
-Bool_t AraEventCalibrator::TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
+Bool_t AraEventCalibrator::TimingCalibrationAndBadSampleReomval(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *blockList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTrimFirstBlk)
 {
  
     int capArrayNumber = 0;
@@ -1213,6 +1241,9 @@ Bool_t AraEventCalibrator::TimingCalibrationAndBadSampleReomval(UsefulAtriStatio
                 std::vector<int> tempSamps;
                 tempSamps = sampleList->at(chanId);
                 sampleList->at(chanId).clear();
+                std::vector<int> tempBlocks;
+                tempBlocks = blockList->at(chanId);
+                blockList->at(chanId).clear();
            
                 int numBlock = int(numPoints/samples_per_block); 
                 for(int blk=0; blk<numBlock; blk++){
@@ -1233,6 +1264,7 @@ Bool_t AraEventCalibrator::TimingCalibrationAndBadSampleReomval(UsefulAtriStatio
                         timeMapIt->second.push_back(tempTimes[trim]); ///< Filling with time
                         voltMapIt->second.push_back(tempVolts[voltIndex[trim]]); ///< Filling with volt
                         sampleList->at(chanId).push_back(tempSamps[voltIndex[trim]]); ///< Filling with sample index
+                        blockList->at(chanId).push_back(tempBlocks[voltIndex[trim]]); ///< Filling with block of sample
                     }
                 }
             } 
@@ -1404,11 +1436,12 @@ void AraEventCalibrator::ApplyCableDelay(UsefulAtriStationEvent *theEvent, std::
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
     \param timeMapIt the iterator referring to the time elements in the 2d map container
     \param sampleList the pointer of WF sample number
+    \param blockList the pointer of block number of each sample
     \param capArrayList the pointer of  'block number' modulo 2
     \param hasTimingCalib boolean statement that whether TimingCalibrationAndBadSampleReomval is already performed or not
     \return boolean true or false
 */
-Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib)
+Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *sampleList, std::vector<std::vector<int> > *blockList, std::vector<std::vector<int> > *capArrayList, Bool_t hasTimingCalib)
 {
 
     int first_block_len = 0;
@@ -1458,9 +1491,157 @@ Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std:
                 voltMapIt->second.erase(voltMapIt->second.begin(),voltMapIt->second.begin()+first_block_len); ///< delete the times in the first block
                 timeMapIt->second.erase(timeMapIt->second.begin(),timeMapIt->second.begin()+first_block_len); ///< delete the ADC (or volt) in the first block
                 sampleList->at(chanId).erase(sampleList->at(chanId).begin(),sampleList->at(chanId).begin()+first_block_len); ///< delete the samples in the first block
+                blockList->at(chanId).erase(blockList->at(chanId).begin(),blockList->at(chanId).begin()+first_block_len); ///< delete the samples in the first block
             }
         }
     } return !hasTooFewBlocks;
+}
+
+//! Correct block offsets
+/*!
+    \param theEvent the useful atri event pointer
+    \param voltMapIt the iterator referring to the voltage elements in the 2d map container
+    \param timeMapIt the iterator referring to the time elements in the 2d map container
+    \param blockList the pointer of block number of each sample
+    \return void
+*/
+void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, std::map< Int_t, std::vector <Double_t> >::iterator &voltMapIt, std::map< Int_t, std::vector <Double_t> >::iterator &timeMapIt, std::vector<std::vector<int> > *blockList)
+{
+    for(int dda=0; dda<DDA_PER_ATRI; dda++) {
+        
+        for(Int_t chan=0; chan<RFCHAN_PER_DDA/2; chan++) { // only need to correct the used channels
+            Int_t chanId=chan+RFCHAN_PER_DDA*dda;
+            voltMapIt=theEvent->fVolts.find(chanId);
+            timeMapIt=theEvent->fTimes.find(chanId);
+            std::vector<int>& blkList = blockList->at(chanId);
+            if(voltMapIt!=theEvent->fVolts.end()) {
+                int total_samples = std::distance(voltMapIt->second.begin(), voltMapIt->second.end());
+                if(total_samples != int(blkList.size()))
+                    throw std::runtime_error("Block list length not equal to number of samples!");
+
+                // create graph of calibrated trace
+                std::vector<double> tmpT(timeMapIt->second.begin(), timeMapIt->second.end());
+                std::vector<double> tmpV(voltMapIt->second.begin(), voltMapIt->second.end());
+
+                
+                // find block edges
+                std::vector<double> blockStarts; // times of the block starts
+                std::vector<double> blockEnds; // times of the block ends
+                blockStarts.push_back(tmpT[0]);
+                for(int i = 1; i < total_samples; ++i) {
+                    if(blkList[i] != blkList[i-1]) {
+                        blockStarts.push_back(tmpT[i]);
+                        blockEnds.push_back(tmpT[i]);
+                    }
+                }
+                blockEnds.push_back(tmpT[total_samples-1]);
+                
+                const int num_block = int(blockStarts.size());
+                std::vector<double> dT(num_block); // width of block
+                for(int i = 0; i < num_block; ++i) 
+                    dT[i] = blockEnds[i] - blockStarts[i]; 
+
+                // interpolate onto regular 0.5 ns timestep
+                TGraph* gr = new TGraph(total_samples, &tmpT[0], &tmpV[0]); 
+                const double dt = 0.5; // ns
+                TGraph* grInt = FFTtools::getInterpolatedGraph(gr, dt);
+                const int len = grInt->GetN();
+                double* trace = grInt->GetY();
+                
+                // transform to frequency space 
+                FFTWComplex* spec = FFTtools::doFFT(len, trace);                
+ 
+                // get spectrum data to fit and precalculate constants for fit
+                const int nFreq = len/2+1;
+                const double dFreq = 1./dt/len; // GHz
+                const double lowPassFreq = 50.e-3; // GHz 
+
+                // calculate the "data" to fit to
+                std::vector<double> angFreq;
+                std::vector<double> specMag;
+                std::vector<double> specPhase;
+                for(int i = 0; i < nFreq; ++i) {
+                    const double thisFreq = i*dFreq;
+                    if(thisFreq <= lowPassFreq) { // only use low frequency data
+                        angFreq.push_back(2.*M_PI*thisFreq);
+
+                        specMag.push_back(spec[i].getAbs());
+                        specPhase.push_back(spec[i].getPhase());
+                    }
+                }
+                
+                // calculate the "model" whose parameters we solve for
+                const int nAngFreq = int(angFreq.size()); // number of frequencies in low frequency data
+                std::vector< std::vector<double> > constMag(num_block, std::vector<double>(nAngFreq));
+                std::vector< std::vector<double> > constPhase(num_block, std::vector<double>(nAngFreq));
+                for(int b = 0; b < num_block; ++b) {
+                    const double blockWidth = dT[b];
+                    const double blockStartShift = blockStarts[b] - blockStarts[0];
+                    for(int i = 0; i < nAngFreq; ++i) {
+                        const double thisAngFreq = angFreq[i];
+
+                        if(thisAngFreq == 0)
+                            constMag[b][i] = blockWidth/dt;
+                        else
+                            constMag[b][i] = TMath::Sin(blockWidth*thisAngFreq/2.)/TMath::Sin(dt*thisAngFreq/2.); 
+                        constPhase[b][i] = -thisAngFreq*(blockWidth/2.+blockStartShift);
+                    }
+                }
+
+                // get block offsets
+                // we do this by minimizing the squared error between the low passed spectrum and the block offsets
+                // this can be done by solving a matrix equation, so we start by setting that up
+                // note that the squared error has been simplified here so it can be written directly in terms of real numbers
+                TMatrixDSym M(num_block);
+                TVectorD b(num_block);
+                for(int b1 = 0; b1 < num_block; ++b1) {
+                    
+                    for(int b2 = 0; b2 <= b1; ++b2) {
+                        
+                        std::vector<double>& constMag2 = constMag[b2];
+                        std::vector<double>& constPhase2 = constPhase[b2];
+                        double valM = 0.;
+                        for(int i = 0; i < nAngFreq; ++i)
+                            valM += constMag[b1][i] * constMag[b2][i] * TMath::Cos(constPhase[b1][i] - constPhase[b2][i]);
+                        M(b1, b2) = valM;
+                    }
+                    
+                    double valb = 0.;
+                    for(int i = 0; i < nAngFreq; ++i)
+                        valb += specMag[i] * constMag[b1][i] * TMath::Cos(specPhase[i] - constPhase[b1][i]);
+                    b(b1) = valb;
+                }               
+
+                // now we solve the equation M*A = b, where A is a vector of block offset amplitudes
+                TDecompSVD svd(M);
+                Bool_t ok;
+                const TVectorD A = svd.Solve(b, ok);
+            
+                // cleanup
+                delete gr;
+                delete grInt;
+                delete [] spec;
+
+                // get mean of original trace
+                const double oldMean = std::accumulate(voltMapIt->second.begin(),
+                                                       voltMapIt->second.end(), 0.0) / (double)total_samples;
+
+                // remove block offsets from original trace
+                for(int i = 0; i < total_samples; ++i) {
+                    const int blk = blkList[i] - blkList[0];
+                    voltMapIt->second[i] -= A(blk);                   
+                }
+
+                // restore the trace's mean
+                const double newMean = std::accumulate(voltMapIt->second.begin(),
+                                                       voltMapIt->second.end(), 0.0) / (double)total_samples;
+                for(int i = 0; i < total_samples; ++i)
+                    voltMapIt->second[i] += oldMean - newMean;
+                    
+            } 
+        }
+    }
+
 }
 
 /*!
