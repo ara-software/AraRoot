@@ -16,6 +16,7 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 #include "TDecompSVD.h"
+#include "TDecompChol.h"
 #include "FFTtools.h"
 #include <iostream>
 #include <fstream>
@@ -55,7 +56,9 @@ Bool_t AraCalType::hasTrimFirstBlock(AraCalType::AraCalType_t calType)
 */
 Bool_t AraCalType::hasBlockOffsetCorrection(AraCalType::AraCalType_t calType)
 {
-    if(calType == kLatestCalib) return kTRUE;
+    if(calType == kLatestCalib
+        || calType == kLatestCalibWithOutTrimFirstBlock
+        || calType == kLatestCalibWithOutZeroMean) return kTRUE;
     return kFALSE;
 }
 
@@ -121,7 +124,8 @@ Bool_t AraCalType::hasCableDelays(AraCalType::AraCalType_t calType)
         || calType == kOnlyADCWithOut1stBlockAndBadSamples
         || calType == kJustPedWithOut1stBlockAndBadSamples
         || calType == kOnlySampWithOut1stBlockAndBadSamples
-        || calType == kLatestCalibWithOutTrimFirstBlock){
+        || calType == kLatestCalibWithOutTrimFirstBlock
+        || calType == kLatestCalib_NoBlockCorrection){
 
         return kTRUE;
     }
@@ -153,7 +157,8 @@ Bool_t AraCalType::hasInterleaveCalib(AraCalType::AraCalType_t calType)
         || calType == kSecondCalibPlusCablesUnDiplexed
         || calType == kLatestCalib
         || calType == kLatestCalib14to20_Bug
-        || calType == kLatestCalibWithOutTrimFirstBlock){
+        || calType == kLatestCalibWithOutTrimFirstBlock
+        || calType == kLatestCalib_NoBlockCorrection){
 
         return kTRUE;
     }
@@ -1093,8 +1098,8 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! This step corrects any remaining offset between blocks
     if(hasBlockOffsetCorrection(calType)) {
         CorrectBlockOffset(theEvent, voltMapIt, timeMapIt, blockList);
-    }
-    
+    } 
+   
     //! extra step. return sample index
     if(hasSampleIndex(calType)){
         ReturnSampleIndex(theEvent, voltMapIt, sampleList);
@@ -1182,8 +1187,7 @@ void AraEventCalibrator::UnpackDAQFormatToElecChanFormat(UsefulAtriStationEvent 
             voltMapIt=theEvent->fVolts.find(chanId);
 
             int samp=0;
-            const int blockIndex = (blockList->at(chanId).size() > 0)?
-                                      blockList->at(chanId).back()+1 : 0; //< Increment the block index (need to do this since block numbers aren't always ordered, surprisingly...)
+            const int blockIndex = (blockList->at(chanId).size() > 0)? blockList->at(chanId).back()+1 : 0; //< Increment the block index (need to do this since block numbers aren't always ordered, surprisingly...)
             //! Now loop over the 64 samples
             for(shortIt=vecVecIt->begin();
                 shortIt!=vecVecIt->end();
@@ -1499,6 +1503,17 @@ Bool_t AraEventCalibrator::TrimFirstBlock(UsefulAtriStationEvent *theEvent, std:
 
 //! Correct block offsets
 /*!
+    This function models each block offset as a rectangle function in the time-domain, solving for the amplitude of the function in the
+    frequency-domain. It does this by transforming a sum of rectangle functions into the frequency-domain and setting their amplitudes to
+    minimize the squared error between this model and the low frequency spectrum of the waveform. Only the low frequency spectrum is used
+    in order to minimize the impact on real signals. Each channel's block offsets are fit independently.
+
+    Since the model for block offsets is linear in their amplitudes, the squared error is convex in the amplitudes and we can solve for the optimal 
+    amplitudes exactly (by taking the derivative of the squared error and setting it to zero). This results in a system of linear equations which 
+    can be solved via a matrix equation: M.A = b, where M (a matrix) and b (a vector) are the constants of the system of linear equations which need 
+    to be solved and A is the vector of block offset amplitudes to be solved for.
+*/
+/*!
     \param theEvent the useful atri event pointer
     \param voltMapIt the iterator referring to the voltage elements in the 2d map container
     \param timeMapIt the iterator referring to the time elements in the 2d map container
@@ -1519,11 +1534,9 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 if(total_samples != int(blkList.size()))
                     throw std::runtime_error("Block list length not equal to number of samples!");
 
-                // create graph of calibrated trace
                 std::vector<double> tmpT(timeMapIt->second.begin(), timeMapIt->second.end());
                 std::vector<double> tmpV(voltMapIt->second.begin(), voltMapIt->second.end());
 
-                
                 // find block edges
                 std::vector<double> blockStarts; // times of the block starts
                 std::vector<double> blockEnds; // times of the block ends
@@ -1541,8 +1554,10 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 for(int i = 0; i < num_block; ++i) 
                     dT[i] = blockEnds[i] - blockStarts[i]; 
 
-                // interpolate onto regular 0.5 ns timestep
+                // create graph of calibrated trace
                 TGraph* gr = new TGraph(total_samples, &tmpT[0], &tmpV[0]); 
+                
+                // interpolate onto regular 0.5 ns timestep
                 const double dt = 0.5; // ns
                 TGraph* grInt = FFTtools::getInterpolatedGraph(gr, dt);
                 const int len = grInt->GetN();
@@ -1550,7 +1565,7 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 
                 // transform to frequency space 
                 FFTWComplex* spec = FFTtools::doFFT(len, trace);                
- 
+
                 // get spectrum data to fit and precalculate constants for fit
                 const int nFreq = len/2+1;
                 const double dFreq = 1./dt/len; // GHz
@@ -1592,6 +1607,7 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 // we do this by minimizing the squared error between the low passed spectrum and the block offsets
                 // this can be done by solving a matrix equation, so we start by setting that up
                 // note that the squared error has been simplified here so it can be written directly in terms of real numbers
+                
                 TMatrixDSym M(num_block);
                 TVectorD b(num_block);
                 for(int b1 = 0; b1 < num_block; ++b1) {
@@ -1610,13 +1626,21 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                     for(int i = 0; i < nAngFreq; ++i)
                         valb += specMag[i] * constMag[b1][i] * TMath::Cos(specPhase[i] - constPhase[b1][i]);
                     b(b1) = valb;
-                }               
-
+                }              
+                
                 // now we solve the equation M*A = b, where A is a vector of block offset amplitudes
-                TDecompSVD svd(M);
+                
+                //TDecompSVD svd(M);
+                //Bool_t ok;
+                //const TVectorD A = svd.Solve(b, ok);
+                TDecompChol chol(M); // fast, but requires M be positive-definite (which should be the case here)
                 Bool_t ok;
-                const TVectorD A = svd.Solve(b, ok);
-            
+                const TVectorD A = chol.Solve(b, ok);
+                if(!ok)
+                    // if this ever happens, its possible the matrix M is somehow not positive definite,
+                    // in which case we can just switch TDecompChol to TDecompSVD above (will be a bit slower but workable)
+                    throw std::runtime_error("Block offsets could not be solved for!"); 
+
                 // cleanup
                 delete gr;
                 delete grInt;
@@ -1637,7 +1661,6 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                                                        voltMapIt->second.end(), 0.0) / (double)total_samples;
                 for(int i = 0; i < total_samples; ++i)
                     voltMapIt->second[i] += oldMean - newMean;
-                    
             } 
         }
     }
