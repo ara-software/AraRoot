@@ -43,6 +43,7 @@ namespace AraCalType {
         kLatestCalib                    = 0x09, ///< Currenly this is kSecondCalibPlusCables
         kLatestCalib14to20_Bug          = 0x0A, ///<new calibration type: everything except voltage calibration. Will reproduce "kLatestCalib" bug present from between ~2014 to September 2020. Use with caution!
         kLatestCalibWithOutZeroMean     = 0x0B, ///< Performs kLatestCalib except the ADC and Voltage zero meaning, 19-12-2021 -MK-
+        kLatestCalib_NoBlockCorrection  = 0x0C, ///< Performs kLatestCalib except the block offset correction
         
         /*!
             Useful CalType for raw data debugging, 19-12-2021 -MK- 
@@ -54,14 +55,14 @@ namespace AraCalType {
             ~WithOut1stBlockAndBadSamples:  Remove 1st block and bad samples by applying TrimFirstBlock(), TimingCalibrationAndBadSampleReomval(), and ApplyCableDelay() 
                                             The number of samples and time width betweens samples will be the same as fully calibrated WF (kLatestCalib). So, users can easy to compare with it.  
         */ 
-        kOnlyPed                             = 0X0C, 
-        kOnlyPedWithOut1stBlock              = 0x0D, ///< It is useful when user makes pedestal by their own custom repeder scripts
-        kOnlyPedWithOut1stBlockAndBadSamples = 0x0E,
-        kOnlyADC                             = 0x0F, ///< Same as kNoCalib
-        kOnlyADCWithOut1stBlock              = 0x10,
-        kOnlyADCWithOut1stBlockAndBadSamples = 0x11,
-        kJustPedWithOut1stBlock              = 0x12, ///< subtract peds and remove first block , 05-03-2022 -MK-
-        kJustPedWithOut1stBlockAndBadSamples = 0x13, ///< subtract peds and remove first block and bad sampeles. useful for checking the wf that has large offet from ped
+        kOnlyPed                             = 0X0D, 
+        kOnlyPedWithOut1stBlock              = 0x0E, ///< It is useful when user makes pedestal by their own custom repeder scripts
+        kOnlyPedWithOut1stBlockAndBadSamples = 0x0F,
+        kOnlyADC                             = 0x10, ///< Same as kNoCalib
+        kOnlyADCWithOut1stBlock              = 0x11,
+        kOnlyADCWithOut1stBlockAndBadSamples = 0x12,
+        kJustPedWithOut1stBlock              = 0x13, ///< subtract peds and remove first block , 05-03-2022 -MK-
+        kJustPedWithOut1stBlockAndBadSamples = 0x14, ///< subtract peds and remove first block and bad sampeles. useful for checking the wf that has large offet from ped
 
         /*! 
             Get sample index. 
@@ -70,12 +71,12 @@ namespace AraCalType {
             and debug which elements of timing / voltage calibration were used to calibrate the event
             26-11-2022 -MK-
         */
-        kOnlySamp                             = 0x14,
-        kOnlySampWithOut1stBlock              = 0x15,
-        kOnlySampWithOut1stBlockAndBadSamples = 0x16,
+        kOnlySamp                             = 0x15,
+        kOnlySampWithOut1stBlock              = 0x16,
+        kOnlySampWithOut1stBlockAndBadSamples = 0x17,
 
         //! full calibration without 1st block triming, 06-02-2023 -MK-
-        kLatestCalibWithOutTrimFirstBlock     = 0x17   
+        kLatestCalibWithOutTrimFirstBlock     = 0x18,   
 
 
     } AraCalType_t;
