@@ -1,4 +1,4 @@
-RunNo,Config,RepYear,,TriggerWindow,ReadoutWindow
+RunNo,Config,RepYear,TriggerWindow,ReadoutWindow
 0,1,2018,30,28
 3286,2,2018,30,28
 3507,3,2018,35,28
