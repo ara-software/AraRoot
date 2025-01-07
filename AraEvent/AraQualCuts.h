@@ -60,6 +60,12 @@ class AraQualCuts
         int getLivetimeConfigurationYear(const int configNumber, int stationId);
         int getLivetimeConfigurationYear(const int configNumber, RawAtriStationEvent *realEvent)
           { return getLivetimeConfigurationYear(configNumber, realEvent->getStationId()); }
+        int getLivetimeConfigurationTriggerWindow(const int configNumber, int stationId);
+        int getLivetimeConfigurationTriggerWindow(const int configNumber, RawAtriStationEvent *realEvent)
+          { return getLivetimeConfigurationTriggerWindow(configNumber, realEvent->getStationId()); }
+        int getLivetimeConfigurationReadoutWindow(const int configNumber, int stationId);
+        int getLivetimeConfigurationReadoutWindow(const int configNumber, RawAtriStationEvent *realEvent)
+          { return getLivetimeConfigurationReadoutWindow(configNumber, realEvent->getStationId()); }
  
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
@@ -69,6 +75,8 @@ class AraQualCuts
         std::vector<int> configStart;
         std::vector<int> configNum;
         std::vector<int> repYear;
+        std::vector<int> trigWindow;
+        std::vector<int> readoutWindow;
 
         void loadLivetimeConfiguration(int stationId);
 };
