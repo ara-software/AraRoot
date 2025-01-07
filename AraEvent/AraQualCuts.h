@@ -55,17 +55,9 @@ class AraQualCuts
         TGraph* getRollingMean(TGraph *grInt, int samplePerBlock); ///< gets the rolling average of a waveform
 
         int getLivetimeConfiguration(const int runNumber, int stationId);
-        int getLivetimeConfiguration(const int runNumber, RawAtriStationEvent *realEvent)
-          { return getLivetimeConfiguration(runNumber, realEvent->getStationId()); }
         int getLivetimeConfigurationYear(const int configNumber, int stationId);
-        int getLivetimeConfigurationYear(const int configNumber, RawAtriStationEvent *realEvent)
-          { return getLivetimeConfigurationYear(configNumber, realEvent->getStationId()); }
         int getLivetimeConfigurationTriggerWindow(const int configNumber, int stationId);
-        int getLivetimeConfigurationTriggerWindow(const int configNumber, RawAtriStationEvent *realEvent)
-          { return getLivetimeConfigurationTriggerWindow(configNumber, realEvent->getStationId()); }
         int getLivetimeConfigurationReadoutWindow(const int configNumber, int stationId);
-        int getLivetimeConfigurationReadoutWindow(const int configNumber, RawAtriStationEvent *realEvent)
-          { return getLivetimeConfigurationReadoutWindow(configNumber, realEvent->getStationId()); }
  
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
