@@ -1537,6 +1537,10 @@ void AraEventCalibrator::CorrectBlockOffset(UsefulAtriStationEvent *theEvent, st
                 std::vector<double> tmpT(timeMapIt->second.begin(), timeMapIt->second.end());
                 std::vector<double> tmpV(voltMapIt->second.begin(), voltMapIt->second.end());
 
+                // check that we have some data points to work with
+                if(tmpT.size() == 0)
+                  continue;
+
                 // find block edges
                 std::vector<double> blockStarts; // times of the block starts
                 std::vector<double> blockEnds; // times of the block ends

@@ -15,6 +15,7 @@ END="\033[0m"
 #This is where we handle arguments passed to the script
 #0  Re-build programs and libraries that have been modified since last build
 #1  Complete re-build -- remove everything from the build directory and start over
+#2  Complete re-build, but with a debug build
 #99 De-bugging - build verbosely
 
 MODE=$1
@@ -75,13 +76,17 @@ mkdir -p $ARA_ROOT_DIR/build #make this directory if it doesn't exist already (i
 cd $ARA_ROOT_DIR/build
 
 #This forces a complete re-build
-if [ $MODE == 1 ] || [ $MODE == 99 ] ; then
-#    echo "Passed the test Mode == 1 or 99"
+if [ $MODE == 1 ] || [ $MODE == 2] || [ $MODE == 99 ] ; then
+#    echo "Passed the test Mode == 1, 2, or 99"
     rm -r $ARA_ROOT_DIR/build/*
 fi
 
 #Now we run cmake to produce the makefiles. The install prefix is where things will be installed to.
-cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
+if [ $MODE == 2 ] ; then
+    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR} -DCMAKE_BUILD_TYPE=DEBUG
+else
+    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
+fi
 
 if [ $MODE == 99 ] ; then
     make VERBOSE=1
