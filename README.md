@@ -48,6 +48,7 @@ ARA ROOT based software, AraRoot, comprises several libraries and executables.
 4. Do `bash INSTALL.sh <MODE>` in the directory of the source code (i.e. in `ARA_ROOT_DIR`) - cmake will take care of the rest. <MODE> should be one of the following:
   - 0 - re-build bins / libs that have been modified
   - 1 - re-build all
+  - 2 - re-build all, but with a debug build
   - 99 - re-build debugging mode - this will produce more verbose output from the build process
 
 ## Adding Your Own Analysis Code to the CMake build structure
