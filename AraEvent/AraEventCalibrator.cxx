@@ -973,9 +973,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     Double_t unixtime = theEvent->unixTime; ///< The unixtime line was added by UAL 01/26/2019.
     std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
     std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
-    std::vector<std::vector<int> > sampleList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
-    std::vector<std::vector<int> > blockList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample block numbers
-    std::vector<std::vector<int> > capArrayList(DDA_PER_ATRI, std::vector<int>(0)); ///< pointer for 'block number' modulo 2
+    std::vector<std::vector<int> > sampleList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< for WF sample numbers
+    std::vector<std::vector<int> > blockList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< for WF sample block numbers
+    std::vector<std::vector<int> > capArrayList(DDA_PER_ATRI, std::vector<int>(0)); ///< for 'block number' modulo 2
     Bool_t hasTrimFirstBlk = false;
     Bool_t hasTimingCalib = false; 
 
