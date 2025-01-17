@@ -973,9 +973,9 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     Double_t unixtime = theEvent->unixTime; ///< The unixtime line was added by UAL 01/26/2019.
     std::map< Int_t, std::vector <Double_t> >::iterator timeMapIt;
     std::map< Int_t, std::vector <Double_t> >::iterator voltMapIt;
-    std::vector<std::vector<int> > *sampleList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
-    std::vector<std::vector<int> > *blockList = new std::vector<std::vector<int> >(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
-    std::vector<std::vector<int> > *capArrayList = new std::vector<std::vector<int> >(DDA_PER_ATRI, std::vector<int>(0)); ///< pointer for 'block number' modulo 2
+    std::vector<std::vector<int> > sampleList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample numbers
+    std::vector<std::vector<int> > blockList(CHANNELS_PER_ATRI, std::vector<int>(0)); ///< pointer for WF sample block numbers
+    std::vector<std::vector<int> > capArrayList(DDA_PER_ATRI, std::vector<int>(0)); ///< pointer for 'block number' modulo 2
     Bool_t hasTrimFirstBlk = false;
     Bool_t hasTimingCalib = false; 
 
@@ -992,7 +992,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     }
 
     //! 3rd step. Converts DAQ data format to Electronic channel format
-    UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList);
+    UnpackDAQFormatToElecChanFormat(theEvent, voltMapIt, timeMapIt, &sampleList, &blockList, &capArrayList);
 
     /*! 
     4th step. Common mode
@@ -1013,18 +1013,18 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! 5th step. Erase first block that currupted by trigger
     //! Apply conditioner function here
     if(hasTrimFirstBlock(calType)) {
-        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList, hasTimingCalib);
+        hasTrimFirstBlk = TrimFirstBlock(theEvent, voltMapIt, timeMapIt, &sampleList, &blockList, &capArrayList, hasTimingCalib);
     }
 
     //! 6th step. Timing calibration and bad sample removal
     //! This step calibrates the time of each sample and only selecting the samples that have good performance
     if(hasBinWidthCalib(calType)){ 
-        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, sampleList, blockList, capArrayList, hasTrimFirstBlk);    
+        hasTimingCalib = TimingCalibrationAndBadSampleReomval(theEvent, voltMapIt, timeMapIt, &sampleList, &blockList, &capArrayList, hasTrimFirstBlk);    
     }
     
     //! 7th step. Pedestal subtraction
     if(hasPedestalSubtraction(calType)) {
-        PedestalSubtraction(theEvent, voltMapIt, sampleList, calType);
+        PedestalSubtraction(theEvent, voltMapIt, &sampleList, calType);
     }
     
     /*!
@@ -1060,12 +1060,12 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         Station A1 followed same calibration procedure as A4 and A5. Not applying zero-mean for A1 (stationID 100) --Mohammad
     */ //do not zero mean if station==4, station==5 
     if(hasADCZeroMean(calType) && thisStationId != 5 && thisStationId != 4 && thisStationId != 100) {
-        ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
+        ApplyZeroMean(theEvent, voltMapIt, &capArrayList, hasTrimFirstBlk, hasTimingCalib);
     }
 
     //! 9th step. Voltage calibration
     if(hasVoltCal(calType)) {
-        VoltageCalibration(theEvent, voltMapIt, sampleList, thisStationId);
+        VoltageCalibration(theEvent, voltMapIt, &sampleList, thisStationId);
     }
    
     /*! 
@@ -1078,7 +1078,7 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
         In the future, we might need to re-perform calibration to get a better conversion factor
     */
     if(hasVoltZeroMean(calType)) {
-        ApplyZeroMean(theEvent, voltMapIt, capArrayList, hasTrimFirstBlk, hasTimingCalib);
+        ApplyZeroMean(theEvent, voltMapIt, &capArrayList, hasTrimFirstBlk, hasTimingCalib);
     }
 
     //! 11th step. Inverts only RF channels = 0,4,8 in A3
@@ -1097,15 +1097,13 @@ void AraEventCalibrator::calibrateEvent(UsefulAtriStationEvent *theEvent, AraCal
     //! 13th step. Block offset correction
     //! This step corrects any remaining offset between blocks
     if(hasBlockOffsetCorrection(calType)) {
-        CorrectBlockOffset(theEvent, voltMapIt, timeMapIt, blockList);
+        CorrectBlockOffset(theEvent, voltMapIt, timeMapIt, &blockList);
     } 
    
     //! extra step. return sample index
     if(hasSampleIndex(calType)){
-        ReturnSampleIndex(theEvent, voltMapIt, sampleList);
+        ReturnSampleIndex(theEvent, voltMapIt, &sampleList);
     }
- 
-    delete sampleList, capArrayList, blockList; ///< delete the pointer
 
     // fprintf(stderr, "AraEventCalibrator::CalibrateEvent() -- finished calibrating event\n");//DEBUG                        
 }
