@@ -76,7 +76,7 @@ mkdir -p $ARA_ROOT_DIR/build #make this directory if it doesn't exist already (i
 cd $ARA_ROOT_DIR/build
 
 #This forces a complete re-build
-if [ $MODE == 1 ] || [ $MODE == 2] || [ $MODE == 99 ] ; then
+if [ $MODE == 1 ] || [ $MODE == 2 ] || [ $MODE == 99 ] ; then
 #    echo "Passed the test Mode == 1, 2, or 99"
     rm -r $ARA_ROOT_DIR/build/*
 fi
