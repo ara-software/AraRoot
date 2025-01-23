@@ -20,7 +20,9 @@
 #include "RaySolver.h"
 #include "Settings.h"
 
-std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel);
+int year=2018;
+
+std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel, int year);
 void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir);
 Position CalculateStationCOG(std::map<int, Position> antennaLocations);
 void CalculateArrivalInformation(
@@ -49,13 +51,12 @@ int main(int argc, char **argv)
     int unixTime = 0;
     int numAntennas = 16;
 
-
     std::string tempFileName = "temp.txt"; // the tables don't exist yet, so we feed it a dummy path
     RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas, 
         radius, angular_size, tempFileName, tempFileName
     );
 
-    CalculateTables(theCorrelator, 0, iceModelidx, argv[3]);
+    CalculateTables(theCorrelator, 0, iceModelidx, argv[3]);  //Useful atri error pops up here
     CalculateTables(theCorrelator, 1, iceModelidx, argv[3]);
 
 }
@@ -112,19 +113,19 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     IceModel *iceModel = new IceModel(0 + 1*10, 0, 0);
 
     // get the antenna locations in a way that AraSim likes
-    std::map<int, Position> antennaLocations = GetAntLocationsInEarthCoords(theCorrelator->GetStationID(), iceModel);
-    Position stationCOG = CalculateStationCOG(antennaLocations);
+    std::map<int, Position> antennaLocations = GetAntLocationsInEarthCoords(theCorrelator->GetStationID(), iceModel, year);
+    Position stationCOG = CalculateStationCOG(antennaLocations);  //UsefulAtri error happens here
 
     // setup a ray solver
     RaySolver *raySolver = new RaySolver;
 
     // and settings
     Settings *settings = new Settings();
-    
+
     // turn up the accuracy on the ray solving
     settings->Z_THIS_TOLERANCE = 1;
     settings->Z_TOLERANCE = 0.05;
-    
+
     settings->NOFZ=1; // make sure n(z) is turned on
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
 
@@ -238,7 +239,7 @@ void CalculateArrivalInformation(
     }
 }
 
-std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel){
+std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel, int year=2011){
 
     // store all of the locations
     std::map<int, Position> antennaLocations;
@@ -255,7 +256,7 @@ std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceM
     AraGeomTool *geomTool = AraGeomTool::Instance();
     for(int ch=0; ch<16; ch++){
         Position temp;
-        double *antLocation = geomTool->getStationInfo(station)->getAntennaInfo(ch)->antLocation;
+        double *antLocation = geomTool->getStationInfo(station, year)->getAntennaInfo(ch)->antLocation;  //Useful atri error happens here
         temp.SetXYZ(antLocation[0]+core_x, antLocation[1]+core_y, antLocation[2]);
         antennaLocations[ch] = temp;
 

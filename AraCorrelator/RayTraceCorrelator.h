@@ -191,7 +191,8 @@ class RayTraceCorrelator : public TObject
             int stationID,
             AraGeomTool *geomTool,
             AraAntPol::AraAntPol_t polarization, 
-            std::vector<int> excludedChannels = {}
+            std::vector<int> excludedChannels = {},
+            int year=2011
         );
 
 

@@ -52,7 +52,8 @@ class AraGeomTool
         AraStationInfo *LoadSQLDbAtri(Int_t unixtime, AraStationId_t stationId);
 
         // Added ifile argument by UAL 02/27/2019
-        AraStationInfo *getStationInfo(AraStationId_t stationId,Int_t DByear=0); ///< Would like to make this const but for now this is fine
+        // AraStationInfo *getStationInfo(AraStationId_t stationId,Int_t DByear=0); ///< Would like to make this const but for now this is fine
+        AraStationInfo *getStationInfo(AraStationId_t stationId,Int_t DByear=2018);  //Testing setting this to 2018 values as default. - JCF 8/24/2024
 
         // Utility functions to do with the different stations
         static bool isIcrrStation(AraStationId_t stationId); ///< Returns TRUE if the station is an ICRR station and false otherwise

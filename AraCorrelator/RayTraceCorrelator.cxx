@@ -223,12 +223,13 @@ std::map< int, std::vector<int> > RayTraceCorrelator::SetupPairs(
     int stationID,
     AraGeomTool *geomTool,
     AraAntPol::AraAntPol_t polSelection,
-    std::vector<int> excludedChannels){
+    std::vector<int> excludedChannels,
+    int year){
     
     // first, figure out what set of antennas is viable to form pairs
     std::vector < int > viableAntennas;
     
-    auto araStationInfo = geomTool->getStationInfo(stationID);
+    auto araStationInfo = geomTool->getStationInfo(stationID, year);
     for(int ant=0; ant<this->numAntennas_; ant++){
 
         // first, check if this event is allowed
