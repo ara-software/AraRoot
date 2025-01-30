@@ -1812,6 +1812,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
         char errMsg[500];
         sprintf(errMsg, "%s -- no pedFile passed! A pedestal file must be passed.", __FUNCTION__);
         sprintf(errMsg, "%s\n\tIt is best-practice to use a run-specific pedestal file, but ''default'' pedestals are available (use with caution): %s", errMsg, fAtriPedFile[calibIndex]);
+        sprintf(errMsg, "%s\n\tPedestal files can be set using AraEventCalibrator::setAtriPedFile(pedFile, stationId) in an AraEventCalibrator instance.", errMsg);
         throw std::runtime_error(errMsg);
     }
     

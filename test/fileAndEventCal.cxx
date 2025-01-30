@@ -4,6 +4,7 @@
 
 #include "RawAtriStationEvent.h"
 #include "UsefulAtriStationEvent.h"
+#include "AraEventCalibrator.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -47,6 +48,31 @@ int main(int argc, char **argv){
 		printf("Number of events is %d (%d expected). Test will fail.",numEntries, numEntries_expected);
 		exit(-1);
 	}
+
+  // get stationId
+  eventTree->GetEntry(0);
+  int stationId = rawEvent->stationId;
+
+  // guess where the default pedestal is 
+  char ped_file_name[500];
+  char calibDir[FILENAME_MAX];
+  char *calibEnv=getenv("ARA_CALIB_DIR");
+  if(!calibEnv) {
+      char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+      if(!utilEnv) {
+          sprintf(calibDir,"calib");
+      } else {
+          sprintf(calibDir,"%s/share/araCalib",utilEnv);
+      }
+  }
+  else {
+      strncpy(calibDir,calibEnv,FILENAME_MAX);
+  }
+  sprintf(ped_file_name,"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
+  
+  // pass the default pedestal for this test     
+  AraEventCalibrator* calibrator = AraEventCalibrator::Instance();
+  calibrator->setAtriPedFile(ped_file_name, stationId); 
 
 	// make sure that when we get a fully calibrated event, the mean of every waveform is zero
 	for(int event=0; event<numEntries; event++){
