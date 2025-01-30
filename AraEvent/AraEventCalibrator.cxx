@@ -1783,12 +1783,12 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
     if(fGotAtriPedFile[calibIndex]==1){
         if(!fileExists(fAtriPedFile[calibIndex])){
             char errMsg[500];
-            sprintf(errMsg, "%s -- pedFile does not exist!\n", __FUNCTION__);
+            sprintf(errMsg, "%s -- pedFile %s does not exist!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
             throw std::runtime_error(errMsg);
         }
         else if(numberOfPedestalValsInFile(fAtriPedFile[calibIndex]) != RFCHAN_PER_DDA*DDA_PER_ATRI*BLOCKS_PER_DDA*SAMPLES_PER_BLOCK){
             char errMsg[500];
-            sprintf(errMsg, "%s -- pedFile has too few values!\n", __FUNCTION__);
+            sprintf(errMsg, "%s -- pedFile %s has too few values!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
             throw std::runtime_error(errMsg);
         }
     }
