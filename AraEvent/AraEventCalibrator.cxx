@@ -1779,43 +1779,41 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
       }
     }
 
+    // if there's a ped file set, make sure it seems okay to use
     if(fGotAtriPedFile[calibIndex]==1){
         if(!fileExists(fAtriPedFile[calibIndex])){
-            fGotAtriPedFile[calibIndex]=0;
-            fprintf(stderr, "%s -- pedFile does not exist!\n", __FUNCTION__);
+            char errMsg[500];
+            sprintf(errMsg, "%s -- pedFile %s does not exist!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
+            throw std::runtime_error(errMsg);
         }
         else if(numberOfPedestalValsInFile(fAtriPedFile[calibIndex]) != RFCHAN_PER_DDA*DDA_PER_ATRI*BLOCKS_PER_DDA*SAMPLES_PER_BLOCK){
-            fGotAtriPedFile[calibIndex]=0;
-            fprintf(stderr, "%s -- pedFile has too few values!\n", __FUNCTION__);
+            char errMsg[500];
+            sprintf(errMsg, "%s -- pedFile %s has too few values!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
+            throw std::runtime_error(errMsg);
         }
     }
 
+    // if there's no ped file set, point user to likely place to find default pedestals
     if(fGotAtriPedFile[calibIndex]==0){
-        char *pedFileEnv = getenv( "ARA_ATRI_PEDESTAL_FILE" );
-        if ( pedFileEnv == NULL ) {
-            char calibDir[FILENAME_MAX];
-            char *calibEnv=getenv("ARA_CALIB_DIR");
-            if(!calibEnv) {
-                char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
-                if(!utilEnv) {
-                    sprintf(calibDir,"calib");
-                    // fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ./calib]");
-                } else {
-                    sprintf(calibDir,"%s/share/araCalib",utilEnv);
-                    // fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_UTIL_INSTALL_DIR/share/calib]");
-                }
+        char calibDir[FILENAME_MAX];
+        char *calibEnv=getenv("ARA_CALIB_DIR");
+        if(!calibEnv) {
+            char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+            if(!utilEnv) {
+                sprintf(calibDir,"calib");
+            } else {
+                sprintf(calibDir,"%s/share/araCalib",utilEnv);
             }
-            else {
-                strncpy(calibDir,calibEnv,FILENAME_MAX);
-                // fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_CALIB_DIR]");
-            }
-            sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
-            // fprintf(stdout," = %s\n",fAtriPedFile[calibIndex]);
-        } // end of IF-block for pedestal file not specified by environment variable
+        }
         else {
-            strncpy(fAtriPedFile[calibIndex],pedFileEnv,FILENAME_MAX);
-            // fprintf(stdout,"AraEventCalibrator::loadAtriPedestals(): INFO - Pedestal file [from ARA_ONE_PEDESTAL_FILE] = %s\n",fAtriPedFile[calibIndex]);
-        } // end of IF-block for pedestal file specified by environment variable
+            strncpy(calibDir,calibEnv,FILENAME_MAX);
+        }
+        sprintf(fAtriPedFile[calibIndex],"%s/ATRI/araAtriStation%iPedestals.txt",calibDir, stationId);
+        char errMsg[500];
+        sprintf(errMsg, "%s -- no pedFile passed! A pedestal file must be passed.", __FUNCTION__);
+        sprintf(errMsg, "%s\n\tIt is best-practice to use a run-specific pedestal file, but ''default'' pedestals are available (use with caution): %s", errMsg, fAtriPedFile[calibIndex]);
+        sprintf(errMsg, "%s\n\tPedestal files can be set using AraEventCalibrator::setAtriPedFile(pedFile, stationId) in an AraEventCalibrator instance.", errMsg);
+        throw std::runtime_error(errMsg);
     }
     
     // Pedestal file
