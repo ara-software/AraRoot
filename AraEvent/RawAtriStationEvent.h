@@ -67,7 +67,7 @@ class RawAtriStationEvent: public RawAraStationEvent
 
    Int_t getFirstCapArray(Int_t dda); ///< Function for asking the block vector the capArray
    bool isCalpulserEvent(); ///< Uses the timeStamp (from Rubidium clock) to decide whether an event is from a local in-ice calpulser
-   bool isPATrigger(){return !isRFTrigger() && !isSoftwareTrigger();}; ///< Infers external PA trigger from lack of trigger tag (really only for A5) 
+   bool isPATrigger(){return !isRFTrigger() && !isSoftwareTrigger();}; ///< Infers an external trigger from lack of trigger tag (only known use-case is for A5 triggers from the PA) 
    
    Bool_t isTrigType(Int_t bit); ///< Was this trigger bit set? bit0 - RF0 Trigger (Deep Antennas), bit1 - RF1 Trigger (Surface Antennas), bit2 - Software trigger
 
