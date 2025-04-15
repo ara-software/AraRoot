@@ -496,7 +496,7 @@ insert into ARA03 VALUES(19, "S4", "SA4", "kSurface",
 0,0,0,25,116,0);
 
 --Update by UAL (01/25/2018). Here I have made the ARA03 2018 table where the channel mappings for channel 2 and channel 3 have been corrected. The correction has been by essentially switching the daqChanNum variable values between them. ARA02 did not have problems for channel mapping.
---Update by MSM (04/15/2025). Switch electric channels for RF channel mapping. See DocDB https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=3332
+--Update by MSM (04/15/2025). Switched electric channels for RF to fix flipped channel mapping between top & bottom HPols on string 3 (RF chans 10 & 14). See DocDB https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=3332
 ----------------------------------------------------------------------------------------
 
 
