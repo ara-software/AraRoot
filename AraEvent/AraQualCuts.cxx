@@ -419,7 +419,7 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
       stationId = 1;
     
     int start, config, year;
-    int trigWin, readoutWin;
+    int trigWin, readoutWin, preTrigWin;
 
     configStart.clear();
     configNum.clear();
@@ -454,6 +454,7 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
       year = std::stoi(words[2]);     
       trigWin = std::stoi(words[3]);
       readoutWin = std::stoi(words[4]);
+      preTrigWin = std::stoi(words[5]);
  
       // check for unexpected data types
       //// check for entries like: "1.5" and "11x" that might have silently converted to int
@@ -461,11 +462,12 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
           std::to_string(config) != words[1] ||
           std::to_string(year) != words[2] ||
           std::to_string(trigWin) != words[3] ||
-          std::to_string(readoutWin) != words[4]) // should be able to convert back fine if this was an integer
+          std::to_string(readoutWin) != words[4] || 
+          std::to_string(preTrigWin) != words[5]) // should be able to convert back fine if this was an integer
         throw std::runtime_error("Unexpected data type in livetime config log file! \
                                  \nSee AraEvent/livetimeConfigs/README.md");
       //// check for negative entries
-      if(start < 0 || config < 0 || year < 0 || trigWin < 0 || readoutWin < 0)
+      if(start < 0 || config < 0 || year < 0 || trigWin < 0 || readoutWin < 0 || preTrigWin < 0)
         throw std::runtime_error("Livetime config log file has a negative entry! \
                                  \nSee AraEvent/livetimeConfigs/README.md");
 
@@ -475,12 +477,32 @@ void AraQualCuts::loadLivetimeConfiguration(int stationId)
       repYear.push_back(year);
       trigWindow.push_back(trigWin);
       readoutWindow.push_back(readoutWin);
+      preTrigWindow.push_back(preTrigWin);
     }
     configLogFile.close();
 
     loadedStationId = stationId;
 
     return;
+}
+
+//! Returns the index for the requested configNumber 
+/*!
+    \param configNumber the station run number
+    \return vector index where info can be found for the request configNumber 
+*/
+int AraQualCuts::getConfigIndex(const int configNumber) 
+{
+    // find the right configuration
+    int configIdx = -1;
+    for(unsigned int i = 0; i < configNum.size(); ++i) {
+      if(configNum[i] == configNumber) {
+        configIdx = i;
+        break;
+      }
+    }
+
+    return configIdx;
 }
 
 //! Returns the livetime configuration number corresponding to a given run number and station 
@@ -534,14 +556,11 @@ int AraQualCuts::getLivetimeConfigurationYear(const int configNumber, int statio
       loadLivetimeConfiguration(stationId);
 
     // find the right configuration
-    int year = -1;
-    for(unsigned int i = 0; i < configNum.size(); ++i) {
-      if(configNum[i] == configNumber)
-        year = repYear[i];       
-    }
-
-    if(year == -1)
+    const int idx = getConfigIndex(configNumber);
+    if(idx == -1)
       throw std::runtime_error("Livetime configuration year not found!");
+
+    const int year = repYear[idx];
 
     return year;
 }
@@ -559,18 +578,13 @@ int AraQualCuts::getLivetimeConfigurationTriggerWindow(const int configNumber, i
       loadLivetimeConfiguration(stationId);
 
     // find the right configuration
-    int trigWin = -1;
-    for(unsigned int i = 0; i < configNum.size(); ++i) {
-      if(configNum[i] == configNumber)
-        trigWin = trigWindow[i];       
-    }
-
-    if(trigWin == -1)
+    const int idx = getConfigIndex(configNumber);
+    if(idx == -1)
       throw std::runtime_error("Livetime configuration trigger window not found!");
 
+    const int trigWin = trigWindow[idx];
+
     return trigWin;
-
-
 }
 
 //! Returns the typical readout window for a given livetime configuration and station 
@@ -586,17 +600,34 @@ int AraQualCuts::getLivetimeConfigurationReadoutWindow(const int configNumber, i
       loadLivetimeConfiguration(stationId);
 
     // find the right configuration
-    int readoutWin = -1;
-    for(unsigned int i = 0; i < configNum.size(); ++i) {
-      if(configNum[i] == configNumber)
-        readoutWin = readoutWindow[i];       
-    }
-
-    if(readoutWin == -1)
+    const int idx = getConfigIndex(configNumber);
+    if(idx == -1)
       throw std::runtime_error("Livetime configuration readout window not found!");
 
+    const int readoutWin = readoutWindow[idx];
+
     return readoutWin;
+}
 
+//! Returns the typical readout window for a given livetime configuration and station 
+/*!
+    \param configNumber the livetime configuration number
+    \param stationId the station Id number 
+    \return readoutWin the readout window 
+*/
+int AraQualCuts::getLivetimeConfigurationPreTriggerWindow(const int configNumber, int stationId)
+{
 
+    if(configStart.empty() || loadedStationId != stationId)
+      loadLivetimeConfiguration(stationId);
+
+    // find the right configuration
+    const int idx = getConfigIndex(configNumber);
+    if(idx == -1)
+      throw std::runtime_error("Livetime configuration pretrigger window not found!");
+
+    const int preTrigWin = preTrigWindow[idx];
+
+    return preTrigWin;
 }
 

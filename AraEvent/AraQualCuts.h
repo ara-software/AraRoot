@@ -46,7 +46,7 @@ class AraQualCuts
         double _HdeltaT; ///< the recommended interpolation factors for hpol waveforms (at the time of writing)
         double _VOffsetThresh; ///< the offset which will trigger a "bad block" in vpol
         double _HOffsetThresh; ///< the offset which will trigger a "bad block" in hpol
-        int _NumOffsetBlocksCut; ///< numer of channels which must have an offset block to qualify the event as bad
+        int _NumOffsetBlocksCut; ///< number of channels which must have an offset block to qualify the event as bad
         int _OffsetBlocksTimeWindowCut; ///< the coincidence window for offset blocks
         bool hasOffsetBlocks(UsefulAtriStationEvent *realEvent); ///< Detects offset blocks
 
@@ -58,6 +58,7 @@ class AraQualCuts
         int getLivetimeConfigurationYear(const int configNumber, int stationId);
         int getLivetimeConfigurationTriggerWindow(const int configNumber, int stationId);
         int getLivetimeConfigurationReadoutWindow(const int configNumber, int stationId);
+        int getLivetimeConfigurationPreTriggerWindow(const int configNumber, int stationId);
  
     protected:
         static AraQualCuts *fgInstance; // protect against multiple instances
@@ -69,8 +70,10 @@ class AraQualCuts
         std::vector<int> repYear;
         std::vector<int> trigWindow;
         std::vector<int> readoutWindow;
+        std::vector<int> preTrigWindow;
 
         void loadLivetimeConfiguration(int stationId);
+        int getConfigIndex(int configNumber);
 };
 
 #endif //ARAQUALCUTS_H
