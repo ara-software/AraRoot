@@ -1,3 +1,3 @@
-RunNo,Config,RepYear,TriggerWindow,ReadoutWindow
-0,1,2018,30,28
-4049,2,2019,30,28
+RunNo,Config,RepYear,TriggerWindow,ReadoutWindow,PreTriggerWindow
+0,1,2018,30,28,10
+4049,2,2019,30,28,10
