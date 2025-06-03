@@ -1,5 +1,5 @@
 RunNo,Config,RepYear,TriggerWindow,ReadoutWindow,PreTriggerWindow
 0,1,2018,30,28,10
 3286,2,2018,30,28,10
-3851,3,2018,35,32,14
+3852,3,2018,35,32,14
 5278,4,2019,31,32,14
