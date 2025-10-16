@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.5)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(ARAROOT_INSTALL_PATH $ENV{ARA_UTIL_INSTALL_DIR})
 #set(CMAKE_CXX_STANDARD 11) #you may also have to specify that you want C++11 standard
