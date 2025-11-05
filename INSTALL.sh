@@ -83,9 +83,9 @@ fi
 
 #Now we run cmake to produce the makefiles. The install prefix is where things will be installed to.
 if [ $MODE == 2 ] ; then
-    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR} -DCMAKE_BUILD_TYPE=DEBUG
+    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR} -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++) -DCMAKE_BUILD_TYPE=DEBUG
 else
-    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR}
+    cmake ../ -DCMAKE_INSTALL_PREFIX=${ARA_UTIL_INSTALL_DIR} -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
 fi
 
 if [ $MODE == 99 ] ; then
