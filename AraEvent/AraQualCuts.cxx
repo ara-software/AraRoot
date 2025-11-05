@@ -521,7 +521,7 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
     for(unsigned int i = 0; i < configStart.size(); ++i) {
       start = configStart[i];
       if(i+1 == configStart.size()) // if this is the last config start assume all future runs are part of the last config
-        end = int(1e10);
+        end = std::numeric_limits<int>::max();
       else // if this isn't the last config start, assume this config continues until the next config begins 
         end = configStart[i+1]; 
 
