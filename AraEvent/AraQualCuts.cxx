@@ -527,6 +527,8 @@ int AraQualCuts::getLivetimeConfiguration(const int runNumber, int stationId)
 
       if(end <= start) {
         char *utilEnv=getenv("ARA_UTIL_INSTALL_DIR");
+        if(stationId == 100) // set to value actually loaded 
+          stationId = 1;
         char configLogFileName[256];
         sprintf(configLogFileName,"%s/share/livetimeConfigs/a%d_livetimeConfigs.txt",utilEnv,stationId);
         throw std::runtime_error("Something is wrong in the livetime configuration log \
