@@ -1788,7 +1788,7 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
         }
         else if(numberOfPedestalValsInFile(fAtriPedFile[calibIndex]) != RFCHAN_PER_DDA*DDA_PER_ATRI*BLOCKS_PER_DDA*SAMPLES_PER_BLOCK){
             char errMsg[500];
-            sprintf(errMsg, "%s -- pedFile %s has too few values!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
+            sprintf(errMsg, "%s -- pedFile %s has an unexpected number of values!\n", __FUNCTION__, fAtriPedFile[calibIndex]);
             throw std::runtime_error(errMsg);
         }
     }
@@ -1833,11 +1833,14 @@ void AraEventCalibrator::loadAtriPedestals(AraStationId_t stationId)
     // now, we open and load the pedestal files
     gzFile inPed = gzopen(fAtriPedFile[calibIndex], "r");
     std::vector<char> buffer(6000000);
-    int nRead = gzread(inPed, &buffer[0], sizeof(char)*6000000);
+    int nRead = gzread(inPed, buffer.data(), buffer.size());
+    if(nRead < 0) {
+        throw std::runtime_error("Error reading ped file values: "+std::string(fAtriPedFile[calibIndex]));
+    }
 
     // we then put the buffer (which are characters at this point)
     // into a string object that we can manipulate
-    std::string string_buffer(buffer.begin(), buffer.end()); // convert the vector of chars to a string    
+    std::string string_buffer(buffer.data(), nRead); // convert the vector of chars to a string    
     std::stringstream ss(string_buffer);
 
     // to do this, we need "buffer" variables
@@ -2145,14 +2148,19 @@ Int_t AraEventCalibrator::numberOfPedestalValsInFile(char *fileName){
     gzFile inPed = gzopen(fileName, "r");
     if(inPed){
         std::vector<char> buffer(6000000);
-        int nRead = gzread(inPed, &buffer[0], sizeof(char)*6000000);
-        std::string string_buffer(buffer.begin(), buffer.end()); // convert the vector of chars to a string
+        int nRead = gzread(inPed, buffer.data(), buffer.size());
+        if(nRead < 0) {
+            throw std::runtime_error("Error reading ped file: "+std::string(fileName));
+        }
+        std::string string_buffer(buffer.data(), nRead); // convert the vector of chars to a string
         std::stringstream ss(string_buffer); // and then convert the string to a stringstream
 
         std::string dummy;
         while( ss >> dummy >> dummy >> dummy){
             for(int samp=0; samp < SAMPLES_PER_BLOCK; samp++){
-                ss >> dummy;
+                if(!(ss >> dummy)){
+                    break;
+                }
                 numPedVals++;
             }
         }
