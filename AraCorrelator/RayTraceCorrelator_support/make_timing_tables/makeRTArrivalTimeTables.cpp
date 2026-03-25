@@ -69,7 +69,13 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     int numPhiBins = theCorrelator->GetNumPhiBins();
     int numAnts = theCorrelator->GetNumAntennas();
     double radius = theCorrelator->GetRadius();
-    auto templateMap = theCorrelator->GetTemplateMap();
+    auto templateMapWeak = theCorrelator->GetTemplateMap();
+    auto templateMap = templateMapWeak.lock();
+
+    if (!templateMap) {
+        std::cerr << "Error: template map expired or was not initialized.\n";
+        return;
+    }
 
     // need ice model
     IceModel *iceModel = new IceModel(0 + 1*10, 0, 0);
