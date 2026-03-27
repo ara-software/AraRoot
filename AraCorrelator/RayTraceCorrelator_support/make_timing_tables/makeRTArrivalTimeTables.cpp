@@ -69,7 +69,16 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     int numPhiBins = theCorrelator->GetNumPhiBins();
     int numAnts = theCorrelator->GetNumAntennas();
     double radius = theCorrelator->GetRadius();
-    auto templateMap = theCorrelator->GetTemplateMap();
+    // We need to do some gymnastics here with GetTemplateMap()
+    // The compiler complains that GetTemplateMap() is not a raw TH2D, it's a std::weak_ptr<TH2D>
+    // To resolve this, we need to lock the weak pointer into a shared_ptr
+    auto templateMapWeak = theCorrelator->GetTemplateMap();
+    auto templateMap = templateMapWeak.lock();
+
+    if (!templateMap) {
+        std::cerr << "Error: template map expired or was not initialized.\n";
+        return;
+    }
 
     // need ice model
     IceModel *iceModel = new IceModel(0 + 1*10, 0, 0);
