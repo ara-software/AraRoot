@@ -54,7 +54,7 @@ Double_t fSouthPole2011_12[3]={27322.88*fFtInm,-3369.89*fFtInm,-36.02*fFtInm};
 // If you know the true SPT depth in ARA global coordinates, please replace the value
 // below and add a reference.
 
-Double_t fSouthPoleTelescope[3]={24774.18*fFtInm,-871.35*fFtInm,0.305}; // z in meters (tuned offset)
+Double_t fSouthPoleTelescope[3]={24774.18*fFtInm,-871.35*fFtInm,1.000656*fFtInm}; // z in meters (tuned offset)
 
 
 Double_t fICL2011_12[4][3]={{24011.58*fFtInm,-1702.53*fFtInm,0},
