@@ -1,0 +1,17 @@
+log    = /scratch/amachtay/ray_trace_tables/log/$(nodename).log
+output = /scratch/amachtay/ray_trace_tables/out/$(nodename).out
+error  = /scratch/amachtay/ray_trace_tables/err/$(nodename).err
+stream_output = True
+stream_error  = True
+requirements  = has_avx2
+request_cpus  = 1
+request_disk  = 1GB
+request_memory = 1000
+Universe = vanilla
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+
+executable = /home/amachtay/ray_trace_tables/make_tables.sh
+arguments  = $(station) $(outputdir) $(radius) $(systematic)
+
+queue
