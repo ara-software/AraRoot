@@ -14,15 +14,14 @@ systematic=$4
 source ~/.bashrc
 
 ## Get the environment variables necessary for running makeRTArrivalTables
-source /cvmfs/ara.opensciencegrid.org/trunk/alma9/setup.sh
-## We need to point to our AraSim version with the systematics
-export ARA_SIM_DIR="/home/amachtay/5SA_Help/analysis/template_analysis/AraSim/" ## This path is on the systematics branch
-export LD_LIBRARY_PATH="$ARA_SIM_DIR:$ARA_UTIL_INSTALL_DIR/lib:$ARA_DEPS_INSTALL_DIR/lib:$NUPHASE_INSTALL_DIR/lib:$MISC_UTIL_DIR/lib:$ROOT_BUILD_DIR/lib"
-export PATH="$ARA_SIM_DIR:$ARA_UTIL_INSTALL_DIR/bin:$ARA_DEPS_INSTALL_DIR/bin:$NUPHASE_INSTALL_DIR/bin:$MISC_UTIL_DIR/bin:$ROOT_BUILD_DIR/bin:$PATH"
+#source /cvmfs/ara.opensciencegrid.org/trunk/alma9/setup.sh
+### We need to point to our AraSim version with the systematics
+new_ray_tables ## Need to load AraProc, Fivestation, etc. + AraSim on the correct branch
 
-cd /data/user/amachtay/ray_trace_tables/AraRoot/AraCorrelator/RayTraceCorrelator_support/make_timing_tables
 
-./makeRTArrivalTimeTables "${station}" "${radius}" "$outputdir" "${systematic}" 
+cd ~/ray_trace_tables
 
-./makeRTArrivalTimeTables "${station}" 300 "$outputdir" "${systematic}" 
-
+## Cobalt wants you to put outputs on TMPDIR I guess
+## So send it there and copy over 
+./makeRTArrivalTimeTables "${station}" "${radius}" "${TMPDIR}" "${systematic}" 
+cp "${TMPDIR}"/* "${outputdir}"

@@ -3,136 +3,136 @@ CONFIG config.dagman
 ## Station 1
 # Up
 JOB st1_r300_sysup   make_tables.sub
-VARS st1_r300_sysup  nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="300" systematic="1"
+VARS st1_r300_sysup  nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="300" systematic="1"
 
 JOB st1_r40_sysup1   make_tables.sub
-VARS st1_r40_sysup1  nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="48.02" systematic="1"
+VARS st1_r40_sysup1  nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="48.02" systematic="1"
 
 JOB st1_r40_sysup2   make_tables.sub
-VARS st1_r40_sysup2  nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="48.91" systematic="1"
+VARS st1_r40_sysup2  nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="48.91" systematic="1"
 
 # Down
 JOB st1_r300_sysdown make_tables.sub
-VARS st1_r300_sysdown nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
+VARS st1_r300_sysdown nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
 
 JOB st1_r40_sysdown1 make_tables.sub
-VARS st1_r40_sysdown1 nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="48.02" systematic="-1"
+VARS st1_r40_sysdown1 nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="48.02" systematic="-1"
 
 JOB st1_r40_sysdown2 make_tables.sub
-VARS st1_r40_sysdown2 nodename="$(JOB)" station="100" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="48.91" systematic="-1"
+VARS st1_r40_sysdown2 nodename="$(JOB)" station="100" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="48.91" systematic="-1"
 
 ## Station 2
 # Up
 JOB st2_r300_sysup   make_tables.sub
-VARS st2_r300_sysup  nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="300" systematic="1"
+VARS st2_r300_sysup  nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="300" systematic="1"
 
 JOB st2_r40_sysup1   make_tables.sub
-VARS st2_r40_sysup1  nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="42.86" systematic="1"
+VARS st2_r40_sysup1  nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="42.86" systematic="1"
 
 JOB st2_r40_sysup2   make_tables.sub
-VARS st2_r40_sysup2  nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="44.07" systematic="1"
+VARS st2_r40_sysup2  nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="44.07" systematic="1"
 
 JOB st2_r40_sysup3   make_tables.sub
-VARS st2_r40_sysup3  nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="47.51" systematic="1"
+VARS st2_r40_sysup3  nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="47.51" systematic="1"
 
 JOB st2_r40_sysup4   make_tables.sub
-VARS st2_r40_sysup4  nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="47.96" systematic="1"
+VARS st2_r40_sysup4  nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="47.96" systematic="1"
 
 
 # Down
 JOB st2_r300_sysdown make_tables.sub
-VARS st2_r300_sysdown nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
+VARS st2_r300_sysdown nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
 
 JOB st2_r40_sysdown1 make_tables.sub
-VARS st2_r40_sysdown1 nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="42.86" systematic="-1"
+VARS st2_r40_sysdown1 nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="42.86" systematic="-1"
 
 JOB st2_r40_sysdown2 make_tables.sub
-VARS st2_r40_sysdown2 nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="44.07" systematic="-1"
+VARS st2_r40_sysdown2 nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="44.07" systematic="-1"
 
 JOB st2_r40_sysdown3 make_tables.sub
-VARS st2_r40_sysdown3 nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="47.51" systematic="-1"
+VARS st2_r40_sysdown3 nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="47.51" systematic="-1"
 
 JOB st2_r40_sysdown4 make_tables.sub
-VARS st2_r40_sysdown4 nodename="$(JOB)" station="2" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="47.96" systematic="-1"
+VARS st2_r40_sysdown4 nodename="$(JOB)" station="2" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="47.96" systematic="-1"
 
 
 ## Station 3
 # Up
 JOB st3_r300_sysup   make_tables.sub
-VARS st3_r300_sysup  nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="300" systematic="1"
+VARS st3_r300_sysup  nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="300" systematic="1"
 
 JOB st3_r40_sysup1   make_tables.sub
-VARS st3_r40_sysup1  nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="41.08" systematic="1"
+VARS st3_r40_sysup1  nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="41.08" systematic="1"
 
 JOB st3_r40_sysup2   make_tables.sub
-VARS st3_r40_sysup2  nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="41.11" systematic="1"
+VARS st3_r40_sysup2  nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="41.11" systematic="1"
 
 JOB st3_r40_sysup3   make_tables.sub
-VARS st3_r40_sysup3  nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="41.77" systematic="1"
+VARS st3_r40_sysup3  nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="41.77" systematic="1"
 
 JOB st3_r40_sysup4   make_tables.sub
-VARS st3_r40_sysup4  nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="41.90" systematic="1"
+VARS st3_r40_sysup4  nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="41.90" systematic="1"
 
 
 # Down
 JOB st3_r300_sysdown make_tables.sub
-VARS st3_r300_sysdown nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
+VARS st3_r300_sysdown nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
 
 JOB st3_r40_sysdown1 make_tables.sub
-VARS st3_r40_sysdown1 nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="41.08" systematic="-1"
+VARS st3_r40_sysdown1 nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="41.08" systematic="-1"
 
 JOB st3_r40_sysdown2 make_tables.sub
-VARS st3_r40_sysdown2 nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="41.11" systematic="-1"
+VARS st3_r40_sysdown2 nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="41.11" systematic="-1"
 
 JOB st3_r40_sysdown3 make_tables.sub
-VARS st3_r40_sysdown3 nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="41.77" systematic="-1"
+VARS st3_r40_sysdown3 nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="41.77" systematic="-1"
 
 JOB st3_r40_sysdown4 make_tables.sub
-VARS st3_r40_sysdown4 nodename="$(JOB)" station="3" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="41.90" systematic="-1"
+VARS st3_r40_sysdown4 nodename="$(JOB)" station="3" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="41.90" systematic="-1"
 
 
 ## Station 4
 # Up
 JOB st4_r300_sysup   make_tables.sub
-VARS st4_r300_sysup  nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="300" systematic="1"
+VARS st4_r300_sysup  nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="300" systematic="1"
 
 JOB st4_r50_sysup1   make_tables.sub
-VARS st4_r50_sysup1  nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="52.60" systematic="1"
+VARS st4_r50_sysup1  nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="52.60" systematic="1"
 
 JOB st4_r50_sysup2   make_tables.sub
-VARS st4_r50_sysup2  nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="53.18" systematic="1"
+VARS st4_r50_sysup2  nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="53.18" systematic="1"
 
 
 # Down
 JOB st4_r300_sysdown make_tables.sub
-VARS st4_r300_sysdown nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
+VARS st4_r300_sysdown nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
 
 JOB st4_r50_sysdown1 make_tables.sub
-VARS st4_r50_sysdown1 nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="52.60" systematic="-1"
+VARS st4_r50_sysdown1 nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="52.60" systematic="-1"
 
 JOB st4_r50_sysdown2 make_tables.sub
-VARS st4_r50_sysdown2 nodename="$(JOB)" station="4" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="53.18" systematic="-1"
+VARS st4_r50_sysdown2 nodename="$(JOB)" station="4" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="53.18" systematic="-1"
 
 
 ## Station 5
 # Up
 JOB st5_r300_sysup   make_tables.sub
-VARS st5_r300_sysup  nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="300" systematic="1"
+VARS st5_r300_sysup  nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="300" systematic="1"
 
 JOB st5_r50_sysup1   make_tables.sub
-VARS st5_r50_sysup1  nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="49.23" systematic="1"
+VARS st5_r50_sysup1  nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="49.23" systematic="1"
 
 JOB st5_r50_sysup2   make_tables.sub
-VARS st5_r50_sysup2  nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/up" radius="49.29" systematic="1"
+VARS st5_r50_sysup2  nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/up" radius="49.29" systematic="1"
 
 
 # Down
 JOB st5_r300_sysdown make_tables.sub
-VARS st5_r300_sysdown nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
+VARS st5_r300_sysdown nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="300" systematic="-1"
 
 JOB st5_r50_sysdown1 make_tables.sub
-VARS st5_r50_sysdown1 nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="49.23" systematic="-1"
+VARS st5_r50_sysdown1 nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="49.23" systematic="-1"
 
 JOB st5_r50_sysdown2 make_tables.sub
-VARS st5_r50_sysdown2 nodename="$(JOB)" station="5" outputdir="/scratch/amachtay/ray_trace_tables/down" radius="49.29" systematic="-1"
+VARS st5_r50_sysdown2 nodename="$(JOB)" station="5" outputdir="/data/user/amachtay/ray_trace_tables/down" radius="49.29" systematic="-1"
 
