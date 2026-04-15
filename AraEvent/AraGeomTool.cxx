@@ -44,7 +44,19 @@ const Double_t fAU=149597890000; //(in meters)
 // Some locations in ARA global coordinates
 Double_t fSouthPole2010_11[3]={27344.05*fFtInm,-3395.14*fFtInm,-35.63*fFtInm};
 Double_t fSouthPole2011_12[3]={27322.88*fFtInm,-3369.89*fFtInm,-36.02*fFtInm};
-Double_t fSouthPoleTelescope[3]={24774.18*fFtInm,-871.35*fFtInm,-30*fFtInm};  ///< Made up the u-number
+
+// Paramita Dasgupta (PDG): SouthPoleTelescope (SPT) is a surface landmark (array z≈0), but after converting from ARA global
+// (array) coordinates to station-centric coordinates, the station rotation can mix x/y into z. As a result,
+// different surface landmarks can end up with slightly different station-centric z values.
+// We therefore apply a small +array-z offset for SPT so that its station-centric z is small and positive,
+// comparable to ICL
+// Date: 1 April 2026.
+// If you know the true SPT depth in ARA global coordinates, please replace the value
+// below and add a reference.
+
+Double_t fSouthPoleTelescope[3]={24774.18*fFtInm,-871.35*fFtInm,1.000656*fFtInm}; // z in meters (tuned offset)
+
+
 Double_t fICL2011_12[4][3]={{24011.58*fFtInm,-1702.53*fFtInm,0},
                             {24060.51*fFtInm,-1723.09*fFtInm,0},
                             {24049.7*fFtInm,-1749.02*fFtInm,0},
