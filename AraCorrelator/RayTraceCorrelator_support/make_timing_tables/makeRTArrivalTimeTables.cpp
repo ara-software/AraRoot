@@ -51,6 +51,7 @@ int main(int argc, char **argv)
     
     double angular_size = 1.;
     int iceModelidx = 40;
+    // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
     int unixTime = 0;
     int numAntennas = 16;
 
@@ -100,6 +101,7 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     
     settings->NOFZ=1; // make sure n(z) is turned on
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
+    // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
 
     // Make it possible to run with upper/lower bounds of systematic error sources
     if (systematics == 1){
