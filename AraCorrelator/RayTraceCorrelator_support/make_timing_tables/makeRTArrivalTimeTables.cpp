@@ -106,15 +106,15 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     // Make it possible to run with upper/lower bounds of systematic error sources
     if (systematics == 1){
 
-      settings->SYSTEMATICS_nofz_delta_ns = 0.08669;
-      settings->SYSTEMATICS_nofz_delta_nd = 0.05000;
+      settings->SYSTEMATICS_nofz_delta_ns = 0.08368;
+      settings->SYSTEMATICS_nofz_delta_nd = 0.00800;
       settings->SYSTEMATICS_nofz_delta_nc = 0.00040;
 
     }
     else if (systematics == -1){
-      settings->SYSTEMATICS_nofz_delta_ns = -0.08669;
-      settings->SYSTEMATICS_nofz_delta_nd = -0.05000;
-      settings->SYSTEMATICS_nofz_delta_nc = -0.00040;
+      settings->SYSTEMATICS_nofz_delta_ns = -0.16000;
+      settings->SYSTEMATICS_nofz_delta_nd = -0.00600;
+      settings->SYSTEMATICS_nofz_delta_nc = -0.00470;
 
     }
     std::cout << "SYSTEMATICS_nofz_delta_ns: " << settings->SYSTEMATICS_nofz_delta_ns << endl;
