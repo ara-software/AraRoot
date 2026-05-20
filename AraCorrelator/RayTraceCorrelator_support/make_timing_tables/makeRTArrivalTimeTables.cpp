@@ -22,7 +22,7 @@
 #include "Settings.h"
 
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel);
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir);
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics);
 Position CalculateStationCOG(std::map<int, Position> antennaLocations);
 void CalculateArrivalInformation(
     RaySolver *raySolver,
@@ -38,32 +38,34 @@ int main(int argc, char **argv)
 
     gStyle->SetOptStat(0);
     
-    if(argc<4) {
-        std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location>\n";
-        std::cout << "e.g.\n" << argv[0] << " 2 300 /path/to/my/home/dir \n";
+    if(argc<5) {
+        std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location> <systematic> \n";
+        std::cout << "e.g.\n" << argv[0] << " 2 300 /path/to/my/home/dir 0 \n";
         return 0;
     }
 
     int station = atoi(argv[1]);
     double radius = atof(argv[2]);
+    int systematics = atof(argv[4]);
+    std::cout << "Systematics set to: " << systematics << endl;
     
     double angular_size = 1.;
-    int iceModelidx = 50;
+    int iceModelidx = 40;
+    // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
     int unixTime = 0;
     int numAntennas = 16;
-
 
     std::string tempFileName = "temp.txt"; // the tables don't exist yet, so we feed it a dummy path
     RayTraceCorrelator *theCorrelator = new RayTraceCorrelator(station, numAntennas, 
         radius, angular_size, tempFileName, tempFileName
     );
 
-    CalculateTables(theCorrelator, 0, iceModelidx, argv[3]);
-    CalculateTables(theCorrelator, 1, iceModelidx, argv[3]);
+    CalculateTables(theCorrelator, 0, iceModelidx, argv[3], systematics);
+    CalculateTables(theCorrelator, 1, iceModelidx, argv[3], systematics);
 
 }
 
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir){
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics){
 
     int numThetaBins = theCorrelator->GetNumThetaBins();
     int numPhiBins = theCorrelator->GetNumPhiBins();
@@ -99,6 +101,26 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     
     settings->NOFZ=1; // make sure n(z) is turned on
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
+    // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
+    // See here for updated systematic errors: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=3525
+
+    // Make it possible to run with upper/lower bounds of systematic error sources
+    if (systematics == 1){
+
+      settings->SYSTEMATICS_nofz_delta_ns = 0.08368;
+      settings->SYSTEMATICS_nofz_delta_nd = 0.00800;
+      settings->SYSTEMATICS_nofz_delta_nc = 0.00040;
+
+    }
+    else if (systematics == -1){
+      settings->SYSTEMATICS_nofz_delta_ns = -0.16000;
+      settings->SYSTEMATICS_nofz_delta_nd = -0.00600;
+      settings->SYSTEMATICS_nofz_delta_nc = -0.00470;
+
+    }
+    std::cout << "SYSTEMATICS_nofz_delta_ns: " << settings->SYSTEMATICS_nofz_delta_ns << endl;
+    std::cout << "SYSTEMATICS_nofz_delta_nd: " << settings->SYSTEMATICS_nofz_delta_nd << endl;
+    std::cout << "SYSTEMATICS_nofz_delta_nc: " << settings->SYSTEMATICS_nofz_delta_nc << endl;
 
     // open output file BEFORE making root containers
     char fileName[500];
@@ -221,6 +243,7 @@ void CalculateArrivalInformation(
     // outputs holder
     std::vector < std::vector < double > > outputs;
     vector < vector < vector <double> > > RayStep;
+
     raySolver->Solve_Ray(source, target, iceModel, outputs, settings, RayStep);
 
     if ((outputs.size() > 0)) {

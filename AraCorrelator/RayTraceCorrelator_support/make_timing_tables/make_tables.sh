@@ -1,32 +1,27 @@
 #!/bin/bash
-#SBATCH --job-name=makeTables
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --time=04:00:00
-#SBATCH --export=ALL
-#SBATCH --array=0-33
-#SBATCH --output=logs/make_tables_%A_%a.out
-#SBATCH --error=logs/make_tables_%A_%a.err
 
-# this is just an example slurm script of how you might make many
-# of the ray trace timing tables on a cluster
+## We need to pass the following variables:
+# 1. Station number
+# 2. The output directory to store the table in
+# 3. The calpulser distance for the station
+# 4. The systematic error we're including on the ice model
+#	(1 for up, -1 for down, 0 (or anything) for nothing)
+station=$1
+outputdir=$2
+radius=$3
+systematic=$4
 
-# declare -a radii=( 
-#   100. 111.02320645 123.26152371 136.84889595 151.93403228
-#   168.68203434 187.27620324 207.92004576 230.83950166 256.28541651
-#   284.53628709 315.90130945 350.72376298 389.38476746 432.30745428
-#   479.96159749 532.86875528 591.60797831 656.82214716 729.22500848
-#   809.60898669 898.85385677 997.93637312 1107.94095982 1230.07157922
-#  1365.66490893 1516.20497132 1683.33937559 1868.89735029 2074.90976364
-#  2303.63135064 2557.56539037 2839.49110356 3152.49407017 3500.
-# )
+source ~/.bashrc
 
-declare -a radii=(
-  0  150  300  450  600  750  900 1050 1200 1350 1500 1650 1800 1950
- 2100 2250 2400 2550 2700 2850 3000 3150 3300 3450 3600 3750 3900 4050
- 4200 4350 4500 4650 4800 4950
-)
-cd /mnt/home/baclark/ara/araroot_pedloader/src/AraCorrelator/RayTraceCorrelator_support/make_timing_tables
-source /mnt/home/baclark/ara/energy_reco_work/energy_reco/code/env_arasim.py
-# echo ${radii[SLURM_ARRAY_TASK_ID]}
-./makeRTArrivalTimeTables 2 ${radii[SLURM_ARRAY_TASK_ID]} . 
+## Get the environment variables necessary for running makeRTArrivalTables
+#source /cvmfs/ara.opensciencegrid.org/trunk/alma9/setup.sh
+### We need to point to our AraSim version with the systematics
+new_ray_tables ## Need to load AraProc, Fivestation, etc. + AraSim on the correct branch
+
+
+cd ~/ray_trace_tables
+
+## Cobalt wants you to put outputs on TMPDIR I guess
+## So send it there and copy over 
+./makeRTArrivalTimeTables "${station}" "${radius}" "${TMPDIR}" "${systematic}" 
+cp "${TMPDIR}"/* "${outputdir}"
