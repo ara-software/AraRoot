@@ -102,6 +102,7 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
     settings->NOFZ=1; // make sure n(z) is turned on
     settings->RAY_TRACE_ICE_MODEL_PARAMS = iceModelidx; // set the ice model as user requested
     // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
+    // See here for updated systematic errors: https://aradocs.wipac.wisc.edu/cgi-bin/DocDB/ShowDocument?docid=3525
 
     // Make it possible to run with upper/lower bounds of systematic error sources
     if (systematics == 1){
