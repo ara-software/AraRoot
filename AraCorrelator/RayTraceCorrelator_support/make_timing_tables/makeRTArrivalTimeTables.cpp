@@ -60,8 +60,8 @@ int main(int argc, char **argv)
 		if (argc == 6 || argc == 7) {
 				analytic = atof(argv[5]);
 				// Check that analytic option is set correctly
-				if (analytic != 0 || analytic != 1){
-						throw std::invalid_argument("analytic argument (arg 5) must be 0 or 1");
+				if (analytic != 0 && analytic != 1){
+						throw std::invalid_argument("analytic argument (arg 5) must be 0 or 1\n");
 				}
     		std::cout << "Systematics set to: " << systematics << endl;
 		}
