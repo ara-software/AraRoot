@@ -38,27 +38,40 @@ int main(int argc, char **argv)
 
     gStyle->SetOptStat(0);
     
+		// Make sure we have at least as many arguments as needed
     if(argc<5) {
         std::cout << "Usage\n" << argv[0] << " <station> <radius> <output location> <systematic> \n";
         std::cout << "e.g.\n" << argv[0] << " 2 300 /path/to/my/home/dir 0 \n";
         return 0;
     }
 
+		// necessary arguments
     int station = atoi(argv[1]);
     double radius = atof(argv[2]);
+		// argv[3] is the output directory
     int systematics = atof(argv[4]);
-    int analytic = atof(argv[5]);
+		// set ice model and analytic options to default
+		// Then update if the user gave the arguments
+		int analytic = 0; // argv[5]
+		int iceModelidx = 40; // argv[6]
+		// ^ Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
 
-		// Check that analytic option is set correctly
-		if (analytic != 0 || analytic != 1){
-				throw std::invalid_argument("analytic argument (arg 5) must be 0 or 1");
+		// if we get more than 5 (6) arguments, check for analytic (model) set ok
+		if (argc == 6 || argc == 7) {
+				analytic = atof(argv[5]);
+				// Check that analytic option is set correctly
+				if (analytic != 0 || analytic != 1){
+						throw std::invalid_argument("analytic argument (arg 5) must be 0 or 1");
+				}
+    		std::cout << "Systematics set to: " << systematics << endl;
 		}
-    std::cout << "Systematics set to: " << systematics << endl;
-    std::cout << "Analytic set to: " << analytic << endl;
-    
+
+		if (argc == 7) {
+				iceModelidx = atof(argv[6]);
+		}
+		std::cout << "IceModel set to: " << iceModelidx << endl;
+
     double angular_size = 1.;
-    int iceModelidx = 40;
-    // Use 40 for the UNL Modified (PA model). Related slide: https://aradocs.wipac.wisc.edu/docs/0022/002222/001/inIceMC_Hughes_A5locations_10222020.pdf
     int unixTime = 0;
     int numAntennas = 16;
 
