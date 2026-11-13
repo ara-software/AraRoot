@@ -22,7 +22,7 @@
 #include "Settings.h"
 
 std::map<int, Position> GetAntLocationsInEarthCoords(int station, IceModel *iceModel);
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics);
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics, int analytic);
 Position CalculateStationCOG(std::map<int, Position> antennaLocations);
 void CalculateArrivalInformation(
     RaySolver *raySolver,
@@ -47,7 +47,14 @@ int main(int argc, char **argv)
     int station = atoi(argv[1]);
     double radius = atof(argv[2]);
     int systematics = atof(argv[4]);
+    int analytic = atof(argv[5]);
+
+		// Check that analytic option is set correctly
+		if (analytic != 0 || analytic != 1){
+				throw std::invalid_argument("analytic argument (arg 5) must be 0 or 1");
+		}
     std::cout << "Systematics set to: " << systematics << endl;
+    std::cout << "Analytic set to: " << analytic << endl;
     
     double angular_size = 1.;
     int iceModelidx = 40;
@@ -60,12 +67,12 @@ int main(int argc, char **argv)
         radius, angular_size, tempFileName, tempFileName
     );
 
-    CalculateTables(theCorrelator, 0, iceModelidx, argv[3], systematics);
-    CalculateTables(theCorrelator, 1, iceModelidx, argv[3], systematics);
+    CalculateTables(theCorrelator, 0, iceModelidx, argv[3], systematics, analytic);
+    CalculateTables(theCorrelator, 1, iceModelidx, argv[3], systematics, analytic);
 
 }
 
-void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics){
+void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModelidx, const std::string &tableDir, int systematics, int analytic){
 
     int numThetaBins = theCorrelator->GetNumThetaBins();
     int numPhiBins = theCorrelator->GetNumPhiBins();
@@ -94,6 +101,9 @@ void CalculateTables(RayTraceCorrelator *theCorrelator, int solNum, int iceModel
 
     // and settings
     Settings *settings = new Settings();
+
+		// Update setting for analytic vs numerical raytracing
+		settings->ANALYTIC_RAYTRACE_MODE = analytic; 
     
     // turn up the accuracy on the ray solving
     settings->Z_THIS_TOLERANCE = 1;
